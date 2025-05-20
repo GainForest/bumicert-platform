@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import { ArrowUpRight, BadgePlus, Home } from "lucide-react";
+import { ArrowUpRight, BadgePlus, Home, User2 } from "lucide-react";
 import { MessageCircleQuestion } from "lucide-react";
 import { NavLinkConfig } from "./types";
 import Link from "next/link";
@@ -17,6 +17,16 @@ const navLinks: NavLinkConfig<"dynamic" | "static">[] = [
     Icon: Home,
     pathCheck: {
       equals: "/",
+    },
+  },
+  {
+    type: "static",
+    id: "profile",
+    href: "/profile",
+    text: "Profile",
+    Icon: User2,
+    pathCheck: {
+      equals: "/profile",
     },
   },
   {
