@@ -4,12 +4,20 @@ import { Button } from "@/components/ui/button";
 import { UserX2, Loader2, User2 } from "lucide-react";
 
 import EthAvatar from "@/components/eth-avatar";
-import { usePrivy } from "@privy-io/react-auth";
+import { useCreateWallet, usePrivy } from "@privy-io/react-auth";
 import { useStackedDialog } from "@/components/ui/StackedDialog/context";
+import { useEffect } from "react";
 
 export default function ProfileCard() {
   const { ready, authenticated, user } = usePrivy();
   const { openDialog } = useStackedDialog();
+  const { createWallet } = useCreateWallet();
+
+  useEffect(() => {
+    if (user && user?.wallet === undefined) {
+      createWallet();
+    }
+  }, [user]);
 
   if (!ready) {
     return (
