@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import "./globals.css";
+import Navbar from "./_components/Navbar";
+import { Button } from "@/components/ui/button";
+import { Sidebar } from "lucide-react";
+import Providers from "./_components/Providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -10,6 +14,12 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-instrument-serif",
+  subsets: ["latin"],
+  weight: ["400"],
 });
 
 export const metadata: Metadata = {
@@ -25,9 +35,30 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} antialiased flex h-screen`}
+        style={{
+          background: `repeating-linear-gradient(
+              -55deg,
+              var(--background),
+              var(--background) 2px,
+              color-mix(in oklab, var(--primary) 10%, transparent) 2px,
+              color-mix(in oklab, var(--primary) 10%, transparent) 4px
+            )`,
+        }}
       >
-        {children}
+        <Providers>
+          <Navbar />
+          <main className="flex-1 bg-background m-2 md:ml-0 border border-border rounded-xl relative">
+            <Button
+              variant="outline"
+              className="absolute top-2 left-2"
+              size={"icon"}
+            >
+              <Sidebar size={16} />
+            </Button>
+            {children}
+          </main>
+        </Providers>
       </body>
     </html>
   );
