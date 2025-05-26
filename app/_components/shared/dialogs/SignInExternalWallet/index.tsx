@@ -18,7 +18,7 @@ const SignInExternalWallet = ({}: StackedDialogContext) => {
       showCloseButton={false}
     >
       <div className="flex flex-col w-full gap-1">
-        <Button onClick={() => handleLoginUsingExternalWallet()}>
+        <Button onClick={handleLoginUsingExternalWallet}>
           Connect Wallet
         </Button>
       </div>

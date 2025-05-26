@@ -9,9 +9,21 @@ import { useStackedDialog } from "@/components/ui/StackedDialog/context";
 import { useEffect } from "react";
 
 export default function ProfileCard() {
-  const { ready, authenticated, user } = usePrivy();
+  const { ready, authenticated, user, getAccessToken } = usePrivy();
   const { openDialog } = useStackedDialog();
   const { createWallet } = useCreateWallet();
+
+  useEffect(() => {
+    // Only run when authenticated and user is available
+    if (authenticated && user) {
+      getAccessToken().then((jwt: string | null) => {
+        if (jwt) {
+          localStorage.setItem("jwt", jwt);
+          console.log("User JWT authenticated:", jwt, user);
+        }
+      });
+    }
+  }, [authenticated, user]);
 
   useEffect(() => {
     if (user && user?.wallet === undefined) {

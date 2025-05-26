@@ -27,6 +27,10 @@ export default function Home() {
         message,
       });
 
+      if (response.data.token) {
+        localStorage.setItem("jwt", response.data.token);
+      }
+
       console.log("Signature successful!", response.data);
     } catch (error) {
       console.error("Signature failed:", error);
