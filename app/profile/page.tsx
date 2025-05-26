@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import CountryForm from "./CountryForm";
 
 export default function ProfilePage() {
   const [projects, setProjects] = useState(null);
@@ -33,6 +34,7 @@ export default function ProfilePage() {
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <h1 className="text-2xl font-bold">Profile Page</h1>
       <p className="mt-2 text-muted-foreground">This is your profile.</p>
+      <CountryForm />
       <div className="mt-6 w-full max-w-lg">
         {loading && <p>Loading projects...</p>}
         {error && <p className="text-red-500">{error}</p>}
