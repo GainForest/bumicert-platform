@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import "./globals.css";
-import Navbar from "./_components/Navbar";
-import { Button } from "@/components/ui/button";
-import { Sidebar } from "lucide-react";
-import Providers from "./_components/Providers";
+import PrivyProvider from "@/components/providers/PrivyProvider";
+import { NavbarContextProvider } from "@/components/global/Navbar/context";
+import NavbarLayout from "@/components/global/Navbar/NavbarLayout";
+import { ModalProvider } from "@/components/ui/modal/context";
+import ChainSwitchProvider from "@/components/providers/ChainSwitchProvider";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { PriceFeedProvider } from "@/components/providers/PriceFeedProvider";
+import { ThemeProvider } from "next-themes";
+import HypercertExchangeClientProvider from "@/components/providers/HypercertExchangeClientProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,32 +38,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} antialiased flex h-screen`}
-        style={{
-          background: `repeating-linear-gradient(
-              -55deg,
-              var(--background),
-              var(--background) 2px,
-              color-mix(in oklab, var(--primary) 10%, transparent) 2px,
-              color-mix(in oklab, var(--primary) 10%, transparent) 4px
-            )`,
-        }}
+        className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} antialiased h-screen`}
       >
-        <Providers>
-          <Navbar />
-          <main className="flex-1 bg-background m-2 md:ml-0 border border-border rounded-xl relative">
-            <Button
-              variant="outline"
-              className="absolute top-2 left-2"
-              size={"icon"}
-            >
-              <Sidebar size={16} />
-            </Button>
-            {children}
-          </main>
-        </Providers>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+          <NuqsAdapter>
+            <PrivyProvider>
+              <ModalProvider>
+                <PriceFeedProvider>
+                  <ChainSwitchProvider>
+                    <HypercertExchangeClientProvider>
+                      <NavbarContextProvider>
+                        <NavbarLayout>{children}</NavbarLayout>
+                      </NavbarContextProvider>
+                    </HypercertExchangeClientProvider>
+                  </ChainSwitchProvider>
+                </PriceFeedProvider>
+              </ModalProvider>
+            </PrivyProvider>
+          </NuqsAdapter>
+        </ThemeProvider>
       </body>
     </html>
   );
