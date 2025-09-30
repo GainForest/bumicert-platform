@@ -29,7 +29,7 @@ const EcocertPage = async ({
             "repeat(auto-fit, minmax(min(460px, 100%), 1fr))",
         }}
       >
-        <ProofsOfImpact ecocert={ecocert} />
+        {/* <ProofsOfImpact ecocert={ecocert} /> */}
         <WidgetItem title="Reviews">Hello</WidgetItem>
         <WidgetItem title="Support">Hello</WidgetItem>
         <WidgetItem title="Contributors & Evaluators">Hello</WidgetItem>

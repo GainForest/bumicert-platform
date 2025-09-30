@@ -57,11 +57,12 @@ const ProofsOfImpact = ({ ecocert }: { ecocert: FullHypercert }) => {
             </p>
           </div>
         ) : (
-          <ProofOfImpact
-            key={firstProofOfImpact.uid}
-            attestation={firstProofOfImpact}
-            creatorAddress={ecocert.creatorAddress as `0x${string}`}
-          />
+          <></>
+          // <ProofOfImpact
+          //   key={firstProofOfImpact.uid}
+          //   attestation={firstProofOfImpact}
+          //   creatorAddress={ecocert.creatorAddress as `0x${string}`}
+          // />
         )}
       </div>
     </WidgetItem>
