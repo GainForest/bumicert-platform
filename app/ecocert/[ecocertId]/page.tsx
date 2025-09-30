@@ -3,7 +3,6 @@ import { fetchFullHypercertById } from "@/graphql/hypercerts/queries/fullHyperce
 import React from "react";
 import Hero from "./_components/Hero";
 import WidgetItem from "./_components/Widgets/WidgetItem";
-import ProofsOfImpact from "./_components/Widgets/ProofsOfImpact";
 import Body from "./_components/Body";
 import HeaderContent from "./_components/HeaderContent";
 

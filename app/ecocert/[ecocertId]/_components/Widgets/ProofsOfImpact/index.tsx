@@ -3,7 +3,6 @@ import WidgetItem from "../WidgetItem";
 import { Button } from "@/components/ui/button";
 import { CirclePlus } from "lucide-react";
 import { FullHypercert } from "@/graphql/hypercerts/queries/fullHypercertById";
-import ProofOfImpact from "./ProofOfImpact";
 import ViewAllButton from "./ViewAllButton";
 
 const ProofsOfImpact = ({ ecocert }: { ecocert: FullHypercert }) => {
