@@ -10,6 +10,7 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { PriceFeedProvider } from "@/components/providers/PriceFeedProvider";
 import { ThemeProvider } from "next-themes";
 import HypercertExchangeClientProvider from "@/components/providers/HypercertExchangeClientProvider";
+import { AtprotoProvider } from "@/components/providers/AtprotoProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,17 +46,19 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <NuqsAdapter>
             <PrivyProvider>
-              <ModalProvider>
-                <PriceFeedProvider>
-                  <ChainSwitchProvider>
-                    <HypercertExchangeClientProvider>
-                      <NavbarContextProvider>
-                        <NavbarLayout>{children}</NavbarLayout>
-                      </NavbarContextProvider>
-                    </HypercertExchangeClientProvider>
-                  </ChainSwitchProvider>
-                </PriceFeedProvider>
-              </ModalProvider>
+              <AtprotoProvider>
+                <ModalProvider>
+                  <PriceFeedProvider>
+                    <ChainSwitchProvider>
+                      <HypercertExchangeClientProvider>
+                        <NavbarContextProvider>
+                          <NavbarLayout>{children}</NavbarLayout>
+                        </NavbarContextProvider>
+                      </HypercertExchangeClientProvider>
+                    </ChainSwitchProvider>
+                  </PriceFeedProvider>
+                </ModalProvider>
+              </AtprotoProvider>
             </PrivyProvider>
           </NuqsAdapter>
         </ThemeProvider>

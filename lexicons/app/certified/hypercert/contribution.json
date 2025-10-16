@@ -1,0 +1,54 @@
+{
+  "lexicon": 1,
+  "id": "app.certified.hypercert.contribution",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A contribution made toward a hypercert's impact.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": ["contributor", "role", "createdAt"],
+        "properties": {
+          "hypercert": {
+            "type": "ref",
+            "ref": "app.certified.hypercert.record",
+            "description": "Reference to the hypercert"
+          },
+          "role": {
+            "type": "string",
+            "description": "Role or title of the contributor",
+            "maxLength": 100
+          },
+          "contributor": {
+            "type": "string",
+            "format": "did",
+            "description": "DID identifying the contributor"
+          },
+          "description": {
+            "type": "string",
+            "description": "What the contributor concretely did",
+            "maxLength": 2000,
+            "maxGraphemes": 500
+          },
+          "workTimeframeFrom": {
+            "type": "string",
+            "format": "datetime",
+            "description": "When this contributor started"
+          },
+          "workTimeframeTo": {
+            "type": "string",
+            "format": "datetime",
+            "description": "When this contributor finished"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}
+
+

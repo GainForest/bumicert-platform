@@ -4,7 +4,7 @@ import { Button } from "../../ui/button";
 import { ChevronLeft, Sidebar } from "lucide-react";
 import { useNavbarContext } from "../Navbar/context";
 import { useHeaderContext } from "../../providers/HeaderProvider";
-import SignInDesktopButton from "./SignInDesktopButton";
+import AtprotoSignInButton from "./AtprotoSignInButton";
 
 const Header = () => {
   const { setOpenState, viewport } = useNavbarContext();
@@ -33,7 +33,7 @@ const Header = () => {
           {viewport === "desktop" && (
             <div className="flex items-center gap-1">
               <div className="h-4 w-0.5 bg-muted-foreground/50 rounded-full"></div>
-              <SignInDesktopButton />
+              <AtprotoSignInButton />
             </div>
           )}
         </div>
