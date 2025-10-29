@@ -3,28 +3,19 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import React from "react";
 import useNewEcocertStore from "../store";
-
-const steps = [
-  {
-    title: "Project Details",
-  },
-  {
-    title: "Impact Details",
-  },
-  {
-    title: "Site Details",
-  },
-  {
-    title: "Review",
-  },
-  {
-    title: "Submit",
-  },
-];
+import { STEPS as steps } from "./Steps/config";
+import { useStep1Store } from "./Steps/Step1/store";
+import { useStep2Store } from "./Steps/Step2/store";
+import { useStep3Store } from "./Steps/Step3/store";
 
 const StepNavigator = () => {
-  const { currentStep, setCurrentStep } = useNewEcocertStore();
-  const stepsCompleted = 2;
+  const { currentStepIndex: currentStep, setCurrentStepIndex: setCurrentStep } =
+    useNewEcocertStore();
+
+  // Get completion percentage from each step store
+  const step1Progress = useStep1Store((state) => state.completionPercentage);
+  const step2Progress = useStep2Store((state) => state.completionPercentage);
+  const step3Progress = useStep3Store((state) => state.completionPercentage);
   return (
     <div className="flex items-center gap-1 w-full">
       {steps.map((step, index) => (
@@ -38,10 +29,11 @@ const StepNavigator = () => {
         >
           <motion.button
             className={cn(
-              "cursor-pointer border border-foreground/20 rounded-md overflow-hidden",
+              "cursor-pointer border border-foreground/20 rounded-md overflow-hidden disabled:cursor-not-allowed disabled:opacity-50",
               currentStep === index && "bg-accent"
             )}
             onClick={() => setCurrentStep(index)}
+            disabled={step.isRequiredToMoveForward}
           >
             <div className="p-2 flex items-center gap-2">
               <motion.div
@@ -59,9 +51,16 @@ const StepNavigator = () => {
           </motion.button>
           <div className="w-full bg-foreground/10 h-2 rounded-md overflow-hidden mt-1">
             <div
-              className="h-full bg-primary"
+              className="h-full bg-primary transition-all duration-300"
               style={{
-                width: stepsCompleted > index ? "100%" : "0%",
+                width: (() => {
+                  // For steps 0-2, use completion percentage from stores
+                  if (index === 0) return `${step1Progress}%`;
+                  if (index === 1) return `${step2Progress}%`;
+                  if (index === 2) return `${step3Progress}%`;
+                  // For steps 3+ (Review, Submit), they're not implemented yet
+                  return "0%";
+                })(),
               }}
             ></div>
           </div>
