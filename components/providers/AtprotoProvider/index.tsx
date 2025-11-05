@@ -43,7 +43,7 @@ export const AtprotoProvider = ({
 }) => {
   const [isReady, setIsReady] = useState(false);
   const [handleResolver, setHandleResolver] = useState<HandleResolverURL>(
-    handleResolvers[1]
+    handleResolvers[0]
   );
   const [client, setClient] = useState<BrowserOAuthClient | null>(null);
   const [agent, setAgent] = useState<Agent | null>(null);
@@ -77,8 +77,9 @@ export const AtprotoProvider = ({
   }, [clientMetadata, handleResolver]);
 
   useEffect(() => {
+    if (!isReady || !client || !clientMetadata) return;
     initializeSession();
-  }, [isReady]);
+  }, [isReady, client, clientMetadata]);
 
   const signIn = useCallback(
     async (handle: string) => {
@@ -116,7 +117,12 @@ export const AtprotoProvider = ({
         return;
       }
       setSession(session);
-      const agent = new Agent(session.fetchHandler.bind(session));
+      const agent: Agent = new Agent({
+        did: session.sub,
+        fetchHandler: session.fetchHandler.bind(session),
+      });
+      agent.assertAuthenticated();
+
       setAgent(agent);
       setIsAuthenticated(true);
     } catch (error: unknown) {

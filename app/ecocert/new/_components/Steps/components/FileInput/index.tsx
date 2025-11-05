@@ -8,6 +8,7 @@ import QuickTooltip from "@/components/ui/quick-tooltip";
 
 // Helper function to check if file is an image
 const isImageFile = (file: File): boolean => {
+  if (file.type === undefined) return false;
   return file.type.startsWith("image/");
 };
 

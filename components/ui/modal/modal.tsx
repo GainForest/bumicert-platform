@@ -4,19 +4,51 @@ import React, { useContext } from "react";
 import { DialogClose, DialogFooter } from "./dialog";
 import { DrawerFooter } from "./drawer";
 import { ModalModeContext } from "./context";
-import { XIcon } from "lucide-react";
+import { ChevronLeft, XIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "../button";
 
 type ModalDivProps = React.ComponentProps<"div">;
 
-export const ModalHeader = ({ ...props }: ModalDivProps) => {
-  return <div className="mb-2" {...props} />;
+export const ModalHeader = ({
+  backAction,
+  ...props
+}: ModalDivProps & {
+  backAction?: () => void;
+}) => {
+  return (
+    <div
+      {...(backAction ? {} : props)}
+      className={cn(
+        "mb-2",
+        backAction ? "flex items-center gap-3" : "",
+        backAction ? props.className : ""
+      )}
+    >
+      {backAction ?
+        <>
+          <Button
+            variant={"secondary"}
+            size={"icon"}
+            className="rounded-full p-0 h-6 w-6"
+            onClick={() => {
+              backAction();
+            }}
+          >
+            <ChevronLeft />
+          </Button>
+          <div {...props} />
+        </>
+      : props.children}
+    </div>
+  );
 };
 
 export const ModalTitle = ({ ...props }: ModalDivProps) => {
   return (
     <h1
-      className="font-serif text-lg font-semibold"
       {...props}
+      className={cn("font-serif text-lg font-semibold", props.className)}
       data-modal-title
     />
   );
@@ -25,8 +57,8 @@ export const ModalTitle = ({ ...props }: ModalDivProps) => {
 export const ModalDescription = ({ ...props }: ModalDivProps) => {
   return (
     <p
-      className="text-sm text-muted-foreground"
       {...props}
+      className={cn("text-sm text-muted-foreground", props.className)}
       data-modal-description
     />
   );

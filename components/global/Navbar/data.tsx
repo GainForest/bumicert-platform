@@ -1,5 +1,6 @@
 import {
   BadgePlus,
+  BuildingIcon,
   Compass,
   MessageCircleQuestion,
   Settings,
@@ -44,6 +45,16 @@ export const navLinks: NavLinkConfig<"dynamic" | "static">[] = [
     Icon: MessageCircleQuestion,
     pathCheck: {
       startsWith: "/faqs",
+    },
+  },
+  {
+    type: "static",
+    id: "organization",
+    href: "/organization",
+    text: "Organization",
+    Icon: BuildingIcon,
+    pathCheck: {
+      startsWith: "/organization",
     },
   },
   {

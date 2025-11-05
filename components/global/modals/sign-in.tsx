@@ -18,12 +18,14 @@ import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { useAtproto } from "@/components/providers/AtprotoProvider";
 import { useQuery } from "@tanstack/react-query";
+import { useModal } from "@/components/ui/modal/context";
 
 export const SignInModalId = "sign-in-modal";
 
 const SignInModal = () => {
   const [handle, setHandle] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const { popModal, stack } = useModal();
   const { isReady, signIn, initializationError, isAuthenticated } =
     useAtproto();
 
@@ -68,7 +70,15 @@ const SignInModal = () => {
 
   return (
     <ModalContent>
-      <ModalHeader>
+      <ModalHeader
+        backAction={
+          stack.length === 1 ?
+            undefined
+          : () => {
+              popModal();
+            }
+        }
+      >
         <ModalTitle>Sign In</ModalTitle>
         <ModalDescription>Provide your handle to continue</ModalDescription>
       </ModalHeader>
