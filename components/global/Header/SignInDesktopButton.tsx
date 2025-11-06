@@ -9,7 +9,7 @@ import {
   ChainSwitchModal,
   ChainSwitchModalId,
 } from "@/components/providers/ChainSwitchProvider";
-import ProfileModal, { ProfileModalId } from "../modals/profile";
+import { ProfileModal, ProfileModalId } from "../modals/profile";
 
 const SignInDesktopButton = () => {
   const { address, isConnecting, isConnected, authenticated, chainId } =
