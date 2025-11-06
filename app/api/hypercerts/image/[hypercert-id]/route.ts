@@ -6,7 +6,7 @@ export const revalidate = 1800;
 
 // GET handler to fetch and return the image associated with the given hypercert ID
 export async function GET(
-  request: NextRequest,
+  _: NextRequest,
   { params }: { params: Promise<{ "hypercert-id": string }> }
 ) {
   const { "hypercert-id": hypercertId } = await params;
@@ -18,7 +18,7 @@ export async function GET(
 
   try {
     const { contentType, buffer } = await getHypercertImage(hypercertId);
-    return new NextResponse(buffer, {
+    return new NextResponse(new Uint8Array(buffer), {
       status: 200,
       headers: {
         "Content-Type": contentType,
