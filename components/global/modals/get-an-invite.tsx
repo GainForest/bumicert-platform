@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/input-group";
 import { Button } from "@/components/ui/button";
 
-export const GetAnInviteModalId = "get-an-invite-modal";
+export const GetAnInviteModalId = "auth/get-an-invite";
 
 export const GetAnInviteModal = () => {
   const { stack, popModal } = useModal();

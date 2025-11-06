@@ -12,12 +12,12 @@ import {
   LucideIcon,
   UserPlusIcon,
 } from "lucide-react";
-import { useAtproto } from "@/components/providers/AtprotoProvider";
 import SignInModal, { SignInModalId } from "./sign-in";
 import { useModal } from "@/components/ui/modal/context";
 import SignUpModal, { SignUpModalId } from "./sign-up";
+import { useAtprotoStore } from "@/components/stores/atproto";
 
-export const AuthModalId = "auth-modal";
+export const AuthModalId = "auth/main";
 
 const Action = ({
   Icon,
@@ -52,10 +52,9 @@ const Action = ({
 };
 
 const AuthModal = () => {
-  const { isReady, isAuthenticated } = useAtproto();
   const { pushModal } = useModal();
-
-  if (isReady && isAuthenticated) {
+  const auth = useAtprotoStore((state) => state.auth);
+  if (auth.authenticated) {
     return (
       <ModalContent>
         <ModalHeader>Already Signed In</ModalHeader>

@@ -1,15 +1,15 @@
-import { publicProcedure } from "@/server/trpc";
+import { protectedProcedure } from "@/server/trpc";
+import { getWriteAgent } from "@/server/utils";
 import z from "zod";
-import { getWriteAgent } from "../_app";
 
-export const uploadFileAsBlob = publicProcedure
+export const uploadFileAsBlob = protectedProcedure
   .input(
     z.object({
       file: z.instanceof(File),
     })
   )
   .mutation(async ({ input }) => {
-    const agent = getWriteAgent();
+    const agent = await getWriteAgent();
     const arrayBuffer = await input.file.arrayBuffer();
     const uint8Array = new Uint8Array(arrayBuffer);
     const response = await agent.uploadBlob(uint8Array, {

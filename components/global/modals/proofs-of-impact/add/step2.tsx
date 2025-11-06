@@ -40,7 +40,7 @@ const formSchema = z
 
 type FormValues = z.infer<typeof formSchema>;
 
-export const AddProofsOfImpactStep2ModalId = "proofs-of-impact-add-step-2";
+export const AddProofsOfImpactStep2ModalId = "proofs-of-impact/add/step2";
 const AddProofsOfImpactStep2 = () => {
   const { stack, hide, popModal, pushModal } = useModal();
   const { step1State, setStep2State } = useAddPoiStore();

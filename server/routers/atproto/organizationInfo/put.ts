@@ -1,12 +1,11 @@
-import { publicProcedure } from "@/server/trpc";
+import { protectedProcedure } from "@/server/trpc";
 import z from "zod";
-import { getWriteAgent, PutRecordResponse } from "../_app";
 import { AppGainforestOrganizationInfo } from "@/lexicon-api";
-import { BlobRef, typedJsonBlobRef } from "@atproto/lexicon";
-import { CID } from "multiformats/cid";
+import { BlobRef } from "@atproto/lexicon";
 import { validate } from "@/lexicon-api/lexicons";
+import { getWriteAgent, PutRecordResponse } from "@/server/utils";
 
-export const putOrganizationInfo = publicProcedure
+export const putOrganizationInfo = protectedProcedure
   .input(
     z.object({
       did: z.string(),
@@ -34,7 +33,7 @@ export const putOrganizationInfo = publicProcedure
     })
   )
   .mutation(async ({ input }) => {
-    const agent = getWriteAgent();
+    const agent = await getWriteAgent();
     const info: AppGainforestOrganizationInfo.Record = {
       $type: "app.gainforest.organization.info",
       displayName: input.info.displayName,

@@ -18,7 +18,7 @@ import AddProofsOfImpactStep1, {
   AddProofsOfImpactStep1ModalId,
 } from "../add/step1";
 
-export const AllProofsOfImpactModalId = "proofs-of-impact-view-all";
+export const AllProofsOfImpactModalId = "proofs-of-impact/view-all";
 
 const AllProofsOfImpactModal = ({
   proofsOfImpact,

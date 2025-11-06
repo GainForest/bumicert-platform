@@ -21,15 +21,16 @@ import {
   MailIcon,
   User2,
   Check,
+  ArrowRight,
 } from "lucide-react";
-import { useAtproto } from "@/components/providers/AtprotoProvider";
 import { useMutation } from "@tanstack/react-query";
 import { useModal } from "@/components/ui/modal/context";
 import { GetAnInviteModal, GetAnInviteModalId } from "./get-an-invite";
 import SignInModal, { SignInModalId } from "./sign-in";
 import { PDS_DOMAIN } from "@/config/atproto";
+import { useAtprotoStore } from "@/components/stores/atproto";
 
-export const SignUpModalId = "sign-up-modal";
+export const SignUpModalId = "auth/sign-up";
 
 const SignUpModal = () => {
   const [inviteCode, setInviteCode] = useState("");
@@ -39,8 +40,7 @@ const SignUpModal = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState("");
   const { popModal, stack, pushModal } = useModal();
-  const { isReady, initializationError, isAuthenticated, signIn } =
-    useAtproto();
+  const auth = useAtprotoStore((state) => state.auth);
 
   const {
     mutate: handleSignUp,
@@ -68,12 +68,11 @@ const SignUpModal = () => {
         );
       }
 
-      // Auto sign-in after successful account creation
-      await signIn(handle);
-      return true;
+      return await res.json();
     },
   });
 
+  const isAuthenticated = auth.authenticated;
   if (isAuthenticated) {
     return (
       <ModalContent>
@@ -112,7 +111,7 @@ const SignUpModal = () => {
               placeholder="abcdefghij"
               value={inviteCode}
               onChange={(e) => setInviteCode(e.target.value)}
-              disabled={!isReady || isSigningUp}
+              disabled={isSigningUp}
             />
           </InputGroup>
           <span className="text-xs text-muted-foreground">
@@ -141,7 +140,7 @@ const SignUpModal = () => {
               placeholder="user@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              disabled={!isReady || isSigningUp}
+              disabled={isSigningUp}
             />
           </InputGroup>
         </div>
@@ -155,7 +154,7 @@ const SignUpModal = () => {
               placeholder="john-doe"
               value={handle}
               onChange={(e) => setHandle(e.target.value.split(".")[0].trim())}
-              disabled={!isReady || isSigningUp}
+              disabled={isSigningUp}
             />
             <InputGroupAddon align="inline-end" className="text-primary">
               .climateai.org
@@ -173,7 +172,7 @@ const SignUpModal = () => {
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              disabled={!isReady || isSigningUp}
+              disabled={isSigningUp}
               type={showPassword ? "text" : "password"}
             />
             <InputGroupAddon align="inline-end" className="text-primary">
@@ -200,7 +199,7 @@ const SignUpModal = () => {
               placeholder="Confirm your password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              disabled={!isReady || isSigningUp}
+              disabled={isSigningUp}
               type={showPassword ? "text" : "password"}
             />
             <InputGroupAddon align="inline-end" className="text-primary">
@@ -220,8 +219,7 @@ const SignUpModal = () => {
       </div>
       <ModalFooter>
         <span className="text-sm text-destructive">
-          {(signUpError as Error | undefined)?.message ??
-            initializationError?.message}
+          {(signUpError as Error | undefined)?.message}
         </span>
         <Button
           disabled={
@@ -232,14 +230,16 @@ const SignUpModal = () => {
             confirmPassword === "" ||
             password !== confirmPassword ||
             isSigningUp ||
-            !isReady
+            isAuthenticated
           }
           onClick={() => {
             if (isSignUpSuccess) {
               pushModal(
                 {
                   id: SignInModalId,
-                  content: <SignInModal initialHandle={handle} />,
+                  content: (
+                    <SignInModal initialHandle={`${handle}.${PDS_DOMAIN}`} />
+                  ),
                 },
                 true
               );
@@ -248,18 +248,17 @@ const SignUpModal = () => {
             }
           }}
         >
-          {isSigningUp || !isReady ?
+          {isSigningUp || isAuthenticated ?
             <Loader2 className="size-4 animate-spin" />
           : isSignUpSuccess ?
             <Check />
           : null}
-          {!isReady ?
-            "Getting ready..."
-          : isSigningUp ?
+          {isSigningUp ?
             "Signing up..."
           : isSignUpSuccess ?
-            "Done! Continue to sign in."
+            "Done! Continue to sign in?"
           : "Sign up"}
+          {isSignUpSuccess && <ArrowRight />}
         </Button>
       </ModalFooter>
     </ModalContent>

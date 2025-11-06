@@ -12,35 +12,50 @@ import {
   ModalTitle,
 } from "@/components/ui/modal/modal";
 import React, { useCallback, useState } from "react";
-import { Check, Loader2, X } from "lucide-react";
+import { Loader2, LockIcon, X } from "lucide-react";
 import useLocalStorage from "use-local-storage";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import { useAtproto } from "@/components/providers/AtprotoProvider";
-import { useQuery } from "@tanstack/react-query";
 import { useModal } from "@/components/ui/modal/context";
+import { api } from "@/lib/trpc/react";
+import { useAtprotoStore } from "@/components/stores/atproto";
+import AuthenticatedModalContent from "./authenticated";
 
-export const SignInModalId = "sign-in-modal";
+export const SignInModalId = "auth/sign-in";
 
 const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
-  const [handle, setHandle] = useState(initialHandle);
-  const [rememberMe, setRememberMe] = useState(false);
-  const { popModal, stack } = useModal();
-  const { isReady, signIn, initializationError, isAuthenticated } =
-    useAtproto();
-
+  const [handlePrefix, setHandlePrefix] = useState(initialHandle);
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(true);
+  const { popModal, stack, hide } = useModal();
+  const isAuthenticated = useAtprotoStore((state) => state.auth.authenticated);
+  const setAuth = useAtprotoStore((state) => state.setAuth);
   const {
-    data: isSignInSuccess,
-    isLoading: isSigningIn,
+    mutate: signIn,
+    isPending: isSigningIn,
     error: signInError,
-    refetch: handleSignIn,
-  } = useQuery({
-    queryKey: ["sign-in", handle],
-    queryFn: async () => {
-      addPreviousSession(handle);
-      return await signIn(handle);
+  } = api.auth.login.useMutation({
+    onSuccess: (data) => {
+      addPreviousSession(data.context.handle);
+      setAuth(data.context, data.service as string);
+
+      // Pop all auth modals from the stack and hide if there
+      const stackCopy = structuredClone(stack);
+      while (stackCopy.length > 1) {
+        if (stackCopy.at(-1)?.startsWith("auth/")) {
+          stackCopy.pop();
+          popModal();
+        } else {
+          break;
+        }
+      }
+
+      // After popping all consecutive auth modals, if the last modal on stack
+      // is an auth modal, then hide the modal.
+      const shouldHideModal =
+        stackCopy.at(-1)?.startsWith("auth/") ? true : false;
+      if (shouldHideModal) hide();
     },
-    enabled: false,
   });
 
   const [previousSessions, setPreviousSessions] = useLocalStorage<
@@ -58,14 +73,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
   }, []);
 
   if (isAuthenticated) {
-    return (
-      <ModalContent>
-        <ModalHeader>Already Signed In</ModalHeader>
-        <ModalDescription>
-          You are already signed in to your account.
-        </ModalDescription>
-      </ModalContent>
-    );
+    return <AuthenticatedModalContent message="You are already signed in." />;
   }
 
   return (
@@ -88,16 +96,16 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
           <InputGroup>
             <InputGroupAddon>@</InputGroupAddon>
             <InputGroupInput
-              placeholder="user.climateai.org"
-              value={handle}
-              onChange={(e) => setHandle(e.target.value)}
-              disabled={!isReady || isSigningIn}
+              placeholder="john-doe"
+              value={handlePrefix}
+              onChange={(e) => setHandlePrefix(e.target.value)}
+              disabled={isSigningIn}
             />
+            <InputGroupAddon align="inline-end" className="text-primary">
+              .climateai.org
+            </InputGroupAddon>
           </InputGroup>
-        </div>
-        <div className="flex flex-col gap-1">
-          <span className="text-sm">Or choose from previous sessions:</span>
-          <div className="w-full p-2 bg-muted rounded-md flex flex-col gap-1">
+          <div className="w-full bg-muted rounded-md flex flex-col gap-0.5 p-1">
             {previousSessions.length === 0 && (
               <div className="w-full text-sm text-muted-foreground text-center p-2">
                 No previous sessions found.
@@ -105,17 +113,31 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
             )}
 
             {previousSessions.map((session) => {
+              const handleSplit = session.handle.split(".");
+              if (handleSplit.length < 2) {
+                return null;
+              }
+              const prefix = handleSplit[0];
+              const suffix = handleSplit.slice(1).join(".");
+              if (suffix !== "climateai.org") {
+                return null;
+              }
+
               return (
-                <div className="w-full relative" key={session.handle}>
+                <div
+                  className={cn(
+                    "w-full relative first:rounded-t-md last:rounded-b-md bg-background",
+                    handlePrefix === prefix && "border border-primary/50"
+                  )}
+                  key={session.handle}
+                >
                   <button
                     className={cn(
-                      "flex items-center gap-2 justify-between bg-background rounded-md px-2 py-1 w-full cursor-pointer",
-                      handle === session.handle &&
-                        "text-primary border border-primary/50"
+                      "flex items-center gap-2 justify-between h-8 rounded-md px-2 py-1 w-full cursor-pointer"
                     )}
                     disabled={isSigningIn}
                     onClick={() => {
-                      setHandle(session.handle);
+                      setHandlePrefix(`${handlePrefix}`);
                     }}
                   >
                     <span className="text-sm font-medium">
@@ -132,9 +154,8 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
                       onClick={() => {
                         setPreviousSessions((prev) => {
                           const newSessions =
-                            prev?.filter(
-                              (session) => session.handle !== session.handle
-                            ) ?? [];
+                            prev?.filter((s) => s.handle !== session.handle) ??
+                            [];
                           return newSessions;
                         });
                       }}
@@ -147,46 +168,59 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
             })}
           </div>
         </div>
+        <div className="flex flex-col gap-1">
+          <span className="text-sm">Enter your password</span>
+          <InputGroup>
+            <InputGroupAddon>
+              <LockIcon />
+            </InputGroupAddon>
+            <InputGroupInput
+              placeholder="Enter your password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={isSigningIn}
+            />
+          </InputGroup>
+        </div>
 
         <div className="flex items-center gap-2 text-sm mt-4">
           <Switch
             checked={
               // If the handle is in the previous sessions, then the switch should be checked
-              previousSessions.find((session) => session.handle === handle) ?
+              (
+                previousSessions.find(
+                  (session) => session.handle === handlePrefix
+                )
+              ) ?
                 true
               : rememberMe
             }
             onCheckedChange={setRememberMe}
             disabled={
               isSigningIn ||
-              previousSessions.find((session) => session.handle === handle) !==
-                undefined
+              previousSessions.find(
+                (session) => session.handle === handlePrefix
+              ) !== undefined
             }
           />
           <span>Remember me</span>
         </div>
       </div>
       <ModalFooter>
-        <span className="text-sm text-destructive">
-          {signInError?.message ?? initializationError?.message}
-        </span>
+        <span className="text-sm text-destructive">{signInError?.message}</span>
         <Button
-          disabled={handle === "" || isSigningIn || !isReady}
+          disabled={handlePrefix === "" || isSigningIn}
           onClick={() => {
-            handleSignIn();
+            signIn({
+              handlePrefix: handlePrefix.split(".")[0],
+              service: "climateai.org",
+              password: password,
+            });
           }}
         >
-          {isSignInSuccess ?
-            <Check />
-          : isSigningIn || !isReady ?
+          {isSigningIn ?
             <Loader2 className="size-4 animate-spin" />
-          : null}
-          {!isReady ?
-            "Getting ready..."
-          : isSignInSuccess ?
-            "Signed in successfully"
-          : isSigningIn ?
-            "Signing in..."
           : "Sign In"}
         </Button>
       </ModalFooter>

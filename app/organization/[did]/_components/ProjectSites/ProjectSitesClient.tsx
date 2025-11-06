@@ -4,7 +4,7 @@ import type {
   AppGainforestOrganizationDefaultSite,
   AppGainforestOrganizationSite,
 } from "@/lexicon-api";
-import { GetRecordResponse } from "@/server/routers/_app";
+import { GetRecordResponse } from "@/server/utils";
 import React, { useState } from "react";
 
 const ProjectSitesClient = ({

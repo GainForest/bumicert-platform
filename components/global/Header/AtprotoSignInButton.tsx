@@ -1,27 +1,31 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { useModal } from "@/components/ui/modal/context";
-import { LogIn, LogOut } from "lucide-react";
+import { Loader2, LogIn, User } from "lucide-react";
 import React from "react";
-import { useAtproto } from "@/components/providers/AtprotoProvider";
 import AuthModal, { AuthModalId } from "../modals/auth";
+import { useAtprotoStore } from "@/components/stores/atproto";
+import { ProfileModal, ProfileModalId } from "../modals/profile";
 
 const AtprotoSignInButton = () => {
   const { pushModal, show } = useModal();
-  const { isAuthenticated, signOut } = useAtproto();
+  const auth = useAtprotoStore((state) => state.auth);
+
+  if (auth.status === "RESUMING") {
+    return <Loader2 className="animate-spin text-primary size-5 mx-1" />;
+  }
+
+  const isAuthenticated = auth.status === "AUTHENTICATED";
+
   return (
     <Button
       size={"sm"}
-      variant={isAuthenticated ? "destructive" : "default"}
+      variant={isAuthenticated ? "outline" : "default"}
       onClick={() => {
-        if (isAuthenticated) {
-          signOut();
-          return;
-        }
         pushModal(
           {
-            id: AuthModalId,
-            content: <AuthModal />,
+            id: isAuthenticated ? ProfileModalId : AuthModalId,
+            content: isAuthenticated ? <ProfileModal /> : <AuthModal />,
           },
           true
         );
@@ -29,9 +33,9 @@ const AtprotoSignInButton = () => {
       }}
     >
       {isAuthenticated ?
-        <LogOut />
+        <User />
       : <LogIn />}
-      {isAuthenticated ? "Sign out" : "Sign in or Register"}
+      {isAuthenticated ? auth.user.handle.split(".")[0] : "Sign in or Register"}
     </Button>
   );
 };

@@ -1,0 +1,126 @@
+"use client";
+import { useAtprotoStore } from "@/components/stores/atproto";
+import { Button } from "@/components/ui/button";
+import { useModal } from "@/components/ui/modal/context";
+import {
+  ModalContent,
+  ModalDescription,
+  ModalFooter,
+  ModalHeader,
+  ModalTitle,
+} from "@/components/ui/modal/modal";
+import { api } from "@/lib/trpc/react";
+import { Building, GalleryVerticalEnd, Loader2, LogOut } from "lucide-react";
+import Link from "next/link";
+
+export const ProfileModalId = "profile";
+
+export const ProfileModal = () => {
+  const { stack, popModal, hide } = useModal();
+  const auth = useAtprotoStore((state) => state.auth);
+  const setAuth = useAtprotoStore((state) => state.setAuth);
+
+  const { mutate: signOut, isPending: isSigningOut } =
+    api.auth.logout.useMutation({
+      onSuccess: () => {
+        setAuth(null);
+        hide().then(() => popModal());
+      },
+    });
+
+  if (!auth.authenticated) {
+    return (
+      <ModalContent>
+        <ModalHeader
+          backAction={
+            stack.length === 1 ?
+              undefined
+            : () => {
+                popModal();
+              }
+          }
+        >
+          <ModalTitle>Not signed in.</ModalTitle>
+        </ModalHeader>
+      </ModalContent>
+    );
+  }
+
+  return (
+    <ModalContent>
+      <ModalHeader
+        backAction={
+          stack.length === 1 ?
+            undefined
+          : () => {
+              popModal();
+            }
+        }
+      >
+        <ModalTitle></ModalTitle>
+        <ModalDescription></ModalDescription>
+      </ModalHeader>
+      <div className="flex flex-col items-center gap-2">
+        <div className="h-20 w-20 rounded-full bg-muted flex items-center justify-center"></div>
+        <div className="flex flex-col items-center">
+          <span className="text-3xl font-serif font-bold">
+            {auth.user.handle.split(".")[0]}
+          </span>
+          <span className="text-sm text-muted-foreground">
+            {auth.user.handle.split(".").slice(1).join(".")}
+          </span>
+        </div>
+        <div className="flex items-center gap-2 w-full my-4">
+          <Link
+            href={`/organization/${auth.user.did}`}
+            className="flex-1 flex items-center"
+          >
+            <Button
+              className="flex-1 h-auto flex-col"
+              variant={"outline"}
+              onClick={() => {
+                hide().then(() => {
+                  popModal();
+                });
+              }}
+            >
+              <Building className="size-8 text-muted-foreground mt-2" />
+              <span>My Organization</span>
+            </Button>
+          </Link>
+          <Link
+            href={`/ecocerts/${auth.user.did}`}
+            className="flex-1 flex items-center"
+          >
+            <Button
+              className="flex-1 h-auto flex-col"
+              variant={"outline"}
+              onClick={() => {
+                hide().then(() => {
+                  popModal();
+                });
+              }}
+            >
+              <GalleryVerticalEnd className="size-8 text-muted-foreground mt-2" />
+              <span>My Ecocerts</span>
+            </Button>
+          </Link>
+        </div>
+      </div>
+      <ModalFooter>
+        <Button
+          variant={"destructive"}
+          onClick={() => {
+            signOut({ service: "climateai.org" });
+          }}
+          disabled={isSigningOut}
+        >
+          {isSigningOut ?
+            <Loader2 className="animate-spin" />
+          : <LogOut />}
+          Sign out
+        </Button>
+      </ModalFooter>
+    </ModalContent>
+  );
+};

@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { AppGainforestOrganizationInfo } from "@/lexicon-api";
 import { BlobRef } from "@atproto/api";
 import { trpcClient } from "@/lib/trpc/client";
-import { PutRecordResponse } from "@/server/routers/_app";
+import { PutRecordResponse } from "@/server/utils";
 
 export type HeroEditingData = {
   displayName: string;
@@ -73,7 +73,7 @@ export const useOrganizationPageStore = create<
     const logoImage = heroEditingData.logoImage;
     let logoImageBlobRef: BlobRef | undefined;
     if (logoImage instanceof File) {
-      const response = await trpcClient.uploadFileAsBlob.mutate({
+      const response = await trpcClient.common.uploadFileAsBlob.mutate({
         file: logoImage,
       });
       if (response.success !== true) {
@@ -89,7 +89,7 @@ export const useOrganizationPageStore = create<
     const coverImage = heroEditingData.coverImage;
     let coverImageBlobRef: BlobRef | undefined;
     if (coverImage instanceof File) {
-      const response = await trpcClient.uploadFileAsBlob.mutate({
+      const response = await trpcClient.common.uploadFileAsBlob.mutate({
         file: coverImage,
       });
       if (response.success !== true) {
@@ -102,7 +102,7 @@ export const useOrganizationPageStore = create<
       coverImageBlobRef = coverImage;
     }
 
-    const response = await trpcClient.putOrganizationInfo.mutate({
+    const response = await trpcClient.organizationInfo.put.mutate({
       did,
       info: {
         $type: "app.gainforest.organization.info",

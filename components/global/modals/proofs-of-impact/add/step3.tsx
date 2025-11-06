@@ -32,7 +32,7 @@ const PreRequisites = () => {
   );
 };
 
-export const AddProofsOfImpactStep3ModalId = "proofs-of-impact-add-step-3";
+export const AddProofsOfImpactStep3ModalId = "proofs-of-impact/add/step3";
 const AddProofsOfImpactStep3 = () => {
   const { stack, hide, popModal, clear } = useModal();
   const { authenticated } = useAccount();
@@ -126,11 +126,17 @@ const AddProofsOfImpactStep3 = () => {
               animate={{
                 width: stepDiff <= 1 ? "4rem" : "0rem",
                 filter:
-                  stepDiff === 0
-                    ? "blur(0px) saturate(1)"
-                    : "blur(4px) saturate(0)",
-                opacity: stepDiff === 0 ? 1 : stepDiff === 1 ? 0.5 : 0,
-                scale: stepDiff === 0 ? 1.2 : stepDiff === 1 ? 0.5 : 0,
+                  stepDiff === 0 ?
+                    "blur(0px) saturate(1)"
+                  : "blur(4px) saturate(0)",
+                opacity:
+                  stepDiff === 0 ? 1
+                  : stepDiff === 1 ? 0.5
+                  : 0,
+                scale:
+                  stepDiff === 0 ? 1.2
+                  : stepDiff === 1 ? 0.5
+                  : 0,
               }}
               transition={{
                 duration: 0.5,
@@ -142,17 +148,15 @@ const AddProofsOfImpactStep3 = () => {
                 <div
                   className={cn(
                     "absolute inset-10 rounded-full blur-xl",
-                    status === "error"
-                      ? "bg-red-500/50"
-                      : "animate-pulse bg-green-500/50"
+                    status === "error" ? "bg-red-500/50" : (
+                      "animate-pulse bg-green-500/50"
+                    )
                   )}
                 />
               )}
-              {status === "error" ? (
+              {status === "error" ?
                 <CircleAlert className="z-10 size-16 text-red-500" />
-              ) : (
-                <step.Icon className={cn("z-10 size-16 text-green-500")} />
-              )}
+              : <step.Icon className={cn("z-10 size-16 text-green-500")} />}
             </motion.div>
           );
         })}
@@ -160,9 +164,9 @@ const AddProofsOfImpactStep3 = () => {
           className={cn("flex aspect-square items-center justify-center")}
           animate={{
             width:
-              currentStepIndex === ADD_POI_PROGRESS_STEPS.length - 1
-                ? "4rem"
-                : "0rem",
+              currentStepIndex === ADD_POI_PROGRESS_STEPS.length - 1 ?
+                "4rem"
+              : "0rem",
             filter: "blur(4px) saturate(0)",
             opacity: 0.5,
             scale: 0.5,
@@ -173,7 +177,7 @@ const AddProofsOfImpactStep3 = () => {
           }}
         />
       </div>
-      {status === "error" ? (
+      {status === "error" ?
         <div className="flex flex-col items-center">
           <span className="text-balance text-center font-bold text-destructive text-lg">
             {errorState?.title}
@@ -190,8 +194,7 @@ const AddProofsOfImpactStep3 = () => {
             <RefreshCcw className="size-4" /> Retry
           </Button>
         </div>
-      ) : (
-        <div className="flex flex-col items-center">
+      : <div className="flex flex-col items-center">
           <span className="text-balance text-center font-bold text-lg text-primary">
             {ADD_POI_PROGRESS_STEPS[currentStepIndex].title}
           </span>
@@ -199,7 +202,7 @@ const AddProofsOfImpactStep3 = () => {
             {ADD_POI_PROGRESS_STEPS[currentStepIndex].description}
           </span>
         </div>
-      )}
+      }
       <ModalFooter>
         {status !== "pending" && (
           <Button variant={"secondary"} onClick={() => handleBack()}>

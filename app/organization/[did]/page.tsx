@@ -29,7 +29,7 @@ const OrganizationPage = async ({
   const did = decodeURIComponent(encodedDid);
 
   const apiCaller = getServerCaller();
-  const response = await apiCaller.getOrganizationInfo({ did });
+  const response = await apiCaller.organizationInfo.get({ did });
 
   if (!response.success && response.code !== "RECORD_NOT_FOUND") {
     throw new Error(response.humanMessage);

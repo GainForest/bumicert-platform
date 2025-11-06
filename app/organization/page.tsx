@@ -1,19 +1,19 @@
 "use client";
 import AtprotoSignInButton from "@/components/global/Header/AtprotoSignInButton";
-import { useAtproto } from "@/components/providers/AtprotoProvider";
 import Container from "@/components/ui/container";
 import { CircleAlert, Loader2 } from "lucide-react";
 import React, { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useAtprotoStore } from "@/components/stores/atproto";
 
 const MyOrganizationPage = () => {
-  const { isReady, isAuthenticated, agent } = useAtproto();
+  const auth = useAtprotoStore((state) => state.auth);
   const router = useRouter();
 
   const myOrganizationPageUrl = useMemo(() => {
-    return agent?.did ? `/organization/${agent.did}` : null;
-  }, [agent?.did]);
+    return auth.user?.did ? `/organization/${auth.user.did}` : null;
+  }, [auth.user]);
 
   useEffect(() => {
     if (myOrganizationPageUrl) {
@@ -23,7 +23,7 @@ const MyOrganizationPage = () => {
   return (
     <Container>
       <div className="w-full h-40 flex flex-col items-center justify-center gap-1 bg-muted/50 rounded-lg mt-2">
-        {isReady && !isAuthenticated ?
+        {auth.status === "UNAUTHENTICATED" ?
           <>
             <CircleAlert className="size-5 text-muted-foreground" />
             <span className="text-muted-foreground text-sm">
@@ -34,7 +34,7 @@ const MyOrganizationPage = () => {
         : <>
             <Loader2 className="size-5 animate-spin text-muted-foreground" />
             <span className="text-muted-foreground text-sm">
-              {isReady ? "Redirecting" : "Loading"}
+              {auth.status === "RESUMING" ? "Loading" : "Redirecting"}
               ...
             </span>
             {myOrganizationPageUrl && (

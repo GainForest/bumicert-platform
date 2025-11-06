@@ -15,7 +15,7 @@ import QuickModal from "@/components/ui/quick-modal";
 const MAX_TITLE_LENGTH = 50;
 const MAX_DESCRIPTION_LENGTH = 450;
 
-export const AddProofsOfImpactStep1ModalId = "proofs-of-impact-add-step-1";
+export const AddProofsOfImpactStep1ModalId = "proofs-of-impact/add/step1";
 const AddProofsOfImpactStep1 = ({ ecocertId }: { ecocertId: string }) => {
   const { stack, pushModal } = useModal();
   const { setStep1State } = useAddPoiStore();
