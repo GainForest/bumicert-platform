@@ -53,7 +53,7 @@ const CallbackPage = () => {
 
   useEffect(() => {
     if (isReady && isAuthenticated && !csrfError) {
-      router.replace("/");
+      router.replace("/organization");
     }
   }, [isReady, isAuthenticated, router, csrfError]);
 
@@ -89,7 +89,10 @@ const CallbackPage = () => {
                 Try again
               </Button>
             )}
-            <Button variant="outline" onClick={() => router.replace("/")}>
+            <Button
+              variant="outline"
+              onClick={() => router.replace("/organization")}
+            >
               Back to Home
             </Button>
           </div>
