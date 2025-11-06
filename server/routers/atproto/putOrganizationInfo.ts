@@ -1,6 +1,6 @@
 import { publicProcedure } from "@/server/trpc";
 import z from "zod";
-import { getWriteAgent } from "../_app";
+import { getWriteAgent, PutRecordResponse } from "../_app";
 import { AppGainforestOrganizationInfo } from "@/lexicon-api";
 import { BlobRef, typedJsonBlobRef } from "@atproto/lexicon";
 import { CID } from "multiformats/cid";
@@ -16,6 +16,7 @@ export const putOrganizationInfo = publicProcedure
         shortDescription: z.string(),
         longDescription: z.string(),
         website: z.string().optional(),
+        logo: z.instanceof(BlobRef).optional(),
         coverImage: z.instanceof(BlobRef).optional(),
         objectives: z.array(
           z.enum([
@@ -40,6 +41,7 @@ export const putOrganizationInfo = publicProcedure
       shortDescription: input.info.shortDescription,
       longDescription: input.info.longDescription,
       website: input.info.website ? input.info.website : undefined,
+      logo: input.info.logo,
       coverImage: input.info.coverImage,
       objectives: input.info.objectives,
       startDate: new Date().toISOString(),
@@ -59,5 +61,5 @@ export const putOrganizationInfo = publicProcedure
       record: info,
     });
 
-    return response;
+    return response as PutRecordResponse;
   });

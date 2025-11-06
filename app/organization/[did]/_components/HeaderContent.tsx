@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import React, { useEffect } from "react";
 import { Check, Pencil, X } from "lucide-react";
 import { useOrganizationPageStore } from "../store";
+import { useModal } from "@/components/ui/modal/context";
+import { SaveInfoModal, SaveInfoModalId } from "./SaveInfoModal";
 
 const LeftContent = () => {
   return null;
@@ -12,6 +14,7 @@ const LeftContent = () => {
 
 const RightContent = () => {
   const { isEditing, setIsEditing } = useOrganizationPageStore();
+  const { show, pushModal } = useModal();
   return (
     <div className="flex items-center gap-1">
       {isEditing ?
@@ -23,7 +26,19 @@ const RightContent = () => {
           >
             <X />
           </Button>
-          <Button size={"sm"} onClick={() => setIsEditing(!isEditing)}>
+          <Button
+            size={"sm"}
+            onClick={() => {
+              pushModal(
+                {
+                  id: SaveInfoModalId,
+                  content: <SaveInfoModal />,
+                },
+                true
+              );
+              show();
+            }}
+          >
             <Check />
             Save
           </Button>

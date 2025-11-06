@@ -15,11 +15,23 @@ import { putOrganizationInfo } from "./atproto/putOrganizationInfo";
 import { tryCatch } from "@/lib/tryCatch";
 import { XRPCError } from "@atproto/xrpc";
 import { TRPCError } from "@trpc/server";
+import { uploadFileAsBlob } from "./atproto/uploadFileAsBlob";
 
 export type GetRecordResponse<T> = {
   value: T;
   uri: string;
   cid: string;
+};
+
+export type PutRecordResponse = {
+  success: true;
+  data: {
+    uri: string;
+    cid: string;
+    commit?: string;
+    validationStatus: "unknown" | (string & {}) | undefined;
+  };
+  headers: Record<string, string>;
 };
 
 export const getReadAgent = () => {
@@ -129,6 +141,7 @@ export const appRouter = createTRPCRouter({
       return response.data;
     }),
   putOrganizationInfo,
+  uploadFileAsBlob,
   getProjectSite: publicProcedure
     .input(z.object({ did: z.string(), rkey: z.string() }))
     .query(async ({ input }) => {
