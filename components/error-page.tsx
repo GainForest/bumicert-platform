@@ -1,11 +1,12 @@
 "use client";
 import React from "react";
 import { Button } from "./ui/button";
-import { CircleAlert, RefreshCcwIcon } from "lucide-react";
+import { CircleAlert, HomeIcon, RefreshCcwIcon } from "lucide-react";
 import { getStripedBackground } from "@/lib/getStripedBackground";
 
 const ErrorPage = ({
   showRefreshButton = true,
+  showHomeButton = true,
   title,
   description,
   error,
@@ -13,6 +14,7 @@ const ErrorPage = ({
   title?: string;
   description?: string;
   showRefreshButton?: boolean;
+  showHomeButton?: boolean;
   error?: unknown;
 }) => {
   console.error(error);
@@ -21,8 +23,8 @@ const ErrorPage = ({
       className="flex flex-col items-center gap-4 w-full p-4 rounded-xl"
       style={{
         background: getStripedBackground(
-          { variable: "--destructive", opacity: 10 },
-          { variable: "--destructive", opacity: 3 }
+          { variable: "--destructive", opacity: 5 },
+          { variable: "--muted", opacity: 10 }
         ),
       }}
     >
@@ -35,12 +37,23 @@ const ErrorPage = ({
           {description ??
             "We're sorry, but an error occurred while processing your request."}
         </p>
-        {showRefreshButton && (
-          <Button className="mt-4" onClick={() => window.location.reload()}>
-            <RefreshCcwIcon />
-            Refresh
-          </Button>
-        )}
+        <div className="flex items-center gap-2 mt-4">
+          {showRefreshButton && (
+            <Button onClick={() => window.location.reload()}>
+              <RefreshCcwIcon />
+              Refresh
+            </Button>
+          )}
+          {showHomeButton && (
+            <Button
+              variant="outline"
+              onClick={() => (window.location.href = "/")}
+            >
+              <HomeIcon />
+              Home
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );

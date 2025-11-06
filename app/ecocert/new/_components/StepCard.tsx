@@ -15,27 +15,47 @@ const stepImages = [
   {
     image: BiokoNeutralImage,
     alt: "Bioko Neutral",
+    tips: [
+      "Use a short and descriptive name for your project.",
+      "Include a website or social link to your project for easy access.",
+    ],
   },
   {
     image: BiokoHoldingLoudspeakerImage,
     alt: "Bioko Holding Loudspeaker",
+    tips: [
+      "Tell your story in your own words. Explain what the problem was and what you did to solve it.",
+      "Share who was involved, such as your group, partners, or local community.",
+      "Describe how your work is helping and what has changed because of it.",
+      "Write freely. Longer stories are welcome.",
+    ],
   },
   {
     image: BiokoHoldingEarthImage,
     alt: "Bioko Holding Earth",
+    tips: [
+      "Add your own community or organization first, then other people or groups who joined.",
+      "Make sure everyone agrees to be included.",
+      "Upload your site boundary in GeoJSON format so it shows on the map.",
+    ],
   },
   {
     image: BiokoHoldingMagnifierImage,
     alt: "Bioko Holding Magnifier",
+    tips: [
+      "Make sure you have completed all the previous steps.",
+      "Review the look of your ecocert before submitting.",
+    ],
   },
   {
     image: BiokoHoldingConfettiImage,
     alt: "Bioko Holding Confetti",
+    tips: ["You have completed all the steps! No more tips for this section."],
   },
 ];
 
 const StepCard = () => {
-  const { currentStep } = useNewEcocertStore();
+  const { currentStepIndex: currentStep } = useNewEcocertStore();
   return (
     <div className="w-full rounded-xl border border-border shadow-lg mt-24">
       <div
@@ -81,20 +101,24 @@ const StepCard = () => {
         }}
       >
         <div className="p-4 pb-0 -mt-6 bg-background z-20 relative rounded-md font-medium">
-          <p className="text-muted-foreground">
-            Hello! I am Bioko. I&apos;ll guide you through the creation of your
-            ecocert.
-          </p>
-          <hr className="my-2" />
+          {currentStep === 0 && (
+            <>
+              <p className="text-muted-foreground">
+                Hello! I am Bioko. I&apos;ll guide you through the creation of
+                your ecocert.
+              </p>
+              <hr className="my-2" />
+            </>
+          )}
+
           <span className="flex items-center gap-1">
             <Lightbulb className="size-4" />
             Tips for this section
           </span>
           <ul className="list-disc list-inside text-sm -indent-5 pl-5 mt-2">
-            <li>Use a short and descriptive name for your project.</li>
-            <li>
-              Include a website or social link to your project for easy access.
-            </li>
+            {stepImages[currentStep].tips.map((tip, index) => (
+              <li key={index}>{tip}</li>
+            ))}
           </ul>
         </div>
         <div className="h-4"></div>

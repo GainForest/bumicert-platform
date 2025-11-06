@@ -405,6 +405,224 @@ export const schemaDict = {
       },
     },
   },
+  AppGainforestOrganizationDefaultSite: {
+    lexicon: 1,
+    id: 'app.gainforest.organization.defaultSite',
+    defs: {
+      main: {
+        type: 'record',
+        description: 'A declaration of the default site for an organization',
+        key: 'literal:self',
+        record: {
+          type: 'object',
+          required: ['site'],
+          properties: {
+            site: {
+              type: 'string',
+              format: 'at-uri',
+              description:
+                'The reference to the default site record in the PDS',
+            },
+          },
+        },
+      },
+    },
+  },
+  AppGainforestOrganizationGetIndexedOrganizations: {
+    lexicon: 1,
+    id: 'app.gainforest.organization.getIndexedOrganizations',
+    defs: {
+      main: {
+        type: 'query',
+        description: 'Get all organizations to view initially on map',
+        parameters: {
+          type: 'params',
+          properties: {},
+        },
+        output: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['organizations'],
+            properties: {
+              organizations: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:app.gainforest.organization.defs#indexedOrganization',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  AppGainforestOrganizationInfo: {
+    lexicon: 1,
+    id: 'app.gainforest.organization.info',
+    defs: {
+      main: {
+        type: 'record',
+        description: 'A declaration of an organization or project',
+        key: 'literal:self',
+        record: {
+          type: 'object',
+          required: [
+            'displayName',
+            'shortDescription',
+            'longDescription',
+            'objectives',
+            'startDate',
+            'country',
+            'visibility',
+          ],
+          properties: {
+            displayName: {
+              type: 'string',
+              description: 'The name of the organization or project',
+              minLength: 8,
+              maxLength: 255,
+            },
+            shortDescription: {
+              type: 'string',
+              description: 'The description of the organization or project',
+              minLength: 50,
+              maxLength: 2000,
+            },
+            longDescription: {
+              type: 'string',
+              description:
+                'The long description of the organization or project in markdown',
+              minLength: 50,
+              maxLength: 5000,
+            },
+            coverImage: {
+              type: 'blob',
+              accept: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+              maxSize: 5242880,
+              description: 'Cover image blob for the organization (max 5MB)',
+            },
+            logo: {
+              type: 'blob',
+              accept: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+              maxSize: 5242880,
+              description: 'Logo blob for the organization (max 5MB)',
+            },
+            objectives: {
+              type: 'array',
+              description: 'The objectives of the organization or project',
+              items: {
+                type: 'string',
+                enum: [
+                  'Conservation',
+                  'Research',
+                  'Education',
+                  'Community',
+                  'Other',
+                ],
+              },
+            },
+            startDate: {
+              type: 'string',
+              description: 'The start date of the organization or project',
+              format: 'datetime',
+            },
+            website: {
+              type: 'string',
+              description: 'The website of the organization or project',
+              format: 'uri',
+            },
+            country: {
+              type: 'string',
+              description:
+                'The country of the organization or project in two letter code (ISO 3166-1 alpha-2)',
+            },
+            visibility: {
+              type: 'string',
+              description:
+                'The visibility of the organization or project in the Green Globe',
+              enum: ['Public', 'Hidden'],
+            },
+          },
+        },
+      },
+    },
+  },
+  AppGainforestOrganizationMeasuredTrees: {
+    lexicon: 1,
+    id: 'app.gainforest.organization.measuredTrees',
+    defs: {
+      main: {
+        type: 'record',
+        description: 'A declaration of measured trees for an organization',
+        key: 'literal:self',
+        record: {
+          type: 'object',
+          required: ['shapefile'],
+          properties: {
+            shapefile: {
+              type: 'string',
+              format: 'uri',
+              description:
+                'The uri pointing to the shapefile of the measured trees',
+            },
+          },
+        },
+      },
+    },
+  },
+  AppGainforestOrganizationSite: {
+    lexicon: 1,
+    id: 'app.gainforest.organization.site',
+    defs: {
+      main: {
+        type: 'record',
+        description: 'A declaration of a site for an organization',
+        key: 'tid',
+        record: {
+          type: 'object',
+          required: ['name', 'lat', 'lon', 'area'],
+          properties: {
+            name: {
+              type: 'string',
+              description: 'The name of the site',
+            },
+            lat: {
+              type: 'string',
+              description: 'The latitude of the centerpoint of the site',
+            },
+            lon: {
+              type: 'string',
+              description: 'The longitude of the centerpoint of the site',
+            },
+            area: {
+              type: 'string',
+              description: 'The area of the site in hectares',
+            },
+            shapefile: {
+              type: 'union',
+              refs: [
+                'lex:app.gainforest.common.defs#uri',
+                'lex:app.gainforest.common.defs#smallBlob',
+              ],
+              description:
+                'URI or blob pointing to a geoJSON file containing the site boundaries',
+            },
+            trees: {
+              type: 'union',
+              refs: [
+                'lex:app.gainforest.common.defs#uri',
+                'lex:app.gainforest.common.defs#smallBlob',
+              ],
+              description:
+                'URI or blob pointing to GeoJSON data containing tree planting data for this site',
+            },
+          },
+        },
+      },
+    },
+  },
 } as const satisfies Record<string, LexiconDoc>
 export const schemas = Object.values(schemaDict) satisfies LexiconDoc[]
 export const lexicons: Lexicons = new Lexicons(schemas)
@@ -445,4 +663,12 @@ export const ids = {
   AppCertifiedHypercertRecord: 'app.certified.hypercert.record',
   AppCertifiedHypercertRights: 'app.certified.hypercert.rights',
   AppCertifiedHypercertSale: 'app.certified.hypercert.sale',
+  AppGainforestOrganizationDefaultSite:
+    'app.gainforest.organization.defaultSite',
+  AppGainforestOrganizationGetIndexedOrganizations:
+    'app.gainforest.organization.getIndexedOrganizations',
+  AppGainforestOrganizationInfo: 'app.gainforest.organization.info',
+  AppGainforestOrganizationMeasuredTrees:
+    'app.gainforest.organization.measuredTrees',
+  AppGainforestOrganizationSite: 'app.gainforest.organization.site',
 } as const

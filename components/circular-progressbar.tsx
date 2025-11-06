@@ -6,10 +6,14 @@ const CircularProgressBar = ({
   value,
   size = 40,
   text,
+  strokeWidth = 9,
+  textSize = 0.3,
 }: {
   value: number;
   size?: number;
   text?: string;
+  textSize?: number;
+  strokeWidth?: number;
 }) => {
   return (
     <div
@@ -24,7 +28,7 @@ const CircularProgressBar = ({
         styles={{
           path: {
             stroke: "var(--primary)",
-            strokeWidth: 9,
+            strokeWidth: strokeWidth,
             strokeLinecap: "round",
           },
           trail: {
@@ -32,7 +36,12 @@ const CircularProgressBar = ({
           },
         }}
       />
-      <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-xs scale-75">
+      <span
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-xs scale-75"
+        style={{
+          fontSize: `${size * textSize}px`,
+        }}
+      >
         {text}
       </span>
     </div>

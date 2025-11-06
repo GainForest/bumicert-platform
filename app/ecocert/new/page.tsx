@@ -3,6 +3,7 @@ import React from "react";
 import StepNavigator from "./_components/StepNavigator";
 import StepCard from "./_components/StepCard";
 import Steps from "./_components/Steps";
+import StepFooter from "./_components/StepFooter";
 
 const NewEcocertPage = () => {
   return (
@@ -12,9 +13,12 @@ const NewEcocertPage = () => {
           <StepNavigator />
           <div className="w-full mt-4">
             <Steps />
+            <StepFooter />
           </div>
         </div>
-        <StepCard />
+        <div className="flex flex-col items-center">
+          <StepCard />
+        </div>
       </div>
     </Container>
   );
