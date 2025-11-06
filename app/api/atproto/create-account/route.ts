@@ -1,14 +1,25 @@
 import { NextRequest } from "next/server";
-import postgres from 'postgres';
+import postgres from "postgres";
+import { PDS_URL } from "@/config/atproto";
+import { env } from "process";
 
-if (!process.env.POSTGRES_URL_NON_POOLING_ATPROTO_AUTH_MAPPING) {
-  throw new Error("Missing POSTGRES_URL_NON_POOLING_ATPROTO_AUTH_MAPPING env var");
+if (!env.POSTGRES_URL_NON_POOLING_ATPROTO_AUTH_MAPPING) {
+  throw new Error(
+    "Missing POSTGRES_URL_NON_POOLING_ATPROTO_AUTH_MAPPING env var"
+  );
 }
-const sql = postgres(process.env.POSTGRES_URL_NON_POOLING_ATPROTO_AUTH_MAPPING, { ssl: 'require' });
+const sql = postgres(env.POSTGRES_URL_NON_POOLING_ATPROTO_AUTH_MAPPING, {
+  ssl: "require",
+});
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json() as { email: string; password: string; handle: string; inviteCode: string };
+    const body = (await req.json()) as {
+      email: string;
+      password: string;
+      handle: string;
+      inviteCode: string;
+    };
     let { email, password, handle, inviteCode } = body;
     email = (email ?? "").trim().toLowerCase();
     password = (password ?? "").trim();
@@ -17,12 +28,16 @@ export async function POST(req: NextRequest) {
 
     if (!email || !password || !handle || !inviteCode) {
       return new Response(
-        JSON.stringify({ error: "BadRequest", message: "Missing required fields" }),
+        JSON.stringify({
+          error: "BadRequest",
+          message: "Missing required fields",
+        }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    const inviteCodeInfo = await sql`SELECT * FROM invites WHERE invite_token = ${inviteCode}`;
+    const inviteCodeInfo =
+      await sql`SELECT * FROM invites WHERE invite_token = ${inviteCode}`;
     if (inviteCodeInfo.length === 0) {
       return new Response(
         JSON.stringify({ error: "Invite code not found in db" }),
@@ -36,8 +51,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const service =
-      process.env.NEXT_PUBLIC_ATPROTO_SERVICE_URL || "https://climateai.org";
+    const service = PDS_URL;
 
     const response = await fetch(
       `${service}/xrpc/com.atproto.server.createAccount`,
@@ -51,18 +65,24 @@ export async function POST(req: NextRequest) {
     if (!response.ok) {
       const error = await response.json();
       console.error("Account creation failed:", error);
-      return new Response(JSON.stringify(error), { status: response.status }); 
+      return new Response(JSON.stringify(error), { status: response.status });
     }
 
-    const data = await response.json() as { handle: string; did: string; accessJwt: string; refreshJwt: string };
+    const data = (await response.json()) as {
+      handle: string;
+      did: string;
+      accessJwt: string;
+      refreshJwt: string;
+    };
     return new Response(JSON.stringify(data), { status: 200 });
-
   } catch (err: unknown) {
     console.error("Unexpected error:", err);
     return new Response(
       JSON.stringify({
         error: "Internal Server Error",
-        message: (err as Record<string, string>).message || "Unexpected error occurred",
+        message:
+          (err as Record<string, string>).message ||
+          "Unexpected error occurred",
       }),
       { status: 500 }
     );

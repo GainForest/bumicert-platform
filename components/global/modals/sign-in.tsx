@@ -22,8 +22,8 @@ import { useModal } from "@/components/ui/modal/context";
 
 export const SignInModalId = "sign-in-modal";
 
-const SignInModal = () => {
-  const [handle, setHandle] = useState("");
+const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
+  const [handle, setHandle] = useState(initialHandle);
   const [rememberMe, setRememberMe] = useState(false);
   const { popModal, stack } = useModal();
   const { isReady, signIn, initializationError, isAuthenticated } =
