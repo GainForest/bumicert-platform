@@ -9,21 +9,25 @@ import {
   is$typed as _is$typed,
   type OmitKey,
 } from '../../../../util'
+import type * as AppCertifiedDefs from '../../../app/certified/defs.js'
 
 const is$typed = _is$typed,
   validate = _validate
-const id = 'app.certified.hypercert.location'
+const id = 'org.hypercerts.claim.evidence'
 
 export interface Record {
-  $type: 'app.certified.hypercert.location'
-  /** Optional name for this location */
-  name?: string
-  /** Optional description for this location */
+  $type: 'org.hypercerts.claim.evidence'
+  content:
+    | $Typed<AppCertifiedDefs.Uri>
+    | $Typed<AppCertifiedDefs.SmallBlob>
+    | { $type: string }
+  /** Optional title to describe the nature of the evidence */
+  title?: string
+  /** Short description explaining what this evidence demonstrates or proves */
+  shortDescription: string
+  /** Optional longer description describing the impact claim evidence. */
   description?: string
-  /** Spatial Reference System: the coordinate system within which the object is positioned (e.g ESPG:4326) */
-  srs?: string
-  /** The location of where the work was performed */
-  value: BlobRef
+  /** Client-declared timestamp when this hypercert claim was originally created */
   createdAt: string
   [k: string]: unknown
 }

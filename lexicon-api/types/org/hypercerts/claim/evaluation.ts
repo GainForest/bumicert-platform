@@ -10,24 +10,26 @@ import {
   type OmitKey,
 } from '../../../../util'
 import type * as ComAtprotoRepoStrongRef from '../../../com/atproto/repo/strongRef.js'
+import type * as AppCertifiedDefs from '../../../app/certified/defs.js'
 
 const is$typed = _is$typed,
   validate = _validate
-const id = 'app.certified.hypercert.measurement'
+const id = 'org.hypercerts.claim.evaluation'
 
 export interface Record {
-  $type: 'app.certified.hypercert.measurement'
-  hypercert: ComAtprotoRepoStrongRef.Main
-  /** DID of the entity performing the measurement */
-  measurerDID: string
-  /** The metric being measured */
-  metric: string
-  /** The measured value */
-  value: string
-  /** URI to methodology documentation, standard protocol, or measurement procedure */
-  measurementMethodURI?: string
-  /** URIs to supporting evidence or data */
-  evidenceURI?: string[]
+  $type: 'org.hypercerts.claim.evaluation'
+  subject: ComAtprotoRepoStrongRef.Main
+  /** DIDs of the evaluators */
+  evaluators: string[]
+  /** Evaluation data (URIs or blobs) containing detailed reports or methodology */
+  evaluations?: (
+    | $Typed<AppCertifiedDefs.Uri>
+    | $Typed<AppCertifiedDefs.SmallBlob>
+    | { $type: string }
+  )[]
+  /** Brief evaluation summary */
+  summary: string
+  /** Client-declared timestamp when this record was originally created */
   createdAt: string
   [k: string]: unknown
 }

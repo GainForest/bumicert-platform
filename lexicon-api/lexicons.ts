@@ -10,9 +10,139 @@ import {
 import { type $Typed, is$typed, maybe$typed } from './util'
 
 export const schemaDict = {
-  AppCertifiedHypercertContribution: {
+  AppCertifiedDefs: {
     lexicon: 1,
-    id: 'app.certified.hypercert.contribution',
+    id: 'app.certified.defs',
+    defs: {
+      uri: {
+        type: 'string',
+        format: 'uri',
+        maxGraphemes: 1000,
+        description: 'URI to external data',
+      },
+      smallBlob: {
+        type: 'blob',
+        accept: ['*/*'],
+        maxSize: 10485760,
+        description: 'Blob to external data (up to 10MB)',
+      },
+      largeBlob: {
+        type: 'blob',
+        accept: ['*/*'],
+        maxSize: 104857600,
+        description: 'Blob to external data (up to 100MB)',
+      },
+    },
+  },
+  OrgHypercertsClaimRecord: {
+    lexicon: 1,
+    id: 'org.hypercerts.claim.record',
+    defs: {
+      main: {
+        type: 'record',
+        description: 'A hypercert record tracking impact work.',
+        key: 'any',
+        record: {
+          type: 'object',
+          required: [
+            'title',
+            'shortDescription',
+            'createdAt',
+            'workScope',
+            'workTimeframeFrom',
+            'workTimeFrameTo',
+          ],
+          properties: {
+            title: {
+              type: 'string',
+              description: 'Title of the hypercert',
+              maxLength: 256,
+            },
+            shortDescription: {
+              type: 'string',
+              description: 'Short blurb of the impact work done.',
+              maxLength: 3000,
+              maxGraphemes: 300,
+            },
+            description: {
+              type: 'string',
+              description:
+                'Optional longer description of the impact work done.',
+              maxLength: 30000,
+              maxGraphemes: 3000,
+            },
+            image: {
+              type: 'union',
+              refs: [
+                'lex:app.certified.defs#uri',
+                'lex:app.certified.defs#smallBlob',
+              ],
+              description:
+                'The hypercert visual representation as a URI or blob',
+            },
+            workScope: {
+              type: 'string',
+              description: 'Scope of the work performed',
+              maxLength: 5000,
+              maxGraphemes: 1000,
+            },
+            workTimeframeFrom: {
+              type: 'string',
+              format: 'datetime',
+              description: 'When the work began',
+            },
+            workTimeFrameTo: {
+              type: 'string',
+              format: 'datetime',
+              description: 'When the work ended',
+            },
+            evidence: {
+              type: 'array',
+              description:
+                'Supporting evidence, documentation, or external data URIs',
+              items: {
+                type: 'ref',
+                ref: 'lex:com.atproto.repo.strongRef',
+                description:
+                  'A strong reference to the evidence that supports this impact claim. The record referenced must conform with the org.hypercerts.claim.evidence lexicon',
+              },
+              maxLength: 100,
+            },
+            contributions: {
+              type: 'array',
+              description:
+                'A strong reference to the contributions done to create the impact in the hypercerts. The record referenced must conform with the lexicon org.hypercerts.claim.contributions',
+              items: {
+                type: 'ref',
+                ref: 'lex:com.atproto.repo.strongRef',
+              },
+            },
+            rights: {
+              type: 'ref',
+              ref: 'lex:com.atproto.repo.strongRef',
+              description:
+                'A strong reference to the rights that this hypercert has. The record referenced must conform with the lexicon org.hypercerts.claim.rights',
+            },
+            location: {
+              type: 'ref',
+              ref: 'lex:com.atproto.repo.strongRef',
+              description:
+                'A strong reference to the location where the work for done hypercert was located. The record referenced must conform with the lexicon org.hypercerts.claim.location',
+            },
+            createdAt: {
+              type: 'string',
+              format: 'datetime',
+              description:
+                'Client-declared timestamp when this record was originally created',
+            },
+          },
+        },
+      },
+    },
+  },
+  OrgHypercertsClaimContribution: {
+    lexicon: 1,
+    id: 'org.hypercerts.claim.contribution',
     defs: {
       main: {
         type: 'record',
@@ -20,51 +150,60 @@ export const schemaDict = {
         key: 'any',
         record: {
           type: 'object',
-          required: ['contributor', 'role', 'createdAt'],
+          required: ['contributors', 'role', 'createdAt'],
           properties: {
             hypercert: {
               type: 'ref',
-              ref: 'lex:app.certified.hypercert.record',
-              description: 'Reference to the hypercert',
+              ref: 'lex:com.atproto.repo.strongRef',
+              description:
+                'A strong reference to the hypercert this contribution is for. The record referenced must conform with the lexicon org.hypercerts.claim.record',
             },
             role: {
               type: 'string',
-              description: 'Role or title of the contributor',
+              description: 'Role or title of the contributor(s).',
               maxLength: 100,
             },
-            contributor: {
-              type: 'string',
-              format: 'did',
-              description: 'DID identifying the contributor',
+            contributors: {
+              type: 'array',
+              description:
+                'List of DIDs identifying the contributors. If multiple are stored in the same hypercertContribution, then they would have the exact same role.',
+              items: {
+                type: 'string',
+                format: 'did',
+              },
             },
             description: {
               type: 'string',
-              description: 'What the contributor concretely did',
+              description: 'What the contribution concretely achieved',
               maxLength: 2000,
               maxGraphemes: 500,
             },
             workTimeframeFrom: {
               type: 'string',
               format: 'datetime',
-              description: 'When this contributor started',
+              description:
+                'When this contribution started. This should be a subset of the hypercert timeframe.',
             },
             workTimeframeTo: {
               type: 'string',
               format: 'datetime',
-              description: 'When this contributor finished',
+              description:
+                'When this contribution finished.  This should be a subset of the hypercert timeframe.',
             },
             createdAt: {
               type: 'string',
               format: 'datetime',
+              description:
+                'Client-declared timestamp when this record was originally created',
             },
           },
         },
       },
     },
   },
-  AppCertifiedHypercertEvaluation: {
+  OrgHypercertsClaimEvaluation: {
     lexicon: 1,
-    id: 'app.certified.hypercert.evaluation',
+    id: 'org.hypercerts.claim.evaluation',
     defs: {
       main: {
         type: 'record',
@@ -72,23 +211,35 @@ export const schemaDict = {
         key: 'tid',
         record: {
           type: 'object',
-          required: ['subject', 'evaluatorDID', 'summary', 'createdAt'],
+          required: ['subject', 'evaluators', 'summary', 'createdAt'],
           properties: {
             subject: {
               type: 'ref',
               ref: 'lex:com.atproto.repo.strongRef',
               description:
-                'Reference to what is being evaluated (hypercert, measurement, etc.)',
+                'A strong reference to the evaluated claim. (e.g measurement, hypercert, contribution, etc)',
             },
-            evaluatorDID: {
-              type: 'string',
-              format: 'did',
-              description: 'DID of the evaluator',
+            evaluators: {
+              type: 'array',
+              description: 'DIDs of the evaluators',
+              items: {
+                type: 'string',
+                format: 'did',
+              },
+              maxLength: 100,
             },
-            evaluationURI: {
-              type: 'string',
-              format: 'uri',
-              description: 'URI to detailed evaluation report or methodology',
+            evaluations: {
+              type: 'array',
+              description:
+                'Evaluation data (URIs or blobs) containing detailed reports or methodology',
+              items: {
+                type: 'union',
+                refs: [
+                  'lex:app.certified.defs#uri',
+                  'lex:app.certified.defs#smallBlob',
+                ],
+              },
+              maxLength: 100,
             },
             summary: {
               type: 'string',
@@ -99,15 +250,69 @@ export const schemaDict = {
             createdAt: {
               type: 'string',
               format: 'datetime',
+              description:
+                'Client-declared timestamp when this record was originally created',
             },
           },
         },
       },
     },
   },
-  AppCertifiedHypercertLocation: {
+  OrgHypercertsClaimEvidence: {
     lexicon: 1,
-    id: 'app.certified.hypercert.location',
+    id: 'org.hypercerts.claim.evidence',
+    defs: {
+      main: {
+        type: 'record',
+        description: 'A piece of evidence supporting a hypercert claim',
+        key: 'any',
+        record: {
+          type: 'object',
+          required: ['content', 'shortDescription', 'createdAt'],
+          properties: {
+            content: {
+              type: 'union',
+              refs: [
+                'lex:app.certified.defs#uri',
+                'lex:app.certified.defs#smallBlob',
+              ],
+              description:
+                'A piece of evidence (URI or blobs) supporting a hypercert claim',
+            },
+            title: {
+              type: 'string',
+              maxLength: 256,
+              description:
+                'Optional title to describe the nature of the evidence',
+            },
+            shortDescription: {
+              type: 'string',
+              maxLength: 3000,
+              maxGraphemes: 300,
+              description:
+                'Short description explaining what this evidence demonstrates or proves',
+            },
+            description: {
+              type: 'string',
+              description:
+                'Optional longer description describing the impact claim evidence.',
+              maxLength: 30000,
+              maxGraphemes: 3000,
+            },
+            createdAt: {
+              type: 'string',
+              format: 'datetime',
+              description:
+                'Client-declared timestamp when this hypercert claim was originally created',
+            },
+          },
+        },
+      },
+    },
+  },
+  OrgHypercertsClaimLocation: {
+    lexicon: 1,
+    id: 'org.hypercerts.claim.location',
     defs: {
       main: {
         type: 'record',
@@ -136,22 +341,28 @@ export const schemaDict = {
               maxLength: 20,
             },
             value: {
-              type: 'blob',
-              accept: ['.geojson', '.kml'],
-              description: 'The location of where the work was performed',
+              type: 'union',
+              refs: [
+                'lex:app.certified.defs#uri',
+                'lex:app.certified.defs#smallBlob',
+              ],
+              description:
+                'The location of where the work was performed as a URI or blob.',
             },
             createdAt: {
               type: 'string',
               format: 'datetime',
+              description:
+                'Client-declared timestamp when this record was originally created',
             },
           },
         },
       },
     },
   },
-  AppCertifiedHypercertMeasurement: {
+  OrgHypercertsClaimMeasurement: {
     lexicon: 1,
-    id: 'app.certified.hypercert.measurement',
+    id: 'org.hypercerts.claim.measurement',
     defs: {
       main: {
         type: 'record',
@@ -159,23 +370,23 @@ export const schemaDict = {
         key: 'tid',
         record: {
           type: 'object',
-          required: [
-            'hypercert',
-            'measurerDID',
-            'metric',
-            'value',
-            'createdAt',
-          ],
+          required: ['hypercert', 'measurers', 'metric', 'value', 'createdAt'],
           properties: {
             hypercert: {
               type: 'ref',
               ref: 'lex:com.atproto.repo.strongRef',
-              description: 'Reference to the hypercert being measured',
+              description:
+                'A strong reference to the hypercert that this measurement is for. The record referenced must conform with the lexicon org.hypercerts.claim.record',
             },
-            measurerDID: {
-              type: 'string',
-              format: 'did',
-              description: 'DID of the entity performing the measurement',
+            measurers: {
+              type: 'array',
+              description:
+                'DIDs of the entity (or entities) that measured this data. ',
+              items: {
+                type: 'string',
+                format: 'did',
+              },
+              maxLength: 100,
             },
             metric: {
               type: 'string',
@@ -205,133 +416,17 @@ export const schemaDict = {
             createdAt: {
               type: 'string',
               format: 'datetime',
+              description:
+                'Client-declared timestamp when this record was originally created',
             },
           },
         },
       },
     },
   },
-  AppCertifiedHypercertRecord: {
+  OrgHypercertsClaimRights: {
     lexicon: 1,
-    id: 'app.certified.hypercert.record',
-    defs: {
-      evidence: {
-        type: 'object',
-        required: ['uri'],
-        properties: {
-          uri: {
-            type: 'string',
-            format: 'uri',
-            description: 'Evidence resource URI',
-          },
-          title: {
-            type: 'string',
-            maxLength: 256,
-            description:
-              'Optional title to describe the nature of the evidence',
-          },
-        },
-      },
-      main: {
-        type: 'record',
-        description: 'A hypercert record tracking impact work.',
-        key: 'any',
-        record: {
-          type: 'object',
-          required: [
-            'hypercertID',
-            'title',
-            'description',
-            'image',
-            'createdAt',
-            'workScope',
-            'workTimeframeFrom',
-            'workTimeFrameTo',
-          ],
-          properties: {
-            title: {
-              type: 'string',
-              description: 'Title of the hypercert',
-              maxLength: 256,
-            },
-            hypercertID: {
-              type: 'string',
-              description: 'Identifier for the impact claim',
-              maxLength: 256,
-            },
-            description: {
-              type: 'string',
-              format: 'uri',
-              description: 'A description of the impact work done.',
-              maxLength: 30000,
-              maxGraphemes: 3000,
-            },
-            image: {
-              type: 'blob',
-              accept: ['image/*'],
-              maxSize: 5000000,
-              description:
-                'Blob reference to hypercert image/visual representation. Maximum size is in bytes',
-            },
-            workScope: {
-              type: 'string',
-              description: 'Scope of the work performed',
-              maxLength: 5000,
-              maxGraphemes: 1000,
-            },
-            workTimeframeFrom: {
-              type: 'string',
-              format: 'datetime',
-              description: 'When the work began',
-            },
-            workTimeFrameTo: {
-              type: 'string',
-              format: 'datetime',
-              description: 'When the work ended',
-            },
-            evidence: {
-              type: 'array',
-              description:
-                'Supporting evidence, documentation, or external data URIs',
-              items: {
-                type: 'ref',
-                ref: 'lex:app.certified.hypercert.record#evidence',
-              },
-              maxLength: 100,
-            },
-            contributors: {
-              type: 'array',
-              description: 'DIDs identifying contributors to this hypercert',
-              items: {
-                type: 'string',
-                format: 'did',
-              },
-              maxLength: 100,
-            },
-            rights: {
-              type: 'string',
-              description:
-                'Rights keyword (as defined in app.certified.hypercert.rights)',
-              maxLength: 10,
-            },
-            location: {
-              type: 'string',
-              format: 'at-uri',
-              description:
-                'AT URI referencing a location record (app.certified.hypercert.location)',
-            },
-            createdAt: {
-              type: 'string',
-              format: 'datetime',
-            },
-          },
-        },
-      },
-    },
-  },
-  AppCertifiedHypercertRights: {
-    lexicon: 1,
-    id: 'app.certified.hypercert.rights',
+    id: 'org.hypercerts.claim.rights',
     defs: {
       main: {
         type: 'record',
@@ -340,7 +435,12 @@ export const schemaDict = {
         key: 'any',
         record: {
           type: 'object',
-          required: ['rightsType', 'rightsDescription'],
+          required: [
+            'rightsName',
+            'rightsType',
+            'rightsDescription',
+            'createdAt',
+          ],
           properties: {
             rightsName: {
               type: 'string',
@@ -349,7 +449,7 @@ export const schemaDict = {
             },
             rightsType: {
               type: 'string',
-              description: 'Short rights identifer for easier search',
+              description: 'Short rights identifier for easier search',
               maxLength: 10,
             },
             rightsDescription: {
@@ -359,47 +459,47 @@ export const schemaDict = {
             createdAt: {
               type: 'string',
               format: 'datetime',
+              description:
+                'Client-declared timestamp when this record was originally created',
             },
           },
         },
       },
     },
   },
-  AppCertifiedHypercertSale: {
+  AppGainforestCommonDefs: {
     lexicon: 1,
-    id: 'app.certified.hypercert.sale',
+    id: 'app.gainforest.common.defs',
     defs: {
-      main: {
-        type: 'record',
-        description: 'A record of a non-tokenized hypercert sale transaction',
-        key: 'tid',
-        record: {
-          type: 'object',
-          required: ['hypercert', 'fractionPurchased'],
-          properties: {
-            hypercert: {
-              type: 'ref',
-              ref: 'lex:com.atproto.repo.strongRef',
-              description: 'Reference to the hypercert record being sold',
-            },
-            fractionPurchased: {
-              type: 'string',
-              description: 'Fraction of the hypercert purchased (0.0 to 1.0)',
-            },
-            priceAmount: {
-              type: 'string',
-              description: 'Purchase price amount',
-            },
-            priceCurrency: {
-              type: 'string',
-              description: "Currency (e.g., 'USD', 'EUR')",
-              maxLength: 10,
-            },
-            buyerDID: {
-              type: 'string',
-              format: 'uri',
-              description: 'DID identifying the buyer',
-            },
+      uri: {
+        type: 'string',
+        format: 'uri',
+        description: 'URI to external data',
+      },
+      smallBlob: {
+        type: 'blob',
+        accept: ['*/*'],
+        maxSize: 10485760,
+        description: 'Blob to external data (up to 10MB)',
+      },
+      largeBlob: {
+        type: 'blob',
+        accept: ['*/*'],
+        maxSize: 104857600,
+        description: 'Blob to external data (up to 100MB)',
+      },
+      indexedOrganization: {
+        type: 'object',
+        required: ['id', 'name'],
+        properties: {
+          id: {
+            type: 'string',
+            format: 'uri',
+            description: 'The URI of the organization',
+          },
+          name: {
+            type: 'string',
+            description: 'The name of the organization',
           },
         },
       },
@@ -449,7 +549,7 @@ export const schemaDict = {
                 type: 'array',
                 items: {
                   type: 'ref',
-                  ref: 'lex:app.gainforest.organization.defs#indexedOrganization',
+                  ref: 'lex:app.gainforest.common.defs#indexedOrganization',
                 },
               },
             },
@@ -623,6 +723,27 @@ export const schemaDict = {
       },
     },
   },
+  ComAtprotoRepoStrongRef: {
+    lexicon: 1,
+    id: 'com.atproto.repo.strongRef',
+    description: 'A URI with a content-hash fingerprint.',
+    defs: {
+      main: {
+        type: 'object',
+        required: ['uri', 'cid'],
+        properties: {
+          uri: {
+            type: 'string',
+            format: 'at-uri',
+          },
+          cid: {
+            type: 'string',
+            format: 'cid',
+          },
+        },
+      },
+    },
+  },
 } as const satisfies Record<string, LexiconDoc>
 export const schemas = Object.values(schemaDict) satisfies LexiconDoc[]
 export const lexicons: Lexicons = new Lexicons(schemas)
@@ -656,13 +777,15 @@ export function validate(
 }
 
 export const ids = {
-  AppCertifiedHypercertContribution: 'app.certified.hypercert.contribution',
-  AppCertifiedHypercertEvaluation: 'app.certified.hypercert.evaluation',
-  AppCertifiedHypercertLocation: 'app.certified.hypercert.location',
-  AppCertifiedHypercertMeasurement: 'app.certified.hypercert.measurement',
-  AppCertifiedHypercertRecord: 'app.certified.hypercert.record',
-  AppCertifiedHypercertRights: 'app.certified.hypercert.rights',
-  AppCertifiedHypercertSale: 'app.certified.hypercert.sale',
+  AppCertifiedDefs: 'app.certified.defs',
+  OrgHypercertsClaimRecord: 'org.hypercerts.claim.record',
+  OrgHypercertsClaimContribution: 'org.hypercerts.claim.contribution',
+  OrgHypercertsClaimEvaluation: 'org.hypercerts.claim.evaluation',
+  OrgHypercertsClaimEvidence: 'org.hypercerts.claim.evidence',
+  OrgHypercertsClaimLocation: 'org.hypercerts.claim.location',
+  OrgHypercertsClaimMeasurement: 'org.hypercerts.claim.measurement',
+  OrgHypercertsClaimRights: 'org.hypercerts.claim.rights',
+  AppGainforestCommonDefs: 'app.gainforest.common.defs',
   AppGainforestOrganizationDefaultSite:
     'app.gainforest.organization.defaultSite',
   AppGainforestOrganizationGetIndexedOrganizations:
@@ -671,4 +794,5 @@ export const ids = {
   AppGainforestOrganizationMeasuredTrees:
     'app.gainforest.organization.measuredTrees',
   AppGainforestOrganizationSite: 'app.gainforest.organization.site',
+  ComAtprotoRepoStrongRef: 'com.atproto.repo.strongRef',
 } as const

@@ -13,9 +13,11 @@ export default function TrpcProvider({ children }: { children: ReactNode }) {
       api.createClient({
         links: [
           loggerLink({ enabled: () => process.env.NODE_ENV === "development" }),
-          httpBatchLink({ url: `${getBaseUrl()}/api/trpc` }),
+          httpBatchLink({
+            url: `${getBaseUrl()}/api/trpc`,
+            transformer: superjson,
+          }),
         ],
-        transformer: superjson,
       }),
     []
   );

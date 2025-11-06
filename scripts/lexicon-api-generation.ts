@@ -71,6 +71,45 @@ const runAfterLexiconApiGeneration = () => {
     );
   }
 
+  // Fix AppCertifiedHypercertRecord.Main to .Record in contribution.ts
+  const contributionTsPath = path.join(
+    lexiconApiPath,
+    "types",
+    "app",
+    "certified",
+    "hypercert",
+    "contribution.ts"
+  );
+
+  if (fs.existsSync(contributionTsPath)) {
+    const contributionTsContent = fs.readFileSync(contributionTsPath, "utf8");
+
+    if (
+      contributionTsContent.includes(
+        "hypercert?: AppCertifiedHypercertRecord.Main"
+      )
+    ) {
+      const updatedContributionTsContent = contributionTsContent.replace(
+        /hypercert\?: AppCertifiedHypercertRecord\.Main/g,
+        "hypercert?: AppCertifiedHypercertRecord.Record"
+      );
+      fs.writeFileSync(
+        contributionTsPath,
+        updatedContributionTsContent,
+        "utf8"
+      );
+      console.log(
+        "contribution.ts updated successfully (replaced .Main with .Record)"
+      );
+    } else {
+      console.log(
+        "contribution.ts already uses .Record (or pattern not found)"
+      );
+    }
+  } else {
+    console.log("contribution.ts file not found");
+  }
+
   console.log(
     "\n If you see errors in the api files, please restart TS server."
   );

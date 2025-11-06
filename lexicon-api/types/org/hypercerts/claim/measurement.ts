@@ -13,17 +13,22 @@ import type * as ComAtprotoRepoStrongRef from '../../../com/atproto/repo/strongR
 
 const is$typed = _is$typed,
   validate = _validate
-const id = 'app.certified.hypercert.evaluation'
+const id = 'org.hypercerts.claim.measurement'
 
 export interface Record {
-  $type: 'app.certified.hypercert.evaluation'
-  subject: ComAtprotoRepoStrongRef.Main
-  /** DID of the evaluator */
-  evaluatorDID: string
-  /** URI to detailed evaluation report or methodology */
-  evaluationURI?: string
-  /** Brief evaluation summary */
-  summary: string
+  $type: 'org.hypercerts.claim.measurement'
+  hypercert: ComAtprotoRepoStrongRef.Main
+  /** DIDs of the entity (or entities) that measured this data. */
+  measurers: string[]
+  /** The metric being measured */
+  metric: string
+  /** The measured value */
+  value: string
+  /** URI to methodology documentation, standard protocol, or measurement procedure */
+  measurementMethodURI?: string
+  /** URIs to supporting evidence or data */
+  evidenceURI?: string[]
+  /** Client-declared timestamp when this record was originally created */
   createdAt: string
   [k: string]: unknown
 }

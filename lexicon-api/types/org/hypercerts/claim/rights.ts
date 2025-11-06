@@ -9,23 +9,21 @@ import {
   is$typed as _is$typed,
   type OmitKey,
 } from '../../../../util'
-import type * as ComAtprotoRepoStrongRef from '../../../com/atproto/repo/strongRef.js'
 
 const is$typed = _is$typed,
   validate = _validate
-const id = 'app.certified.hypercert.sale'
+const id = 'org.hypercerts.claim.rights'
 
 export interface Record {
-  $type: 'app.certified.hypercert.sale'
-  hypercert: ComAtprotoRepoStrongRef.Main
-  /** Fraction of the hypercert purchased (0.0 to 1.0) */
-  fractionPurchased: string
-  /** Purchase price amount */
-  priceAmount?: string
-  /** Currency (e.g., 'USD', 'EUR') */
-  priceCurrency?: string
-  /** DID identifying the buyer */
-  buyerDID?: string
+  $type: 'org.hypercerts.claim.rights'
+  /** Full name of the rights */
+  rightsName: string
+  /** Short rights identifier for easier search */
+  rightsType: string
+  /** Description of the rights of this hypercert */
+  rightsDescription: string
+  /** Client-declared timestamp when this record was originally created */
+  createdAt: string
   [k: string]: unknown
 }
 
