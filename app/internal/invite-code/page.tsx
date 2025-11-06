@@ -64,8 +64,8 @@ const InviteCodePage = () => {
 
   return (
     <div className="mx-auto max-w-xl p-6">
-      <h1 className="text-2xl font-semibold">Generate Invite Code</h1>
-      <p className="text-sm text-muted-foreground mt-1">
+      <h1 className="text-3xl font-bold font-serif">Generate Invite Code</h1>
+      <p className="font-medium text-lg text-muted-foreground mt-1">
         Internal tool for admins to create a one-time invite code bound to an
         email.
       </p>
