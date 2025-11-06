@@ -6,7 +6,10 @@ export const generateClientMetadata = () => {
   const appName = "Ecocertain";
 
   // URL computations
-  const publicUrl = env.VERCEL_PROJECT_PRODUCTION_URL; // Injected by Vercel automatically
+  const publicUrl =
+    env.VERCEL_PROJECT_PRODUCTION_URL ?
+      (`https://${env.VERCEL_PROJECT_PRODUCTION_URL}` as `https://${string}`)
+    : undefined; // Injected by Vercel automatically
   const normalizedPublicUrl = publicUrl?.replace(/\/$/, "") as
     | `https://${string}`
     | undefined;
