@@ -10,7 +10,7 @@ export interface StoredSession extends JwtPayload {
 }
 
 const SECRET_KEY = new TextEncoder().encode(
-  process.env.SESSION_SECRET || "your-secret-key-min-32-chars-long"
+  process.env.COOKIE_SECRET || "your-secret-key-min-32-chars-long"
 );
 
 async function encrypt(payload: StoredSession): Promise<string> {

@@ -4,7 +4,7 @@ import type { AppGainforestOrganizationInfo } from "@/lexicon-api";
 import getBlobUrl from "@/lib/atproto/getBlobUrl";
 import { BadgeCheck, Pencil } from "lucide-react";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useOrganizationPageStore } from "../../store";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import {
   ImageEditorModalId,
 } from "../../_modals/image-editor";
 import { BlobRef } from "@atproto/api";
+import useHydratedData from "@/hooks/use-hydration";
 
 const getImageUrl = (image: File | BlobRef | undefined, did: string) => {
   if (image instanceof File) {
@@ -27,13 +28,18 @@ const getImageUrl = (image: File | BlobRef | undefined, did: string) => {
 };
 
 const Hero = ({
-  did,
   initialData,
+  initialDid,
 }: {
-  did: string;
   initialData: AppGainforestOrganizationInfo.Record;
+  initialDid: string;
 }) => {
-  const [data] = useState(initialData);
+  const reactiveData = useOrganizationPageStore((state) => state.data);
+  const data = useHydratedData(initialData, reactiveData);
+
+  const reactiveDid = useOrganizationPageStore((state) => state.did);
+  const did = useHydratedData(initialDid, reactiveDid);
+
   const isEditing = useOrganizationPageStore((state) => state.isEditing);
   const editingData = useOrganizationPageStore(
     (state) => state.heroEditingData
@@ -41,7 +47,6 @@ const Hero = ({
   const setEditingData = useOrganizationPageStore(
     (actions) => actions.setHeroEditingData
   );
-  const setDid = useOrganizationPageStore((actions) => actions.setDid);
   const { show, pushModal } = useModal();
 
   useEffect(() => {
@@ -52,10 +57,6 @@ const Hero = ({
       logoImage: data.logo,
     });
   }, [isEditing, data]);
-
-  useEffect(() => {
-    setDid(did);
-  }, [did]);
 
   const coverImageUrl =
     data.coverImage ? getBlobUrl(did, data.coverImage) : null;

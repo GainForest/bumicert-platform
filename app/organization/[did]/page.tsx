@@ -6,11 +6,13 @@ import SubHero from "./_components/SubHero";
 import AboutOrganization from "./_components/AboutOrganization";
 import { AppGainforestOrganizationInfo } from "@/lexicon-api";
 import HeaderContent from "./_components/HeaderContent";
+import { OrganizationPageHydrator } from "./hydrator";
 
 const EMPTY_ORGANIZATION_DATA: AppGainforestOrganizationInfo.Record = {
   $type: "app.gainforest.organization.info",
   displayName: "",
   wesite: undefined,
+  logo: undefined,
   coverImage: undefined,
   shortDescription: "",
   longDescription: "",
@@ -41,13 +43,18 @@ const OrganizationPage = async ({
   ) as AppGainforestOrganizationInfo.Record;
 
   return (
-    <Container>
-      <HeaderContent />
-      <Hero did={did} initialData={serializedData} />
-      <SubHero initialData={serializedData} />
-      <AboutOrganization initialData={serializedData} />
-      {/* <ProjectSites did={did} /> */}
-    </Container>
+    <OrganizationPageHydrator
+      initialSerializedData={serializedData}
+      initialDid={did}
+    >
+      <Container>
+        <HeaderContent />
+        <Hero initialData={serializedData} initialDid={did} />
+        <SubHero initialData={serializedData} />
+        <AboutOrganization initialData={serializedData} />
+        {/* <ProjectSites did={did} /> */}
+      </Container>
+    </OrganizationPageHydrator>
   );
 };
 

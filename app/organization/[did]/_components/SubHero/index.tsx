@@ -11,7 +11,7 @@ import {
   MapPin,
 } from "lucide-react";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useOrganizationPageStore } from "../../store";
 import { useModal } from "@/components/ui/modal/context";
 import VisibilitySelectorModal, {
@@ -28,6 +28,7 @@ import {
   StartDateSelectorModal,
   StartDateSelectorModalId,
 } from "../../_modals/start-date-selector";
+import useHydratedData from "@/hooks/use-hydration";
 
 const formatWebsite = (website: string | undefined) => {
   if (!website) return undefined;
@@ -77,7 +78,9 @@ const SubHero = ({
 }: {
   initialData: AppGainforestOrganizationInfo.Record;
 }) => {
-  const [data] = useState(initialData);
+  const reactiveData = useOrganizationPageStore((state) => state.data);
+  const data = useHydratedData(initialData, reactiveData);
+
   const isEditing = useOrganizationPageStore((state) => state.isEditing);
   const editingData = useOrganizationPageStore(
     (state) => state.subHeroEditingData

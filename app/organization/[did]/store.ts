@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { AppGainforestOrganizationInfo } from "@/lexicon-api";
 import { BlobRef } from "@atproto/api";
 import { trpcClient } from "@/lib/trpc/client";
-import { PutRecordResponse } from "@/server/utils";
 
 export type HeroEditingData = {
   displayName: string;
@@ -24,6 +23,7 @@ export type AboutEditingData = {
 };
 
 export type OrganizationPageStoreState = {
+  data: AppGainforestOrganizationInfo.Record | null;
   isEditing: boolean;
   did: string;
   heroEditingData: HeroEditingData;
@@ -32,17 +32,22 @@ export type OrganizationPageStoreState = {
 };
 
 export type OrganizationPageStoreActions = {
+  setData: (data: AppGainforestOrganizationInfo.Record) => void;
   setDid: (did: string) => void;
   setIsEditing: (isEditing: boolean) => void;
   setHeroEditingData: (heroEditingData: HeroEditingData) => void;
   setSubHeroEditingData: (subHeroEditingData: SubHeroEditingData) => void;
   setAboutEditingData: (aboutEditingData: AboutEditingData) => void;
-  saveAllEditingData: () => Promise<PutRecordResponse>;
+  saveAllEditingData: () => Promise<{
+    success: true;
+    data: AppGainforestOrganizationInfo.Record;
+  }>;
 };
 
 export const useOrganizationPageStore = create<
   OrganizationPageStoreState & OrganizationPageStoreActions
 >((set, get) => ({
+  data: null,
   isEditing: false,
   did: "",
   heroEditingData: {
@@ -61,6 +66,7 @@ export const useOrganizationPageStore = create<
   aboutEditingData: {
     longDescription: "",
   },
+  setData: (data) => set({ data }),
   setDid: (did) => set({ did }),
   setIsEditing: (isEditing) => set({ isEditing }),
   setHeroEditingData: (heroEditingData) => set({ heroEditingData }),
@@ -102,22 +108,35 @@ export const useOrganizationPageStore = create<
       coverImageBlobRef = coverImage;
     }
 
+    const organizationInfo: AppGainforestOrganizationInfo.Record = {
+      $type: "app.gainforest.organization.info",
+      displayName: heroEditingData.displayName,
+      logo: logoImageBlobRef,
+      coverImage: coverImageBlobRef,
+      shortDescription: heroEditingData.shortDescription,
+      longDescription: aboutEditingData.longDescription,
+      objectives: subHeroEditingData.objectives,
+      startDate: subHeroEditingData.startDate,
+      country: subHeroEditingData.country,
+      visibility: subHeroEditingData.visibility,
+    };
+
     const response = await trpcClient.organizationInfo.put.mutate({
       did,
-      info: {
-        $type: "app.gainforest.organization.info",
-        displayName: heroEditingData.displayName,
-        logo: logoImageBlobRef,
-        coverImage: coverImageBlobRef,
-        shortDescription: heroEditingData.shortDescription,
-        longDescription: aboutEditingData.longDescription,
-        objectives: subHeroEditingData.objectives,
-        startDate: subHeroEditingData.startDate,
-        country: subHeroEditingData.country,
-        visibility: subHeroEditingData.visibility,
-      },
+      info: organizationInfo,
     });
 
-    return response;
+    if (response.success !== true) {
+      throw new Error("Failed to save all editing data");
+    }
+
+    set({
+      data: organizationInfo,
+    });
+
+    return {
+      success: true,
+      data: organizationInfo,
+    };
   },
 }));

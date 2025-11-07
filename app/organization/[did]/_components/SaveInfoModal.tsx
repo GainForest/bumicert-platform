@@ -15,6 +15,7 @@ export const SaveInfoModalId = "save-info-modal";
 
 export const SaveInfoModal = () => {
   const { stack, popModal, hide } = useModal();
+  const setIsEditing = useOrganizationPageStore((state) => state.setIsEditing);
   const saveAllEditingData = useOrganizationPageStore(
     (actions) => actions.saveAllEditingData
   );
@@ -26,6 +27,7 @@ export const SaveInfoModal = () => {
   } = useMutation({
     mutationFn: saveAllEditingData,
     onSuccess: () => {
+      setIsEditing(false);
       hide().then(() => {
         popModal();
       });
