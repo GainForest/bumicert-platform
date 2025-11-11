@@ -9,6 +9,7 @@ import {
   is$typed as _is$typed,
   type OmitKey,
 } from '../../../../util'
+import type * as AppGainforestCommonDefs from '../common/defs.js'
 
 const is$typed = _is$typed,
   validate = _validate
@@ -22,10 +23,9 @@ export interface Record {
   shortDescription: string
   /** The long description of the organization or project in markdown */
   longDescription: string
-  /** Cover image blob for the organization (max 5MB) */
+  /** Cover image for the organization */
   coverImage?: BlobRef
-  /** Logo blob for the organization (max 5MB) */
-  logo?: BlobRef
+  logo?: AppGainforestCommonDefs.SmallImage
   /** The objectives of the organization or project */
   objectives: (
     | 'Conservation'

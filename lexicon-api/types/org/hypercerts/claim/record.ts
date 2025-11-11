@@ -31,7 +31,7 @@ export interface Record {
   /** Scope of the work performed */
   workScope: string
   /** When the work began */
-  workTimeframeFrom: string
+  workTimeFrameFrom: string
   /** When the work ended */
   workTimeFrameTo: string
   /** Supporting evidence, documentation, or external data URIs */

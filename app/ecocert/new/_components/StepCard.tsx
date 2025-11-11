@@ -59,7 +59,7 @@ const StepCard = () => {
   return (
     <div className="w-full rounded-xl border border-border shadow-lg mt-24">
       <div
-        className="w-full h-[8rem] relative z-10"
+        className="w-full h-32 relative z-10"
         style={{
           background: getStripedBackground(
             {
@@ -85,7 +85,7 @@ const StepCard = () => {
             key={currentStep}
           >
             <Image
-              className="h-[14rem] w-auto drop-shadow-lg"
+              className="h-56 w-auto drop-shadow-lg"
               src={stepImages[currentStep].image}
               alt={stepImages[currentStep].alt}
             />
@@ -100,7 +100,7 @@ const StepCard = () => {
           boxShadow: "0 -10px 10px rgba(0, 0, 0, 0.1)",
         }}
       >
-        <div className="p-4 pb-0 -mt-6 bg-background z-20 relative rounded-md font-medium">
+        <div className="p-4 pb-0 -mt-6 bg-background z-15 relative rounded-md font-medium">
           {currentStep === 0 && (
             <>
               <p className="text-muted-foreground">

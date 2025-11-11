@@ -7,9 +7,8 @@ import { useStep2Store } from "./store";
 import useNewEcocertStore from "../../../store";
 
 const Step2 = () => {
-  const { showValidationErrorsInForm, currentStepIndex } = useNewEcocertStore();
-  const shouldShowValidationErrors =
-    showValidationErrorsInForm.has(currentStepIndex);
+  const { maxStepIndexReached, currentStepIndex } = useNewEcocertStore();
+  const shouldShowValidationErrors = currentStepIndex < maxStepIndexReached;
 
   const {
     formValues,

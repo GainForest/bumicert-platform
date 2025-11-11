@@ -20,6 +20,10 @@ export type Uri = string
 export type SmallBlob = BlobRef
 /** Blob to external data (up to 100MB) */
 export type LargeBlob = BlobRef
+/** Image blob (up to 5MB) */
+export type SmallImage = BlobRef
+/** Image blob (up to 10MB) */
+export type LargeImage = BlobRef
 
 export interface IndexedOrganization {
   $type?: 'app.gainforest.common.defs#indexedOrganization'

@@ -3,8 +3,8 @@ import { create } from "zustand";
 export type NewEcocertFormState = {
   currentStepIndex: number;
 
-  // Form indexes that should show validation errors in the form
-  showValidationErrorsInForm: Set<number>;
+  // Form index that is the last step index reached by the user
+  maxStepIndexReached: number;
 };
 
 export type NewEcocertFormActions = {
@@ -14,17 +14,12 @@ export type NewEcocertFormActions = {
 const useNewEcocertStore = create<NewEcocertFormState & NewEcocertFormActions>(
   (set) => ({
     currentStepIndex: 0,
-    showValidationErrorsInForm: new Set(),
+    maxStepIndexReached: 0,
     setCurrentStepIndex: (step) =>
-      set((state) => {
-        // If the step changes, start showing validation errors in the previous step
-        if (step !== state.currentStepIndex) {
-          state.showValidationErrorsInForm.add(state.currentStepIndex);
-        }
-        return {
-          currentStepIndex: step,
-        };
-      }),
+      set((state) => ({
+        currentStepIndex: step,
+        maxStepIndexReached: Math.max(state.maxStepIndexReached, step),
+      })),
   })
 );
 

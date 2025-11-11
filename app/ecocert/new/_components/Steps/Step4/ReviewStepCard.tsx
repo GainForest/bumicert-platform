@@ -122,6 +122,7 @@ const ReviewStepCard = <
                   className="rounded-full"
                   variant={"outline"}
                   size={"sm"}
+                  onClick={onEdit}
                 >
                   Fix
                   <ArrowRightIcon />

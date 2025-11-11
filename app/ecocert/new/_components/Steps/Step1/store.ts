@@ -12,11 +12,6 @@ export const step1Schema = z.object({
     .min(1, "Required")
     .max(2048, "No more than 2048 characters allowed")
     .describe("Website or Social Link"),
-  logo: z
-    .instanceof(File)
-    .nullable()
-    .refine((v) => v !== null, { message: "Required" })
-    .describe("Logo"),
   coverImage: z
     .instanceof(File)
     .nullable()
@@ -36,9 +31,7 @@ export const step1Schema = z.object({
     )
     .describe("Work Type"),
   projectDateRange: z
-    .tuple([z.date(), z.date()])
-    .nullable()
-    .refine((v) => v !== null, { message: "Required" })
+    .tuple([z.date(), z.date().nullable()])
     .describe("Project Date Range"),
   isProjectOngoing: z.boolean().describe("Is Project Ongoing"),
 });
@@ -55,10 +48,9 @@ type Step1StoreState = {
 type Step1StoreActions = {
   setProjectName: (name: string) => void;
   setWebsiteOrSocialLink: (link: string) => void;
-  setLogo: (logo: File | null) => void;
   setCoverImage: (image: File | null) => void;
   setWorkType: (type: Step1FormValues["workType"]) => void;
-  setProjectDateRange: (range: [Date, Date] | null) => void;
+  setProjectDateRange: (range: [Date, Date | null]) => void;
   setIsProjectOngoing: (ongoing: boolean) => void;
   updateValidationsAndCompletionPercentage: () => void;
   reset: () => void;
@@ -70,11 +62,10 @@ export const useStep1Store = create<Step1StoreState & Step1StoreActions>(
     formValues: {
       projectName: "",
       websiteOrSocialLink: "",
-      logo: null,
       coverImage: null,
       workType: "Conservation",
-      projectDateRange: null,
-      isProjectOngoing: false,
+      projectDateRange: [new Date(`${new Date().getFullYear()}-01-01`), null],
+      isProjectOngoing: true,
     },
     errors: {},
     isValid: false,
@@ -93,12 +84,6 @@ export const useStep1Store = create<Step1StoreState & Step1StoreActions>(
       }));
       get().updateValidationsAndCompletionPercentage();
     },
-    setLogo: (logo) => {
-      set((state) => ({
-        formValues: { ...state.formValues, logo },
-      }));
-      get().updateValidationsAndCompletionPercentage();
-    },
     setCoverImage: (image) => {
       set((state) => ({
         formValues: { ...state.formValues, coverImage: image },
@@ -112,9 +97,11 @@ export const useStep1Store = create<Step1StoreState & Step1StoreActions>(
       get().updateValidationsAndCompletionPercentage();
     },
     setProjectDateRange: (range) => {
-      set((state) => ({
-        formValues: { ...state.formValues, projectDateRange: range },
-      }));
+      set((state) => {
+        return {
+          formValues: { ...state.formValues, projectDateRange: range },
+        };
+      });
       get().updateValidationsAndCompletionPercentage();
     },
     setIsProjectOngoing: (ongoing) => {
@@ -165,11 +152,13 @@ export const useStep1Store = create<Step1StoreState & Step1StoreActions>(
         formValues: {
           projectName: "",
           websiteOrSocialLink: "",
-          logo: null,
           coverImage: null,
           workType: "Conservation",
-          projectDateRange: null,
-          isProjectOngoing: false,
+          projectDateRange: [
+            new Date(`${new Date().getFullYear()}-01-01`),
+            null,
+          ],
+          isProjectOngoing: true,
         },
         errors: {},
         isValid: false,

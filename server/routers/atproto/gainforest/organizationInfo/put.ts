@@ -1,22 +1,21 @@
 import { protectedProcedure } from "@/server/trpc";
 import z from "zod";
 import { AppGainforestOrganizationInfo } from "@/lexicon-api";
-import { BlobRef } from "@atproto/lexicon";
 import { validate } from "@/lexicon-api/lexicons";
 import { getWriteAgent, PutRecordResponse } from "@/server/utils";
+import { BlobRefJSONSchema, toBlobRef } from "../../utils";
 
 export const putOrganizationInfo = protectedProcedure
   .input(
     z.object({
       did: z.string(),
       info: z.object({
-        $type: z.literal("app.gainforest.organization.info"),
         displayName: z.string(),
         shortDescription: z.string(),
         longDescription: z.string(),
         website: z.string().optional(),
-        logo: z.instanceof(BlobRef).optional(),
-        coverImage: z.instanceof(BlobRef).optional(),
+        logo: BlobRefJSONSchema.optional(),
+        coverImage: BlobRefJSONSchema.optional(),
         objectives: z.array(
           z.enum([
             "Conservation",
@@ -40,8 +39,9 @@ export const putOrganizationInfo = protectedProcedure
       shortDescription: input.info.shortDescription,
       longDescription: input.info.longDescription,
       website: input.info.website ? input.info.website : undefined,
-      logo: input.info.logo,
-      coverImage: input.info.coverImage,
+      logo: input.info.logo ? toBlobRef(input.info.logo) : undefined,
+      coverImage:
+        input.info.coverImage ? toBlobRef(input.info.coverImage) : undefined,
       objectives: input.info.objectives,
       startDate: new Date().toISOString(),
       country: input.info.country,
@@ -60,5 +60,8 @@ export const putOrganizationInfo = protectedProcedure
       record: info,
     });
 
-    return response as PutRecordResponse;
+    return {
+      ...response,
+      value: info,
+    } as PutRecordResponse<AppGainforestOrganizationInfo.Record>;
   });

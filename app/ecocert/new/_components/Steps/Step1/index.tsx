@@ -8,31 +8,35 @@ import {
 import {
   CalendarClock,
   Club,
-  GalleryVertical,
   Globe,
   HandHeart,
   ImagePlusIcon,
 } from "lucide-react";
 import FileInput from "../components/FileInput";
 import FormField from "../components/FormField";
-import { CalendarRange } from "@/components/ui/calendar-range";
 import { useStep1Store } from "./store";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import Capsules from "../components/Capsules";
 import useNewEcocertStore from "../../../store";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 const Step1 = () => {
-  const { showValidationErrorsInForm, currentStepIndex } = useNewEcocertStore();
-  const shouldShowValidationErrors =
-    showValidationErrorsInForm.has(currentStepIndex);
+  const { maxStepIndexReached, currentStepIndex } = useNewEcocertStore();
+  const shouldShowValidationErrors = currentStepIndex < maxStepIndexReached;
 
   const {
     formValues,
     errors,
     setProjectName,
     setWebsiteOrSocialLink,
-    setLogo,
     setCoverImage,
     setWorkType,
     setProjectDateRange,
@@ -43,7 +47,6 @@ const Step1 = () => {
   const {
     projectName,
     websiteOrSocialLink,
-    logo,
     coverImage,
     workType,
     projectDateRange,
@@ -97,38 +100,20 @@ const Step1 = () => {
             />
           </InputGroup>
         </FormField>
-        <div className="flex items-center gap-2 w-full">
-          <FormField
-            Icon={ImagePlusIcon}
-            label="Your logo"
-            className="flex-1"
-            error={errors.logo}
-            showError={shouldShowValidationErrors}
-          >
-            <FileInput
-              placeholder="Upload or drag and drop an image"
-              value={logo}
-              onFileChange={setLogo}
-              supportedFileTypes={["image/*"]}
-              maxSizeInMB={5}
-            />
-          </FormField>
-          <FormField
-            Icon={GalleryVertical}
-            label="Cover Image"
-            className="flex-2"
-            error={errors.coverImage}
-            showError={shouldShowValidationErrors}
-          >
-            <FileInput
-              placeholder="Upload or drag and drop an image"
-              value={coverImage}
-              onFileChange={setCoverImage}
-              supportedFileTypes={["image/*"]}
-              maxSizeInMB={10}
-            />
-          </FormField>
-        </div>
+        <FormField
+          Icon={ImagePlusIcon}
+          label="Cover Image"
+          error={errors.coverImage}
+          showError={shouldShowValidationErrors}
+        >
+          <FileInput
+            placeholder="Upload or drag and drop an image"
+            value={coverImage}
+            onFileChange={setCoverImage}
+            supportedFileTypes={["image/*"]}
+            maxSizeInMB={10}
+          />
+        </FormField>
         <FormField
           Icon={HandHeart}
           label="What kind of work are you doing?"
@@ -151,38 +136,119 @@ const Step1 = () => {
             ]}
           />
         </FormField>
-        <FormField
-          Icon={CalendarClock}
-          label="Project Date Range"
-          className="flex-1"
-          error={errors.projectDateRange}
-          showError={shouldShowValidationErrors}
-        >
-          <div className="flex items-center gap-4 mt-1">
-            <CalendarRange
-              id="project-date-range"
-              value={projectDateRange}
-              onValueChange={(range) => {
-                setProjectDateRange(range);
-              }}
-            />
-            <div className="flex items-center gap-2 text-sm">
-              <Checkbox
-                id="ongoing"
-                className="bg-background size-5"
-                checked={isProjectOngoing}
-                onCheckedChange={(checked) =>
-                  setIsProjectOngoing(
-                    checked === "indeterminate" ? false : checked
-                  )
-                }
-              />
-              <Label htmlFor="ongoing" className="cursor-pointer">
-                The impact is still ongoing.
-              </Label>
+        <div className="flex items-stretch gap-2">
+          <FormField
+            Icon={CalendarClock}
+            label="Project Start Date"
+            className="flex-1"
+            error={errors.projectDateRange}
+            showError={shouldShowValidationErrors}
+          >
+            <div className="mt-1">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    id="project-start-date"
+                    className="group w-full flex items-center justify-center text-center bg-foreground/2 transition-all duration-300 rounded-md cursor-pointer p-2"
+                  >
+                    <span
+                      className={cn(
+                        "text-foreground/20 group-hover:text-foreground/40 text-xl font-semibold",
+                        projectDateRange[0] &&
+                          "text-foreground group-hover:text-primary"
+                      )}
+                    >
+                      {projectDateRange[0] ?
+                        format(projectDateRange[0], "LLL dd, y")
+                      : "Select the Start Date"}
+                    </span>
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent>
+                  <Calendar
+                    id="project-start-date"
+                    mode="single"
+                    selected={projectDateRange[0] ?? undefined}
+                    onSelect={(date) => {
+                      setProjectDateRange([
+                        date ?? new Date(`${new Date().getFullYear()}-01-01`),
+                        projectDateRange[1],
+                      ]);
+                    }}
+                    defaultMonth={projectDateRange[0] ?? undefined}
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
-          </div>
-        </FormField>
+          </FormField>
+          <FormField
+            Icon={CalendarClock}
+            label="Project End Date"
+            className="flex-1"
+            error={errors.projectDateRange}
+            showError={shouldShowValidationErrors}
+          >
+            <div className="mt-1">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    id="project-end-date"
+                    className="group w-full flex items-center justify-center text-center bg-foreground/2 transition-all duration-300 rounded-md cursor-pointer p-2"
+                    disabled={isProjectOngoing}
+                  >
+                    {isProjectOngoing && (
+                      <span className="text-foreground/20 text-xl font-semibold">
+                        Ongoing
+                      </span>
+                    )}
+                    {!isProjectOngoing && (
+                      <span
+                        className={cn(
+                          "text-foreground/20 group-hover:text-foreground/40 text-xl font-semibold",
+                          projectDateRange[1] &&
+                            "text-foreground group-hover:text-primary"
+                        )}
+                      >
+                        {projectDateRange[1] ?
+                          format(projectDateRange[1], "LLL dd, y")
+                        : "Select the End Date"}
+                      </span>
+                    )}
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent>
+                  <Calendar
+                    id="project-end-date"
+                    mode="single"
+                    selected={projectDateRange[1] ?? undefined}
+                    onSelect={(date) => {
+                      setProjectDateRange([
+                        projectDateRange[0] ?? null,
+                        date ?? null,
+                      ]);
+                    }}
+                    defaultMonth={projectDateRange[1] ?? undefined}
+                  />
+                </PopoverContent>
+              </Popover>
+              <div className="flex items-center gap-2 text-sm mt-1">
+                <Checkbox
+                  id="ongoing"
+                  className="bg-background size-5"
+                  checked={isProjectOngoing}
+                  onCheckedChange={(checked) =>
+                    setIsProjectOngoing(
+                      checked === "indeterminate" ? false : checked
+                    )
+                  }
+                />
+                <Label htmlFor="ongoing" className="cursor-pointer">
+                  The impact is still ongoing.
+                </Label>
+              </div>
+            </div>
+          </FormField>
+        </div>
       </div>
     </div>
   );

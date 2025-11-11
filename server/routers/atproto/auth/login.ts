@@ -1,6 +1,6 @@
 import { saveSession, StoredSession } from "@/server/session";
 import { publicProcedure } from "@/server/trpc";
-import { CredentialSession } from "@atproto/api";
+import AtpAgent, { CredentialSession } from "@atproto/api";
 import { TRPCError } from "@trpc/server";
 import z from "zod";
 

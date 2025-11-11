@@ -1,19 +1,28 @@
 import { protectedProcedure } from "@/server/trpc";
 import { getWriteAgent } from "@/server/utils";
 import z from "zod";
+import { BlobRefJSON } from "../utils";
 
 export const uploadFileAsBlob = protectedProcedure
   .input(
     z.object({
-      file: z.instanceof(File),
+      name: z.string(),
+      type: z.string(),
+      dataBase64: z.string(),
     })
   )
   .mutation(async ({ input }) => {
     const agent = await getWriteAgent();
-    const arrayBuffer = await input.file.arrayBuffer();
-    const uint8Array = new Uint8Array(arrayBuffer);
-    const response = await agent.uploadBlob(uint8Array, {
-      encoding: input.file.type,
-    });
-    return response;
+    const data = Buffer.from(input.dataBase64, "base64");
+    const file = new File([data], input.name, { type: input.type });
+    const response = await agent.uploadBlob(file);
+
+    // Convert the response to json blobref like object
+    return {
+      success: response.success,
+      headers: response.headers,
+      data: {
+        blob: response.data.blob.toJSON() as BlobRefJSON,
+      },
+    };
   });

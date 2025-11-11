@@ -1,25 +1,53 @@
 "use client";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useStep1Store } from "../Step1/store";
-
 import Image from "next/image";
-import EcocertImage from "./image.png";
 import { ProgressiveBlur } from "@/components/ui/progressive-blur";
+import { domToJpeg } from "modern-screenshot";
+import { useStep4Store } from "./store";
 
-const Ecocert = () => {
+export const EcocertArt = () => {
   const name = useStep1Store((state) => state.formValues.projectName);
+  const coverImage = useStep1Store((state) => state.formValues.coverImage);
+  const ref = useRef<HTMLDivElement>(null);
+  const setEcocertArtImage = useStep4Store((state) => state.setEcocertArtImage);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    if (coverImage) {
+      domToJpeg(ref.current).then((image) => {
+        // convert base64 to blob
+        const blob = new Blob([image], { type: "image/jpeg" });
+        // convert blob to file
+        const file = new File([blob], "ecocert-art.jpeg", {
+          type: "image/jpeg",
+        });
+        setEcocertArtImage(file);
+      });
+    }
+  }, [coverImage]);
+
+  if (!coverImage) return null;
 
   return (
-    <div className="p-2 rounded-3xl shadow-2xl bg-white border border-black/10">
+    <div
+      ref={ref}
+      className="p-2 rounded-3xl shadow-2xl bg-white border border-black/10"
+    >
       <div className="w-[256px] h-[360px] relative overflow-hidden rounded-2xl">
-        <Image src={EcocertImage} alt="Ecocert" fill className="rounded-2xl" />
+        <Image
+          src={URL.createObjectURL(coverImage)}
+          alt="Ecocert"
+          fill
+          className="rounded-2xl"
+        />
         <ProgressiveBlur
           position="bottom"
           height="35%"
           className="z-0"
           borderRadiusClassName="rounded-2xl"
         />
-        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-b from-transparent to-white/50"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-linear-to-b from-transparent to-white/50"></div>
         <div className="absolute top-3 left-3 h-9 w-9 rounded-full bg-white border-2 border-black/10 shadow-lg">
           <Image
             src={"/assets/media/images/logo.svg"}
@@ -57,14 +85,25 @@ const Ecocert = () => {
 };
 
 const EcocertPreviewCard = () => {
+  const step1CompletionPercentage = useStep1Store(
+    (state) => state.completionPercentage
+  );
   return (
     <div className="rounded-xl border border-primary/10 shadow-lg overflow-hidden bg-primary/10 flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-center text-center text-primary px-2 py-1">
         <span className="font-medium">Preview your ecocert</span>
       </div>
+
       <div className="bg-background p-2 rounded-xl flex-1 flex flex-col items-center justify-center">
-        <Ecocert />
+        {step1CompletionPercentage === 100 ?
+          <EcocertArt />
+        : <div className="flex-1 flex flex-col items-center justify-center">
+            <span className="text-sm text-muted-foreground text-center text-pretty">
+              You need to complete the first step to preview the ecocert.
+            </span>
+          </div>
+        }
       </div>
     </div>
   );

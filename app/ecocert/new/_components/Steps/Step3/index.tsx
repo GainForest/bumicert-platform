@@ -23,9 +23,8 @@ import useNewEcocertStore from "../../../store";
 const Step3 = () => {
   const [geoJsonFile, setGeoJsonFile] = useState<File | null>(null);
 
-  const { showValidationErrorsInForm, currentStepIndex } = useNewEcocertStore();
-  const shouldShowValidationErrors =
-    showValidationErrorsInForm.has(currentStepIndex);
+  const { maxStepIndexReached, currentStepIndex } = useNewEcocertStore();
+  const shouldShowValidationErrors = currentStepIndex < maxStepIndexReached;
 
   const {
     formValues: {

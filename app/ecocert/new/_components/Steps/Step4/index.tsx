@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import ReviewStepCard from "./ReviewStepCard";
 import { STEPS as steps } from "../config";
 import useNewEcocertStore from "../../../store";
@@ -8,6 +8,7 @@ import { step2Schema, useStep2Store } from "../Step2/store";
 import { step3Schema, useStep3Store } from "../Step3/store";
 import { format } from "date-fns";
 import EcocertPreviewCard from "./EcocertPreviewCard";
+import { useStep4Store } from "./store";
 
 const FormValue = ({
   label,
@@ -35,6 +36,22 @@ const Step4 = () => {
   const step2Errors = useStep2Store((state) => state.errors);
   const step3Errors = useStep3Store((state) => state.errors);
 
+  const ecocertArtImage = useStep4Store((state) => state.ecocertArtImage);
+  const setCompletionPercentage = useStep4Store(
+    (state) => state.setCompletionPercentage
+  );
+  useEffect(() => {
+    const progresses = [
+      step1Progress,
+      step2Progress,
+      step3Progress,
+      ecocertArtImage ? 100 : 0,
+    ];
+    setCompletionPercentage(
+      progresses.reduce((acc, curr) => acc + curr, 0) / progresses.length
+    );
+  }, [step1Progress, step2Progress, step3Progress, ecocertArtImage]);
+
   return (
     <div>
       <h1 className="text-3xl font-bold font-serif">Review the information.</h1>
@@ -53,10 +70,6 @@ const Step4 = () => {
 
             let parsedValue: string;
             switch (typedKey) {
-              case "logo":
-                parsedValue =
-                  step1FormValues[typedKey] ? "Uploaded" : "Not Uploaded";
-                break;
               case "coverImage":
                 parsedValue =
                   step1FormValues[typedKey] ? "Uploaded" : "Not Uploaded";
@@ -64,7 +77,7 @@ const Step4 = () => {
               case "projectDateRange":
                 parsedValue =
                   step1FormValues[typedKey] ?
-                    `From ${format(step1FormValues[typedKey][0], "LLL dd, y")} to ${format(step1FormValues[typedKey][1], "LLL dd, y")}`
+                    `From ${format(step1FormValues[typedKey][0], "LLL dd, y")} to ${step1FormValues[typedKey][1] ? format(step1FormValues[typedKey][1], "LLL dd, y") : "Present"}`
                   : "Not Uploaded";
                 break;
               case "isProjectOngoing":

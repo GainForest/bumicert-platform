@@ -49,7 +49,7 @@ export const schemaDict = {
             'shortDescription',
             'createdAt',
             'workScope',
-            'workTimeframeFrom',
+            'workTimeFrameFrom',
             'workTimeFrameTo',
           ],
           properties: {
@@ -86,7 +86,7 @@ export const schemaDict = {
               maxLength: 5000,
               maxGraphemes: 1000,
             },
-            workTimeframeFrom: {
+            workTimeFrameFrom: {
               type: 'string',
               format: 'datetime',
               description: 'When the work began',
@@ -488,6 +488,18 @@ export const schemaDict = {
         maxSize: 104857600,
         description: 'Blob to external data (up to 100MB)',
       },
+      smallImage: {
+        type: 'blob',
+        accept: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+        maxSize: 5242880,
+        description: 'Image blob (up to 5MB)',
+      },
+      largeImage: {
+        type: 'blob',
+        accept: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+        maxSize: 10485760,
+        description: 'Image blob (up to 10MB)',
+      },
       indexedOrganization: {
         type: 'object',
         required: ['id', 'name'],
@@ -599,15 +611,13 @@ export const schemaDict = {
             },
             coverImage: {
               type: 'blob',
-              accept: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
-              maxSize: 5242880,
-              description: 'Cover image blob for the organization (max 5MB)',
+              ref: 'app.gainforest.common.defs#smallImage',
+              description: 'Cover image for the organization',
             },
             logo: {
-              type: 'blob',
-              accept: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
-              maxSize: 5242880,
-              description: 'Logo blob for the organization (max 5MB)',
+              type: 'ref',
+              ref: 'lex:app.gainforest.common.defs#smallImage',
+              description: 'Logo for the organization',
             },
             objectives: {
               type: 'array',

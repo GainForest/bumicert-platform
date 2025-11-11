@@ -10,7 +10,7 @@ export type GetRecordResponse<T> = {
   cid: string;
 };
 
-export type PutRecordResponse = {
+export type PutRecordResponse<T> = {
   success: true;
   data: {
     uri: string;
@@ -19,6 +19,7 @@ export type PutRecordResponse = {
     validationStatus: "unknown" | (string & {}) | undefined;
   };
   headers: Record<string, string>;
+  value: T;
 };
 
 export const getReadAgent = () => {

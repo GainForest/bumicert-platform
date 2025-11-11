@@ -1,6 +1,8 @@
 import { Agent, CredentialSession } from "@atproto/api";
 import { create } from "zustand";
 import { StoredSession } from "@/server/session";
+import { tryCatch } from "@/lib/tryCatch";
+import { trpcClient } from "@/lib/trpc/client";
 
 export type AtprotoAuthCatalog = {
   unauthenticated: {
@@ -52,15 +54,26 @@ export const useAtprotoStore = create<AtprotoStoreState & AtprotoStoreActions>(
         const credentialSession = new CredentialSession(
           new URL(`https://${service}`)
         );
-        const result = await credentialSession.resumeSession({
-          accessJwt: session.accessJwt,
-          refreshJwt: session.refreshJwt,
-          handle: session.handle,
-          did: session.did,
-          active: true,
-        });
-        if (!result.success) {
-          throw new Error("Failed to resume session");
+        const [result, error] = await tryCatch(
+          credentialSession.resumeSession({
+            accessJwt: session.accessJwt,
+            refreshJwt: session.refreshJwt,
+            handle: session.handle,
+            did: session.did,
+            active: true,
+          })
+        );
+        if (error || !result || !result.success) {
+          trpcClient.auth.logout.mutate({ service: "climateai.org" });
+          set({
+            auth: {
+              status: "UNAUTHENTICATED",
+              authenticated: false,
+              user: null,
+              agent: null,
+            },
+          });
+          return;
         }
         const agent = new Agent(credentialSession);
         set({

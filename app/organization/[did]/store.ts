@@ -1,13 +1,13 @@
 import { create } from "zustand";
 import { AppGainforestOrganizationInfo } from "@/lexicon-api";
-import { BlobRef } from "@atproto/api";
 import { trpcClient } from "@/lib/trpc/client";
+import { BlobRefJSON } from "@/server/routers/atproto/utils";
 
 export type HeroEditingData = {
   displayName: string;
   shortDescription: string;
-  coverImage: File | BlobRef | undefined;
-  logoImage: File | BlobRef | undefined;
+  coverImage: File | BlobRefJSON | undefined;
+  logoImage: File | BlobRefJSON | undefined;
 };
 
 export type SubHeroEditingData = {
@@ -77,10 +77,14 @@ export const useOrganizationPageStore = create<
       get();
 
     const logoImage = heroEditingData.logoImage;
-    let logoImageBlobRef: BlobRef | undefined;
+    let logoImageBlobRef: BlobRefJSON | undefined;
     if (logoImage instanceof File) {
       const response = await trpcClient.common.uploadFileAsBlob.mutate({
-        file: logoImage,
+        name: logoImage.name,
+        type: logoImage.type,
+        dataBase64: await logoImage
+          .arrayBuffer()
+          .then((buffer) => Buffer.from(buffer).toString("base64")),
       });
       if (response.success !== true) {
         throw new Error("Failed to upload logo image");
@@ -93,10 +97,14 @@ export const useOrganizationPageStore = create<
     }
 
     const coverImage = heroEditingData.coverImage;
-    let coverImageBlobRef: BlobRef | undefined;
+    let coverImageBlobRef: BlobRefJSON | undefined;
     if (coverImage instanceof File) {
       const response = await trpcClient.common.uploadFileAsBlob.mutate({
-        file: coverImage,
+        name: coverImage.name,
+        type: coverImage.type,
+        dataBase64: await coverImage
+          .arrayBuffer()
+          .then((buffer) => Buffer.from(buffer).toString("base64")),
       });
       if (response.success !== true) {
         throw new Error("Failed to upload cover image");
@@ -108,8 +116,9 @@ export const useOrganizationPageStore = create<
       coverImageBlobRef = coverImage;
     }
 
-    const organizationInfo: AppGainforestOrganizationInfo.Record = {
-      $type: "app.gainforest.organization.info",
+    const organizationInfo: Parameters<
+      typeof trpcClient.organizationInfo.put.mutate
+    >[0]["info"] = {
       displayName: heroEditingData.displayName,
       logo: logoImageBlobRef,
       coverImage: coverImageBlobRef,
@@ -131,12 +140,12 @@ export const useOrganizationPageStore = create<
     }
 
     set({
-      data: organizationInfo,
+      data: response.value,
     });
 
     return {
       success: true,
-      data: organizationInfo,
+      data: response.value,
     };
   },
 }));
