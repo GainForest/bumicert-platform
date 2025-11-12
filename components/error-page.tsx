@@ -10,12 +10,14 @@ const ErrorPage = ({
   title,
   description,
   error,
+  cta,
 }: {
   title?: string;
   description?: string;
   showRefreshButton?: boolean;
   showHomeButton?: boolean;
   error?: unknown;
+  cta?: React.ReactNode;
 }) => {
   console.error(error);
   return (
@@ -38,6 +40,7 @@ const ErrorPage = ({
             "We're sorry, but an error occurred while processing your request."}
         </p>
         <div className="flex items-center gap-2 mt-4">
+          {cta}
           {showRefreshButton && (
             <Button onClick={() => window.location.reload()}>
               <RefreshCcwIcon />
