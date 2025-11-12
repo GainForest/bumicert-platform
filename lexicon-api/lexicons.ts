@@ -610,8 +610,8 @@ export const schemaDict = {
               maxLength: 5000,
             },
             coverImage: {
-              type: 'blob',
-              ref: 'app.gainforest.common.defs#smallImage',
+              type: 'ref',
+              ref: 'lex:app.gainforest.common.defs#smallImage',
               description: 'Cover image for the organization',
             },
             logo: {

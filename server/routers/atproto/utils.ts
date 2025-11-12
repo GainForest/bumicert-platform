@@ -32,3 +32,12 @@ export const FileGeneratorSchema = z.object({
 });
 
 export type FileGenerator = z.infer<typeof FileGeneratorSchema>;
+
+export const toFile = async (fileGenerator: FileGenerator) => {
+  const file = new File(
+    [Buffer.from(fileGenerator.dataBase64, "base64")],
+    fileGenerator.name,
+    { type: fileGenerator.type }
+  );
+  return file;
+};

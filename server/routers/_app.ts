@@ -9,11 +9,13 @@ import { login } from "./atproto/auth/login";
 import { resume } from "./atproto/auth/resume";
 import { logout } from "./atproto/auth/logout";
 import { getOrganizationInfo } from "./atproto/gainforest/organizationInfo/get";
-import { listProjectSites } from "./atproto/gainforest/projectSite/list";
-import { getProjectSite } from "./atproto/gainforest/projectSite/get";
-import { getDefaultProjectSite } from "./atproto/gainforest/projectSite/getDefault";
+import { listSites } from "./atproto/gainforest/site/list";
+import { getProjectSite } from "./atproto/gainforest/site/get";
+import { getDefaultProjectSite } from "./atproto/gainforest/site/getDefault";
 import { postHypercertClaim } from "./atproto/hypercerts/claim/post";
 import { updateOrganizationInfo } from "./atproto/gainforest/organizationInfo/update";
+import { getAllSites } from "./atproto/gainforest/site/getAll";
+import { createSite } from "./atproto/gainforest/site/create";
 
 export const appRouter = createTRPCRouter({
   health: publicProcedure.query(() => ({ status: "ok" })),
@@ -30,10 +32,14 @@ export const appRouter = createTRPCRouter({
     put: putOrganizationInfo,
     update: updateOrganizationInfo,
   },
-  projectSites: {
-    list: listProjectSites,
-    get: getProjectSite,
-    getDefault: getDefaultProjectSite,
+  gainforest: {
+    site: {
+      list: listSites,
+      create: createSite,
+      getAll: getAllSites,
+      get: getProjectSite,
+      getDefault: getDefaultProjectSite,
+    },
   },
   hypercerts: {
     createClaim: postHypercertClaim,

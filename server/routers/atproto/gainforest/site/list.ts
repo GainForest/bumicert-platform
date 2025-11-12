@@ -2,7 +2,7 @@ import { publicProcedure } from "@/server/trpc";
 import { z } from "zod";
 import { getReadAgent } from "@/server/utils";
 
-export const listProjectSites = publicProcedure
+export const listSites = publicProcedure
   .input(z.object({ did: z.string() }))
   .query(async ({ input }) => {
     const agent = getReadAgent();

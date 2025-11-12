@@ -37,77 +37,40 @@ const runAfterLexiconApiGeneration = () => {
     console.log("index.ts already contains the required import");
   }
 
-  // Fix imports in the lexicon-api/lexicons.ts file
-  // Find "util.js" within first 100 lines and replace with "util"
+  // Fix imports/exports in lexicon-api/lexicons.ts and index.ts
+  // Remove .ts and .js extensions from import/export statements
 
-  const lexiconsTsPath = path.join(lexiconApiPath, "lexicons.ts");
-  const lexiconsTsContent = fs.readFileSync(lexiconsTsPath, "utf8");
+  const filesToFix = ["lexicons.ts", "index.ts"];
 
-  // Split file into lines for easier processing
-  const lexiconsTsLines = lexiconsTsContent.split("\n");
-  let changed = false;
+  for (const fileName of filesToFix) {
+    const filePath = path.join(lexiconApiPath, fileName);
+    const fileContent = fs.readFileSync(filePath, "utf8");
 
-  // Only look in first 100 lines
-  const maxLinesToScan = Math.min(100, lexiconsTsLines.length);
+    // Regex to match import/export statements with .ts or .js extensions
+    // Matches: from "...something.ts" or from "...something.js"
+    // Also handles: from '...something.ts' or from '...something.js'
+    const importExportRegex = /(from\s+["'])([^"']+)(\.(ts|js))(["'])/g;
 
-  for (let i = 0; i < maxLinesToScan; i++) {
-    if (lexiconsTsLines[i].includes("util.js")) {
-      lexiconsTsLines[i] = lexiconsTsLines[i].replace(
-        /util\.js(['"])/g,
-        "util$1"
-      );
-      changed = true;
-    }
-  }
+    let updatedContent = fileContent;
+    let changed = false;
 
-  if (changed) {
-    // Re-join and write file only if modified
-    const updatedLexiconsTsContent = lexiconsTsLines.join("\n");
-    fs.writeFileSync(lexiconsTsPath, updatedLexiconsTsContent, "utf8");
-    console.log("lexicons.ts updated successfully");
-  } else {
-    console.log(
-      "No 'util.js' import found within first 100 lines of lexicons.ts"
+    // Replace all matches
+    updatedContent = updatedContent.replace(
+      importExportRegex,
+      (match, prefix, pathWithoutExt, ext, extType, suffix) => {
+        changed = true;
+        return prefix + pathWithoutExt + suffix;
+      }
     );
-  }
 
-  // Fix AppCertifiedHypercertRecord.Main to .Record in contribution.ts
-  const contributionTsPath = path.join(
-    lexiconApiPath,
-    "types",
-    "app",
-    "certified",
-    "hypercert",
-    "contribution.ts"
-  );
-
-  if (fs.existsSync(contributionTsPath)) {
-    const contributionTsContent = fs.readFileSync(contributionTsPath, "utf8");
-
-    if (
-      contributionTsContent.includes(
-        "hypercert?: AppCertifiedHypercertRecord.Main"
-      )
-    ) {
-      const updatedContributionTsContent = contributionTsContent.replace(
-        /hypercert\?: AppCertifiedHypercertRecord\.Main/g,
-        "hypercert?: AppCertifiedHypercertRecord.Record"
-      );
-      fs.writeFileSync(
-        contributionTsPath,
-        updatedContributionTsContent,
-        "utf8"
-      );
+    if (changed) {
+      fs.writeFileSync(filePath, updatedContent, "utf8");
       console.log(
-        "contribution.ts updated successfully (replaced .Main with .Record)"
+        `${fileName} updated successfully (removed .ts/.js extensions)`
       );
     } else {
-      console.log(
-        "contribution.ts already uses .Record (or pattern not found)"
-      );
+      console.log(`No .ts/.js extensions found in ${fileName}`);
     }
-  } else {
-    console.log("contribution.ts file not found");
   }
 
   console.log(

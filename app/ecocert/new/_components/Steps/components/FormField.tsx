@@ -13,6 +13,7 @@ const FormField = ({
   error,
   className,
   showError = true,
+  biokoMode = true,
 }: {
   label: string;
   Icon: LucideIcon;
@@ -22,6 +23,7 @@ const FormField = ({
   error?: string;
   showError?: boolean;
   className?: string;
+  biokoMode?: boolean;
 }) => {
   const kebabCaseLabel = label.toLowerCase().replace(/ /g, "-");
   return (
@@ -34,21 +36,24 @@ const FormField = ({
         className
       )}
     >
-      <div className="absolute -top-8 right-0 w-30 h-20 not-[group-focus-within]:pointer-events-none">
-        <div className="w-full h-8 rounded-md absolute top-0 overflow-hidden">
+      {biokoMode && (
+        <div className="absolute -top-8 right-0 w-30 h-20 not-[group-focus-within]:pointer-events-none">
+          <div className="w-full h-8 rounded-md absolute top-0 overflow-hidden">
+            <Image
+              src={BiokoPeekingImage}
+              alt="Bioko Peeking"
+              className="h-8 w-auto absolute top-8 right-6 group-focus-within:top-0 transition-all duration-300"
+            />
+          </div>
+
           <Image
-            src={BiokoPeekingImage}
-            alt="Bioko Peeking"
-            className="h-8 w-auto absolute top-8 right-6 group-focus-within:-top-0 transition-all duration-300"
+            src={BiokoGrabbingImage}
+            alt="Bioko Grabbing"
+            className="h-4 w-auto absolute top-6 -right-1 opacity-0 group-focus-within:opacity-100 transition-all duration-300"
           />
         </div>
+      )}
 
-        <Image
-          src={BiokoGrabbingImage}
-          alt="Bioko Grabbing"
-          className="h-4 w-auto absolute top-6 -right-1 opacity-0 group-focus-within:opacity-100 transition-all duration-300"
-        />
-      </div>
       <div className="flex items-center justify-between w-full">
         <label
           htmlFor={htmlFor ?? kebabCaseLabel}

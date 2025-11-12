@@ -151,7 +151,7 @@ const Step5 = () => {
     },
   });
 
-  const geojson = step3FormValues.siteBoundaryGeoJson;
+  const geojson = step3FormValues.siteBoundaries;
   const [uploadedGeojsonBlobRef, setUploadedGeojsonBlobRef] =
     useState<BlobRefJSON | null>(null);
   const [uploadGeojsonError, setUploadGeojsonError] = useState<string | null>(
@@ -169,7 +169,7 @@ const Step5 = () => {
         // TODO: Convert actual geojson to file
         name: "geojson.json",
         type: "application/json",
-        dataBase64: Buffer.from(geojson).toString("base64"),
+        dataBase64: Buffer.from(geojson[0]).toString("base64"),
       });
       if (response.success !== true)
         throw new Error("Failed to upload geojson");

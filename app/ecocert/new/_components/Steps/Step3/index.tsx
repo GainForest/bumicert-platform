@@ -1,42 +1,40 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import FormField from "../components/FormField";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from "@/components/ui/input-group";
+import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
 import { Button } from "@/components/ui/button";
 import {
   Users,
   ShieldCheck,
   Map,
   PlusCircle,
-  Globe2,
   Trash2,
+  Loader2,
+  Loader2Icon,
+  CircleDashed,
+  Check,
 } from "lucide-react";
 import { useStep3Store } from "./store";
 import { Checkbox } from "@/components/ui/checkbox";
-import FileInput from "../components/FileInput";
 import useNewEcocertStore from "../../../store";
+import { useQuery } from "@tanstack/react-query";
+import { trpcClient } from "@/lib/trpc/client";
+import { useAtprotoStore } from "@/components/stores/atproto";
+import { useModal } from "@/components/ui/modal/context";
+import { AddSiteModalId } from "./AddSiteModal";
+import { AddSiteModal } from "./AddSiteModal";
+import { cn } from "@/lib/utils";
 
 const Step3 = () => {
-  const [geoJsonFile, setGeoJsonFile] = useState<File | null>(null);
-
   const { maxStepIndexReached, currentStepIndex } = useNewEcocertStore();
   const shouldShowValidationErrors = currentStepIndex < maxStepIndexReached;
 
   const {
-    formValues: {
-      contributors,
-      siteBoundaryGeoJson,
-      confirmPermissions,
-      agreeTnc,
-    },
+    formValues: { contributors, confirmPermissions, agreeTnc },
     addContributor,
     updateContributor,
     removeContributor,
-    setSiteBoundaryGeoJson,
+    setSiteBoundaries,
     setConfirmPermissions,
     setAgreeTnc,
     errors,
@@ -46,6 +44,55 @@ const Step3 = () => {
   useEffect(() => {
     updateValidationsAndCompletionPercentage();
   }, [shouldShowValidationErrors]);
+
+  const auth = useAtprotoStore((state) => state.auth);
+  const { pushModal, show } = useModal();
+  const onAddSite = () => {
+    pushModal(
+      {
+        id: AddSiteModalId,
+        content: <AddSiteModal />,
+      },
+      true
+    );
+    show();
+  };
+  const [selectedSites, setSelectedSites] = useState<Set<string>>(new Set());
+  const handleSiteToggleClick = (cid: string) => {
+    const newSet = new Set(selectedSites);
+    if (newSet.has(cid)) {
+      newSet.delete(cid);
+    } else {
+      newSet.add(cid);
+    }
+    setSelectedSites(newSet);
+    const siteAtUrls = Array.from(newSet)
+      .map((cid) => {
+        const site = sites?.find((site) => site.cid === cid);
+        if (!site) return null;
+        return site.uri;
+      })
+      .filter((url) => url !== null);
+
+    setSiteBoundaries(siteAtUrls);
+  };
+  const {
+    data: sites,
+    isPending: isSitesPending,
+    isPlaceholderData: isOlderSites,
+    error: sitesFetchError,
+  } = useQuery({
+    queryKey: ["getAllSites", auth.user?.did],
+    queryFn: async () => {
+      if (!auth.user?.did) throw new Error("User is not authenticated");
+      const response = await trpcClient.gainforest.site.getAll.query({
+        did: auth.user?.did,
+      });
+      return response;
+    },
+    enabled: !!auth.user?.did,
+  });
+  const isSitesLoading = isSitesPending || isOlderSites;
 
   return (
     <div>
@@ -103,40 +150,98 @@ const Step3 = () => {
 
         <FormField
           Icon={Map}
-          label="Upload Site Boundaries"
+          label="Site Boundaries"
           description="Please upload your site boundary in GeoJSON format so we can visualize your project on the map."
         >
-          <InputGroup className="h-8 bg-background">
-            <InputGroupAddon>
-              <Globe2 />
-            </InputGroupAddon>
-            <InputGroupInput placeholder="Paste URL to a GeoJSON file" />
-          </InputGroup>
-          <div className="flex items-center justify-center text-muted-foreground text-sm uppercase">
-            <span>or</span>
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted-foreground">
+              Select the sites for this ecocert, or upload a new site.
+            </span>
+            <span className="text-sm text-muted-foreground">
+              {isSitesLoading ?
+                <Loader2Icon className="animate-spin size-3" />
+              : sites?.length ?
+                `${sites.length} sites found.`
+              : "No sites found."}
+            </span>
           </div>
-          <FileInput
-            placeholder="Upload or drag and drop a GeoJSON file"
-            supportedFileTypes={["application/geo+json", "application/json"]}
-            maxSizeInMB={10}
-            onFileChange={(file) => {
-              setGeoJsonFile(file);
-              if (file) {
-                // Convert File to Blob URL for storage
-                const url = URL.createObjectURL(file);
-                setSiteBoundaryGeoJson(url);
-              } else {
-                if (
-                  siteBoundaryGeoJson &&
-                  siteBoundaryGeoJson.startsWith("blob:")
-                ) {
-                  URL.revokeObjectURL(siteBoundaryGeoJson);
+
+          <div className="h-40 w-full border border-dashed border-border rounded-lg bg-background/50">
+            {isSitesLoading && (
+              <div className="w-full h-full flex flex-col items-center justify-center">
+                <Loader2 className="animate-spin text-muted-foreground size-4" />
+                <span className="text-sm text-muted-foreground">
+                  Loading your sites...
+                </span>
+              </div>
+            )}
+            {!isSitesLoading && (
+              <>
+                {!sites || sites.length === 0 ?
+                  <div className="w-full h-full flex flex-col items-center justify-center">
+                    <span className="text-sm text-muted-foreground">
+                      {sitesFetchError ?
+                        "Unable to load sites."
+                      : "No sites found."}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="mt-2"
+                      onClick={onAddSite}
+                    >
+                      <PlusCircle /> Add a site
+                    </Button>
+                  </div>
+                : <div className="grid grid-cols-2 gap-1 p-2">
+                    {sites.map((site) => {
+                      const siteData = site.value;
+                      return (
+                        <Button
+                          key={site.cid}
+                          variant={"outline"}
+                          size="sm"
+                          className={cn(
+                            "h-auto flex items-center justify-start px-4 pl-6 py-2 gap-3",
+                            selectedSites.has(site.cid) && "border-primary"
+                          )}
+                          onClick={() => handleSiteToggleClick(site.cid)}
+                        >
+                          {selectedSites.has(site.cid) ?
+                            <div className="h-5 w-5 rounded-full bg-primary flex items-center justify-center">
+                              <Check className="size-3 text-white" />
+                            </div>
+                          : <CircleDashed className="size-5 text-muted-foreground" />
+                          }
+                          <div className="flex flex-col items-start justify-start">
+                            <span className="text-base font-medium">
+                              {siteData.name}
+                            </span>
+                            <div className="flex items-center gap-1">
+                              <span className="text-sm text-muted-foreground mr-1">
+                                {siteData.area} hectares
+                              </span>
+                              <span className="text-sm text-muted-foreground">
+                                {"("}
+                                {siteData.lat}°, {siteData.lon}°{")"}
+                              </span>
+                            </div>
+                          </div>
+                        </Button>
+                      );
+                    })}
+                    <Button
+                      variant="outline"
+                      className="h-auto"
+                      onClick={onAddSite}
+                    >
+                      <PlusCircle /> Add a site
+                    </Button>
+                  </div>
                 }
-                setSiteBoundaryGeoJson(null);
-              }
-            }}
-            value={geoJsonFile}
-          />
+              </>
+            )}
+          </div>
         </FormField>
 
         <FormField

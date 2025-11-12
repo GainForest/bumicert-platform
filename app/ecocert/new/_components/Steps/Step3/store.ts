@@ -6,11 +6,12 @@ export const step3Schema = z.object({
     .array(z.string().min(1, "All contributors must have a name"))
     .min(1, "Required")
     .describe("List of Contributors"),
-  siteBoundaryGeoJson: z
-    .url()
-    .nullable()
-    .refine((v) => v !== null, { message: "Required" })
-    .describe("Site Boundary GeoJSON"),
+  siteBoundaries: z
+    .array(z.url())
+    .refine((v) => v.length > 0, {
+      message: "Required",
+    })
+    .describe("Site Boundaries"),
   confirmPermissions: z
     .boolean()
     .refine((v) => v === true, {
@@ -38,7 +39,7 @@ type Step3StoreActions = {
   addContributor: (name: string) => void;
   updateContributor: (index: number, name: string) => void;
   removeContributor: (index: number) => void;
-  setSiteBoundaryGeoJson: (url: string | null) => void;
+  setSiteBoundaries: (urls: string[]) => void;
   setConfirmPermissions: (v: boolean) => void;
   setAgreeTnc: (v: boolean) => void;
   updateValidationsAndCompletionPercentage: () => void;
@@ -49,7 +50,7 @@ export const useStep3Store = create<Step3StoreState & Step3StoreActions>(
   (set, get) => ({
     formValues: {
       contributors: [],
-      siteBoundaryGeoJson: null,
+      siteBoundaries: [],
       confirmPermissions: false,
       agreeTnc: false,
     },
@@ -88,9 +89,9 @@ export const useStep3Store = create<Step3StoreState & Step3StoreActions>(
       }));
       get().updateValidationsAndCompletionPercentage();
     },
-    setSiteBoundaryGeoJson: (url) => {
+    setSiteBoundaries: (urls) => {
       set((state) => ({
-        formValues: { ...state.formValues, siteBoundaryGeoJson: url },
+        formValues: { ...state.formValues, siteBoundaries: urls },
       }));
       get().updateValidationsAndCompletionPercentage();
     },
@@ -147,7 +148,7 @@ export const useStep3Store = create<Step3StoreState & Step3StoreActions>(
       set({
         formValues: {
           contributors: [],
-          siteBoundaryGeoJson: null,
+          siteBoundaries: [],
           confirmPermissions: false,
           agreeTnc: false,
         },

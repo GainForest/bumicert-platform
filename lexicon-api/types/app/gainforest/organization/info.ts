@@ -23,8 +23,7 @@ export interface Record {
   shortDescription: string
   /** The long description of the organization or project in markdown */
   longDescription: string
-  /** Cover image for the organization */
-  coverImage?: BlobRef
+  coverImage?: AppGainforestCommonDefs.SmallImage
   logo?: AppGainforestCommonDefs.SmallImage
   /** The objectives of the organization or project */
   objectives: (

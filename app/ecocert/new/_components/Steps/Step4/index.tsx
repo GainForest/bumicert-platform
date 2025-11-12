@@ -126,9 +126,8 @@ const Step4 = () => {
               case "contributors":
                 parsedValue = step3FormValues[typedKey].join(", ");
                 break;
-              case "siteBoundaryGeoJson":
-                parsedValue =
-                  step3FormValues[typedKey] ? "Uploaded" : "Not Uploaded";
+              case "siteBoundaries":
+                parsedValue = `${step3FormValues[typedKey].length} site${step3FormValues[typedKey].length > 1 ? "s" : ""} selected`;
                 break;
               case "confirmPermissions":
                 parsedValue = step3FormValues[typedKey] ? "Yes" : "No";
