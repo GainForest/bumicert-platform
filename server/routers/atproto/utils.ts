@@ -24,3 +24,11 @@ export const toBlobRef = (input: BlobRefJSON) => {
     size: input.size,
   });
 };
+
+export const FileGeneratorSchema = z.object({
+  name: z.string(),
+  type: z.string(),
+  dataBase64: z.string(),
+});
+
+export type FileGenerator = z.infer<typeof FileGeneratorSchema>;

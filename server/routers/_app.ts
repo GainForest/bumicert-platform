@@ -13,6 +13,7 @@ import { listProjectSites } from "./atproto/gainforest/projectSite/list";
 import { getProjectSite } from "./atproto/gainforest/projectSite/get";
 import { getDefaultProjectSite } from "./atproto/gainforest/projectSite/getDefault";
 import { postHypercertClaim } from "./atproto/hypercerts/claim/post";
+import { updateOrganizationInfo } from "./atproto/gainforest/organizationInfo/update";
 
 export const appRouter = createTRPCRouter({
   health: publicProcedure.query(() => ({ status: "ok" })),
@@ -27,6 +28,7 @@ export const appRouter = createTRPCRouter({
   organizationInfo: {
     get: getOrganizationInfo,
     put: putOrganizationInfo,
+    update: updateOrganizationInfo,
   },
   projectSites: {
     list: listProjectSites,

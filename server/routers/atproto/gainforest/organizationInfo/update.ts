@@ -11,6 +11,7 @@ import {
   toBlobRef,
 } from "../../utils";
 import { Agent } from "@atproto/api";
+import { TRPCError } from "@trpc/server";
 
 const uploadFile = async (fileGenerator: FileGenerator, agent: Agent) => {
   const file = new File(
@@ -22,7 +23,7 @@ const uploadFile = async (fileGenerator: FileGenerator, agent: Agent) => {
   return response.data.blob.toJSON() as BlobRefJSON;
 };
 
-export const putOrganizationInfo = protectedProcedure
+export const updateOrganizationInfo = protectedProcedure
   .input(
     z.object({
       did: z.string(),
@@ -84,15 +85,42 @@ export const putOrganizationInfo = protectedProcedure
       throw new Error(result.error.message);
     }
 
-    const response = await agent.com.atproto.repo.putRecord({
-      collection: "app.gainforest.organization.info",
+    const response = await agent.com.atproto.repo.applyWrites({
       repo: input.did,
-      rkey: "self",
-      record: info,
+      writes: [
+        {
+          $type: "com.atproto.repo.applyWrites#update",
+          collection: "app.gainforest.organization.info",
+          rkey: "self",
+          value: info,
+        },
+      ],
     });
 
+    if (response.success !== true) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to update organization info",
+      });
+    }
+
     return {
-      ...response,
+      success: true,
+      uploads:
+        input.uploads ?
+          {
+            logo:
+              input.uploads.logo ?
+                logoBlobRef ? toBlobRef(logoBlobRef)
+                : undefined
+              : undefined,
+            coverImage:
+              input.uploads.coverImage ?
+                coverImageBlobRef ? toBlobRef(coverImageBlobRef)
+                : undefined
+              : undefined,
+          }
+        : undefined,
       value: info,
-    } as PutRecordResponse<AppGainforestOrganizationInfo.Record>;
+    };
   });

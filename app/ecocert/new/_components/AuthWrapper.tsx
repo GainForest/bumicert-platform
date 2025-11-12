@@ -22,14 +22,20 @@ const AuthWrapper = ({
   const auth = useAtprotoStore((state) => state.auth);
 
   const {
-    data: organizationInfo,
     isPending: isPendingOrganizationInfo,
     error: organizationInfoError,
     isPlaceholderData: isOlderData,
   } = useQuery({
     queryKey: ["organizationInfo", auth.user?.did],
-    queryFn: () =>
-      trpcClient.organizationInfo.get.query({ did: auth.user?.did ?? "" }),
+    queryFn: async () => {
+      const response = await trpcClient.organizationInfo.get.query({
+        did: auth.user?.did ?? "",
+      });
+      if (!response.success) {
+        throw new Error(response.humanMessage);
+      }
+      return response.data.value;
+    },
     enabled: !!auth.user?.did,
   });
 
@@ -37,8 +43,7 @@ const AuthWrapper = ({
   const isAuthenticated = auth.status === "AUTHENTICATED";
   const isUnauthenticated = auth.status === "UNAUTHENTICATED";
   const isResuming = auth.status === "RESUMING";
-  const hasOrganizationError =
-    organizationInfoError || (organizationInfo && !organizationInfo.success);
+  const hasOrganizationError = !!organizationInfoError;
   const isContentReady =
     isAuthenticated && !isLoadingOrganizationInfo && !hasOrganizationError;
   const shouldShowOverlay = !isContentReady;
