@@ -102,6 +102,13 @@ export const UploadLogoModal = () => {
         </div>
       : <FileInput
           placeholder="Upload a logo for your organization"
+          supportedFileTypes={[
+            "image/jpg",
+            "image/jpeg",
+            "image/png",
+            "image/webp",
+          ]}
+          maxSizeInMB={5}
           value={logo}
           onFileChange={setLogo}
         />

@@ -110,7 +110,12 @@ const Step1 = () => {
             placeholder="Upload or drag and drop an image"
             value={coverImage}
             onFileChange={setCoverImage}
-            supportedFileTypes={["image/*"]}
+            supportedFileTypes={[
+              "image/jpg",
+              "image/jpeg",
+              "image/png",
+              "image/webp",
+            ]}
             maxSizeInMB={10}
           />
         </FormField>

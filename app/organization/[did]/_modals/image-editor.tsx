@@ -95,7 +95,13 @@ export const ImageEditorModal = ({
             <span className="text-sm text-muted-foreground">Loading...</span>
           </div>
         : <FileInput
-            supportedFileTypes={["image/*"]}
+            supportedFileTypes={[
+              "image/jpg",
+              "image/jpeg",
+              "image/png",
+              "image/webp",
+            ]}
+            maxSizeInMB={5}
             value={image}
             onFileChange={(file) => {
               setImage(file ?? undefined);

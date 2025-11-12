@@ -117,11 +117,8 @@ const Step3 = () => {
           </div>
           <FileInput
             placeholder="Upload or drag and drop a GeoJSON file"
-            supportedFileTypes={[
-              "application/geo+json",
-              "application/json",
-              ".geojson",
-            ]}
+            supportedFileTypes={["application/geo+json", "application/json"]}
+            maxSizeInMB={10}
             onFileChange={(file) => {
               setGeoJsonFile(file);
               if (file) {
