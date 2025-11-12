@@ -20,6 +20,7 @@ import { useStep3Store } from "../Step3/store";
 import { PutRecordResponse } from "@/server/utils";
 import { OrgHypercertsClaimRecord } from "@/lexicon-api";
 import { BlobRefJSON } from "@/server/routers/atproto/utils";
+import { useStep5Store } from "./store";
 
 const ProgressItem = ({
   iconset,
@@ -112,6 +113,12 @@ const Step5 = () => {
   const step3FormValues = useStep3Store((state) => state.formValues);
 
   const ecocertArtImage = useStep4Store((state) => state.ecocertArtImage);
+  const setOverallStatus = useStep5Store((state) => state.setOverallStatus);
+
+  useEffect(() => {
+    setOverallStatus("pending");
+  }, []);
+
   const [uploadedArtBlobRef, setUploadedArtBlobRef] =
     useState<BlobRefJSON | null>(null);
   const [uploadArtError, setUploadArtError] = useState<string | null>(null);
@@ -203,8 +210,12 @@ const Step5 = () => {
           workScope: step1FormValues.workType,
           workTimeFrameFrom: step1FormValues.projectDateRange[0].toISOString(),
           workTimeFrameTo:
-            step1FormValues.projectDateRange[1]?.toISOString() ||
-            new Date().toISOString(),
+            (
+              step1FormValues.isProjectOngoing ||
+              step1FormValues.projectDateRange[1] === null
+            ) ?
+              new Date(0).toISOString()
+            : step1FormValues.projectDateRange[1].toISOString(),
           location: [uploadedGeojsonBlobRef],
           createdAt: new Date().toISOString(),
         },
