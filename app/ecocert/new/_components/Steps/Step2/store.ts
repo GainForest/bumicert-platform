@@ -5,8 +5,13 @@ export const step2Schema = z.object({
   impactStory: z
     .string()
     .min(50, "At least 50 characters required")
-    .max(8000, "No more than 8000 characters allowed")
+    .max(30000, "No more than 8000 characters allowed")
     .describe("Your Impact Story"),
+  shortDescription: z
+    .string()
+    .min(1, "Required")
+    .max(3000, "No more than 3000 characters allowed")
+    .describe("Short Description"),
 });
 
 type Step2FormValues = z.infer<typeof step2Schema>;
@@ -20,6 +25,7 @@ type Step2StoreState = {
 
 type Step2StoreActions = {
   setImpactStory: (text: string) => void;
+  setShortDescription: (text: string) => void;
   updateValidationsAndCompletionPercentage: () => void;
   reset: () => void;
 };
@@ -28,6 +34,7 @@ export const useStep2Store = create<Step2StoreState & Step2StoreActions>(
   (set, get) => ({
     formValues: {
       impactStory: "",
+      shortDescription: "",
     },
     errors: {},
     isValid: false,
@@ -36,6 +43,13 @@ export const useStep2Store = create<Step2StoreState & Step2StoreActions>(
     setImpactStory: (text) => {
       set((state) => ({
         formValues: { ...state.formValues, impactStory: text },
+      }));
+      get().updateValidationsAndCompletionPercentage();
+    },
+
+    setShortDescription: (text) => {
+      set((state) => ({
+        formValues: { ...state.formValues, shortDescription: text },
       }));
       get().updateValidationsAndCompletionPercentage();
     },
@@ -81,6 +95,7 @@ export const useStep2Store = create<Step2StoreState & Step2StoreActions>(
       set({
         formValues: {
           impactStory: "",
+          shortDescription: "",
         },
         errors: {},
         isValid: false,

@@ -136,7 +136,7 @@ const Step5 = () => {
       const response = await createEcocertMutationFn({
         claim: {
           title: step1FormValues.projectName,
-          shortDescription: step2FormValues.impactStory,
+          shortDescription: step2FormValues.shortDescription,
           description: step2FormValues.impactStory,
           workScope: step1FormValues.workType,
           workTimeFrameFrom: step1FormValues.projectDateRange[0].toISOString(),

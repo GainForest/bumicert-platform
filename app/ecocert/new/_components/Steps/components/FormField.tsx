@@ -9,6 +9,7 @@ const FormField = ({
   Icon,
   children,
   label,
+  inlineEndMessage,
   htmlFor,
   error,
   className,
@@ -17,6 +18,7 @@ const FormField = ({
 }: {
   label: string;
   Icon: LucideIcon;
+  inlineEndMessage?: React.ReactNode;
   description?: string;
   children: React.ReactNode;
   htmlFor?: string;
@@ -67,9 +69,12 @@ const FormField = ({
           <Icon className="size-3.5" />
           {label}
         </label>
-        {showError && error && (
+        {showError && error ?
           <span className="text-destructive text-xs">{error}</span>
-        )}
+        : <span className="text-xs text-muted-foreground">
+            {inlineEndMessage}
+          </span>
+        }
       </div>
 
       {children}

@@ -12,11 +12,13 @@ const QuickTooltip = ({
   content,
   asChild = false,
   openOnClick = false,
+  triggerClassName,
 }: {
   children: React.ReactNode;
   content: React.ReactNode;
   asChild?: boolean;
   openOnClick?: boolean;
+  triggerClassName?: string;
 }) => {
   const [open, setOpen] = useState(false);
 
@@ -27,7 +29,7 @@ const QuickTooltip = ({
           <TooltipTrigger
             onClick={() => setOpen(true)}
             // onBlur={() => setOpen(false)}
-
+            className={triggerClassName}
             asChild={asChild}
           >
             {children}
