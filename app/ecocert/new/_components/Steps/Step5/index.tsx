@@ -201,7 +201,7 @@ const Step5 = () => {
         }
         status={authStatus}
       />
-      {authStatus === "success" && createEcocertStatus === "success" && (
+      {authStatus === "success" && (
         <ProgressItem
           iconset={{
             Error: CircleAlertIcon,

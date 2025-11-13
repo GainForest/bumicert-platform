@@ -6,7 +6,7 @@ export const step3Schema = z.object({
     .array(z.string().min(1, "All contributors must have a name"))
     .min(1, "Required")
     .describe("List of Contributors"),
-  siteBoundaries: z.url("Required").describe("Site Boundaries"),
+  siteBoundaries: z.string().min(1, "Required").describe("Site Boundaries"),
   confirmPermissions: z
     .boolean()
     .refine((v) => v === true, {

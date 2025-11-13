@@ -9,6 +9,7 @@ import {
   BlobRefJSONSchema,
   FileGenerator,
   FileGeneratorSchema,
+  toBlobRef,
   toFile,
   validateRecordOrThrow,
 } from "../../utils";
@@ -89,7 +90,6 @@ export const createHypercertClaim = protectedProcedure
     );
 
     // Claim record
-    const uploadEcocertImagePromise = uploadFile(input.uploads.image, agent);
     const claim: OrgHypercertsClaim.Record = {
       $type: "org.hypercerts.claim",
       title: input.claim.title,
@@ -140,14 +140,17 @@ export const createHypercertClaim = protectedProcedure
       });
     }
     // 2. Upload image to the PDS
-    const imageBlobRef = await uploadEcocertImagePromise;
+    const imageBlobRef = await uploadFile(input.uploads.image, agent);
     // 3. Write claim to the PDS
     const claimResponse = await agent.com.atproto.repo.createRecord({
       repo: did,
       collection: "org.hypercerts.claim",
       record: {
         ...validatedClaim,
-        image: imageBlobRef,
+        image: {
+          $type: "app.certified.defs#smallImage",
+          image: toBlobRef(imageBlobRef),
+        },
         location: {
           $type: "com.atproto.repo.strongRef",
           uri: locationWriteResponse.data.uri,

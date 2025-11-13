@@ -23,12 +23,20 @@ export const EcocertArt = ({ logoUrl }: { logoUrl: string | null }) => {
     if (!ref.current) return;
     if (coverImage) {
       domToJpeg(ref.current).then((image) => {
-        // convert base64 to blob
-        const blob = new Blob([image], { type: "image/jpeg" });
-        // convert blob to file
-        const file = new File([blob], "ecocert-art.jpeg", {
-          type: "image/jpeg",
-        });
+        // Convert data URL to a File
+        // image is a data URL (base64)
+        // Extract the mime type and base64 data
+        const match = image.match(/^data:(image\/[a-zA-Z]+);base64,(.*)$/);
+        if (!match) return;
+        const mimeType = match[1];
+        const base64Data = match[2];
+        const byteString = atob(base64Data);
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i);
+        }
+        const file = new File([ab], "ecocert-art.jpeg", { type: mimeType });
         setEcocertArtImage(file);
       });
     }
@@ -125,27 +133,31 @@ const EcocertPreviewCard = () => {
       </div>
 
       <div className="bg-background p-2 rounded-xl flex-1 flex flex-col gap-2 items-center justify-center">
-        <div className="w-full flex items-start gap-2 border border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300 rounded-lg p-2 relative">
-          <button
-            type="button"
-            className="absolute h-6 w-6 -top-1 -right-1 bg-amber-500 text-white rounded-full flex items-center justify-center cursor-pointer"
-            onClick={() => {
-              pushModal(
-                {
-                  id: UploadLogoModalId,
-                  content: <UploadLogoModal />,
-                },
-                true
-              );
-              show();
-            }}
-          >
-            <UploadIcon className="size-4" />
-          </button>
-          <span className="text-sm text-pretty mr-3">
-            Your organization doesn&apos;t have a logo. Do you want to add one?
-          </span>
-        </div>
+        {!logoFromData && (
+          <div className="w-full flex items-start gap-2 border border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300 rounded-lg p-2 relative">
+            <button
+              type="button"
+              className="absolute h-6 w-6 -top-1 -right-1 bg-amber-500 text-white rounded-full flex items-center justify-center cursor-pointer"
+              onClick={() => {
+                pushModal(
+                  {
+                    id: UploadLogoModalId,
+                    content: <UploadLogoModal />,
+                  },
+                  true
+                );
+                show();
+              }}
+            >
+              <UploadIcon className="size-4" />
+            </button>
+            <span className="text-sm text-pretty mr-3">
+              Your organization doesn&apos;t have a logo. Do you want to add
+              one?
+            </span>
+          </div>
+        )}
+
         {step1CompletionPercentage === 100 ?
           <EcocertArt logoUrl={logoUrl} />
         : isLoadingOrganizationInfo ?

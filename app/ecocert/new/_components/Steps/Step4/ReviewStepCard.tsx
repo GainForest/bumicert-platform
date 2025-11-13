@@ -42,6 +42,7 @@ const ReviewStepCard = <
               className="h-6 rounded-full -mr-1"
               variant={"ghost"}
               size={"sm"}
+              onClick={onEdit}
             >
               Edit
               <ArrowRightIcon />

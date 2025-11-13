@@ -133,14 +133,17 @@ const Step3 = () => {
           Icon={Map}
           label="Site Boundaries"
           description="Please upload your site boundary in GeoJSON format so we can visualize your project on the map."
+          error={errors.siteBoundaries}
         >
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">
-              Select the sites for this ecocert, or upload a new site.
+              Select a site for this ecocert, or add a new one.
             </span>
             <span className="text-sm text-muted-foreground">
               {isSitesLoading ?
                 <Loader2Icon className="animate-spin size-3" />
+              : siteBoundaries !== "" ?
+                "Selected"
               : sites?.length ?
                 `${sites.length} site${sites.length > 1 ? "s" : ""} found.`
               : "No sites found."}
@@ -186,7 +189,13 @@ const Step3 = () => {
                             "h-auto flex items-center justify-start px-4 pl-6 py-2 gap-3",
                             siteBoundaries === site.uri && "border-primary"
                           )}
-                          onClick={() => setSiteBoundaries(site.uri)}
+                          onClick={() => {
+                            if (siteBoundaries === site.uri) {
+                              setSiteBoundaries("");
+                            } else {
+                              setSiteBoundaries(site.uri);
+                            }
+                          }}
                         >
                           {siteBoundaries === site.uri ?
                             <div className="h-5 w-5 rounded-full bg-primary flex items-center justify-center">
