@@ -14,7 +14,7 @@ interface CapsulesProps {
   className?: string;
   selectMultiple?: boolean;
   value?: string | string[];
-  onChange?: (value: string | string[]) => void;
+  onChange?: (value: string[]) => void;
 }
 
 const Capsules = ({
@@ -35,7 +35,7 @@ const Capsules = ({
         onChange(currentValues.filter((v) => v !== optionValue));
       }
     } else {
-      onChange(checked ? optionValue : "");
+      onChange(checked ? [optionValue] : []);
     }
   };
 

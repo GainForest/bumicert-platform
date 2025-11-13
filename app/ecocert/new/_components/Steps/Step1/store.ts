@@ -17,19 +17,7 @@ export const step1Schema = z.object({
     .nullable()
     .refine((v) => v !== null, { message: "Required" })
     .describe("Cover Image"),
-  workType: z
-    .enum(
-      [
-        "Conservation",
-        "Restoration",
-        "Community Led",
-        "Landscape",
-        "Science",
-        "Other",
-      ],
-      "Required"
-    )
-    .describe("Work Type"),
+  workType: z.array(z.string()).min(1, "Required").describe("Work Type"),
   projectDateRange: z
     .tuple([z.date(), z.date().nullable()])
     .describe("Project Date Range"),
@@ -49,7 +37,7 @@ type Step1StoreActions = {
   setProjectName: (name: string) => void;
   setWebsiteOrSocialLink: (link: string) => void;
   setCoverImage: (image: File | null) => void;
-  setWorkType: (type: Step1FormValues["workType"]) => void;
+  setWorkType: (types: Step1FormValues["workType"]) => void;
   setProjectDateRange: (range: [Date, Date | null]) => void;
   setIsProjectOngoing: (ongoing: boolean) => void;
   updateValidationsAndCompletionPercentage: () => void;
@@ -63,7 +51,7 @@ export const useStep1Store = create<Step1StoreState & Step1StoreActions>(
       projectName: "",
       websiteOrSocialLink: "",
       coverImage: null,
-      workType: "Conservation",
+      workType: [],
       projectDateRange: [new Date(`${new Date().getFullYear()}-01-01`), null],
       isProjectOngoing: true,
     },
@@ -90,9 +78,9 @@ export const useStep1Store = create<Step1StoreState & Step1StoreActions>(
       }));
       get().updateValidationsAndCompletionPercentage();
     },
-    setWorkType: (type) => {
+    setWorkType: (types) => {
       set((state) => ({
-        formValues: { ...state.formValues, workType: type },
+        formValues: { ...state.formValues, workType: types },
       }));
       get().updateValidationsAndCompletionPercentage();
     },
@@ -153,7 +141,7 @@ export const useStep1Store = create<Step1StoreState & Step1StoreActions>(
           projectName: "",
           websiteOrSocialLink: "",
           coverImage: null,
-          workType: "Conservation",
+          workType: [],
           projectDateRange: [
             new Date(`${new Date().getFullYear()}-01-01`),
             null,

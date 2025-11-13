@@ -128,16 +128,22 @@ const Step1 = () => {
         >
           <Capsules
             className="mt-1"
-            selectMultiple={false}
+            selectMultiple={true}
             value={workType}
-            onChange={(value) => setWorkType(value as typeof workType)}
+            onChange={(value) => setWorkType(value)}
             options={[
-              { value: "Conservation", label: "Conservation" },
-              { value: "Restoration", label: "Restoration" },
-              { value: "Community Led", label: "Community Led" },
-              { value: "Landscape", label: "Landscape" },
-              { value: "Science", label: "Science" },
-              { value: "Other", label: "Other" },
+              { value: "Community Resilience", label: "Community Resilience" },
+              {
+                value: "Biodiversity Monitoring",
+                label: "Biodiversity Monitoring",
+              },
+              {
+                value: "Environmental Education",
+                label: "Environmental Education",
+              },
+              { value: "Mangrove Restoration", label: "Mangrove Restoration" },
+              { value: "Agroforestry", label: "Agroforestry" },
+              { value: "Tree Planting", label: "Tree Planting" },
             ]}
           />
         </FormField>

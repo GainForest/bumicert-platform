@@ -83,6 +83,10 @@ const Step4 = () => {
               case "isProjectOngoing":
                 parsedValue = step1FormValues[typedKey] ? "Yes" : "No";
                 break;
+              case "workType":
+                parsedValue =
+                  step1FormValues[typedKey].join(", ") || "Not Selected";
+                break;
               default:
                 parsedValue = step1FormValues[typedKey];
             }

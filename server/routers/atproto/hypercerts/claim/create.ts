@@ -47,7 +47,7 @@ export const createHypercertClaim = protectedProcedure
         title: z.string(),
         shortDescription: z.string(),
         description: z.string().optional(),
-        workScope: z.string(),
+        workScope: z.array(z.string()),
         workTimeFrameFrom: z.string(),
         workTimeFrameTo: z.string(),
         createdAt: z.string(),
@@ -100,7 +100,7 @@ export const createHypercertClaim = protectedProcedure
       location: undefined,
       contributions: undefined,
       // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-      workScope: input.claim.workScope,
+      workScope: input.claim.workScope.join(", "),
       workTimeFrameFrom: input.claim.workTimeFrameFrom,
       workTimeFrameTo: input.claim.workTimeFrameTo,
       createdAt: new Date().toISOString(),
