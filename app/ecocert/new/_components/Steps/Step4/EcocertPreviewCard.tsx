@@ -113,7 +113,7 @@ const EcocertPreviewCard = () => {
   });
   const logoFromData = isOlderData ? undefined : organizationInfo?.logo;
   const logoUrl =
-    logoFromData ? getBlobUrl(auth.user?.did ?? "", logoFromData) : null;
+    logoFromData ? getBlobUrl(auth.user?.did ?? "", logoFromData.image) : null;
 
   const isLoadingOrganizationInfo = isPendingOrganizationInfo || isOlderData;
 

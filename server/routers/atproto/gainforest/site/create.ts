@@ -71,14 +71,17 @@ export const createSite = protectedProcedure
     }
 
     const geojsonUploadResponse = await agent.uploadBlob(file);
-    const geojsonBlobRef = geojsonUploadResponse.data.blob.toJSON();
+    const geojsonBlobRef = geojsonUploadResponse.data.blob;
     const site: AppGainforestOrganizationSite.Record = {
       $type: "app.gainforest.organization.site",
       name: input.site.name,
       lat: input.site.lat,
       lon: input.site.lon,
       area: input.site.area,
-      shapefile: geojsonBlobRef,
+      shapefile: {
+        $type: "app.gainforest.common.defs#smallBlob",
+        blob: geojsonBlobRef,
+      },
     };
 
     const validationResult = AppGainforestOrganizationSite.validateRecord(site);
@@ -110,7 +113,7 @@ export const createSite = protectedProcedure
     return {
       success: true,
       uploads: {
-        shapefile: geojsonBlobRef,
+        shapefile: geojsonBlobRef.toJSON(),
       },
       value: site,
     };

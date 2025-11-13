@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import FormField from "../components/FormField";
 import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
 import { Button } from "@/components/ui/button";
@@ -30,7 +30,7 @@ const Step3 = () => {
   const shouldShowValidationErrors = currentStepIndex < maxStepIndexReached;
 
   const {
-    formValues: { contributors, confirmPermissions, agreeTnc },
+    formValues: { contributors, confirmPermissions, agreeTnc, siteBoundaries },
     addContributor,
     updateContributor,
     removeContributor,
@@ -56,25 +56,6 @@ const Step3 = () => {
       true
     );
     show();
-  };
-  const [selectedSites, setSelectedSites] = useState<Set<string>>(new Set());
-  const handleSiteToggleClick = (cid: string) => {
-    const newSet = new Set(selectedSites);
-    if (newSet.has(cid)) {
-      newSet.delete(cid);
-    } else {
-      newSet.add(cid);
-    }
-    setSelectedSites(newSet);
-    const siteAtUrls = Array.from(newSet)
-      .map((cid) => {
-        const site = sites?.find((site) => site.cid === cid);
-        if (!site) return null;
-        return site.uri;
-      })
-      .filter((url) => url !== null);
-
-    setSiteBoundaries(siteAtUrls);
   };
   const {
     data: sites,
@@ -161,7 +142,7 @@ const Step3 = () => {
               {isSitesLoading ?
                 <Loader2Icon className="animate-spin size-3" />
               : sites?.length ?
-                `${sites.length} sites found.`
+                `${sites.length} site${sites.length > 1 ? "s" : ""} found.`
               : "No sites found."}
             </span>
           </div>
@@ -182,7 +163,7 @@ const Step3 = () => {
                     <span className="text-sm text-muted-foreground">
                       {sitesFetchError ?
                         "Unable to load sites."
-                      : "No sites found."}
+                      : "No site found."}
                     </span>
                     <Button
                       variant="outline"
@@ -203,11 +184,11 @@ const Step3 = () => {
                           size="sm"
                           className={cn(
                             "h-auto flex items-center justify-start px-4 pl-6 py-2 gap-3",
-                            selectedSites.has(site.cid) && "border-primary"
+                            siteBoundaries === site.uri && "border-primary"
                           )}
-                          onClick={() => handleSiteToggleClick(site.cid)}
+                          onClick={() => setSiteBoundaries(site.uri)}
                         >
-                          {selectedSites.has(site.cid) ?
+                          {siteBoundaries === site.uri ?
                             <div className="h-5 w-5 rounded-full bg-primary flex items-center justify-center">
                               <Check className="size-3 text-white" />
                             </div>

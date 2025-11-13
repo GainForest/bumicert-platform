@@ -20,16 +20,17 @@ export const getAllSites = publicProcedure
       });
     }
 
-    return response.data
-      .records as GetRecordResponse<AppGainforestOrganizationSite.Record>[];
-    // const records = response.data.records.map((record) => record.value);
+    const validRecords = response.data.records
+      .map((record) => {
+        const result = AppGainforestOrganizationSite.validateRecord(
+          record.value
+        );
+        if (result.success) return record;
+        return null;
+      })
+      .filter(
+        (record) => record !== null
+      ) as GetRecordResponse<AppGainforestOrganizationSite.Record>[];
 
-    // TODO: VALIDATE RECORDS
-    // const validRecords = records.filter((record) => {
-    //   const result = AppGainforestOrganizationSite.validateRecord(record);
-    //   console.log(record, result);
-    //   return result.success;
-    // }) as AppGainforestOrganizationSite.Record[];
-
-    // return records as AppGainforestOrganizationSite.Record[];
+    return validRecords;
   });

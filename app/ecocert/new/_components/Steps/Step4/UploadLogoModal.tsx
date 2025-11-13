@@ -63,10 +63,12 @@ export const UploadLogoModal = () => {
         info: {
           ...organizationInfo,
           logo:
-            organizationInfo.logo ? organizationInfo.logo.toJSON() : undefined,
+            organizationInfo.logo ?
+              organizationInfo.logo.image.toJSON()
+            : undefined,
           coverImage:
             organizationInfo.coverImage ?
-              organizationInfo.coverImage.toJSON()
+              organizationInfo.coverImage.image.toJSON()
             : undefined,
         },
       });

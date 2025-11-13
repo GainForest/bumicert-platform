@@ -10,9 +10,87 @@ const is$typed = _is$typed,
   validate = _validate
 const id = 'app.certified.defs'
 
-/** URI to external data */
-export type Uri = string
-/** Blob to external data (up to 10MB) */
-export type SmallBlob = BlobRef
-/** Blob to external data (up to 100MB) */
-export type LargeBlob = BlobRef
+/** Object containing a URI to external data */
+export interface Uri {
+  $type?: 'app.certified.defs#uri'
+  /** URI to external data */
+  uri: string
+}
+
+const hashUri = 'uri'
+
+export function isUri<V>(v: V) {
+  return is$typed(v, id, hashUri)
+}
+
+export function validateUri<V>(v: V) {
+  return validate<Uri & V>(v, id, hashUri)
+}
+
+/** Object containing a blob to external data */
+export interface SmallBlob {
+  $type?: 'app.certified.defs#smallBlob'
+  /** Blob to external data (up to 10MB) */
+  blob: BlobRef
+}
+
+const hashSmallBlob = 'smallBlob'
+
+export function isSmallBlob<V>(v: V) {
+  return is$typed(v, id, hashSmallBlob)
+}
+
+export function validateSmallBlob<V>(v: V) {
+  return validate<SmallBlob & V>(v, id, hashSmallBlob)
+}
+
+/** Object containing a blob to external data */
+export interface LargeBlob {
+  $type?: 'app.certified.defs#largeBlob'
+  /** Blob to external data (up to 100MB) */
+  blob: BlobRef
+}
+
+const hashLargeBlob = 'largeBlob'
+
+export function isLargeBlob<V>(v: V) {
+  return is$typed(v, id, hashLargeBlob)
+}
+
+export function validateLargeBlob<V>(v: V) {
+  return validate<LargeBlob & V>(v, id, hashLargeBlob)
+}
+
+/** Object containing a small image */
+export interface SmallImage {
+  $type?: 'app.certified.defs#smallImage'
+  /** Image (up to 5MB) */
+  image: BlobRef
+}
+
+const hashSmallImage = 'smallImage'
+
+export function isSmallImage<V>(v: V) {
+  return is$typed(v, id, hashSmallImage)
+}
+
+export function validateSmallImage<V>(v: V) {
+  return validate<SmallImage & V>(v, id, hashSmallImage)
+}
+
+/** Object containing a large image */
+export interface LargeImage {
+  $type?: 'app.certified.defs#largeImage'
+  /** Image (up to 10MB) */
+  image: BlobRef
+}
+
+const hashLargeImage = 'largeImage'
+
+export function isLargeImage<V>(v: V) {
+  return is$typed(v, id, hashLargeImage)
+}
+
+export function validateLargeImage<V>(v: V) {
+  return validate<LargeImage & V>(v, id, hashLargeImage)
+}

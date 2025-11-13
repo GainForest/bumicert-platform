@@ -12,7 +12,7 @@ import { getOrganizationInfo } from "./atproto/gainforest/organizationInfo/get";
 import { listSites } from "./atproto/gainforest/site/list";
 import { getProjectSite } from "./atproto/gainforest/site/get";
 import { getDefaultProjectSite } from "./atproto/gainforest/site/getDefault";
-import { postHypercertClaim } from "./atproto/hypercerts/claim/post";
+import { createHypercertClaim } from "./atproto/hypercerts/claim/create";
 import { updateOrganizationInfo } from "./atproto/gainforest/organizationInfo/update";
 import { getAllSites } from "./atproto/gainforest/site/getAll";
 import { createSite } from "./atproto/gainforest/site/create";
@@ -42,7 +42,9 @@ export const appRouter = createTRPCRouter({
     },
   },
   hypercerts: {
-    createClaim: postHypercertClaim,
+    claim: {
+      create: createHypercertClaim,
+    },
   },
 });
 export type AppRouter = typeof appRouter;

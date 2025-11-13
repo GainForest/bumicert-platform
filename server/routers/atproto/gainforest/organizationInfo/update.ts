@@ -57,11 +57,11 @@ export const updateOrganizationInfo = protectedProcedure
   )
   .mutation(async ({ input }) => {
     const agent = await getWriteAgent();
-    const logoBlobRef =
+    const logoBlobRefJson =
       input.uploads?.logo ?
         await uploadFile(input.uploads.logo, agent)
       : undefined;
-    const coverImageBlobRef =
+    const coverImageBlobRefJson =
       input.uploads?.coverImage ?
         await uploadFile(input.uploads.coverImage, agent)
       : undefined;
@@ -72,8 +72,20 @@ export const updateOrganizationInfo = protectedProcedure
       shortDescription: input.info.shortDescription,
       longDescription: input.info.longDescription,
       website: input.info.website ? input.info.website : undefined,
-      logo: logoBlobRef ? toBlobRef(logoBlobRef) : undefined,
-      coverImage: coverImageBlobRef ? toBlobRef(coverImageBlobRef) : undefined,
+      logo:
+        logoBlobRefJson ?
+          {
+            $type: "app.gainforest.common.defs#smallImage",
+            image: toBlobRef(logoBlobRefJson),
+          }
+        : undefined,
+      coverImage:
+        coverImageBlobRefJson ?
+          {
+            $type: "app.gainforest.common.defs#smallImage",
+            image: toBlobRef(coverImageBlobRefJson),
+          }
+        : undefined,
       objectives: input.info.objectives,
       startDate: new Date().toISOString(),
       country: input.info.country,
@@ -111,12 +123,20 @@ export const updateOrganizationInfo = protectedProcedure
           {
             logo:
               input.uploads.logo ?
-                logoBlobRef ? toBlobRef(logoBlobRef)
+                logoBlobRefJson ?
+                  {
+                    $type: "app.gainforest.common.defs#smallImage",
+                    image: toBlobRef(logoBlobRefJson),
+                  }
                 : undefined
               : undefined,
             coverImage:
               input.uploads.coverImage ?
-                coverImageBlobRef ? toBlobRef(coverImageBlobRef)
+                coverImageBlobRefJson ?
+                  {
+                    $type: "app.gainforest.common.defs#smallImage",
+                    image: toBlobRef(coverImageBlobRefJson),
+                  }
                 : undefined
               : undefined,
           }

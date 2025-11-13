@@ -1,6 +1,7 @@
 import { CID, Version } from "multiformats/cid";
 import z from "zod";
-import { BlobRef } from "@atproto/lexicon";
+import { BlobRef, ValidationResult } from "@atproto/lexicon";
+import { TRPCError } from "@trpc/server";
 
 export const BlobRefJSONSchema = z.object({
   $type: z.literal("blob"),
@@ -40,4 +41,18 @@ export const toFile = async (fileGenerator: FileGenerator) => {
     { type: fileGenerator.type }
   );
   return file;
+};
+
+export const validateRecordOrThrow = <T>(
+  record: T,
+  { validateRecord }: { validateRecord: (record: T) => ValidationResult }
+) => {
+  const validation = validateRecord(record);
+  if (!validation.success) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: validation.error.message,
+    });
+  }
+  return record;
 };

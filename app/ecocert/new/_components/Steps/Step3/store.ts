@@ -6,12 +6,7 @@ export const step3Schema = z.object({
     .array(z.string().min(1, "All contributors must have a name"))
     .min(1, "Required")
     .describe("List of Contributors"),
-  siteBoundaries: z
-    .array(z.url())
-    .refine((v) => v.length > 0, {
-      message: "Required",
-    })
-    .describe("Site Boundaries"),
+  siteBoundaries: z.url("Required").describe("Site Boundaries"),
   confirmPermissions: z
     .boolean()
     .refine((v) => v === true, {
@@ -39,7 +34,7 @@ type Step3StoreActions = {
   addContributor: (name: string) => void;
   updateContributor: (index: number, name: string) => void;
   removeContributor: (index: number) => void;
-  setSiteBoundaries: (urls: string[]) => void;
+  setSiteBoundaries: (url: string) => void;
   setConfirmPermissions: (v: boolean) => void;
   setAgreeTnc: (v: boolean) => void;
   updateValidationsAndCompletionPercentage: () => void;
@@ -50,7 +45,7 @@ export const useStep3Store = create<Step3StoreState & Step3StoreActions>(
   (set, get) => ({
     formValues: {
       contributors: [],
-      siteBoundaries: [],
+      siteBoundaries: "",
       confirmPermissions: false,
       agreeTnc: false,
     },
@@ -89,9 +84,9 @@ export const useStep3Store = create<Step3StoreState & Step3StoreActions>(
       }));
       get().updateValidationsAndCompletionPercentage();
     },
-    setSiteBoundaries: (urls) => {
+    setSiteBoundaries: (url: string) => {
       set((state) => ({
-        formValues: { ...state.formValues, siteBoundaries: urls },
+        formValues: { ...state.formValues, siteBoundaries: url },
       }));
       get().updateValidationsAndCompletionPercentage();
     },
@@ -148,7 +143,7 @@ export const useStep3Store = create<Step3StoreState & Step3StoreActions>(
       set({
         formValues: {
           contributors: [],
-          siteBoundaries: [],
+          siteBoundaries: "",
           confirmPermissions: false,
           agreeTnc: false,
         },

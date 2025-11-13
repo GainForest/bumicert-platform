@@ -17,9 +17,6 @@ import { useStep4Store } from "../Step4/store";
 import { useStep1Store } from "../Step1/store";
 import { useStep2Store } from "../Step2/store";
 import { useStep3Store } from "../Step3/store";
-import { PutRecordResponse } from "@/server/utils";
-import { OrgHypercertsClaimRecord } from "@/lexicon-api";
-import { BlobRefJSON } from "@/server/routers/atproto/utils";
 import { useStep5Store } from "./store";
 
 const ProgressItem = ({
@@ -119,94 +116,28 @@ const Step5 = () => {
     setOverallStatus("pending");
   }, []);
 
-  const [uploadedArtBlobRef, setUploadedArtBlobRef] =
-    useState<BlobRefJSON | null>(null);
-  const [uploadArtError, setUploadArtError] = useState<string | null>(null);
-  const uploadArtStatus =
-    uploadArtError ? "error"
-    : uploadedArtBlobRef === null ? "pending"
-    : "success";
-  const uploadFileAsBlobMutationFn = trpcClient.common.uploadFileAsBlob.mutate;
-  const { mutate: uploadEcocertArt } = useMutation({
-    mutationKey: ["upload-ecocert-art"],
-    mutationFn: async () => {
-      if (!ecocertArtImage) throw new Error("Ecocert art image is required");
-      const response = await uploadFileAsBlobMutationFn({
-        name: ecocertArtImage.name,
-        type: ecocertArtImage.type,
-        dataBase64: await ecocertArtImage
-          .arrayBuffer()
-          .then((buffer) => Buffer.from(buffer).toString("base64")),
-      });
-      if (response.success !== true)
-        throw new Error("Failed to upload ecocert art");
-      return response.data.blob;
-    },
-    onSuccess: (data) => {
-      setUploadedArtBlobRef(data);
-    },
-    onError: (error) => {
-      console.error(error);
-      setUploadArtError(error.message);
-    },
-  });
-
-  const geojson = step3FormValues.siteBoundaries;
-  const [uploadedGeojsonBlobRef, setUploadedGeojsonBlobRef] =
-    useState<BlobRefJSON | null>(null);
-  const [uploadGeojsonError, setUploadGeojsonError] = useState<string | null>(
-    null
-  );
-  const uploadGeojsonStatus =
-    uploadGeojsonError ? "error"
-    : uploadedGeojsonBlobRef === null ? "pending"
-    : "success";
-  const { mutate: uploadGeojson } = useMutation({
-    mutationKey: ["upload-geojson"],
-    mutationFn: async () => {
-      if (!geojson) throw new Error("Geojson is required");
-      const response = await uploadFileAsBlobMutationFn({
-        // TODO: Convert actual geojson to file
-        name: "geojson.json",
-        type: "application/json",
-        dataBase64: Buffer.from(geojson[0]).toString("base64"),
-      });
-      if (response.success !== true)
-        throw new Error("Failed to upload geojson");
-      return response.data.blob;
-    },
-    onSuccess: (data) => {
-      setUploadedGeojsonBlobRef(data);
-    },
-    onError: (error) => {
-      console.error(error);
-      setUploadGeojsonError(error.message);
-    },
-  });
-
-  const createEcocertMutationFn = trpcClient.hypercerts.createClaim.mutate;
-  const [createdEcocertBlobRef, setCreatedEcocertBlobRef] =
-    useState<PutRecordResponse<OrgHypercertsClaimRecord.Record> | null>(null);
+  const createEcocertMutationFn = trpcClient.hypercerts.claim.create.mutate;
+  type CreateEcocertResponse = Awaited<
+    ReturnType<typeof createEcocertMutationFn>
+  >;
+  const [createdEcocertResponse, setCreatedEcocertResponse] =
+    useState<CreateEcocertResponse | null>(null);
   const [createEcocertError, setCreateEcocertError] = useState<string | null>(
     null
   );
   const createEcocertStatus =
     createEcocertError ? "error"
-    : createdEcocertBlobRef === null ? "pending"
+    : createdEcocertResponse === null ? "pending"
     : "success";
   const { mutate: createEcocert } = useMutation({
     mutationKey: ["create-ecocert"],
     mutationFn: async () => {
-      if (!uploadedArtBlobRef) throw new Error("Ecocert art image is required");
-      if (!uploadedGeojsonBlobRef) throw new Error("Geojson is required");
+      if (!ecocertArtImage) throw new Error("Ecocert art image is required");
       const response = await createEcocertMutationFn({
-        info: {
+        claim: {
           title: step1FormValues.projectName,
-          image: {
-            $type: "app.certified.defs.smallBlob",
-            blob: uploadedArtBlobRef,
-          },
           shortDescription: step2FormValues.impactStory,
+          description: step2FormValues.impactStory,
           workScope: step1FormValues.workType,
           workTimeFrameFrom: step1FormValues.projectDateRange[0].toISOString(),
           workTimeFrameTo:
@@ -216,8 +147,18 @@ const Step5 = () => {
             ) ?
               new Date(0).toISOString()
             : step1FormValues.projectDateRange[1].toISOString(),
-          location: [uploadedGeojsonBlobRef],
           createdAt: new Date().toISOString(),
+        },
+        uploads: {
+          contributors: step3FormValues.contributors,
+          siteAtUri: step3FormValues.siteBoundaries,
+          image: {
+            dataBase64: await ecocertArtImage
+              .arrayBuffer()
+              .then((buffer) => Buffer.from(buffer).toString("base64")),
+            name: ecocertArtImage.name,
+            type: ecocertArtImage.type,
+          },
         },
       });
       if (response.success !== true)
@@ -225,7 +166,7 @@ const Step5 = () => {
       return response;
     },
     onSuccess: (data) => {
-      setCreatedEcocertBlobRef(data);
+      setCreatedEcocertResponse(data);
     },
     onError: (error) => {
       console.error(error);
@@ -235,25 +176,15 @@ const Step5 = () => {
 
   useEffect(() => {
     if (authStatus === "success") {
-      uploadEcocertArt();
+      createEcocert();
     }
   }, [authStatus]);
 
   useEffect(() => {
-    if (authStatus === "success" && uploadArtStatus === "success") {
-      uploadGeojson();
+    if (authStatus === "success" && createEcocertStatus === "success") {
+      setOverallStatus("success");
     }
-  }, [authStatus, uploadArtStatus]);
-
-  useEffect(() => {
-    if (
-      authStatus === "success" &&
-      uploadArtStatus === "success" &&
-      uploadGeojsonStatus === "success"
-    ) {
-      createEcocert();
-    }
-  }, [authStatus, uploadArtStatus, uploadGeojsonStatus]);
+  }, [authStatus, createEcocertStatus]);
 
   return (
     <div>
@@ -270,73 +201,28 @@ const Step5 = () => {
         }
         status={authStatus}
       />
-      {authStatus === "success" && (
+      {authStatus === "success" && createEcocertStatus === "success" && (
         <ProgressItem
           iconset={{
             Error: CircleAlertIcon,
             Success: CircleCheckIcon,
           }}
           title={
-            uploadArtError ? "Upload failed."
-            : uploadedArtBlobRef === null ?
-              "Uploading ecocert image"
-            : "Uploaded ecocert image"
+            createEcocertError ? "Failed to publish."
+            : createdEcocertResponse === null ?
+              "Publishing your ecocert"
+            : "Published!"
           }
           description={
-            uploadArtError ? uploadArtError
-            : uploadedArtBlobRef === null ?
-              "The ecocert image is being uploaded."
+            createEcocertError ? createEcocertError
+            : createdEcocertResponse === null ?
+              "We are publishing your ecocert."
             : ""
           }
-          status={uploadArtStatus}
+          status={createEcocertStatus}
+          isLastStep={true}
         />
       )}
-      {authStatus === "success" && uploadArtStatus === "success" && (
-        <ProgressItem
-          iconset={{
-            Error: CircleAlertIcon,
-            Success: CircleCheckIcon,
-          }}
-          title={
-            uploadGeojsonError ? "Upload failed."
-            : uploadedGeojsonBlobRef === null ?
-              "Uploading site boundaries"
-            : "Uploaded site boundaries"
-          }
-          description={
-            uploadGeojsonError ? uploadGeojsonError
-            : uploadedGeojsonBlobRef === null ?
-              "Uploading the geojson file for the site boundaries."
-            : ""
-          }
-          status={uploadGeojsonStatus}
-        />
-      )}
-
-      {authStatus === "success" &&
-        uploadArtStatus === "success" &&
-        uploadGeojsonStatus === "success" && (
-          <ProgressItem
-            iconset={{
-              Error: CircleAlertIcon,
-              Success: CircleCheckIcon,
-            }}
-            title={
-              createEcocertError ? "Failed to publish."
-              : createdEcocertBlobRef === null ?
-                "Publishing your ecocert"
-              : "Published!"
-            }
-            description={
-              createEcocertError ? createEcocertError
-              : createdEcocertBlobRef === null ?
-                "We are publishing your ecocert."
-              : ""
-            }
-            status={createEcocertStatus}
-            isLastStep={true}
-          />
-        )}
     </div>
   );
 };
