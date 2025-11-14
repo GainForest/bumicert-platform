@@ -11,6 +11,7 @@ import { trpcClient } from "@/lib/trpc/client";
 import { useModal } from "@/components/ui/modal/context";
 import { SiteEditorModal, SiteEditorModalId } from "./SiteEditorModal";
 import { Serialize, unserialize } from "@/lib/atproto/serialization";
+import { useAtprotoStore } from "@/components/stores/atproto";
 
 const getAllSites = trpcClient.gainforest.site.getAll.query;
 export type AllSitesData = Awaited<ReturnType<typeof getAllSites>>;
@@ -23,6 +24,8 @@ const SitesClient = ({
   serializedInitialData: Serialize<AllSitesData>;
 }) => {
   const initialData = unserialize(serializedInitialData);
+  const auth = useAtprotoStore((state) => state.auth);
+  const shouldEdit = auth.status === "AUTHENTICATED" && auth.user.did === did;
   const {
     data: reactiveDataSerialized,
     isPlaceholderData: isOlderReactiveData,
@@ -63,18 +66,20 @@ const SitesClient = ({
         {allSites.length === 0 ?
           <div className="w-full bg-muted h-40 rounded-lg mt-2 flex flex-col items-center justify-center text-center text-pretty text-sm">
             <span className="font-serif font-bold text-xl text-muted-foreground">
-              No sites yet. Click the button below to add one.
+              No sites yet. {shouldEdit && "Click the button below to add one."}
             </span>
 
-            <Button
-              variant={"outline"}
-              size={"sm"}
-              className="mt-2"
-              onClick={() => handleAddSite()}
-            >
-              <CirclePlusIcon className="opacity-40" />
-              Add a new site
-            </Button>
+            {shouldEdit && (
+              <Button
+                variant={"outline"}
+                size={"sm"}
+                className="mt-2"
+                onClick={() => handleAddSite()}
+              >
+                <CirclePlusIcon className="opacity-40" />
+                Add a new site
+              </Button>
+            )}
           </div>
         : <div className="grid grid-cols-[1fr_1fr_1fr] gap-2 mt-4">
             {allSites.map((site) => {
@@ -88,14 +93,16 @@ const SitesClient = ({
               );
             })}
 
-            <Button
-              variant={"outline"}
-              className="h-auto rounded-xl flex-col text-lg"
-              onClick={() => handleAddSite()}
-            >
-              <CirclePlusIcon className="size-8 opacity-40" />
-              Add a new site
-            </Button>
+            {shouldEdit && (
+              <Button
+                variant={"outline"}
+                className="h-auto rounded-xl flex-col text-lg"
+                onClick={() => handleAddSite()}
+              >
+                <CirclePlusIcon className="size-8 opacity-40" />
+                Add a new site
+              </Button>
+            )}
           </div>
         }
       </section>

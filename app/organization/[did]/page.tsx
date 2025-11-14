@@ -42,6 +42,9 @@ const OrganizationPage = async ({
   );
 
   let data = EMPTY_ORGANIZATION_DATA;
+  console.log("==============");
+  console.log(error);
+  console.log("==============");
   if (error) {
     if (error instanceof TRPCError && error.code === "NOT_FOUND") {
       // Display empty organization data

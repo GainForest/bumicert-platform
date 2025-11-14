@@ -28,6 +28,7 @@ import { SiteEditorModal, SiteEditorModalId } from "./SiteEditorModal";
 import { getShapefilePreviewUrl } from "./utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { trpcClient } from "@/lib/trpc/client";
+import { useAtprotoStore } from "@/components/stores/atproto";
 
 export type SiteData = AllSitesData["sites"][number];
 type SiteCardProps = {
@@ -53,6 +54,9 @@ const SiteCard = ({ siteData, defaultSite, did }: SiteCardProps) => {
     : shapefile.blob,
     did
   );
+
+  const auth = useAtprotoStore((state) => state.auth);
+  const shouldEdit = auth.status === "AUTHENTICATED" && auth.user.did === did;
   const { pushModal, show } = useModal();
 
   const queryClient = useQueryClient();
@@ -142,43 +146,45 @@ const SiteCard = ({ siteData, defaultSite, did }: SiteCardProps) => {
           <div className="w-full flex items-center justify-between text-sm text-muted-foreground mt-1">
             <span>No ecocerts use this site.</span>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant={"ghost"}>
-                  {disableActions ?
-                    <Loader2 className="animate-spin" />
-                  : <MoreVertical />}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem
-                  onClick={() => handleEdit()}
-                  disabled={disableActions}
-                >
-                  <Pencil />
-                  Edit
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  disabled={isDefaultSite || disableActions}
-                  onClick={() => {
-                    console.log("setting default site", siteData.uri);
-                    setDefaultSite(siteData.uri);
-                  }}
-                >
-                  <BadgeCheck />
-                  {isDefaultSite ? "Already default" : "Make Default"}
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  disabled={isDefaultSite || disableActions}
-                  variant="destructive"
-                  onClick={() => deleteSite(siteData.uri)}
-                >
-                  <Trash2 />
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {shouldEdit && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant={"ghost"}>
+                    {disableActions ?
+                      <Loader2 className="animate-spin" />
+                    : <MoreVertical />}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem
+                    onClick={() => handleEdit()}
+                    disabled={disableActions}
+                  >
+                    <Pencil />
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    disabled={isDefaultSite || disableActions}
+                    onClick={() => {
+                      console.log("setting default site", siteData.uri);
+                      setDefaultSite(siteData.uri);
+                    }}
+                  >
+                    <BadgeCheck />
+                    {isDefaultSite ? "Already default" : "Make Default"}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    disabled={isDefaultSite || disableActions}
+                    variant="destructive"
+                    onClick={() => deleteSite(siteData.uri)}
+                  >
+                    <Trash2 />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
       </div>
