@@ -179,7 +179,7 @@ const FileInput = ({
           "w-full h-40 border border-dashed border-border rounded-md transition-colors relative overflow-hidden",
           isDragOver ? "border-primary bg-primary/5" : "",
           error ? "border-destructive" : "",
-          value ? "bg-background" : "bg-foreground/[0.01]"
+          value ? "bg-background" : "bg-foreground/1"
         )}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}

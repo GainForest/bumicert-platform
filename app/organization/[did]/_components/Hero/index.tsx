@@ -16,6 +16,7 @@ import {
 } from "../../_modals/image-editor";
 import { BlobRef } from "@atproto/api";
 import useHydratedData from "@/hooks/use-hydration";
+import { toBlobRef, type BlobRefJSON } from "@/server/routers/atproto/utils";
 
 const getImageUrl = (image: File | BlobRef | undefined, did: string) => {
   if (image instanceof File) {
@@ -53,16 +54,26 @@ const Hero = ({
     setEditingData({
       displayName: data.displayName,
       shortDescription: data.shortDescription,
-      coverImage: data.coverImage,
-      logoImage: data.logo,
+      coverImage: data.coverImage ? data.coverImage.image.toJSON() : undefined,
+      logoImage: data.logo ? data.logo.image.toJSON() : undefined,
     });
   }, [isEditing, data]);
 
   const coverImageUrl =
-    data.coverImage ? getBlobUrl(did, data.coverImage) : null;
-  const editingCoverImageUrl = getImageUrl(editingData.coverImage, did);
-  const logoImageUrl = data.logo ? getBlobUrl(did, data.logo) : null;
-  const editingLogoImageUrl = getImageUrl(editingData.logoImage, did);
+    data.coverImage ? getBlobUrl(did, data.coverImage.image) : null;
+  const editingCoverImageUrl =
+    editingData.coverImage ?
+      editingData.coverImage instanceof File ?
+        getImageUrl(editingData.coverImage, did)
+      : getBlobUrl(did, editingData.coverImage)
+    : null;
+  const logoImageUrl = data.logo ? getBlobUrl(did, data.logo.image) : null;
+  const editingLogoImageUrl =
+    editingData.logoImage ?
+      editingData.logoImage instanceof File ?
+        getImageUrl(editingData.logoImage, did)
+      : getBlobUrl(did, editingData.logoImage)
+    : null;
 
   return (
     <div className="w-full h-60 rounded-t-2xl overflow-hidden relative">
@@ -83,7 +94,7 @@ const Hero = ({
           className="object-cover"
         />
       : <div className="absolute inset-0 bg-muted" />}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background">
+      <div className="absolute inset-0 bg-linear-to-b from-transparent to-background">
         {isEditing ?
           <Button
             variant={"outline"}
@@ -96,12 +107,21 @@ const Hero = ({
                     <ImageEditorModal
                       title="Edit Organization Logo"
                       description="Choose an image to update the organization logo."
-                      initialImage={editingData.logoImage}
+                      initialImage={
+                        editingData.logoImage instanceof File ?
+                          editingData.logoImage
+                        : editingData.logoImage ?
+                          toBlobRef(editingData.logoImage)
+                        : undefined
+                      }
                       did={did}
                       onImageChange={(image) => {
                         setEditingData({
                           ...editingData,
-                          logoImage: image,
+                          logoImage:
+                            image instanceof File ? image
+                            : image ? (image.toJSON() as BlobRefJSON)
+                            : undefined,
                         });
                       }}
                     />
@@ -193,12 +213,21 @@ const Hero = ({
                     <ImageEditorModal
                       title="Edit Organization Cover Image"
                       description="Choose an image to update the organization cover image."
-                      initialImage={editingData.coverImage}
+                      initialImage={
+                        editingData.coverImage instanceof File ?
+                          editingData.coverImage
+                        : editingData.coverImage ?
+                          toBlobRef(editingData.coverImage)
+                        : undefined
+                      }
                       did={did}
                       onImageChange={(image) => {
                         setEditingData({
                           ...editingData,
-                          coverImage: image,
+                          coverImage:
+                            image instanceof File ? image
+                            : image ? (image.toJSON() as BlobRefJSON)
+                            : undefined,
                         });
                       }}
                     />

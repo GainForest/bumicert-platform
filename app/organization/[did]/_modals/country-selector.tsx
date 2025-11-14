@@ -59,7 +59,7 @@ const CountrySelectorModal = ({
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}
       />
-      <div className="w-full h-full max-h-[max(45vh,_500px)] overflow-y-auto mt-2">
+      <div className="w-full h-full max-h-[max(45vh,500px)] overflow-y-auto mt-2">
         <div className="grid grid-cols-2 gap-2">
           {/* Show the selected country on top if it exists */}
           {searchText === "" && selectedCountryData && (

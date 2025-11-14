@@ -52,7 +52,8 @@ const formatCountryName = (countryName: string | undefined) => {
     : countryName;
 };
 
-const getDateFromString = (dateString: string) => {
+const getDateFromString = (dateString: string | undefined) => {
+  if (!dateString) return undefined;
   try {
     const date = new Date(dateString);
     if (isNaN(date.getTime())) {
@@ -93,7 +94,7 @@ const SubHero = ({
     setEditingData({
       country: data.country,
       website: data.website,
-      startDate: data.startDate,
+      startDate: data.startDate ?? null,
       visibility: data.visibility,
       objectives: data.objectives,
     });
@@ -169,16 +170,19 @@ const SubHero = ({
         PropertyIcon={Calendar}
         propertyName="Date started"
         propertyValue={
-          formatDate(getDateFromString(data.startDate)) ?? "NOT_DEFINED"
+          formatDate(getDateFromString(data.startDate ?? undefined)) ??
+          "NOT_DEFINED"
         }
         editingPropertyValue={
-          formatDate(getDateFromString(editingData.startDate)) ?? "NOT_DEFINED"
+          formatDate(getDateFromString(editingData.startDate ?? undefined)) ??
+          "NOT_DEFINED"
         }
         modalId={StartDateSelectorModalId}
         modalContent={
           <StartDateSelectorModal
             initialStartDate={
-              getDateFromString(editingData.startDate) ?? new Date()
+              getDateFromString(editingData.startDate ?? undefined) ??
+              new Date()
             }
             onStartDateChange={(startDate) => {
               setEditingData({

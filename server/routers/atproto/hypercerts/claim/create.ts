@@ -16,7 +16,7 @@ import {
 import { Agent } from "@atproto/api";
 import {
   AppCertifiedLocation,
-  OrgHypercertsClaim,
+  OrgHypercertsClaimClaim,
   OrgHypercertsClaimContribution,
 } from "@/lexicon-api";
 import { getWriteAgent } from "@/server/utils/agent";
@@ -86,8 +86,8 @@ export const createHypercertClaim = protectedProcedure
     );
 
     // Claim record
-    const claim: OrgHypercertsClaim.Record = {
-      $type: "org.hypercerts.claim",
+    const claim: OrgHypercertsClaimClaim.Record = {
+      $type: "org.hypercerts.claim.claim",
       title: input.claim.title,
       shortDescription: input.claim.shortDescription,
       description: input.claim.description,
@@ -101,7 +101,10 @@ export const createHypercertClaim = protectedProcedure
       workTimeFrameTo: input.claim.workTimeFrameTo,
       createdAt: new Date().toISOString(),
     };
-    const validatedClaim = validateRecordOrThrow(claim, OrgHypercertsClaim);
+    const validatedClaim = validateRecordOrThrow(
+      claim,
+      OrgHypercertsClaimClaim
+    );
 
     // Contribution record
     const contribution: OrgHypercertsClaimContribution.Record = {
@@ -152,7 +155,7 @@ export const createHypercertClaim = protectedProcedure
           uri: locationWriteResponse.data.uri,
           cid: locationWriteResponse.data.cid,
         },
-      } satisfies OrgHypercertsClaim.Record,
+      } satisfies OrgHypercertsClaimClaim.Record,
     });
     if (claimResponse.success !== true) {
       throw new TRPCError({

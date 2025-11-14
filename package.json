@@ -10,7 +10,7 @@
     "lint": "next lint",
     "prepare": "husky",
     "gql": "gql.tada generate-output",
-    "codegen:lexicon-api": "bunx @atproto/lex-cli@0.9.5 gen-api ./lexicon-api ./../hypercerts-lexicon/org/hypercerts/*.json ./../hypercerts-lexicon/org/hypercerts/*/*.json ./../hypercerts-lexicon/app/certified/*.json ./../lexicons/*/*/*/*.json && bun run scripts/lexicon-api-generation.ts"
+    "codegen:lexicon-api": "bunx @atproto/lex-cli@0.9.5 gen-api ./lexicon-api ./../hypercerts-lexicon/org/hypercerts/*/*.json ./../hypercerts-lexicon/app/certified/*.json ./../lexicons/*/*/*/*.json && bun run scripts/lexicon-api-generation.ts"
   },
   "dependencies": {
     "@atproto/api": "^0.17.3",

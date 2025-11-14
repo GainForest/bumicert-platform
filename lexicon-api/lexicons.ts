@@ -150,9 +150,9 @@ export const schemaDict = {
       },
     },
   },
-  OrgHypercertsClaim: {
+  OrgHypercertsClaimClaim: {
     lexicon: 1,
-    id: 'org.hypercerts.claim',
+    id: 'org.hypercerts.claim.claim',
     defs: {
       main: {
         type: 'record',
@@ -889,7 +889,7 @@ export function validate(
 export const ids = {
   AppCertifiedDefs: 'app.certified.defs',
   AppCertifiedLocation: 'app.certified.location',
-  OrgHypercertsClaim: 'org.hypercerts.claim',
+  OrgHypercertsClaimClaim: 'org.hypercerts.claim.claim',
   OrgHypercertsClaimContribution: 'org.hypercerts.claim.contribution',
   OrgHypercertsClaimEvaluation: 'org.hypercerts.claim.evaluation',
   OrgHypercertsClaimEvidence: 'org.hypercerts.claim.evidence',

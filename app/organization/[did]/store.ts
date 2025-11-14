@@ -13,7 +13,7 @@ export type HeroEditingData = {
 export type SubHeroEditingData = {
   country: string;
   website?: string;
-  startDate: string;
+  startDate: string | null;
   visibility: AppGainforestOrganizationInfo.Record["visibility"];
   objectives: AppGainforestOrganizationInfo.Record["objectives"];
 };
@@ -59,7 +59,7 @@ export const useOrganizationPageStore = create<
   subHeroEditingData: {
     country: "",
     website: "",
-    startDate: "",
+    startDate: null,
     visibility: "Public",
     objectives: [],
   },
@@ -117,7 +117,7 @@ export const useOrganizationPageStore = create<
     }
 
     const organizationInfo: Parameters<
-      typeof trpcClient.organizationInfo.put.mutate
+      typeof trpcClient.organizationInfo.createOrUpdate.mutate
     >[0]["info"] = {
       displayName: heroEditingData.displayName,
       logo: logoImageBlobRef,
@@ -125,19 +125,15 @@ export const useOrganizationPageStore = create<
       shortDescription: heroEditingData.shortDescription,
       longDescription: aboutEditingData.longDescription,
       objectives: subHeroEditingData.objectives,
-      startDate: subHeroEditingData.startDate,
+      startDate: subHeroEditingData.startDate ?? undefined,
       country: subHeroEditingData.country,
       visibility: subHeroEditingData.visibility,
     };
 
-    const response = await trpcClient.organizationInfo.put.mutate({
+    const response = await trpcClient.organizationInfo.createOrUpdate.mutate({
       did,
       info: organizationInfo,
     });
-
-    if (response.success !== true) {
-      throw new Error("Failed to save all editing data");
-    }
 
     set({
       data: response.value,
