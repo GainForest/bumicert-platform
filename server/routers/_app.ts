@@ -3,7 +3,6 @@ import {
   createTRPCRouter,
   publicProcedure,
 } from "../../server/trpc";
-import { putOrganizationInfo } from "./atproto/gainforest/organizationInfo/put";
 import { uploadFileAsBlob } from "./atproto/common/uploadFileAsBlob";
 import { login } from "./atproto/auth/login";
 import { resume } from "./atproto/auth/resume";
@@ -13,7 +12,7 @@ import { listSites } from "./atproto/gainforest/site/list";
 import { getProjectSite } from "./atproto/gainforest/site/get";
 import { getDefaultProjectSite } from "./atproto/gainforest/site/getDefault";
 import { createHypercertClaim } from "./atproto/hypercerts/claim/create";
-import { updateOrganizationInfo } from "./atproto/gainforest/organizationInfo/udpate";
+import { createOrUpdateOrganizationInfo } from "./atproto/gainforest/organizationInfo/createOrUpdate";
 import { getAllSites } from "./atproto/gainforest/site/getAll";
 import { createSite } from "./atproto/gainforest/site/create";
 import { updateSite } from "./atproto/gainforest/site/update";
@@ -32,8 +31,7 @@ export const appRouter = createTRPCRouter({
   },
   organizationInfo: {
     get: getOrganizationInfo,
-    put: putOrganizationInfo,
-    update: updateOrganizationInfo,
+    createOrUpdate: createOrUpdateOrganizationInfo,
   },
   gainforest: {
     site: {

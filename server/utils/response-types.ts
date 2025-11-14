@@ -5,13 +5,9 @@ export type GetRecordResponse<T> = {
 };
 
 export type PutRecordResponse<T> = {
-  success: true;
-  data: {
-    uri: string;
-    cid: string;
-    commit?: string;
-    validationStatus: "unknown" | (string & {}) | undefined;
-  };
-  headers: Record<string, string>;
+  uri: string;
+  cid: string;
+  commit?: string;
+  validationStatus: "unknown" | (string & {}) | undefined;
   value: T;
 };

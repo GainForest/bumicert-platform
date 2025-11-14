@@ -46,7 +46,7 @@ export const UploadLogoModal = () => {
       if (!logo) throw new Error("Logo is required");
       if (!organizationInfo)
         throw new Error("Organization information is required");
-      return await trpcClient.organizationInfo.update.mutate({
+      return await trpcClient.organizationInfo.createOrUpdate.mutate({
         did: auth.user?.did ?? "",
         uploads: {
           logo: {

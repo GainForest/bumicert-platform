@@ -3,15 +3,17 @@ import z from "zod";
 import { AppGainforestOrganizationInfo } from "@/lexicon-api";
 import { validate } from "@/lexicon-api/lexicons";
 import { PutRecordResponse } from "@/server/utils/response-types";
+import { Agent } from "@atproto/api";
+import { TRPCError } from "@trpc/server";
+import { getWriteAgent } from "@/server/utils/agent";
 import {
   BlobRefJSON,
   BlobRefJSONSchema,
   FileGenerator,
   FileGeneratorSchema,
   toBlobRef,
+  validateRecordOrThrow,
 } from "../../utils";
-import { Agent } from "@atproto/api";
-import { getWriteAgent } from "@/server/utils/agent";
 
 const uploadFile = async (fileGenerator: FileGenerator, agent: Agent) => {
   const file = new File(
@@ -23,7 +25,7 @@ const uploadFile = async (fileGenerator: FileGenerator, agent: Agent) => {
   return response.data.blob.toJSON() as BlobRefJSON;
 };
 
-export const putOrganizationInfo = protectedProcedure
+export const createOrUpdateOrganizationInfo = protectedProcedure
   .input(
     z.object({
       did: z.string(),
@@ -43,7 +45,7 @@ export const putOrganizationInfo = protectedProcedure
             "Other",
           ])
         ),
-        startDate: z.string(),
+        startDate: z.string().optional(),
         country: z.string(),
         visibility: z.enum(["Public", "Hidden"]),
       }),
@@ -87,25 +89,29 @@ export const putOrganizationInfo = protectedProcedure
           }
         : undefined,
       objectives: input.info.objectives,
-      startDate: new Date().toISOString(),
+      startDate: input.info.startDate ? input.info.startDate : undefined,
       country: input.info.country,
       visibility: input.info.visibility,
     };
 
-    const result = validate(info, "app.gainforest.organization.info", "main");
-    if (!result.success) {
-      throw new Error(result.error.message);
-    }
+    validateRecordOrThrow(info, AppGainforestOrganizationInfo);
 
     const response = await agent.com.atproto.repo.putRecord({
-      collection: "app.gainforest.organization.info",
       repo: input.did,
-      rkey: "self",
+      collection: "app.gainforest.organization.info",
       record: info,
+      rkey: "self",
     });
 
+    if (response.success !== true) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to update organization info",
+      });
+    }
+
     return {
-      ...response,
+      ...response.data,
       value: info,
     } as PutRecordResponse<AppGainforestOrganizationInfo.Record>;
   });
