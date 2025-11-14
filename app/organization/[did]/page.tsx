@@ -13,6 +13,7 @@ import { TRPCError } from "@trpc/server";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getSessionFromRequest } from "@/server/session";
 
 const EMPTY_ORGANIZATION_DATA: AppGainforestOrganizationInfo.Record = {
   $type: "app.gainforest.organization.info",
@@ -42,9 +43,7 @@ const OrganizationPage = async ({
   );
 
   let data = EMPTY_ORGANIZATION_DATA;
-  console.log("==============");
-  console.log(error);
-  console.log("==============");
+
   if (error) {
     if (error instanceof TRPCError && error.code === "NOT_FOUND") {
       // Display empty organization data
@@ -61,6 +60,17 @@ const OrganizationPage = async ({
   const serializedData = JSON.parse(
     JSON.stringify(data)
   ) as AppGainforestOrganizationInfo.Record;
+
+  if (data.visibility === "Hidden") {
+    try {
+      const session = await getSessionFromRequest();
+      if (session && session.did !== did) {
+        throw new Error("This organization is hidden.");
+      }
+    } catch {
+      throw new Error("This organization is hidden.");
+    }
+  }
 
   return (
     <OrganizationPageHydrator
