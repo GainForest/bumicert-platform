@@ -686,7 +686,6 @@ export const schemaDict = {
             'shortDescription',
             'longDescription',
             'objectives',
-            'startDate',
             'country',
             'visibility',
           ],
@@ -793,7 +792,7 @@ export const schemaDict = {
         key: 'tid',
         record: {
           type: 'object',
-          required: ['name', 'lat', 'lon', 'area'],
+          required: ['name', 'lat', 'lon', 'area', 'shapefile'],
           properties: {
             name: {
               type: 'string',

@@ -1,6 +1,6 @@
 import { publicProcedure } from "@/server/trpc";
 import { z } from "zod";
-import { getReadAgent } from "@/server/utils";
+import { getReadAgent } from "@/server/utils/agent";
 
 export const listSites = publicProcedure
   .input(z.object({ did: z.string() }))

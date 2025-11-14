@@ -25,7 +25,7 @@ export interface Record {
   lon: string
   /** The area of the site in hectares */
   area: string
-  shapefile?:
+  shapefile:
     | $Typed<AppGainforestCommonDefs.Uri>
     | $Typed<AppGainforestCommonDefs.SmallBlob>
     | { $type: string }

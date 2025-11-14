@@ -13,9 +13,12 @@ import { listSites } from "./atproto/gainforest/site/list";
 import { getProjectSite } from "./atproto/gainforest/site/get";
 import { getDefaultProjectSite } from "./atproto/gainforest/site/getDefault";
 import { createHypercertClaim } from "./atproto/hypercerts/claim/create";
-import { updateOrganizationInfo } from "./atproto/gainforest/organizationInfo/update";
+import { updateOrganizationInfo } from "./atproto/gainforest/organizationInfo/udpate";
 import { getAllSites } from "./atproto/gainforest/site/getAll";
 import { createSite } from "./atproto/gainforest/site/create";
+import { updateSite } from "./atproto/gainforest/site/update";
+import { setDefaultSite } from "./atproto/gainforest/site/setDefault";
+import { deleteSite } from "./atproto/gainforest/site/delete";
 
 export const appRouter = createTRPCRouter({
   health: publicProcedure.query(() => ({ status: "ok" })),
@@ -36,9 +39,12 @@ export const appRouter = createTRPCRouter({
     site: {
       list: listSites,
       create: createSite,
+      update: updateSite,
       getAll: getAllSites,
       get: getProjectSite,
+      delete: deleteSite,
       getDefault: getDefaultProjectSite,
+      setDefault: setDefaultSite,
     },
   },
   hypercerts: {

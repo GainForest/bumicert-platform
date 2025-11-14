@@ -31,10 +31,7 @@ const AuthWrapper = ({
       const response = await trpcClient.organizationInfo.get.query({
         did: auth.user?.did ?? "",
       });
-      if (!response.success) {
-        throw new Error(response.humanMessage);
-      }
-      return response.data.value;
+      return response.value;
     },
     enabled: !!auth.user?.did,
   });

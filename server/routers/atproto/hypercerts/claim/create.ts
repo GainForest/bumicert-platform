@@ -2,7 +2,7 @@ import { protectedProcedure } from "@/server/trpc";
 import z from "zod";
 import { BlobRef } from "@atproto/lexicon";
 import { validate } from "@/lexicon-api/lexicons";
-import { getWriteAgent, PutRecordResponse } from "@/server/utils";
+import { PutRecordResponse } from "@/server/utils/response-types";
 import { TRPCError } from "@trpc/server";
 import {
   BlobRefJSON,
@@ -19,6 +19,7 @@ import {
   OrgHypercertsClaim,
   OrgHypercertsClaimContribution,
 } from "@/lexicon-api";
+import { getWriteAgent } from "@/server/utils/agent";
 
 const uploadFile = async (fileGenerator: FileGenerator, agent: Agent) => {
   const file = new File(
@@ -30,11 +31,6 @@ const uploadFile = async (fileGenerator: FileGenerator, agent: Agent) => {
   return response.data.blob.toJSON() as BlobRefJSON;
 };
 
-const validateInitialRecords = (
-  claim: OrgHypercertsClaim.Record,
-  location: AppCertifiedLocation.Record,
-  contribution: OrgHypercertsClaimContribution.Record
-) => {};
 /**
  * This procedure is solely used to create a new ecocert
  * with bare minimum information based on
@@ -76,7 +72,7 @@ export const createHypercertClaim = protectedProcedure
     const location: AppCertifiedLocation.Record = {
       $type: "app.certified.location",
       lpVersion: "1.0.0",
-      srs: "https://epsg.io/4326",
+      srs: "https://epsg.io/3857",
       locationType: "geojson",
       location: {
         $type: "app.certified.defs#uri",

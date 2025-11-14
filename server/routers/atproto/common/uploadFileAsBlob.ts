@@ -1,7 +1,7 @@
 import { protectedProcedure } from "@/server/trpc";
-import { getWriteAgent } from "@/server/utils";
 import z from "zod";
 import { BlobRefJSON } from "../utils";
+import { getWriteAgent } from "@/server/utils/agent";
 
 export const uploadFileAsBlob = protectedProcedure
   .input(

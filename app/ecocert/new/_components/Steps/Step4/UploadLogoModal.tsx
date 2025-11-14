@@ -13,7 +13,6 @@ import { trpcClient } from "@/lib/trpc/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { useModal } from "@/components/ui/modal/context";
-import { AppGainforestOrganizationInfo } from "@/lexicon-api";
 
 export const UploadLogoModalId = "upload/organization/logo";
 
@@ -33,10 +32,7 @@ export const UploadLogoModal = () => {
       const response = await trpcClient.organizationInfo.get.query({
         did: auth.user?.did ?? "",
       });
-      if (!response.success) {
-        throw new Error(response.humanMessage);
-      }
-      return response.data.value;
+      return response.value;
     },
   });
   const isLoadingOrganizationInfo = isPendingOrganizationInfo || isOlderData;
@@ -74,10 +70,9 @@ export const UploadLogoModal = () => {
         },
       });
     },
-    onSuccess: (data) => {
-      queryClient.setQueryData(["organizationInfo", auth.user?.did], {
+    onSuccess: () => {
+      queryClient.invalidateQueries({
         queryKey: ["organizationInfo", auth.user?.did],
-        data: data.value satisfies AppGainforestOrganizationInfo.Record,
       });
     },
   });

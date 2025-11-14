@@ -34,7 +34,7 @@ export interface Record {
     | 'Other'
   )[]
   /** The start date of the organization or project */
-  startDate: string
+  startDate?: string
   /** The website of the organization or project */
   website?: string
   /** The country of the organization or project in two letter code (ISO 3166-1 alpha-2) */

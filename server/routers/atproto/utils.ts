@@ -43,6 +43,16 @@ export const toFile = async (fileGenerator: FileGenerator) => {
   return file;
 };
 
+export const toFileGenerator = async (file: File) => {
+  return {
+    name: file.name,
+    type: file.type,
+    dataBase64: await file
+      .arrayBuffer()
+      .then((buffer) => Buffer.from(buffer).toString("base64")),
+  };
+};
+
 export const validateRecordOrThrow = <T>(
   record: T,
   { validateRecord }: { validateRecord: (record: T) => ValidationResult }
@@ -50,8 +60,9 @@ export const validateRecordOrThrow = <T>(
   const validation = validateRecord(record);
   if (!validation.success) {
     throw new TRPCError({
-      code: "BAD_REQUEST",
+      code: "UNPROCESSABLE_CONTENT",
       message: validation.error.message,
+      cause: validation.error,
     });
   }
   return record;

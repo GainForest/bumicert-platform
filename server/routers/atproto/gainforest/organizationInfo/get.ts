@@ -2,14 +2,12 @@ import { publicProcedure } from "@/server/trpc";
 import { z } from "zod";
 import { tryCatch } from "@/lib/tryCatch";
 import { XRPCError } from "@atproto/xrpc";
-import {
-  ClassifiedError,
-  ClassifiedSuccess,
-  getReadAgent,
-  classifyXRPCError,
-  GetRecordResponse,
-} from "@/server/utils";
+import { GetRecordResponse } from "@/server/utils/response-types";
 import { AppGainforestOrganizationInfo } from "@/lexicon-api";
+import { getReadAgent } from "@/server/utils/agent";
+import { xrpcErrorToTRPCError } from "@/server/utils/classify-xrpc-error";
+import { TRPCError } from "@trpc/server";
+import { validateRecordOrThrow } from "../../utils";
 
 export const getOrganizationInfo = publicProcedure
   .input(z.object({ did: z.string() }))
@@ -24,36 +22,24 @@ export const getOrganizationInfo = publicProcedure
 
     if (error) {
       if (error instanceof XRPCError) {
-        const classifiedError = classifyXRPCError(error);
-        return classifiedError;
+        const trpcError = xrpcErrorToTRPCError(error);
+        throw trpcError;
       } else {
-        console.error("An error occured:", error);
-        console.error("Client will see it as an unknown error");
-        return {
-          success: false,
-          humanMessage: "An unknown error occurred.",
-          code: "UNKNOWN_ERROR",
-        } satisfies ClassifiedError;
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "An unknown error occurred.",
+        });
       }
     }
 
     if (response.success !== true) {
-      console.error(
-        "Response received but success is false. Response:",
-        response
-      );
-      console.error("Client will see it as an unknown error");
-      return {
-        success: false,
-        humanMessage: "Failed to get organization info.",
-        code: "UNKNOWN_ERROR",
-      } satisfies ClassifiedError;
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to get organization info.",
+      });
     }
 
-    return {
-      success: true,
-      data: response.data as GetRecordResponse<AppGainforestOrganizationInfo.Record>,
-    } satisfies ClassifiedSuccess<
-      GetRecordResponse<AppGainforestOrganizationInfo.Record>
-    >;
+    validateRecordOrThrow(response.data.value, AppGainforestOrganizationInfo);
+
+    return response.data as GetRecordResponse<AppGainforestOrganizationInfo.Record>;
   });

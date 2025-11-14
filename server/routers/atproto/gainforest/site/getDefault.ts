@@ -1,8 +1,8 @@
 import { publicProcedure } from "@/server/trpc";
-import { getReadAgent } from "@/server/utils";
 import z from "zod";
-import { GetRecordResponse } from "@/server/utils";
+import { GetRecordResponse } from "@/server/utils/response-types";
 import { AppGainforestOrganizationDefaultSite } from "@/lexicon-api";
+import { getReadAgent } from "@/server/utils/agent";
 
 export const getDefaultProjectSite = publicProcedure
   .input(z.object({ did: z.string() }))

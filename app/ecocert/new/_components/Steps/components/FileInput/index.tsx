@@ -237,7 +237,9 @@ const FileInput = ({
             <FileIcon className="size-12 text-muted-foreground" />
             <div className="text-center">
               <p className="font-medium text-sm truncate max-w-full">
-                {value.name}
+                {value.name.length > 20 ?
+                  value.name.slice(0, 20) + "..."
+                : value.name}
               </p>
               <p className="text-xs text-muted-foreground">
                 {formatFileSize(value.size)}

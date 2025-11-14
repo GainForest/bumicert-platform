@@ -2,7 +2,7 @@ import { protectedProcedure } from "@/server/trpc";
 import z from "zod";
 import { AppGainforestOrganizationInfo } from "@/lexicon-api";
 import { validate } from "@/lexicon-api/lexicons";
-import { getWriteAgent, PutRecordResponse } from "@/server/utils";
+import { PutRecordResponse } from "@/server/utils/response-types";
 import {
   BlobRefJSON,
   BlobRefJSONSchema,
@@ -11,6 +11,7 @@ import {
   toBlobRef,
 } from "../../utils";
 import { Agent } from "@atproto/api";
+import { getWriteAgent } from "@/server/utils/agent";
 
 const uploadFile = async (fileGenerator: FileGenerator, agent: Agent) => {
   const file = new File(

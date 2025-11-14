@@ -69,7 +69,7 @@ const Step3 = () => {
       const response = await trpcClient.gainforest.site.getAll.query({
         did: auth.user?.did,
       });
-      return response;
+      return response.sites;
     },
     enabled: !!auth.user?.did,
   });

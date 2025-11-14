@@ -13,13 +13,7 @@ import { Button } from "@/components/ui/button";
 import { trpcClient } from "@/lib/trpc/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAtprotoStore } from "@/components/stores/atproto";
-import {
-  Loader2,
-  PenIcon,
-  UnfoldHorizontalIcon,
-  UnfoldVerticalIcon,
-  UploadIcon,
-} from "lucide-react";
+import { Loader2, PenIcon, UploadIcon } from "lucide-react";
 import FormField from "../components/FormField";
 import { Input } from "@/components/ui/input";
 
@@ -29,8 +23,6 @@ export const AddSiteModal = () => {
   const { stack, popModal, hide } = useModal();
   const [geoJsonFile, setGeoJsonFile] = useState<File | null>(null);
   const [siteName, setSiteName] = useState<string>("");
-  const [siteLat, setSiteLat] = useState<string>("");
-  const [siteLon, setSiteLon] = useState<string>("");
 
   const queryClient = useQueryClient();
   const auth = useAtprotoStore((state) => state.auth);
@@ -46,9 +38,6 @@ export const AddSiteModal = () => {
       await trpcClient.gainforest.site.create.mutate({
         site: {
           name: siteName,
-          lat: siteLat,
-          lon: siteLon,
-          area: "100",
         },
         uploads: {
           shapefile: {
@@ -92,32 +81,6 @@ export const AddSiteModal = () => {
             onChange={(e) => setSiteName(e.target.value)}
           />
         </FormField>
-        <div className="flex items-center gap-2">
-          <FormField
-            label="Latitude"
-            Icon={UnfoldVerticalIcon}
-            biokoMode={false}
-          >
-            <Input
-              value={siteLat}
-              id="latitude"
-              placeholder="90"
-              onChange={(e) => setSiteLat(e.target.value)}
-            />
-          </FormField>
-          <FormField
-            label="Longitude"
-            Icon={UnfoldHorizontalIcon}
-            biokoMode={false}
-          >
-            <Input
-              id="longitude"
-              value={siteLon}
-              placeholder="-180"
-              onChange={(e) => setSiteLon(e.target.value)}
-            />
-          </FormField>
-        </div>
       </div>
       <FileInput
         placeholder="Upload or drag and drop a GeoJSON file"
@@ -151,13 +114,7 @@ export const AddSiteModal = () => {
             Done
           </Button>
         : <Button
-            disabled={
-              isCreatingSite ||
-              !geoJsonFile ||
-              siteName.trim() === "" ||
-              siteLat.trim() === "" ||
-              siteLon.trim() === ""
-            }
+            disabled={isCreatingSite || !geoJsonFile || siteName.trim() === ""}
             onClick={() => createSite()}
           >
             {isCreatingSite ?

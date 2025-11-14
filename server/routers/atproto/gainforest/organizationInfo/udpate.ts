@@ -2,7 +2,10 @@ import { protectedProcedure } from "@/server/trpc";
 import z from "zod";
 import { AppGainforestOrganizationInfo } from "@/lexicon-api";
 import { validate } from "@/lexicon-api/lexicons";
-import { getWriteAgent, PutRecordResponse } from "@/server/utils";
+import { PutRecordResponse } from "@/server/utils/response-types";
+import { Agent } from "@atproto/api";
+import { TRPCError } from "@trpc/server";
+import { getWriteAgent } from "@/server/utils/agent";
 import {
   BlobRefJSON,
   BlobRefJSONSchema,
@@ -10,8 +13,6 @@ import {
   FileGeneratorSchema,
   toBlobRef,
 } from "../../utils";
-import { Agent } from "@atproto/api";
-import { TRPCError } from "@trpc/server";
 
 const uploadFile = async (fileGenerator: FileGenerator, agent: Agent) => {
   const file = new File(
@@ -43,7 +44,7 @@ export const updateOrganizationInfo = protectedProcedure
             "Other",
           ])
         ),
-        startDate: z.string(),
+        startDate: z.string().optional(),
         country: z.string(),
         visibility: z.enum(["Public", "Hidden"]),
       }),
@@ -87,7 +88,7 @@ export const updateOrganizationInfo = protectedProcedure
           }
         : undefined,
       objectives: input.info.objectives,
-      startDate: new Date().toISOString(),
+      startDate: input.info.startDate ? input.info.startDate : undefined,
       country: input.info.country,
       visibility: input.info.visibility,
     };
