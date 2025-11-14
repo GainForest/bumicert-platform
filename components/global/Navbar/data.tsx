@@ -1,10 +1,4 @@
-import {
-  BadgePlus,
-  BuildingIcon,
-  Compass,
-  MessageCircleQuestion,
-  Settings,
-} from "lucide-react";
+import { BadgePlus, BuildingIcon, Compass } from "lucide-react";
 import { NavLinkConfig } from "./types";
 
 export const navLinks: NavLinkConfig<"dynamic" | "static">[] = [
@@ -20,33 +14,25 @@ export const navLinks: NavLinkConfig<"dynamic" | "static">[] = [
     },
   },
   {
-    type: "dynamic",
-    id: "my-hypercerts",
-    clientNode: {
-      Desktop: () => <div>My Hypercerts</div>,
-      Mobile: () => <div>My Hypercerts</div>,
-    },
-  },
-  {
     type: "static",
     id: "submit",
-    href: "/submit",
+    href: "/ecocert/new",
     text: "Create",
     Icon: BadgePlus,
     pathCheck: {
-      equals: "/submit",
+      equals: "/ecocert/new",
     },
   },
-  {
-    type: "static",
-    id: "faqs",
-    href: "/faqs",
-    text: "FAQs",
-    Icon: MessageCircleQuestion,
-    pathCheck: {
-      startsWith: "/faqs",
-    },
-  },
+  // {
+  //   type: "static",
+  //   id: "faqs",
+  //   href: "/faqs",
+  //   text: "FAQs",
+  //   Icon: MessageCircleQuestion,
+  //   pathCheck: {
+  //     startsWith: "/faqs",
+  //   },
+  // },
   {
     type: "static",
     id: "organization",
@@ -57,16 +43,16 @@ export const navLinks: NavLinkConfig<"dynamic" | "static">[] = [
       startsWith: "/organization",
     },
   },
-  {
-    type: "static",
-    id: "settings",
-    href: "/settings",
-    text: "Settings",
-    Icon: Settings,
-    pathCheck: {
-      startsWith: "/settings",
-    },
-  },
+  // {
+  //   type: "static",
+  //   id: "settings",
+  //   href: "/settings",
+  //   text: "Settings",
+  //   Icon: Settings,
+  //   pathCheck: {
+  //     startsWith: "/settings",
+  //   },
+  // },
 ];
 
 export const footerLinks: {
