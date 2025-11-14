@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useRef, useState } from "react";
 import Image from "next/image";
 import { ArrowUpRight, Moon, Sun } from "lucide-react";
 import Link from "next/link";
@@ -11,11 +11,15 @@ import { useTheme } from "next-themes";
 
 const DesktopNavbar = () => {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const [mounted, setMounted] = useState(() => typeof window !== "undefined");
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  // Use startTransition to avoid synchronous setState in effect
+  if (typeof window !== "undefined" && !mounted) {
+    // Use queueMicrotask to defer state update
+    queueMicrotask(() => {
+      setMounted(true);
+    });
+  }
 
   return (
     <nav className={cn("w-[240px] p-4 flex flex-col justify-between")}>

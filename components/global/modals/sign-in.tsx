@@ -62,15 +62,20 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
     { handle: string }[]
   >("previous-sessions", []);
 
-  const addPreviousSession = useCallback((handle: string) => {
-    setPreviousSessions((prev) => {
-      const alreadyExists = prev?.find((session) => session.handle === handle);
-      if (alreadyExists) {
-        return prev;
-      }
-      return [...(prev ?? []), { handle }];
-    });
-  }, []);
+  const addPreviousSession = useCallback(
+    (handle: string) => {
+      setPreviousSessions((prev) => {
+        const alreadyExists = prev?.find(
+          (session) => session.handle === handle
+        );
+        if (alreadyExists) {
+          return prev;
+        }
+        return [...(prev ?? []), { handle }];
+      });
+    },
+    [setPreviousSessions]
+  );
 
   if (isAuthenticated) {
     return <AuthenticatedModalContent message="You are already signed in." />;

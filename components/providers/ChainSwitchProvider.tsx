@@ -54,12 +54,15 @@ export const ChainSwitchModal = ({ strict = false }: { strict?: boolean }) => {
     );
   };
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies(switchError, setSwitchError): switchError and setSwitchError should not trigger this side effect
+  // Clear error when selectedChainId becomes null (after success or error)
   useEffect(() => {
-    if (switchError && selectedChainId === null) {
-      setSwitchError(null);
+    if (selectedChainId === null && switchError) {
+      // Use setTimeout to avoid synchronous setState in effect
+      setTimeout(() => {
+        setSwitchError(null);
+      }, 0);
     }
-  }, [selectedChainId]);
+  }, [selectedChainId, switchError]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies(handleBackAndClose): handleBackAndClose should not trigger this side effect
   useEffect(() => {

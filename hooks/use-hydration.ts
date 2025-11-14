@@ -16,7 +16,12 @@ const useHydratedData = <T>(
   const [data, setData] = useState(initialData);
   useEffect(() => {
     if (reactiveData == null) return;
-    setData((prev) => (isDeepEqual(prev, reactiveData) ? prev : reactiveData));
+    // Use setTimeout to avoid synchronous setState in effect
+    setTimeout(() => {
+      setData((prev) =>
+        isDeepEqual(prev, reactiveData) ? prev : reactiveData
+      );
+    }, 0);
   }, [reactiveData]);
 
   return data;

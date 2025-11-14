@@ -56,7 +56,7 @@ const AddProofsOfImpactStep3 = () => {
       description: step1State.description,
       sources: step2State.sources,
     });
-  }, [step1State, step2State, authenticated, hcExchangeClient, signer]);
+  }, [step1State, step2State, authenticated, hcExchangeClient, signer, start]);
 
   const handleBack = useCallback(() => {
     if (status === "success") {

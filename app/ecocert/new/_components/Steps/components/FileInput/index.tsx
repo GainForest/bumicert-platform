@@ -71,6 +71,20 @@ const FileInput = ({
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const handleRemoveFile = useCallback(() => {
+    // Clean up preview URL to prevent memory leaks
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl("");
+    }
+
+    onFileChange?.(null);
+    setError("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  }, [previewUrl, onFileChange]);
+
   // Master handler for all file selection events
   const handleFileSelect = useCallback(
     (file: File) => {
@@ -100,7 +114,13 @@ const FileInput = ({
         setPreviewUrl("");
       }
     },
-    [onFileChange, maxSizeInMB, supportedFileTypes, previewUrl]
+    [
+      onFileChange,
+      maxSizeInMB,
+      supportedFileTypes,
+      previewUrl,
+      handleRemoveFile,
+    ]
   );
 
   // Drag and drop handlers
@@ -134,28 +154,19 @@ const FileInput = ({
     fileInputRef.current?.click();
   };
 
-  const handleRemoveFile = () => {
-    // Clean up preview URL to prevent memory leaks
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl);
-      setPreviewUrl("");
-    }
-
-    onFileChange?.(null);
-    setError("");
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
-
   // Effect to handle preview URL creation when value changes
   useEffect(() => {
     if (value && isImageFile(value)) {
       const url = URL.createObjectURL(value);
-      setPreviewUrl(url);
+      // Use setTimeout to avoid synchronous setState in effect
+      setTimeout(() => {
+        setPreviewUrl(url);
+      }, 0);
       return () => URL.revokeObjectURL(url);
     } else {
-      setPreviewUrl("");
+      setTimeout(() => {
+        setPreviewUrl("");
+      }, 0);
     }
   }, [value]);
 
