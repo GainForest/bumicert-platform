@@ -3,16 +3,21 @@ import React, { useLayoutEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ArrowUpRight, Moon, Sun } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { footerLinks, navLinks } from "./data";
 import { Switch } from "@/components/ui/switch";
 import { useTheme } from "next-themes";
 import useIsMounted from "@/hooks/use-is-mounted";
+import { useAtprotoStore } from "@/components/stores/atproto";
 
 const DesktopNavbar = () => {
   const { theme, setTheme } = useTheme();
   const isMounted = useIsMounted();
+  const pathname = usePathname();
+  const auth = useAtprotoStore((state) => state.auth);
+  const did = auth.user?.did;
 
   return (
     <nav className={cn("w-[240px] p-4 flex flex-col justify-between")}>
@@ -32,7 +37,18 @@ const DesktopNavbar = () => {
         {/* Nav Links */}
         <ul className="mt-2 flex flex-col gap-1">
           {navLinks.map((link) => {
-            if (link.type !== "static") return;
+            let isHighlighted = false;
+
+            if ("equals" in link.pathCheck) {
+              isHighlighted = pathname === link.pathCheck.equals;
+              // Special case for organization link
+              if (link.id === "organization" && did && !isHighlighted) {
+                isHighlighted = pathname.startsWith(`/organization/${did}`);
+              }
+            } else {
+              isHighlighted = pathname.startsWith(link.pathCheck.startsWith);
+            }
+
             return (
               <li key={link.id} className="w-full">
                 <Link href={link.href} className="w-full">
@@ -41,22 +57,22 @@ const DesktopNavbar = () => {
                     size="sm"
                     className={cn(
                       "w-full text-left justify-start relative overflow-hidden",
-                      link.id === "explore" && "bg-accent hover:bg-accent"
+                      isHighlighted && "bg-accent hover:bg-accent"
                     )}
                   >
-                    {link.id === "explore" && (
+                    {isHighlighted && (
                       <div className="absolute left-0.5 top-2 bottom-2 w-0.5 bg-primary rounded-full" />
                     )}
                     <link.Icon
                       size={16}
                       className={cn(
                         "text-primary/70",
-                        link.id === "explore" && "text-primary"
+                        isHighlighted && "text-primary"
                       )}
                     />
                     <span
                       className={cn(
-                        link.id === "explore" && "text-primary font-semibold"
+                        isHighlighted && "text-primary font-semibold"
                       )}
                     >
                       {link.text}

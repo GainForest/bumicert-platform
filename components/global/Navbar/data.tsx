@@ -1,9 +1,8 @@
 import { BadgePlus, BuildingIcon, Compass } from "lucide-react";
 import { NavLinkConfig } from "./types";
 
-export const navLinks: NavLinkConfig<"dynamic" | "static">[] = [
+export const navLinks: NavLinkConfig[] = [
   {
-    type: "static",
     id: "explore",
     href: "/",
     text: "Explore",
@@ -14,7 +13,6 @@ export const navLinks: NavLinkConfig<"dynamic" | "static">[] = [
     },
   },
   {
-    type: "static",
     id: "submit",
     href: "/ecocert/new",
     text: "Create",
@@ -24,7 +22,6 @@ export const navLinks: NavLinkConfig<"dynamic" | "static">[] = [
     },
   },
   // {
-  //   type: "static",
   //   id: "faqs",
   //   href: "/faqs",
   //   text: "FAQs",
@@ -34,17 +31,15 @@ export const navLinks: NavLinkConfig<"dynamic" | "static">[] = [
   //   },
   // },
   {
-    type: "static",
     id: "organization",
     href: "/organization",
-    text: "Organization",
+    text: "My Organization",
     Icon: BuildingIcon,
     pathCheck: {
-      startsWith: "/organization",
+      equals: "/organization",
     },
   },
   // {
-  //   type: "static",
   //   id: "settings",
   //   href: "/settings",
   //   text: "Settings",
