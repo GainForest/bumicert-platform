@@ -46,7 +46,6 @@ export const createHypercertClaim = protectedProcedure
         workScope: z.array(z.string()),
         workTimeFrameFrom: z.string(),
         workTimeFrameTo: z.string(),
-        createdAt: z.string(),
       }),
       uploads: z.object({
         image: FileGeneratorSchema,

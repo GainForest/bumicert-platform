@@ -19,9 +19,8 @@ export const step1Schema = z.object({
     .describe("Cover Image"),
   workType: z.array(z.string()).min(1, "Required").describe("Work Type"),
   projectDateRange: z
-    .tuple([z.date(), z.date().nullable()])
+    .tuple([z.date(), z.date()])
     .describe("Project Date Range"),
-  isProjectOngoing: z.boolean().describe("Is Project Ongoing"),
 });
 
 type Step1FormValues = z.infer<typeof step1Schema>;
@@ -38,8 +37,7 @@ type Step1StoreActions = {
   setWebsiteOrSocialLink: (link: string) => void;
   setCoverImage: (image: File | null) => void;
   setWorkType: (types: Step1FormValues["workType"]) => void;
-  setProjectDateRange: (range: [Date, Date | null]) => void;
-  setIsProjectOngoing: (ongoing: boolean) => void;
+  setProjectDateRange: (range: [Date, Date]) => void;
   updateValidationsAndCompletionPercentage: () => void;
   reset: () => void;
 };
@@ -52,8 +50,10 @@ export const useStep1Store = create<Step1StoreState & Step1StoreActions>(
       websiteOrSocialLink: "",
       coverImage: null,
       workType: [],
-      projectDateRange: [new Date(`${new Date().getFullYear()}-01-01`), null],
-      isProjectOngoing: true,
+      projectDateRange: [
+        new Date(`${new Date().getFullYear()}-01-01`),
+        new Date(`${new Date().getFullYear()}-02-15`),
+      ],
     },
     errors: {},
     isValid: false,
@@ -90,12 +90,6 @@ export const useStep1Store = create<Step1StoreState & Step1StoreActions>(
           formValues: { ...state.formValues, projectDateRange: range },
         };
       });
-      get().updateValidationsAndCompletionPercentage();
-    },
-    setIsProjectOngoing: (ongoing) => {
-      set((state) => ({
-        formValues: { ...state.formValues, isProjectOngoing: ongoing },
-      }));
       get().updateValidationsAndCompletionPercentage();
     },
 
@@ -144,9 +138,8 @@ export const useStep1Store = create<Step1StoreState & Step1StoreActions>(
           workType: [],
           projectDateRange: [
             new Date(`${new Date().getFullYear()}-01-01`),
-            null,
+            new Date(`${new Date().getFullYear()}-02-15`),
           ],
-          isProjectOngoing: true,
         },
         errors: {},
         isValid: false,

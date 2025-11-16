@@ -141,14 +141,7 @@ const Step5 = () => {
           description: step2FormValues.impactStory,
           workScope: step1FormValues.workType,
           workTimeFrameFrom: step1FormValues.projectDateRange[0].toISOString(),
-          workTimeFrameTo:
-            (
-              step1FormValues.isProjectOngoing ||
-              step1FormValues.projectDateRange[1] === null
-            ) ?
-              new Date(0).toISOString()
-            : step1FormValues.projectDateRange[1].toISOString(),
-          createdAt: new Date().toISOString(),
+          workTimeFrameTo: step1FormValues.projectDateRange[1].toISOString(),
         },
         uploads: {
           contributors: step3FormValues.contributors,

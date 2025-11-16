@@ -36,21 +36,15 @@ const Step4 = () => {
   const step2Errors = useStep2Store((state) => state.errors);
   const step3Errors = useStep3Store((state) => state.errors);
 
-  const ecocertArtImage = useStep4Store((state) => state.ecocertArtImage);
   const setCompletionPercentage = useStep4Store(
     (state) => state.setCompletionPercentage
   );
   useEffect(() => {
-    const progresses = [
-      step1Progress,
-      step2Progress,
-      step3Progress,
-      ecocertArtImage ? 100 : 0,
-    ];
+    const progresses = [step1Progress, step2Progress, step3Progress];
     setCompletionPercentage(
       progresses.reduce((acc, curr) => acc + curr, 0) / progresses.length
     );
-  }, [step1Progress, step2Progress, step3Progress, ecocertArtImage]);
+  }, [step1Progress, step2Progress, step3Progress]);
 
   return (
     <div>
@@ -79,9 +73,6 @@ const Step4 = () => {
                   step1FormValues[typedKey] ?
                     `From ${format(step1FormValues[typedKey][0], "LLL dd, y")} to ${step1FormValues[typedKey][1] ? format(step1FormValues[typedKey][1], "LLL dd, y") : "Present"}`
                   : "Not Uploaded";
-                break;
-              case "isProjectOngoing":
-                parsedValue = step1FormValues[typedKey] ? "Yes" : "No";
                 break;
               case "workType":
                 parsedValue =

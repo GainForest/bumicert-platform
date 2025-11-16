@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, Lightbulb } from "lucide-react";
 import type { DateRange } from "react-day-picker";
 
 import { cn } from "@/lib/utils";
@@ -23,16 +23,7 @@ export interface CalendarRangeProps {
   id?: string;
 }
 
-export function CalendarRange({
-  value,
-  onValueChange,
-  placeholder = "Pick a date range",
-  className,
-  disabled = false,
-  id,
-}: CalendarRangeProps) {
-  const [open, setOpen] = React.useState(false);
-
+export function CalendarRange({ value, onValueChange }: CalendarRangeProps) {
   const handleSelect = (range: DateRange | undefined) => {
     if (range?.from && range?.to) {
       const newValue: [Date, Date] = [range.from, range.to];
@@ -44,48 +35,28 @@ export function CalendarRange({
   };
 
   return (
-    <div className={cn("grid gap-2", className)}>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            id={id}
-            variant="outline"
-            className={cn(
-              "w-full justify-start text-left font-normal",
-              !value?.[0] && "text-muted-foreground"
-            )}
-            disabled={disabled}
-          >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {value?.[0] && value?.[1] ?
-              <>
-                {format(value[0], "LLL dd, y")} -{" "}
-                {format(value[1], "LLL dd, y")}
-              </>
-            : <span>{placeholder}</span>}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-          <Calendar
-            className="h-[340px]"
-            mode="range"
-            defaultMonth={value?.[0]}
-            selected={
-              value ?
-                {
-                  from: value[0],
-                  to: value[1],
-                }
-              : undefined
+    <>
+      <Calendar
+        className="h-[340px] w-full"
+        mode="range"
+        defaultMonth={value?.[0]}
+        selected={
+          value ?
+            {
+              from: value[0],
+              to: value[1],
             }
-            onSelect={handleSelect}
-            numberOfMonths={2}
-          />
-          <div className="w-full flex items-center text-center justify-center text-sm text-muted-foreground mb-2">
-            To change start date, double click a date.
-          </div>
-        </PopoverContent>
-      </Popover>
-    </div>
+          : undefined
+        }
+        onSelect={handleSelect}
+        numberOfMonths={2}
+      />
+      <div className="w-full flex items-center text-center justify-center text-sm text-primary mb-2">
+        <span className="px-2 py-1 bg-muted rounded-lg flex items-center gap-2">
+          <Lightbulb className="size-4" />
+          Double click a date to change the start date.
+        </span>
+      </div>
+    </>
   );
 }

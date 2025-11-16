@@ -27,6 +27,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { CalendarRange } from "@/components/ui/calendar-range";
 
 const Step1 = () => {
   const { maxStepIndexReached, currentStepIndex } = useNewEcocertStore();
@@ -40,7 +41,6 @@ const Step1 = () => {
     setCoverImage,
     setWorkType,
     setProjectDateRange,
-    setIsProjectOngoing,
     updateValidationsAndCompletionPercentage,
   } = useStep1Store();
 
@@ -50,7 +50,6 @@ const Step1 = () => {
     coverImage,
     workType,
     projectDateRange,
-    isProjectOngoing,
   } = formValues;
 
   useEffect(() => {
@@ -147,119 +146,43 @@ const Step1 = () => {
             ]}
           />
         </FormField>
-        <div className="flex items-stretch gap-2">
-          <FormField
-            Icon={CalendarClock}
-            label="Project Start Date"
-            className="flex-1"
-            error={errors.projectDateRange}
-            showError={shouldShowValidationErrors}
-          >
-            <div className="mt-1">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button
-                    id="project-start-date"
-                    className="group w-full flex items-center justify-center text-center bg-foreground/2 transition-all duration-300 rounded-md cursor-pointer p-2"
-                  >
-                    <span
-                      className={cn(
-                        "text-foreground/20 group-hover:text-foreground/40 text-xl font-semibold",
-                        projectDateRange[0] &&
-                          "text-foreground group-hover:text-primary"
-                      )}
-                    >
-                      {projectDateRange[0] ?
-                        format(projectDateRange[0], "LLL dd, y")
-                      : "Select the Start Date"}
-                    </span>
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent>
-                  <Calendar
-                    id="project-start-date"
-                    mode="single"
-                    selected={projectDateRange[0] ?? undefined}
-                    onSelect={(date) => {
-                      setProjectDateRange([
-                        date ?? new Date(`${new Date().getFullYear()}-01-01`),
-                        projectDateRange[1],
-                      ]);
-                    }}
-                    defaultMonth={projectDateRange[0] ?? undefined}
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-          </FormField>
-          <FormField
-            Icon={CalendarClock}
-            label="Project End Date"
-            className="flex-1"
-            error={errors.projectDateRange}
-            showError={shouldShowValidationErrors}
-          >
-            <div className="mt-1">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button
-                    id="project-end-date"
-                    className="group w-full flex items-center justify-center text-center bg-foreground/2 transition-all duration-300 rounded-md cursor-pointer p-2"
-                    disabled={isProjectOngoing}
-                  >
-                    {isProjectOngoing && (
-                      <span className="text-foreground/20 text-xl font-semibold">
-                        Ongoing
-                      </span>
+        <FormField
+          Icon={CalendarClock}
+          label="Project Date Range"
+          className="flex-1"
+          error={errors.projectDateRange}
+          showError={shouldShowValidationErrors}
+        >
+          <div className="mt-1">
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  id="project-date-range"
+                  className="group w-full flex items-center justify-center text-center bg-foreground/2 transition-all duration-300 rounded-md cursor-pointer p-2"
+                >
+                  <span
+                    className={cn(
+                      "text-foreground/20 group-hover:text-foreground/40 text-2xl font-medium",
+                      "text-foreground group-hover:text-primary"
                     )}
-                    {!isProjectOngoing && (
-                      <span
-                        className={cn(
-                          "text-foreground/20 group-hover:text-foreground/40 text-xl font-semibold",
-                          projectDateRange[1] &&
-                            "text-foreground group-hover:text-primary"
-                        )}
-                      >
-                        {projectDateRange[1] ?
-                          format(projectDateRange[1], "LLL dd, y")
-                        : "Select the End Date"}
-                      </span>
-                    )}
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent>
-                  <Calendar
-                    id="project-end-date"
-                    mode="single"
-                    selected={projectDateRange[1] ?? undefined}
-                    onSelect={(date) => {
-                      setProjectDateRange([
-                        projectDateRange[0] ?? null,
-                        date ?? null,
-                      ]);
-                    }}
-                    defaultMonth={projectDateRange[1] ?? undefined}
-                  />
-                </PopoverContent>
-              </Popover>
-              <div className="flex items-center gap-2 text-sm mt-1">
-                <Checkbox
-                  id="ongoing"
-                  className="bg-background size-5"
-                  checked={isProjectOngoing}
-                  onCheckedChange={(checked) =>
-                    setIsProjectOngoing(
-                      checked === "indeterminate" ? false : checked
-                    )
-                  }
+                  >
+                    {format(projectDateRange[0], "LLL dd, y")} →{" "}
+                    {format(projectDateRange[1], "LLL dd, y")}{" "}
+                  </span>
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto">
+                <CalendarRange
+                  value={projectDateRange}
+                  onValueChange={(value) => {
+                    if (!value) return;
+                    setProjectDateRange(value);
+                  }}
                 />
-                <Label htmlFor="ongoing" className="cursor-pointer">
-                  The impact is still ongoing.
-                </Label>
-              </div>
-            </div>
-          </FormField>
-        </div>
+              </PopoverContent>
+            </Popover>
+          </div>
+        </FormField>
       </div>
     </div>
   );
