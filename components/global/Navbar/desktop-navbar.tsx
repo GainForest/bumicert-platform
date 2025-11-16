@@ -8,16 +8,11 @@ import { cn } from "@/lib/utils";
 import { footerLinks, navLinks } from "./data";
 import { Switch } from "@/components/ui/switch";
 import { useTheme } from "next-themes";
+import useIsMounted from "@/hooks/use-is-mounted";
 
 const DesktopNavbar = () => {
   const { theme, setTheme } = useTheme();
-  const isFirstRender = useRef(true);
-  const [mounted, setMounted] = useState(false);
-
-  useLayoutEffect(() => {
-    setMounted(isFirstRender.current);
-    isFirstRender.current = false;
-  }, []);
+  const isMounted = useIsMounted();
 
   return (
     <nav className={cn("w-[240px] p-4 flex flex-col justify-between")}>
@@ -108,7 +103,7 @@ const DesktopNavbar = () => {
           </span>
           <div className="flex items-center gap-1">
             <Sun className="size-3" />
-            {mounted && (
+            {isMounted && (
               <Switch
                 checked={theme === "dark"}
                 onCheckedChange={() =>
