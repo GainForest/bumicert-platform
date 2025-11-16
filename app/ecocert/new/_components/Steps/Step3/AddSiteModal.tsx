@@ -84,7 +84,7 @@ export const AddSiteModal = () => {
       </div>
       <FileInput
         placeholder="Upload or drag and drop a GeoJSON file"
-        supportedFileTypes={["application/geo+json", "application/json"]}
+        supportedFileTypes={["application/geo+json"]}
         maxSizeInMB={10}
         onFileChange={(file) => {
           setGeoJsonFile(file);

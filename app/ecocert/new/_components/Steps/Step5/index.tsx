@@ -18,6 +18,7 @@ import { useStep1Store } from "../Step1/store";
 import { useStep2Store } from "../Step2/store";
 import { useStep3Store } from "../Step3/store";
 import { useStep5Store } from "./store";
+import { toFileGenerator } from "@/server/routers/atproto/utils";
 
 const ProgressItem = ({
   iconset,
@@ -109,7 +110,6 @@ const Step5 = () => {
   const step2FormValues = useStep2Store((state) => state.formValues);
   const step3FormValues = useStep3Store((state) => state.formValues);
 
-  const ecocertArtImage = useStep4Store((state) => state.ecocertArtImage);
   const setOverallStatus = useStep5Store((state) => state.setOverallStatus);
 
   useEffect(() => {
@@ -132,7 +132,8 @@ const Step5 = () => {
   const { mutate: createEcocert } = useMutation({
     mutationKey: ["create-ecocert"],
     mutationFn: async () => {
-      if (!ecocertArtImage) throw new Error("Ecocert art image is required");
+      if (!step1FormValues.coverImage)
+        throw new Error("Cover image is required");
       const response = await createEcocertMutationFn({
         claim: {
           title: step1FormValues.projectName,
@@ -152,13 +153,7 @@ const Step5 = () => {
         uploads: {
           contributors: step3FormValues.contributors,
           siteAtUri: step3FormValues.siteBoundaries,
-          image: {
-            dataBase64: await ecocertArtImage
-              .arrayBuffer()
-              .then((buffer) => Buffer.from(buffer).toString("base64")),
-            name: ecocertArtImage.name,
-            type: ecocertArtImage.type,
-          },
+          image: await toFileGenerator(step1FormValues.coverImage),
         },
       });
       if (response.success !== true)

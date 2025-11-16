@@ -21,6 +21,18 @@ const formatFileSize = (bytes: number): string => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
 };
 
+// MIME type to file extension mapping for fallback validation
+const mimeTypeToExtensions: Record<string, string[]> = {
+  "application/geo+json": [".geojson"],
+  "application/geojson": [".geojson"],
+};
+
+// Helper function to get file extension
+const getFileExtension = (fileName: string): string => {
+  const lastDot = fileName.lastIndexOf(".");
+  return lastDot !== -1 ? fileName.substring(lastDot).toLowerCase() : "";
+};
+
 // Helper function to validate the file
 const validateFile = (
   file: File,
@@ -33,16 +45,32 @@ const validateFile = (
     throw new Error(`File size exceeds ${maxSizeInMB}MB.`);
   }
 
+  const fileExtension = getFileExtension(file.name);
+  const fileType = file.type || "";
+
   const isValidType = supportedFileTypes.some((type) => {
     if (type.endsWith("/*")) {
       const category = type.split("/")[0];
-      return file.type.startsWith(category + "/");
+      return fileType.startsWith(category + "/");
     }
     if (type.startsWith(".")) {
       // Check file extension
-      return file.name.toLowerCase().endsWith(type.toLowerCase());
+      return fileExtension === type.toLowerCase();
     }
-    return file.type === type;
+
+    // Check MIME type first
+    if (fileType === type) {
+      return true;
+    }
+
+    // Fallback: if MIME type is empty or doesn't match, check file extension
+    // This handles Windows where file.type can be empty or incorrect
+    const extensions = mimeTypeToExtensions[type];
+    if (extensions) {
+      return extensions.some((ext) => fileExtension === ext);
+    }
+
+    return false;
   });
 
   if (!isValidType) {

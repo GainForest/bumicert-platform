@@ -12,43 +12,25 @@ import getBlobUrl from "@/lib/atproto/getBlobUrl";
 import { Loader2, UploadIcon } from "lucide-react";
 import { useModal } from "@/components/ui/modal/context";
 import { UploadLogoModal, UploadLogoModalId } from "./UploadLogoModal";
+import { format } from "date-fns";
 
-export const EcocertArt = ({ logoUrl }: { logoUrl: string | null }) => {
-  const name = useStep1Store((state) => state.formValues.projectName);
-  const coverImage = useStep1Store((state) => state.formValues.coverImage);
-  const ref = useRef<HTMLDivElement>(null);
-  const setEcocertArtImage = useStep4Store((state) => state.setEcocertArtImage);
-
-  useEffect(() => {
-    if (!ref.current) return;
-    if (coverImage) {
-      domToJpeg(ref.current).then((image) => {
-        // Convert data URL to a File
-        // image is a data URL (base64)
-        // Extract the mime type and base64 data
-        const match = image.match(/^data:(image\/[a-zA-Z]+);base64,(.*)$/);
-        if (!match) return;
-        const mimeType = match[1];
-        const base64Data = match[2];
-        const byteString = atob(base64Data);
-        const ab = new ArrayBuffer(byteString.length);
-        const ia = new Uint8Array(ab);
-        for (let i = 0; i < byteString.length; i++) {
-          ia[i] = byteString.charCodeAt(i);
-        }
-        const file = new File([ab], "ecocert-art.jpeg", { type: mimeType });
-        setEcocertArtImage(file);
-      });
-    }
-  }, [coverImage]);
-
-  if (!coverImage) return null;
-
+export const EcocertArt = ({
+  logoUrl,
+  coverImage,
+  title,
+  objectives,
+  startDate,
+  endDate,
+}: {
+  logoUrl: string | null;
+  coverImage: File;
+  title: string;
+  objectives: string[];
+  startDate: Date;
+  endDate: Date;
+}) => {
   return (
-    <div
-      ref={ref}
-      className="p-2 rounded-3xl shadow-2xl bg-white border border-black/10"
-    >
+    <div className="p-2 rounded-3xl shadow-2xl bg-white border border-black/10">
       <div className="w-[256px] h-[360px] relative overflow-hidden rounded-2xl">
         <Image
           src={URL.createObjectURL(coverImage)}
@@ -70,22 +52,20 @@ export const EcocertArt = ({ logoUrl }: { logoUrl: string | null }) => {
         </div>
         <div className="absolute bottom-3 left-3 right-3 flex flex-col">
           <span className="text-xs border border-white/15 bg-black/15 text-white backdrop-blur-lg rounded-full px-2 py-1 w-fit">
-            Aug 9, 2024 → Oct 9, 2024
+            {format(startDate, "LLL dd, y")} → {format(endDate, "LLL dd, y")}
           </span>
           <span className="font-serif text-white text-shadow-lg text-3xl mt-2">
-            {name ?? "Hypercert Title"}
+            {title}
           </span>
           <div className="flex items-center gap-1 flex-wrap mt-2">
-            {["Tree Planting", "Education", "Biodiversity Conservation"].map(
-              (objective) => (
-                <span
-                  key={objective}
-                  className="text-xs bg-white/40 text-black backdrop-blur-lg rounded-md px-3 py-1.5 w-fit font-medium text-shadow-lg shadow-lg"
-                >
-                  {objective}
-                </span>
-              )
-            )}
+            {objectives.map((objective) => (
+              <span
+                key={objective}
+                className="text-xs bg-white/40 text-black backdrop-blur-lg rounded-md px-3 py-1.5 w-fit font-medium text-shadow-lg shadow-lg"
+              >
+                {objective}
+              </span>
+            ))}
             <span className="text-xs bg-black/40 text-white backdrop-blur-lg rounded-md px-2 py-1.5 w-fit font-medium text-shadow-lg shadow-lg">
               +3
             </span>
@@ -97,9 +77,13 @@ export const EcocertArt = ({ logoUrl }: { logoUrl: string | null }) => {
 };
 
 const EcocertPreviewCard = () => {
-  const step1CompletionPercentage = useStep1Store(
-    (state) => state.completionPercentage
-  );
+  const step1FormValues = useStep1Store((state) => state.formValues);
+  const {
+    coverImage,
+    projectName: title,
+    workType: objectives,
+    projectDateRange: [startDate, endDate],
+  } = step1FormValues;
   const auth = useAtprotoStore((state) => state.auth);
   const { show, pushModal } = useModal();
   const {
@@ -121,6 +105,9 @@ const EcocertPreviewCard = () => {
     logoFromData ? getBlobUrl(auth.user?.did ?? "", logoFromData.image) : null;
 
   const isLoadingOrganizationInfo = isPendingOrganizationInfo || isOlderData;
+
+  const isEcocertArtReady =
+    coverImage && title && objectives && startDate && endDate;
 
   return (
     <div className="rounded-xl border border-primary/10 shadow-lg overflow-hidden bg-primary/10 flex flex-col">
@@ -155,8 +142,15 @@ const EcocertPreviewCard = () => {
           </div>
         )}
 
-        {step1CompletionPercentage === 100 ?
-          <EcocertArt logoUrl={logoUrl} />
+        {isEcocertArtReady ?
+          <EcocertArt
+            logoUrl={logoUrl}
+            coverImage={coverImage}
+            title={title}
+            objectives={objectives}
+            startDate={startDate}
+            endDate={endDate}
+          />
         : isLoadingOrganizationInfo ?
           <div className="flex-1 flex flex-col items-center justify-center">
             <Loader2 className="animate-spin" />

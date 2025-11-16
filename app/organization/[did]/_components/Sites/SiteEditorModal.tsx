@@ -245,10 +245,7 @@ export const SiteEditorModal = ({ initialData, did }: SiteEditorModalProps) => {
                     <FileInput
                       placeholder="Upload a GeoJSON file"
                       value={shapefile ?? undefined}
-                      supportedFileTypes={[
-                        "application/geo+json",
-                        "application/json",
-                      ]}
+                      supportedFileTypes={["application/geo+json"]}
                       maxSizeInMB={10}
                       onFileChange={(file) => setShapefile(file)}
                     />
