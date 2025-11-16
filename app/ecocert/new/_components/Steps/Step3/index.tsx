@@ -13,6 +13,7 @@ import {
   Loader2Icon,
   CircleDashed,
   Check,
+  ChevronRight,
 } from "lucide-react";
 import { useStep3Store } from "./store";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -24,6 +25,13 @@ import { useModal } from "@/components/ui/modal/context";
 import { AddSiteModalId } from "./AddSiteModal";
 import { AddSiteModal } from "./AddSiteModal";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
+
+const formatCoordinate = (coordinate: string) => {
+  const num = parseFloat(coordinate);
+  if (isNaN(num)) return coordinate;
+  return num.toFixed(2);
+};
 
 const Step3 = () => {
   const { maxStepIndexReached, currentStepIndex } = useNewEcocertStore();
@@ -73,6 +81,9 @@ const Step3 = () => {
     },
     enabled: !!auth.user?.did,
   });
+  console.log("==============");
+  console.log(JSON.stringify(sites, null, 2));
+  console.log("==============");
   const isSitesLoading = isSitesPending || isOlderSites;
 
   return (
@@ -134,20 +145,22 @@ const Step3 = () => {
           label="Site Boundaries"
           description="Please upload your site boundary in GeoJSON format so we can visualize your project on the map."
           error={errors.siteBoundaries}
+          showError={shouldShowValidationErrors}
         >
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">
               Select a site for this ecocert, or add a new one.
             </span>
-            <span className="text-sm text-muted-foreground">
-              {isSitesLoading ?
-                <Loader2Icon className="animate-spin size-3" />
-              : siteBoundaries !== "" ?
-                "Selected"
-              : sites?.length ?
-                `${sites.length} site${sites.length > 1 ? "s" : ""} found.`
-              : "No sites found."}
-            </span>
+            {auth.user?.did && (
+              <span className="text-sm text-muted-foreground">
+                <Link
+                  href={`/organization/${auth.user.did}`}
+                  className="flex items-center text-primary hover:underline"
+                >
+                  Manage sites <ChevronRight className="size-4" />
+                </Link>
+              </span>
+            )}
           </div>
 
           <div className="h-40 w-full border border-dashed border-border rounded-lg bg-background/50">
@@ -198,7 +211,7 @@ const Step3 = () => {
                           }}
                         >
                           {siteBoundaries === site.uri ?
-                            <div className="h-5 w-5 rounded-full bg-primary flex items-center justify-center">
+                            <div className="h-5 w-5 rounded-full bg-primary flex items-center justify-center shrink-0">
                               <Check className="size-3 text-white" />
                             </div>
                           : <CircleDashed className="size-5 text-muted-foreground" />
@@ -209,11 +222,12 @@ const Step3 = () => {
                             </span>
                             <div className="flex items-center gap-1">
                               <span className="text-sm text-muted-foreground mr-1">
-                                {siteData.area} hectares
+                                {siteData.area} ha
                               </span>
                               <span className="text-sm text-muted-foreground">
                                 {"("}
-                                {siteData.lat}°, {siteData.lon}°{")"}
+                                {formatCoordinate(siteData.lat)}°,{" "}
+                                {formatCoordinate(siteData.lon)}°{")"}
                               </span>
                             </div>
                           </div>

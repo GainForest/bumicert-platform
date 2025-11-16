@@ -147,7 +147,7 @@ const Hero = ({
             </div>
             Logo
           </Button>
-        : <div className="absolute top-2 left-2 h-8 w-8 rounded-full bg-muted overflow-hidden">
+        : <div className="absolute top-2 left-2 h-8 w-8 rounded-full bg-background border border-border shadow-xs overflow-hidden">
             {logoImageUrl && (
               <Image
                 src={logoImageUrl}
