@@ -8,11 +8,11 @@ import { type $Typed, is$typed as _is$typed, type OmitKey } from '../../../util'
 
 const is$typed = _is$typed,
   validate = _validate
-const id = 'app.certified.defs'
+const id = 'org.hypercerts.defs'
 
 /** Object containing a URI to external data */
 export interface Uri {
-  $type?: 'app.certified.defs#uri'
+  $type?: 'org.hypercerts.defs#uri'
   /** URI to external data */
   uri: string
 }
@@ -29,7 +29,7 @@ export function validateUri<V>(v: V) {
 
 /** Object containing a blob to external data */
 export interface SmallBlob {
-  $type?: 'app.certified.defs#smallBlob'
+  $type?: 'org.hypercerts.defs#smallBlob'
   /** Blob to external data (up to 10MB) */
   blob: BlobRef
 }
@@ -46,7 +46,7 @@ export function validateSmallBlob<V>(v: V) {
 
 /** Object containing a blob to external data */
 export interface LargeBlob {
-  $type?: 'app.certified.defs#largeBlob'
+  $type?: 'org.hypercerts.defs#largeBlob'
   /** Blob to external data (up to 100MB) */
   blob: BlobRef
 }
@@ -63,7 +63,7 @@ export function validateLargeBlob<V>(v: V) {
 
 /** Object containing a small image */
 export interface SmallImage {
-  $type?: 'app.certified.defs#smallImage'
+  $type?: 'org.hypercerts.defs#smallImage'
   /** Image (up to 5MB) */
   image: BlobRef
 }
@@ -80,7 +80,7 @@ export function validateSmallImage<V>(v: V) {
 
 /** Object containing a large image */
 export interface LargeImage {
-  $type?: 'app.certified.defs#largeImage'
+  $type?: 'org.hypercerts.defs#largeImage'
   /** Image (up to 10MB) */
   image: BlobRef
 }

@@ -68,13 +68,14 @@ export const createHypercertClaim = protectedProcedure
 
     // Generate record data for validation before writing to the PDS:
     // Location record
+    const locationNSID = "app.certified.location";
     const location: AppCertifiedLocation.Record = {
-      $type: "app.certified.location",
+      $type: locationNSID,
       lpVersion: "1.0.0",
       srs: "https://epsg.io/3857",
       locationType: "geojson",
       location: {
-        $type: "app.certified.defs#uri",
+        $type: "org.hypercerts.defs#uri",
         uri: input.uploads.siteAtUri,
       },
       createdAt: new Date().toISOString(),
@@ -85,8 +86,9 @@ export const createHypercertClaim = protectedProcedure
     );
 
     // Claim record
+    const claimNSID = "org.hypercerts.claim.claim";
     const claim: OrgHypercertsClaimClaim.Record = {
-      $type: "org.hypercerts.claim.claim",
+      $type: claimNSID,
       title: input.claim.title,
       shortDescription: input.claim.shortDescription,
       description: input.claim.description,
@@ -106,6 +108,7 @@ export const createHypercertClaim = protectedProcedure
     );
 
     // Contribution record
+    const contributionNSID = "org.hypercerts.claim.contribution";
     const contribution: OrgHypercertsClaimContribution.Record = {
       $type: "org.hypercerts.claim.contribution",
       // Use dummy hypercert reference for now because the claim record is not yet created:
@@ -128,7 +131,7 @@ export const createHypercertClaim = protectedProcedure
     // 1. Write location to the PDS
     const locationWriteResponse = await agent.com.atproto.repo.createRecord({
       repo: did,
-      collection: "app.certified.location",
+      collection: locationNSID,
       record: validatedLocation,
     });
     if (locationWriteResponse.success !== true) {
@@ -142,11 +145,11 @@ export const createHypercertClaim = protectedProcedure
     // 3. Write claim to the PDS
     const claimResponse = await agent.com.atproto.repo.createRecord({
       repo: did,
-      collection: "org.hypercerts.claim",
+      collection: claimNSID,
       record: {
         ...validatedClaim,
         image: {
-          $type: "app.certified.defs#smallImage",
+          $type: "org.hypercerts.defs#smallImage",
           image: toBlobRef(imageBlobRef),
         },
         location: {
@@ -166,7 +169,7 @@ export const createHypercertClaim = protectedProcedure
     const contributionWriteResponse = await agent.com.atproto.repo.createRecord(
       {
         repo: did,
-        collection: "org.hypercerts.claim.contribution",
+        collection: contributionNSID,
         record: {
           ...validatedContribution,
           hypercert: {

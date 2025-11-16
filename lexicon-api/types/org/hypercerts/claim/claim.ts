@@ -9,7 +9,7 @@ import {
   is$typed as _is$typed,
   type OmitKey,
 } from '../../../../util'
-import type * as AppCertifiedDefs from '../../../app/certified/defs.js'
+import type * as OrgHypercertsDefs from '../defs.js'
 import type * as ComAtprotoRepoStrongRef from '../../../com/atproto/repo/strongRef.js'
 
 const is$typed = _is$typed,
@@ -25,8 +25,8 @@ export interface Record {
   /** Optional longer description of the impact work done. */
   description?: string
   image?:
-    | $Typed<AppCertifiedDefs.Uri>
-    | $Typed<AppCertifiedDefs.SmallImage>
+    | $Typed<OrgHypercertsDefs.Uri>
+    | $Typed<OrgHypercertsDefs.SmallImage>
     | { $type: string }
   /** Scope of the work performed */
   workScope: string

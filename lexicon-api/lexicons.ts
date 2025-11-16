@@ -10,77 +10,6 @@ import {
 import { type $Typed, is$typed, maybe$typed } from './util'
 
 export const schemaDict = {
-  AppCertifiedDefs: {
-    lexicon: 1,
-    id: 'app.certified.defs',
-    defs: {
-      uri: {
-        type: 'object',
-        required: ['uri'],
-        description: 'Object containing a URI to external data',
-        properties: {
-          uri: {
-            type: 'string',
-            format: 'uri',
-            maxGraphemes: 1024,
-            description: 'URI to external data',
-          },
-        },
-      },
-      smallBlob: {
-        type: 'object',
-        required: ['blob'],
-        description: 'Object containing a blob to external data',
-        properties: {
-          blob: {
-            type: 'blob',
-            accept: ['*/*'],
-            maxSize: 10485760,
-            description: 'Blob to external data (up to 10MB)',
-          },
-        },
-      },
-      largeBlob: {
-        type: 'object',
-        required: ['blob'],
-        description: 'Object containing a blob to external data',
-        properties: {
-          blob: {
-            type: 'blob',
-            accept: ['*/*'],
-            maxSize: 104857600,
-            description: 'Blob to external data (up to 100MB)',
-          },
-        },
-      },
-      smallImage: {
-        type: 'object',
-        required: ['image'],
-        description: 'Object containing a small image',
-        properties: {
-          image: {
-            type: 'blob',
-            accept: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
-            maxSize: 5242880,
-            description: 'Image (up to 5MB)',
-          },
-        },
-      },
-      largeImage: {
-        type: 'object',
-        required: ['image'],
-        description: 'Object containing a large image',
-        properties: {
-          image: {
-            type: 'blob',
-            accept: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
-            maxSize: 10485760,
-            description: 'Image (up to 10MB)',
-          },
-        },
-      },
-    },
-  },
   AppCertifiedLocation: {
     lexicon: 1,
     id: 'app.certified.location',
@@ -121,8 +50,8 @@ export const schemaDict = {
             location: {
               type: 'union',
               refs: [
-                'lex:app.certified.defs#uri',
-                'lex:app.certified.defs#smallBlob',
+                'lex:org.hypercerts.defs#uri',
+                'lex:org.hypercerts.defs#smallBlob',
               ],
               description:
                 'The location of where the work was performed as a URI or blob.',
@@ -190,8 +119,8 @@ export const schemaDict = {
             image: {
               type: 'union',
               refs: [
-                'lex:app.certified.defs#uri',
-                'lex:app.certified.defs#smallImage',
+                'lex:org.hypercerts.defs#uri',
+                'lex:org.hypercerts.defs#smallImage',
               ],
               description:
                 'The hypercert visual representation as a URI or image blob',
@@ -350,8 +279,8 @@ export const schemaDict = {
               items: {
                 type: 'union',
                 refs: [
-                  'lex:app.certified.defs#uri',
-                  'lex:app.certified.defs#smallBlob',
+                  'lex:org.hypercerts.defs#uri',
+                  'lex:org.hypercerts.defs#smallBlob',
                 ],
               },
               maxLength: 100,
@@ -388,8 +317,8 @@ export const schemaDict = {
             content: {
               type: 'union',
               refs: [
-                'lex:app.certified.defs#uri',
-                'lex:app.certified.defs#smallBlob',
+                'lex:org.hypercerts.defs#uri',
+                'lex:org.hypercerts.defs#smallBlob',
               ],
               description:
                 'A piece of evidence (URI or blobs) supporting a hypercert claim',
@@ -527,6 +456,77 @@ export const schemaDict = {
               description:
                 'Client-declared timestamp when this record was originally created',
             },
+          },
+        },
+      },
+    },
+  },
+  OrgHypercertsDefs: {
+    lexicon: 1,
+    id: 'org.hypercerts.defs',
+    defs: {
+      uri: {
+        type: 'object',
+        required: ['uri'],
+        description: 'Object containing a URI to external data',
+        properties: {
+          uri: {
+            type: 'string',
+            format: 'uri',
+            maxGraphemes: 1024,
+            description: 'URI to external data',
+          },
+        },
+      },
+      smallBlob: {
+        type: 'object',
+        required: ['blob'],
+        description: 'Object containing a blob to external data',
+        properties: {
+          blob: {
+            type: 'blob',
+            accept: ['*/*'],
+            maxSize: 10485760,
+            description: 'Blob to external data (up to 10MB)',
+          },
+        },
+      },
+      largeBlob: {
+        type: 'object',
+        required: ['blob'],
+        description: 'Object containing a blob to external data',
+        properties: {
+          blob: {
+            type: 'blob',
+            accept: ['*/*'],
+            maxSize: 104857600,
+            description: 'Blob to external data (up to 100MB)',
+          },
+        },
+      },
+      smallImage: {
+        type: 'object',
+        required: ['image'],
+        description: 'Object containing a small image',
+        properties: {
+          image: {
+            type: 'blob',
+            accept: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+            maxSize: 5242880,
+            description: 'Image (up to 5MB)',
+          },
+        },
+      },
+      largeImage: {
+        type: 'object',
+        required: ['image'],
+        description: 'Object containing a large image',
+        properties: {
+          image: {
+            type: 'blob',
+            accept: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+            maxSize: 10485760,
+            description: 'Image (up to 10MB)',
           },
         },
       },
@@ -887,7 +887,6 @@ export function validate(
 }
 
 export const ids = {
-  AppCertifiedDefs: 'app.certified.defs',
   AppCertifiedLocation: 'app.certified.location',
   OrgHypercertsClaimClaim: 'org.hypercerts.claim.claim',
   OrgHypercertsClaimContribution: 'org.hypercerts.claim.contribution',
@@ -895,6 +894,7 @@ export const ids = {
   OrgHypercertsClaimEvidence: 'org.hypercerts.claim.evidence',
   OrgHypercertsClaimMeasurement: 'org.hypercerts.claim.measurement',
   OrgHypercertsClaimRights: 'org.hypercerts.claim.rights',
+  OrgHypercertsDefs: 'org.hypercerts.defs',
   AppGainforestCommonDefs: 'app.gainforest.common.defs',
   AppGainforestOrganizationDefaultSite:
     'app.gainforest.organization.defaultSite',
