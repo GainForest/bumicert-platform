@@ -31,22 +31,26 @@ const StepNavigator = () => {
         >
           <motion.button
             className={cn(
-              "cursor-pointer border border-foreground/20 rounded-md overflow-hidden disabled:cursor-not-allowed disabled:opacity-50",
-              currentStep === index && "bg-accent"
+              "cursor-pointer rounded-md overflow-hidden hover:bg-muted disabled:hover:bg-transparent hover:text-primary disabled:hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
             )}
             onClick={() => setCurrentStep(index)}
             disabled={step.isRequiredToMoveForward}
           >
             <div className="p-2 flex items-center gap-2">
               <motion.div
-                className="h-8 w-8 bg-foreground/10 rounded-full flex items-center justify-center"
+                className={cn(
+                  "h-7 w-7 bg-foreground/10 rounded-full flex items-center justify-center",
+                  currentStep === index && "bg-primary text-primary-foreground"
+                )}
                 layout
               >
                 {index + 1}
               </motion.div>
               {currentStep === index && (
                 <div className="flex flex-col items-start">
-                  <b className="text-sm font-bold text-nowrap">{step.title}</b>
+                  <b className="font-serif font-bold text-nowrap">
+                    {step.title}
+                  </b>
                 </div>
               )}
             </div>

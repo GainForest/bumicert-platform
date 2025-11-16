@@ -11,7 +11,7 @@ const NewEcocertPage = () => {
       <div className="grid grid-cols-[1fr_300px] gap-6">
         <div className="flex flex-col">
           <StepNavigator />
-          <div className="w-full mt-4">
+          <div className="w-full mt-8">
             <Steps />
             <StepFooter />
           </div>
