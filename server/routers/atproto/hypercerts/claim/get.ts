@@ -3,18 +3,18 @@ import { z } from "zod";
 import { tryCatch } from "@/lib/tryCatch";
 import { XRPCError } from "@atproto/xrpc";
 import { GetRecordResponse } from "@/server/utils/response-types";
-import { AppGainforestOrganizationInfo } from "@/lexicon-api";
+import { OrgHypercertsClaimClaim } from "@/lexicon-api";
 import { getReadAgent } from "@/server/utils/agent";
 import { xrpcErrorToTRPCError } from "@/server/utils/classify-xrpc-error";
 import { TRPCError } from "@trpc/server";
 import { validateRecordOrThrow } from "../../utils";
 
-export const getOrganizationInfoPure = async (did: string) => {
+export const getHypercertClaimPure = async (did: string, rkey: string) => {
   const agent = getReadAgent();
   const getRecordPromise = agent.com.atproto.repo.getRecord({
-    collection: "app.gainforest.organization.info",
+    collection: "org.hypercerts.claim.claim",
     repo: did,
-    rkey: "self",
+    rkey: rkey,
   });
   const [response, error] = await tryCatch(getRecordPromise);
 
@@ -37,13 +37,13 @@ export const getOrganizationInfoPure = async (did: string) => {
     });
   }
 
-  validateRecordOrThrow(response.data.value, AppGainforestOrganizationInfo);
+  validateRecordOrThrow(response.data.value, OrgHypercertsClaimClaim);
 
-  return response.data as GetRecordResponse<AppGainforestOrganizationInfo.Record>;
+  return response.data as GetRecordResponse<OrgHypercertsClaimClaim.Record>;
 };
 
-export const getOrganizationInfo = publicProcedure
-  .input(z.object({ did: z.string() }))
+export const getHypercertClaim = publicProcedure
+  .input(z.object({ did: z.string(), rkey: z.string() }))
   .query(async ({ input }) => {
-    return await getOrganizationInfoPure(input.did);
+    return await getHypercertClaimPure(input.did, input.rkey);
   });

@@ -1,10 +1,10 @@
 "use client";
 
-import { Hypercert } from "@/graphql/hypercerts/queries/hypercertById";
+import { Ecocert } from "@/types/ecocert";
 import { useQueryState } from "nuqs";
 import { useMemo } from "react";
 
-export const useFilteredEcocerts = (ecocerts: Hypercert[]) => {
+export const useFilteredEcocerts = (ecocerts: Ecocert[]) => {
   const [searchParams] = useQueryState("q", {
     defaultValue: "",
   });
@@ -13,8 +13,15 @@ export const useFilteredEcocerts = (ecocerts: Hypercert[]) => {
     if (searchParams === "") return ecocerts;
     return ecocerts.filter(
       (ecocert) =>
-        ecocert.name.toLowerCase().includes(searchParams.toLowerCase()) ||
-        ecocert.description.toLowerCase().includes(searchParams.toLowerCase())
+        ecocert.claim.value.title
+          .toLowerCase()
+          .includes(searchParams.toLowerCase()) ||
+        ecocert.claim.value.shortDescription
+          .toLowerCase()
+          .includes(searchParams.toLowerCase()) ||
+        ecocert.claim.value.description
+          ?.toLowerCase()
+          .includes(searchParams.toLowerCase())
     );
   }, [ecocerts, searchParams]);
 

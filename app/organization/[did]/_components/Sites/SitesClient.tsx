@@ -40,6 +40,9 @@ const SitesClient = ({
   const data = useHydratedData(initialData, reactiveData ?? null);
   const allSites = data.sites;
   const defaultSite = data.defaultSite;
+  console.log("=============");
+  console.log(allSites);
+  console.log("=============");
 
   const { pushModal, show } = useModal();
 

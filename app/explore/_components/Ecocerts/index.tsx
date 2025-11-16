@@ -15,6 +15,8 @@ import { Button } from "@/components/ui/button";
 import { Eraser } from "lucide-react";
 import { useQueryState } from "nuqs";
 import { AnimatePresence } from "framer-motion";
+import { trpcClient } from "@/lib/trpc/client";
+import { getEcocertsFromClaims } from "@/server/utils/claims";
 
 const Ecocerts = () => {
   const {
@@ -24,13 +26,9 @@ const Ecocerts = () => {
   } = useQuery({
     queryKey: ["ecocerts"],
     queryFn: async () => {
-      const hypercerts = await Promise.all(
-        ALL_HYPERCERT_IDS.map(async (hypercertId) => {
-          const hypercert = await fetchHypercertById(hypercertId);
-          return hypercert;
-        })
-      );
-      return hypercerts;
+      const claimsWithOrgInfo =
+        await trpcClient.hypercerts.claim.getAllAcrossOrgs.query();
+      return getEcocertsFromClaims(claimsWithOrgInfo);
     },
   });
 
@@ -53,16 +51,15 @@ const Ecocerts = () => {
       <div className="flex items-center justify-center">
         <div className="w-full flex flex-wrap items-stretch justify-center gap-4">
           <AnimatePresence mode="wait">
-            {isPending ? (
+            {isPending ?
               Array.from({ length: 12 }).map((_, index) => (
                 <EcocertCardSkeleton key={index} />
               ))
-            ) : sortedAndFilteredEcocerts.length > 0 ? (
+            : sortedAndFilteredEcocerts.length > 0 ?
               sortedAndFilteredEcocerts.map((ecocert) => (
-                <EcocertCard key={ecocert.hypercertId} ecocert={ecocert} />
+                <EcocertCard key={ecocert.claim.cid} ecocert={ecocert} />
               ))
-            ) : (
-              <NothingPage
+            : <NothingPage
                 title="No ecocerts found."
                 description="Please try changing your search."
                 cta={
@@ -76,7 +73,7 @@ const Ecocerts = () => {
                   </Button>
                 }
               />
-            )}
+            }
           </AnimatePresence>
         </div>
       </div>

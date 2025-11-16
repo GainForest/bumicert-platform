@@ -2,28 +2,20 @@
 
 import usePriceFeed from "@/components/providers/PriceFeedProvider";
 import { Hypercert } from "@/graphql/hypercerts/queries/hypercertById";
+import { Ecocert } from "@/types/ecocert";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 
 export type TEcocertSortingOptions = {
-  key: "date-created" | "funds-raised" | "funding-goal";
+  key: "date-created";
   order: "asc" | "desc";
 };
 
 export const sortingOptions: Array<{
   value: TEcocertSortingOptions["key"];
   label: string;
-}> = [
-  { value: "date-created", label: "Date Created" },
-  { value: "funds-raised", label: "Funds Raised" },
-  { value: "funding-goal", label: "Funding Goal" },
-];
+}> = [{ value: "date-created", label: "Date Created" }];
 
-export type HypercertWithUSDSales = Hypercert & {
-  usdSales: number;
-  usdFundingGoal: number;
-};
-
-const useSortedEcocerts = (ecocerts: Hypercert[]): HypercertWithUSDSales[] => {
+const useSortedEcocerts = (ecocerts: Ecocert[]): Ecocert[] => {
   const [sortKey] = useQueryState(
     "sort",
     parseAsStringLiteral<TEcocertSortingOptions["key"]>(
@@ -37,58 +29,47 @@ const useSortedEcocerts = (ecocerts: Hypercert[]): HypercertWithUSDSales[] => {
       "desc",
     ]).withDefault("desc")
   );
-  const priceFeed = usePriceFeed();
 
-  const injectUSDSales = (ecocerts: Hypercert[]): HypercertWithUSDSales[] => {
-    return ecocerts.map((ecocert) => {
-      const pricePerPercentInUSD = ecocert.lastValidOrder?.pricePerPercentInUSD;
-      const usdFundingGoal = pricePerPercentInUSD
-        ? Number(pricePerPercentInUSD) * 100
-        : 0;
-      if (priceFeed.status !== "ready")
-        return { ...ecocert, usdSales: 0, usdFundingGoal };
-      const usdSales = ecocert.sales.reduce((acc, sale) => {
-        const saleInUSD = priceFeed.weiToUsd(
-          sale.currency as `0x${string}`,
-          BigInt(sale.currencyAmount)
-        );
-        return acc + (saleInUSD ?? 0);
-      }, 0);
-      return {
-        ...ecocert,
-        usdSales,
-        usdFundingGoal,
-      };
-    });
-  };
+  // const priceFeed = usePriceFeed();
 
-  const ecocertsWithUSDSales = injectUSDSales(ecocerts);
+  // const injectUSDSales = (ecocerts: Ecocert[]): Ecocert[] => {
+  //   return ecocerts.map((ecocert) => {
+  //     const pricePerPercentInUSD = ecocert.lastValidOrder?.pricePerPercentInUSD;
+  //     const usdFundingGoal = pricePerPercentInUSD
+  //       ? Number(pricePerPercentInUSD) * 100
+  //       : 0;
+  //     if (priceFeed.status !== "ready")
+  //       return { ...ecocert, usdSales: 0, usdFundingGoal };
+  //     const usdSales = ecocert.sales.reduce((acc, sale) => {
+  //       const saleInUSD = priceFeed.weiToUsd(
+  //         sale.currency as `0x${string}`,
+  //         BigInt(sale.currencyAmount)
+  //       );
+  //       return acc + (saleInUSD ?? 0);
+  //     }, 0);
+  //     return {
+  //       ...ecocert,
+  //       usdSales,
+  //       usdFundingGoal,
+  //     };
+  //   });
+  // };
 
-  const getAscendingSortedEcocerts = (
-    ecocerts: HypercertWithUSDSales[]
-  ): HypercertWithUSDSales[] => {
+  // const ecocertsWithUSDSales = injectUSDSales(ecocerts);
+
+  const getAscendingSortedEcocerts = (ecocerts: Ecocert[]): Ecocert[] => {
     if (sortKey === "date-created") {
       return ecocerts.sort((a, b) => {
         return (
-          Number(a.creationBlockTimestamp) - Number(b.creationBlockTimestamp)
+          new Date(a.claim.value.createdAt).getTime() -
+          new Date(b.claim.value.createdAt).getTime()
         );
-      });
-    }
-    if (sortKey === "funds-raised") {
-      return ecocerts.sort((a, b) => {
-        return a.usdSales - b.usdSales;
-      });
-    }
-    if (sortKey === "funding-goal") {
-      return ecocerts.sort((a, b) => {
-        return a.usdFundingGoal - b.usdFundingGoal;
       });
     }
     return ecocerts;
   };
 
-  const ascendingSortedEcocerts =
-    getAscendingSortedEcocerts(ecocertsWithUSDSales);
+  const ascendingSortedEcocerts = getAscendingSortedEcocerts(ecocerts);
   if (sortDirection === "desc") {
     return ascendingSortedEcocerts.reverse();
   }

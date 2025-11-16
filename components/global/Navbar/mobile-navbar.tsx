@@ -17,7 +17,9 @@ const MobileNavbar = () => {
           Ecocertain
         </span>
         <Button variant={"outline"} size={"sm"} onClick={() => setOpenState()}>
-          {openState.mobile ? <X /> : <Menu />}
+          {openState.mobile ?
+            <X />
+          : <Menu />}
         </Button>
         <Button
           variant={"outline"}
@@ -31,31 +33,27 @@ const MobileNavbar = () => {
         <div className="flex flex-col gap-2 w-full mb-2">
           <div className="flex items-center justify-center flex-wrap gap-1">
             {navLinks.map((link) => {
-              if (link.type === "static") {
-                return (
-                  <Button
-                    variant={"ghost"}
-                    size={"sm"}
-                    key={link.id}
-                    className="flex flex-col gap-1 items-center h-auto min-w-16 p-1"
+              return (
+                <Button
+                  variant={"ghost"}
+                  size={"sm"}
+                  key={link.id}
+                  className="flex flex-col gap-1 items-center h-auto min-w-16 p-1"
+                >
+                  <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center shadow-lg">
+                    <link.Icon className="size-4 text-primary-foreground" />
+                  </div>
+                  <span
+                    className={cn(
+                      "text-xs px-2 py-1 rounded-md",
+                      link.id === "explore" &&
+                        "bg-primary text-primary-foreground"
+                    )}
                   >
-                    <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center shadow-lg">
-                      <link.Icon className="size-4 text-primary-foreground" />
-                    </div>
-                    <span
-                      className={cn(
-                        "text-xs px-2 py-1 rounded-md",
-                        link.id === "explore" &&
-                          "bg-primary text-primary-foreground"
-                      )}
-                    >
-                      {link.text}
-                    </span>
-                  </Button>
-                );
-              } else {
-                return null;
-              }
+                    {link.text}
+                  </span>
+                </Button>
+              );
             })}
           </div>
           <div className="flex items-center justify-center flex-wrap gap-2">

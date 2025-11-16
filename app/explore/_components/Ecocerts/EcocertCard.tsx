@@ -4,8 +4,12 @@ import Image from "next/image";
 import CircularProgressBar from "@/components/circular-progressbar";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
-import { HypercertWithUSDSales } from "../../_hooks/use-sorted-ecocerts";
 import { motion } from "framer-motion";
+import { Ecocert } from "@/types/ecocert";
+import getBlobUrl from "@/lib/atproto/getBlobUrl";
+import { SmallImage, Uri } from "@/lexicon-api/types/org/hypercerts/defs";
+import { $Typed } from "@/lexicon-api/util";
+import { EcocertArt } from "@/app/ecocert/new/_components/Steps/Step4/EcocertPreviewCard";
 
 const StripedDiv = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -26,10 +30,19 @@ const StripedDiv = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const EcocertCard = ({ ecocert }: { ecocert: HypercertWithUSDSales }) => {
-  const percentageSold =
-    ecocert.usdSales /
-    Number(ecocert.lastValidOrder?.pricePerPercentInUSD ?? 1);
+const EcocertCard = ({ ecocert }: { ecocert: Ecocert }) => {
+  const image = ecocert.claim.value.image;
+  let imageUrl: string | null = null;
+  if (image?.$type === "org.hypercerts.defs#smallImage") {
+    imageUrl = getBlobUrl(
+      ecocert.repo.did,
+      (image as $Typed<SmallImage>).image
+    );
+  } else if (image?.$type === "org.hypercerts.defs#uri") {
+    imageUrl = (image as $Typed<Uri>).uri;
+  }
+  if (!imageUrl) return null;
+
   return (
     <motion.div
       className="group bg-background rounded-lg shadow-lg w-[280px] flex flex-col dark:border dark:border-border"
@@ -38,62 +51,24 @@ const EcocertCard = ({ ecocert }: { ecocert: HypercertWithUSDSales }) => {
       exit={{ opacity: 0, filter: "blur(10px)", scale: 0.75 }}
     >
       <Link
-        href={`/ecocert/${ecocert.hypercertId}`}
+        href={`/ecocert/${ecocert.repo.did}-${ecocert.claim.cid}`}
         className="flex flex-col w-full"
       >
         <StripedDiv>
-          <Image
-            src={`/api/hypercerts/image/${ecocert.hypercertId}`}
-            alt={ecocert.name}
-            className="object-cover object-top h-full w-full shadow-lg"
-            width={280}
-            height={400}
+          <EcocertArt
+            logoUrl={null}
+            coverImage={imageUrl}
+            title={ecocert.claim.value.title}
+            objectives={[]}
+            startDate={new Date(ecocert.claim.value.workTimeFrameFrom)}
+            endDate={new Date(ecocert.claim.value.workTimeFrameTo)}
           />
         </StripedDiv>
 
         <div className="p-3 flex flex-col justify-between gap-3 flex-1">
           <span className="font-serif font-bold text-lg line-clamp-2">
-            {ecocert.name}
+            {ecocert.claim.value.title}
           </span>
-          {ecocert.totalUnitsForSale === undefined ||
-          ecocert.lastValidOrder === undefined ? (
-            <div className="flex items-center justify-between gap-2 bg-muted/80 rounded-lg p-2 mt-1">
-              <div className="flex flex-col text-sm text-muted-foreground justify-center">
-                <span>
-                  <Clock className="size-4" />
-                </span>
-                <span>Coming Soon...</span>
-              </div>
-              <CircularProgressBar value={0} size={40} text="_ _" />
-            </div>
-          ) : (
-            <div className="flex items-center justify-between gap-2 bg-muted/80 rounded-lg p-2 mt-1">
-              <div className="flex flex-col text-sm text-muted-foreground">
-                <span>
-                  <span className="text-muted-foreground">Raised:</span>{" "}
-                  <b className="text-primary">${ecocert.usdSales.toFixed(2)}</b>
-                  <span className="mx-1">{" · "}</span>
-                  <span className="text-muted-foreground inline-flex items-center gap-1">
-                    {ecocert.uniqueBuyersCount}{" "}
-                    <ShoppingCart className="size-4" />
-                  </span>
-                </span>
-                <span>
-                  <span className="text-muted-foreground">Target:</span>{" "}
-                  <b className="text-primary">
-                    ${ecocert.usdFundingGoal.toFixed(2)}
-                  </b>
-                </span>
-              </div>
-              <CircularProgressBar
-                value={percentageSold}
-                size={40}
-                text={`${
-                  percentageSold > 999 ? ">999" : percentageSold.toFixed(0)
-                }%`}
-              />
-            </div>
-          )}
         </div>
       </Link>
     </motion.div>

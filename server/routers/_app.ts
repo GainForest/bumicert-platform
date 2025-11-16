@@ -18,6 +18,7 @@ import { createSite } from "./atproto/gainforest/site/create";
 import { updateSite } from "./atproto/gainforest/site/update";
 import { setDefaultSite } from "./atproto/gainforest/site/setDefault";
 import { deleteSite } from "./atproto/gainforest/site/delete";
+import getAllClaimsAcrossOrganizations from "./atproto/hypercerts/claim/getAllAcrossOrgs";
 
 export const appRouter = createTRPCRouter({
   health: publicProcedure.query(() => ({ status: "ok" })),
@@ -48,6 +49,7 @@ export const appRouter = createTRPCRouter({
   hypercerts: {
     claim: {
       create: createHypercertClaim,
+      getAllAcrossOrgs: getAllClaimsAcrossOrganizations,
     },
   },
 });

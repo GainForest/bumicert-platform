@@ -23,7 +23,7 @@ export const EcocertArt = ({
   endDate,
 }: {
   logoUrl: string | null;
-  coverImage: File;
+  coverImage: File | string;
   title: string;
   objectives: string[];
   startDate: Date;
@@ -33,7 +33,11 @@ export const EcocertArt = ({
     <div className="p-2 rounded-3xl shadow-2xl bg-white border border-black/10">
       <div className="w-[256px] h-[360px] relative overflow-hidden rounded-2xl">
         <Image
-          src={URL.createObjectURL(coverImage)}
+          src={
+            typeof coverImage === "string" ? coverImage : (
+              URL.createObjectURL(coverImage)
+            )
+          }
           alt="Ecocert"
           fill
           className="rounded-2xl"
