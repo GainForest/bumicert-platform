@@ -27,10 +27,51 @@ const mimeTypeToExtensions: Record<string, string[]> = {
   "application/geojson": [".geojson"],
 };
 
+// Extension to MIME type mapping (reverse of above)
+const extensionToMimeType: Record<string, string> = {
+  ".geojson": "application/geo+json",
+};
+
 // Helper function to get file extension
 const getFileExtension = (fileName: string): string => {
   const lastDot = fileName.lastIndexOf(".");
   return lastDot !== -1 ? fileName.substring(lastDot).toLowerCase() : "";
+};
+
+// Helper function to infer MIME type from file extension and supported types
+const inferMimeType = (
+  file: File,
+  supportedFileTypes: string[]
+): string | null => {
+  const fileExtension = getFileExtension(file.name);
+
+  // First, check if we have a direct mapping
+  if (extensionToMimeType[fileExtension]) {
+    const mimeType = extensionToMimeType[fileExtension];
+    // Verify it's in the supported types
+    if (supportedFileTypes.includes(mimeType)) {
+      return mimeType;
+    }
+  }
+
+  // Check if any supported type matches this extension via mimeTypeToExtensions
+  for (const supportedType of supportedFileTypes) {
+    if (supportedType.startsWith(".")) {
+      // It's an extension-based type
+      if (fileExtension === supportedType.toLowerCase()) {
+        // Try to find a MIME type for this extension
+        return extensionToMimeType[fileExtension] || null;
+      }
+    } else if (!supportedType.endsWith("/*")) {
+      // It's a specific MIME type, check if extension matches
+      const extensions = mimeTypeToExtensions[supportedType];
+      if (extensions && extensions.includes(fileExtension)) {
+        return supportedType;
+      }
+    }
+  }
+
+  return null;
 };
 
 // Helper function to validate the file
@@ -130,13 +171,26 @@ const FileInput = ({
         return;
       }
 
+      // If file type is empty, try to infer it from the extension
+      let fileToUse = file;
+      if (!file.type || file.type === "") {
+        const inferredType = inferMimeType(file, supportedFileTypes);
+        if (inferredType) {
+          // Create a new File object with the correct MIME type
+          fileToUse = new File([file], file.name, {
+            type: inferredType,
+            lastModified: file.lastModified,
+          });
+        }
+      }
+
       // Update the states
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl);
       }
-      onFileChange?.(file);
-      if (isImageFile(file)) {
-        const url = URL.createObjectURL(file);
+      onFileChange?.(fileToUse);
+      if (isImageFile(fileToUse)) {
+        const url = URL.createObjectURL(fileToUse);
         setPreviewUrl(url);
       } else {
         setPreviewUrl("");
