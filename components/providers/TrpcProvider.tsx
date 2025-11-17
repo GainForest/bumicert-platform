@@ -3,7 +3,7 @@
 import { ReactNode, useMemo } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink, loggerLink } from "@trpc/client";
-import superjson from "superjson";
+import { customTransformer } from "@/server/utils/transformer";
 import { api, getBaseUrl } from "@/lib/trpc/react";
 
 export default function TrpcProvider({ children }: { children: ReactNode }) {
@@ -15,7 +15,7 @@ export default function TrpcProvider({ children }: { children: ReactNode }) {
           loggerLink({ enabled: () => process.env.NODE_ENV === "development" }),
           httpBatchLink({
             url: `${getBaseUrl()}/api/trpc`,
-            transformer: superjson,
+            transformer: customTransformer,
           }),
         ],
       }),

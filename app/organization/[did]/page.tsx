@@ -14,6 +14,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getSessionFromRequest } from "@/server/session";
+import { serialize } from "@/server/utils/transformer";
 
 const EMPTY_ORGANIZATION_DATA: AppGainforestOrganizationInfo.Record = {
   $type: "app.gainforest.organization.info",
@@ -57,9 +58,7 @@ const OrganizationPage = async ({
     data = response.value;
   }
 
-  const serializedData = JSON.parse(
-    JSON.stringify(data)
-  ) as AppGainforestOrganizationInfo.Record;
+  const serializedData = serialize(data);
 
   if (data.visibility === "Hidden") {
     try {

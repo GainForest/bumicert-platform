@@ -51,11 +51,7 @@ const RightContent = () => {
             Save
           </Button>
         </>
-      : <Button
-          size={"sm"}
-          variant={"outline"}
-          onClick={() => setIsEditing(!isEditing)}
-        >
+      : <Button size={"sm"} onClick={() => setIsEditing(!isEditing)}>
           <Pencil />
           Edit
         </Button>

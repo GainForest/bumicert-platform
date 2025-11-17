@@ -1,6 +1,6 @@
 import { protectedProcedure } from "@/server/trpc";
 import z from "zod";
-import { BlobRefJSON } from "../utils";
+import { BlobRefGenerator } from "../utils";
 import { getWriteAgent } from "@/server/utils/agent";
 
 export const uploadFileAsBlob = protectedProcedure
@@ -22,7 +22,7 @@ export const uploadFileAsBlob = protectedProcedure
       success: response.success,
       headers: response.headers,
       data: {
-        blob: response.data.blob.toJSON() as BlobRefJSON,
+        blob: response.data.blob,
       },
     };
   });

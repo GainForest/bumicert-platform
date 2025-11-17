@@ -1,13 +1,19 @@
 import { create } from "zustand";
 import { AppGainforestOrganizationInfo } from "@/lexicon-api";
 import { trpcClient } from "@/lib/trpc/client";
-import { BlobRefJSON } from "@/server/routers/atproto/utils";
+import {
+  BlobRefGenerator,
+  toBlobRefGenerator,
+  toFileGenerator,
+} from "@/server/routers/atproto/utils";
+import { BlobRef } from "@atproto/api";
+import { PutRecordResponse } from "@/server/utils/response-types";
 
 export type HeroEditingData = {
   displayName: string;
   shortDescription: string;
-  coverImage: File | BlobRefJSON | undefined;
-  logoImage: File | BlobRefJSON | undefined;
+  coverImage: File | BlobRef | undefined;
+  logoImage: File | BlobRef | undefined;
 };
 
 export type SubHeroEditingData = {
@@ -38,10 +44,9 @@ export type OrganizationPageStoreActions = {
   setHeroEditingData: (heroEditingData: HeroEditingData) => void;
   setSubHeroEditingData: (subHeroEditingData: SubHeroEditingData) => void;
   setAboutEditingData: (aboutEditingData: AboutEditingData) => void;
-  saveAllEditingData: () => Promise<{
-    success: true;
-    data: AppGainforestOrganizationInfo.Record;
-  }>;
+  saveAllEditingData: () => Promise<
+    PutRecordResponse<AppGainforestOrganizationInfo.Record>
+  >;
 };
 
 export const useOrganizationPageStore = create<
@@ -77,71 +82,49 @@ export const useOrganizationPageStore = create<
       get();
 
     const logoImage = heroEditingData.logoImage;
-    let logoImageBlobRef: BlobRefJSON | undefined;
-    if (logoImage instanceof File) {
-      const response = await trpcClient.common.uploadFileAsBlob.mutate({
-        name: logoImage.name,
-        type: logoImage.type,
-        dataBase64: await logoImage
-          .arrayBuffer()
-          .then((buffer) => Buffer.from(buffer).toString("base64")),
-      });
-      if (response.success !== true) {
-        throw new Error("Failed to upload logo image");
-      }
-      logoImageBlobRef = response.data.blob;
-    } else if (logoImage === undefined) {
-      logoImageBlobRef = undefined;
-    } else {
-      logoImageBlobRef = logoImage;
-    }
+    const logoImageBlobRef =
+      logoImage instanceof BlobRef ? toBlobRefGenerator(logoImage) : undefined;
+    const logoImageFileGenerator =
+      logoImage instanceof File ? await toFileGenerator(logoImage) : undefined;
 
     const coverImage = heroEditingData.coverImage;
-    let coverImageBlobRef: BlobRefJSON | undefined;
-    if (coverImage instanceof File) {
-      const response = await trpcClient.common.uploadFileAsBlob.mutate({
-        name: coverImage.name,
-        type: coverImage.type,
-        dataBase64: await coverImage
-          .arrayBuffer()
-          .then((buffer) => Buffer.from(buffer).toString("base64")),
-      });
-      if (response.success !== true) {
-        throw new Error("Failed to upload cover image");
-      }
-      coverImageBlobRef = response.data.blob;
-    } else if (coverImage === undefined) {
-      coverImageBlobRef = undefined;
-    } else {
-      coverImageBlobRef = coverImage;
-    }
+    const coverImageBlobRef =
+      coverImage instanceof BlobRef ?
+        toBlobRefGenerator(coverImage)
+      : undefined;
+    const coverImageFileGenerator =
+      coverImage instanceof File ?
+        await toFileGenerator(coverImage)
+      : undefined;
 
     const organizationInfo: Parameters<
       typeof trpcClient.organizationInfo.createOrUpdate.mutate
-    >[0]["info"] = {
-      displayName: heroEditingData.displayName,
-      logo: logoImageBlobRef,
-      coverImage: coverImageBlobRef,
-      shortDescription: heroEditingData.shortDescription,
-      longDescription: aboutEditingData.longDescription,
-      objectives: subHeroEditingData.objectives,
-      startDate: subHeroEditingData.startDate ?? undefined,
-      country: subHeroEditingData.country,
-      visibility: subHeroEditingData.visibility,
-    };
-
-    const response = await trpcClient.organizationInfo.createOrUpdate.mutate({
+    >[0] = {
       did,
-      info: organizationInfo,
-    });
-
-    set({
-      data: response.value,
-    });
-
-    return {
-      success: true,
-      data: response.value,
+      info: {
+        displayName: heroEditingData.displayName,
+        logo: logoImageBlobRef,
+        coverImage: coverImageBlobRef,
+        shortDescription: heroEditingData.shortDescription,
+        longDescription: aboutEditingData.longDescription,
+        objectives: subHeroEditingData.objectives,
+        startDate: subHeroEditingData.startDate ?? undefined,
+        country: subHeroEditingData.country,
+        visibility: subHeroEditingData.visibility,
+      },
+      uploads:
+        logoImageFileGenerator || coverImageFileGenerator ?
+          {
+            logo: logoImageFileGenerator,
+            coverImage: coverImageFileGenerator,
+          }
+        : undefined,
     };
+
+    const response =
+      await trpcClient.organizationInfo.createOrUpdate.mutate(organizationInfo);
+    set({ data: response.value });
+
+    return response;
   },
 }));

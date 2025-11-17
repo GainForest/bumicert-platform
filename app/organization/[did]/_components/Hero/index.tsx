@@ -16,7 +16,15 @@ import {
 } from "../../_modals/image-editor";
 import { BlobRef } from "@atproto/api";
 import useHydratedData from "@/hooks/use-hydration";
-import { toBlobRef, type BlobRefJSON } from "@/server/routers/atproto/utils";
+import {
+  toBlobRef,
+  type BlobRefGenerator,
+} from "@/server/routers/atproto/utils";
+import {
+  customTransformer,
+  deserialize,
+  SerializedSuperjson,
+} from "@/server/utils/transformer";
 
 const getImageUrl = (image: File | BlobRef | undefined, did: string) => {
   if (image instanceof File) {
@@ -32,11 +40,11 @@ const Hero = ({
   initialData,
   initialDid,
 }: {
-  initialData: AppGainforestOrganizationInfo.Record;
+  initialData: SerializedSuperjson<AppGainforestOrganizationInfo.Record>;
   initialDid: string;
 }) => {
   const reactiveData = useOrganizationPageStore((state) => state.data);
-  const data = useHydratedData(initialData, reactiveData);
+  const data = useHydratedData(deserialize(initialData), reactiveData);
 
   const reactiveDid = useOrganizationPageStore((state) => state.did);
   const did = useHydratedData(initialDid, reactiveDid);
@@ -54,8 +62,8 @@ const Hero = ({
     setEditingData({
       displayName: data.displayName,
       shortDescription: data.shortDescription,
-      coverImage: data.coverImage ? data.coverImage.image.toJSON() : undefined,
-      logoImage: data.logo ? data.logo.image.toJSON() : undefined,
+      coverImage: data.coverImage ? data.coverImage.image : undefined,
+      logoImage: data.logo ? data.logo.image : undefined,
     });
   }, [isEditing, data]);
 
@@ -107,21 +115,12 @@ const Hero = ({
                     <ImageEditorModal
                       title="Edit Organization Logo"
                       description="Choose an image to update the organization logo."
-                      initialImage={
-                        editingData.logoImage instanceof File ?
-                          editingData.logoImage
-                        : editingData.logoImage ?
-                          toBlobRef(editingData.logoImage)
-                        : undefined
-                      }
+                      initialImage={editingData.logoImage}
                       did={did}
                       onImageChange={(image) => {
                         setEditingData({
                           ...editingData,
-                          logoImage:
-                            image instanceof File ? image
-                            : image ? (image.toJSON() as BlobRefJSON)
-                            : undefined,
+                          logoImage: image,
                         });
                       }}
                     />
@@ -213,21 +212,12 @@ const Hero = ({
                     <ImageEditorModal
                       title="Edit Organization Cover Image"
                       description="Choose an image to update the organization cover image."
-                      initialImage={
-                        editingData.coverImage instanceof File ?
-                          editingData.coverImage
-                        : editingData.coverImage ?
-                          toBlobRef(editingData.coverImage)
-                        : undefined
-                      }
+                      initialImage={editingData.coverImage}
                       did={did}
                       onImageChange={(image) => {
                         setEditingData({
                           ...editingData,
-                          coverImage:
-                            image instanceof File ? image
-                            : image ? (image.toJSON() as BlobRefJSON)
-                            : undefined,
+                          coverImage: image,
                         });
                       }}
                     />

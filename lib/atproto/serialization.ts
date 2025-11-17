@@ -1,4 +1,4 @@
-import { BlobRefJSON, toBlobRef } from "@/server/routers/atproto/utils";
+import { BlobRefGenerator, toBlobRef } from "@/server/routers/atproto/utils";
 import { BlobRef } from "@atproto/api";
 import { isObject } from "../isObject";
 
@@ -12,23 +12,23 @@ type ReplaceType<T, U, V> =
   : // Otherwise, keep original type
     T;
 
-export type Serialize<T> = ReplaceType<T, BlobRef, BlobRefJSON>;
+export type Serialize<T> = ReplaceType<T, BlobRef, BlobRefGenerator>;
 
 export const serialize = <T>(data: T): Serialize<T> => {
   return JSON.parse(JSON.stringify(data)) as Serialize<T>;
 };
 
-export const unserialize = <T>(data: Serialize<T>): T => {
+export const deserialize = <T>(data: Serialize<T>): T => {
   const isObj = isObject(data);
   if (!isObj) {
     if (Array.isArray(data)) {
-      return data.map(unserialize) as T;
+      return data.map(deserialize) as T;
     }
     return data as T;
   }
   if ("$type" in data && data.$type === "blob" && "ref" in data) {
     try {
-      return toBlobRef(data as unknown as BlobRefJSON) as T;
+      return toBlobRef(data as unknown as BlobRefGenerator) as T;
     } catch {
       return data as T;
     }
@@ -36,6 +36,6 @@ export const unserialize = <T>(data: Serialize<T>): T => {
 
   const obj = data as Record<string, unknown>;
   return Object.fromEntries(
-    Object.entries(obj).map(([key, value]) => [key, unserialize(value)])
+    Object.entries(obj).map(([key, value]) => [key, deserialize(value)])
   ) as T;
 };

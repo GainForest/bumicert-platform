@@ -4,14 +4,16 @@ import type { AppGainforestOrganizationInfo } from "@/lexicon-api";
 import { useOrganizationPageStore } from "../../store";
 import { Textarea } from "@/components/ui/textarea";
 import useHydratedData from "@/hooks/use-hydration";
+import { BlobRef } from "@atproto/api";
+import { deserialize, SerializedSuperjson } from "@/server/utils/transformer";
 
 const AboutOrganization = ({
   initialData,
 }: {
-  initialData: AppGainforestOrganizationInfo.Record;
+  initialData: SerializedSuperjson<AppGainforestOrganizationInfo.Record>;
 }) => {
   const reactiveData = useOrganizationPageStore((state) => state.data);
-  const data = useHydratedData(initialData, reactiveData);
+  const data = useHydratedData(deserialize(initialData), reactiveData);
   const isEditing = useOrganizationPageStore((state) => state.isEditing);
   const editingData = useOrganizationPageStore(
     (state) => state.aboutEditingData

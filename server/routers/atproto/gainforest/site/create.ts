@@ -2,7 +2,11 @@ import { protectedProcedure, publicProcedure } from "@/server/trpc";
 import { z } from "zod";
 import { getWriteAgent } from "@/server/utils/agent";
 import { AppGainforestOrganizationSite } from "@/lexicon-api";
-import { BlobRefJSONSchema, FileGeneratorSchema, toFile } from "../../utils";
+import {
+  BlobRefGeneratorSchema,
+  FileGeneratorSchema,
+  toFile,
+} from "../../utils";
 import { TRPCError } from "@trpc/server";
 import { validateGeojsonOrThrow } from "@/lib/geojson/validate";
 import { tryCatch } from "@/lib/tryCatch";

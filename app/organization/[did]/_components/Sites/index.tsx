@@ -3,7 +3,7 @@ import React from "react";
 import SitesClient, { AllSitesData } from "./SitesClient";
 import { tryCatch } from "@/lib/tryCatch";
 import { TRPCError } from "@trpc/server";
-import { Serialize } from "@/lib/atproto/serialization";
+import { serialize } from "@/server/utils/transformer";
 
 const Sites = async ({ did }: { did: string }) => {
   const apiCaller = getServerCaller();
@@ -28,9 +28,7 @@ const Sites = async ({ did }: { did: string }) => {
     allSitesData = response;
   }
 
-  const serializedInitialData = JSON.parse(
-    JSON.stringify(allSitesData)
-  ) as Serialize<AllSitesData>;
+  const serializedInitialData = serialize(allSitesData);
 
   return (
     <SitesClient did={did} serializedInitialData={serializedInitialData} />

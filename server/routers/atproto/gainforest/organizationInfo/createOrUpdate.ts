@@ -7,11 +7,12 @@ import { Agent } from "@atproto/api";
 import { TRPCError } from "@trpc/server";
 import { getWriteAgent } from "@/server/utils/agent";
 import {
-  BlobRefJSON,
-  BlobRefJSONSchema,
+  BlobRefGenerator,
+  BlobRefGeneratorSchema,
   FileGenerator,
   FileGeneratorSchema,
   toBlobRef,
+  toBlobRefGenerator,
   validateRecordOrThrow,
 } from "../../utils";
 
@@ -22,7 +23,7 @@ const uploadFile = async (fileGenerator: FileGenerator, agent: Agent) => {
     { type: fileGenerator.type }
   );
   const response = await agent.uploadBlob(file);
-  return response.data.blob.toJSON() as BlobRefJSON;
+  return toBlobRefGenerator(response.data.blob);
 };
 
 export const createOrUpdateOrganizationInfo = protectedProcedure
@@ -34,8 +35,8 @@ export const createOrUpdateOrganizationInfo = protectedProcedure
         shortDescription: z.string(),
         longDescription: z.string(),
         website: z.string().optional(),
-        logo: BlobRefJSONSchema.optional(),
-        coverImage: BlobRefJSONSchema.optional(),
+        logo: BlobRefGeneratorSchema.optional(),
+        coverImage: BlobRefGeneratorSchema.optional(),
         objectives: z.array(
           z.enum([
             "Conservation",
@@ -59,14 +60,14 @@ export const createOrUpdateOrganizationInfo = protectedProcedure
   )
   .mutation(async ({ input }) => {
     const agent = await getWriteAgent();
-    const logoBlobRefJson =
+    const logoBlobRefGenerator =
       input.uploads?.logo ?
         await uploadFile(input.uploads.logo, agent)
-      : undefined;
-    const coverImageBlobRefJson =
+      : input.info.logo;
+    const coverImageBlobRefGenerator =
       input.uploads?.coverImage ?
         await uploadFile(input.uploads.coverImage, agent)
-      : undefined;
+      : input.info.coverImage;
 
     const info: AppGainforestOrganizationInfo.Record = {
       $type: "app.gainforest.organization.info",
@@ -75,17 +76,17 @@ export const createOrUpdateOrganizationInfo = protectedProcedure
       longDescription: input.info.longDescription,
       website: input.info.website ? input.info.website : undefined,
       logo:
-        logoBlobRefJson ?
+        logoBlobRefGenerator ?
           {
             $type: "app.gainforest.common.defs#smallImage",
-            image: toBlobRef(logoBlobRefJson),
+            image: toBlobRef(logoBlobRefGenerator),
           }
         : undefined,
       coverImage:
-        coverImageBlobRefJson ?
+        coverImageBlobRefGenerator ?
           {
             $type: "app.gainforest.common.defs#smallImage",
-            image: toBlobRef(coverImageBlobRefJson),
+            image: toBlobRef(coverImageBlobRefGenerator),
           }
         : undefined,
       objectives: input.info.objectives,

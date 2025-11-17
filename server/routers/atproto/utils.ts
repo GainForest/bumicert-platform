@@ -3,8 +3,7 @@ import z from "zod";
 import { BlobRef, ValidationResult } from "@atproto/lexicon";
 import { TRPCError } from "@trpc/server";
 
-export const BlobRefJSONSchema = z.object({
-  $type: z.literal("blob"),
+export const BlobRefGeneratorSchema = z.object({
   ref: z.object({
     $link: z.string(),
   }),
@@ -12,9 +11,9 @@ export const BlobRefJSONSchema = z.object({
   size: z.number(),
 });
 
-export type BlobRefJSON = z.infer<typeof BlobRefJSONSchema>;
+export type BlobRefGenerator = z.infer<typeof BlobRefGeneratorSchema>;
 
-export const toBlobRef = (input: BlobRefJSON) => {
+export const toBlobRef = (input: BlobRefGenerator) => {
   const validCID: CID<unknown, number, number, Version> = CID.parse(
     input.ref.$link
   );
@@ -24,6 +23,15 @@ export const toBlobRef = (input: BlobRefJSON) => {
     mimeType: input.mimeType,
     size: input.size,
   });
+};
+
+export const toBlobRefGenerator = (blobRef: BlobRef): BlobRefGenerator => {
+  const json = blobRef.toJSON();
+  return {
+    ref: json.ref,
+    mimeType: json.mimeType,
+    size: json.size,
+  };
 };
 
 export const FileGeneratorSchema = z.object({

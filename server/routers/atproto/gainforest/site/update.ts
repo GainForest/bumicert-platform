@@ -2,10 +2,14 @@ import { protectedProcedure, publicProcedure } from "@/server/trpc";
 import { z } from "zod";
 import { getWriteAgent } from "@/server/utils/agent";
 import { AppGainforestOrganizationSite } from "@/lexicon-api";
-import { BlobRefJSONSchema, FileGeneratorSchema, toFile } from "../../utils";
+import {
+  BlobRefGeneratorSchema,
+  FileGeneratorSchema,
+  toFile,
+} from "../../utils";
 import { TRPCError } from "@trpc/server";
 import { computeGeojsonFile, fetchGeojsonFromUrl } from "./utils";
-import { unserialize } from "@/lib/atproto/serialization";
+import { deserialize } from "@/lib/atproto/serialization";
 
 export const updateSite = protectedProcedure
   .input(
@@ -17,7 +21,7 @@ export const updateSite = protectedProcedure
           .union([
             z.object({
               $type: z.literal("app.gainforest.common.defs#smallBlob"),
-              blob: BlobRefJSONSchema,
+              blob: BlobRefGeneratorSchema,
             }),
             z.object({
               $type: z.literal("app.gainforest.common.defs#uri"),
@@ -71,7 +75,7 @@ export const updateSite = protectedProcedure
       lon = computed.lon;
       area = computed.area;
     } else if (input.site.shapefile) {
-      shapefile = unserialize(input.site.shapefile);
+      shapefile = deserialize(input.site.shapefile);
       lat = input.site.lat;
       lon = input.site.lon;
       area = input.site.area;

@@ -13,6 +13,10 @@ import { trpcClient } from "@/lib/trpc/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { useModal } from "@/components/ui/modal/context";
+import {
+  toBlobRefGenerator,
+  toFileGenerator,
+} from "@/server/routers/atproto/utils";
 
 export const UploadLogoModalId = "upload/organization/logo";
 
@@ -49,23 +53,17 @@ export const UploadLogoModal = () => {
       return await trpcClient.organizationInfo.createOrUpdate.mutate({
         did: auth.user?.did ?? "",
         uploads: {
-          logo: {
-            name: logo.name,
-            type: logo.type,
-            dataBase64: await logo
-              .arrayBuffer()
-              .then((buffer) => Buffer.from(buffer).toString("base64")),
-          },
+          logo: await toFileGenerator(logo),
         },
         info: {
           ...organizationInfo,
           logo:
             organizationInfo.logo ?
-              organizationInfo.logo.image.toJSON()
+              toBlobRefGenerator(organizationInfo.logo.image)
             : undefined,
           coverImage:
             organizationInfo.coverImage ?
-              organizationInfo.coverImage.image.toJSON()
+              toBlobRefGenerator(organizationInfo.coverImage.image)
             : undefined,
         },
       });

@@ -5,11 +5,12 @@ import { validate } from "@/lexicon-api/lexicons";
 import { PutRecordResponse } from "@/server/utils/response-types";
 import { TRPCError } from "@trpc/server";
 import {
-  BlobRefJSON,
-  BlobRefJSONSchema,
+  BlobRefGenerator,
+  BlobRefGeneratorSchema,
   FileGenerator,
   FileGeneratorSchema,
   toBlobRef,
+  toBlobRefGenerator,
   toFile,
   validateRecordOrThrow,
 } from "../../utils";
@@ -28,7 +29,7 @@ const uploadFile = async (fileGenerator: FileGenerator, agent: Agent) => {
     { type: fileGenerator.type }
   );
   const response = await agent.uploadBlob(file);
-  return response.data.blob.toJSON() as BlobRefJSON;
+  return toBlobRefGenerator(response.data.blob);
 };
 
 /**

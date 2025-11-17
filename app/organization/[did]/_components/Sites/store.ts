@@ -1,12 +1,12 @@
 import { create } from "zustand";
-import { BlobRefJSON } from "@/server/routers/atproto/utils";
+import { BlobRefGenerator } from "@/server/routers/atproto/utils";
 
 export type SiteData = {
   name: string;
   lat: string;
   lon: string;
   area: string;
-  shapefile: BlobRefJSON | File | string | null;
+  shapefile: BlobRefGenerator | File | string | null;
   rkey: string;
   atUri: string;
 };

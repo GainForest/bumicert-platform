@@ -29,6 +29,7 @@ import {
   StartDateSelectorModalId,
 } from "../../_modals/start-date-selector";
 import useHydratedData from "@/hooks/use-hydration";
+import { deserialize, SerializedSuperjson } from "@/server/utils/transformer";
 
 const formatWebsite = (website: string | undefined) => {
   if (!website) return undefined;
@@ -77,10 +78,10 @@ const formatDate = (date: Date | undefined) => {
 const SubHero = ({
   initialData,
 }: {
-  initialData: AppGainforestOrganizationInfo.Record;
+  initialData: SerializedSuperjson<AppGainforestOrganizationInfo.Record>;
 }) => {
   const reactiveData = useOrganizationPageStore((state) => state.data);
-  const data = useHydratedData(initialData, reactiveData);
+  const data = useHydratedData(deserialize(initialData), reactiveData);
 
   const isEditing = useOrganizationPageStore((state) => state.isEditing);
   const editingData = useOrganizationPageStore(

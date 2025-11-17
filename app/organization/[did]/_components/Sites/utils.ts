@@ -1,10 +1,10 @@
 import getBlobUrl from "@/lib/atproto/getBlobUrl";
-import { BlobRefJSON } from "@/server/routers/atproto/utils";
+import { BlobRefGenerator } from "@/server/routers/atproto/utils";
 import { BlobRef } from "@atproto/api";
 
-export const getShapefilePreviewUrl = <T extends BlobRef | BlobRefJSON>(
+export const getShapefilePreviewUrl = <T extends BlobRef | BlobRefGenerator>(
   shapefile: T | string,
-  did: T extends BlobRef | BlobRefJSON ? string : undefined
+  did: T extends BlobRef | BlobRefGenerator ? string : undefined
 ) => {
   const suffix = "https://gainforest.app/geo/view?source-value=";
   if (typeof shapefile === "string") {

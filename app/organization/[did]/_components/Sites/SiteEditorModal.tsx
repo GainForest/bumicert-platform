@@ -8,7 +8,10 @@ import {
 } from "@/components/ui/modal/modal";
 import { useState } from "react";
 import { trpcClient } from "@/lib/trpc/client";
-import { toFileGenerator } from "@/server/routers/atproto/utils";
+import {
+  toBlobRefGenerator,
+  toFileGenerator,
+} from "@/server/routers/atproto/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { KnownShapefileT, SiteData } from "./SiteCard";
@@ -117,7 +120,7 @@ export const SiteEditorModal = ({ initialData, did }: SiteEditorModalProps) => {
                   }
                 : {
                     $type: "app.gainforest.common.defs#smallBlob",
-                    blob: initialShapefile.blob.toJSON(),
+                    blob: toBlobRefGenerator(initialShapefile.blob),
                   },
               lat: initialSite!.lat,
               lon: initialSite!.lon,

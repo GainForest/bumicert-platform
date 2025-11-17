@@ -10,8 +10,8 @@ import { useQuery } from "@tanstack/react-query";
 import { trpcClient } from "@/lib/trpc/client";
 import { useModal } from "@/components/ui/modal/context";
 import { SiteEditorModal, SiteEditorModalId } from "./SiteEditorModal";
-import { Serialize, unserialize } from "@/lib/atproto/serialization";
 import { useAtprotoStore } from "@/components/stores/atproto";
+import { SerializedSuperjson, deserialize } from "@/server/utils/transformer";
 
 const getAllSites = trpcClient.gainforest.site.getAll.query;
 export type AllSitesData = Awaited<ReturnType<typeof getAllSites>>;
@@ -21,21 +21,17 @@ const SitesClient = ({
   serializedInitialData,
 }: {
   did: string;
-  serializedInitialData: Serialize<AllSitesData>;
+  serializedInitialData: SerializedSuperjson<AllSitesData>;
 }) => {
-  const initialData = unserialize(serializedInitialData);
+  const initialData = deserialize(serializedInitialData);
   const auth = useAtprotoStore((state) => state.auth);
   const shouldEdit = auth.status === "AUTHENTICATED" && auth.user.did === did;
-  const {
-    data: reactiveDataSerialized,
-    isPlaceholderData: isOlderReactiveData,
-  } = useQuery({
-    queryKey: ["getAllSites", did],
-    queryFn: async () =>
-      (await getAllSites({ did })) as Serialize<AllSitesData>,
-  });
+  const { data: reactiveData, isPlaceholderData: isOlderReactiveData } =
+    useQuery({
+      queryKey: ["getAllSites", did],
+      queryFn: async () => await getAllSites({ did }),
+    });
   const isReactiveDataUpdating = isOlderReactiveData;
-  const reactiveData = unserialize(reactiveDataSerialized);
 
   const data = useHydratedData(initialData, reactiveData ?? null);
   const allSites = data.sites;
