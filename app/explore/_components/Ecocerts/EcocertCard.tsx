@@ -45,7 +45,6 @@ const EcocertCard = ({ ecocert }: { ecocert: Ecocert }) => {
 
   return (
     <motion.div
-      className="group bg-background rounded-lg shadow-lg w-[280px] flex flex-col dark:border dark:border-border"
       initial={{ opacity: 0, filter: "blur(10px)", scale: 0.75 }}
       animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
       exit={{ opacity: 0, filter: "blur(10px)", scale: 0.75 }}
@@ -54,22 +53,14 @@ const EcocertCard = ({ ecocert }: { ecocert: Ecocert }) => {
         href={`/ecocert/${ecocert.repo.did}-${ecocert.claim.cid}`}
         className="flex flex-col w-full"
       >
-        <StripedDiv>
-          <EcocertArt
-            logoUrl={null}
-            coverImage={imageUrl}
-            title={ecocert.claim.value.title}
-            objectives={[]}
-            startDate={new Date(ecocert.claim.value.workTimeFrameFrom)}
-            endDate={new Date(ecocert.claim.value.workTimeFrameTo)}
-          />
-        </StripedDiv>
-
-        <div className="p-3 flex flex-col justify-between gap-3 flex-1">
-          <span className="font-serif font-bold text-lg line-clamp-2">
-            {ecocert.claim.value.title}
-          </span>
-        </div>
+        <EcocertArt
+          logoUrl={ecocert.organizationInfo.logoUrl}
+          coverImage={imageUrl}
+          title={ecocert.claim.value.title}
+          objectives={ecocert.claim.value.workScope.split(",")}
+          startDate={new Date(ecocert.claim.value.workTimeFrameFrom)}
+          endDate={new Date(ecocert.claim.value.workTimeFrameTo)}
+        />
       </Link>
     </motion.div>
   );

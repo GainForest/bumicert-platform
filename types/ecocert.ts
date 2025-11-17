@@ -7,6 +7,7 @@ export type Ecocert = {
   };
   organizationInfo: {
     name: string;
+    logoUrl: string | null;
   };
   claim: GetRecordResponse<OrgHypercertsClaimClaim.Record>;
 };

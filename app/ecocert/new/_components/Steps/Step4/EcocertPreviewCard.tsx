@@ -30,7 +30,7 @@ export const EcocertArt = ({
   endDate: Date;
 }) => {
   return (
-    <div className="p-2 rounded-3xl shadow-2xl bg-white border border-black/10">
+    <div className="group p-2 rounded-3xl shadow-2xl bg-white border border-black/10">
       <div className="w-[256px] h-[360px] relative overflow-hidden rounded-2xl">
         <Image
           src={
@@ -40,7 +40,7 @@ export const EcocertArt = ({
           }
           alt="Ecocert"
           fill
-          className="rounded-2xl"
+          className="rounded-2xl scale-105 group-hover:scale-100 transition-all duration-300"
         />
         <ProgressiveBlur
           position="bottom"
@@ -48,7 +48,8 @@ export const EcocertArt = ({
           className="z-0"
           borderRadiusClassName="rounded-2xl"
         />
-        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-linear-to-b from-transparent to-white/50"></div>
+        {/* White gradient to improve contrast */}
+        <div className="absolute inset-0 bg-linear-to-b from-transparent to-black/40 z-0"></div>
         <div className="absolute top-3 left-3 h-9 w-9 rounded-full bg-white border-2 border-black/10 shadow-lg">
           {logoUrl && (
             <Image src={logoUrl} alt="Logo" fill className="rounded-full" />
@@ -62,17 +63,19 @@ export const EcocertArt = ({
             {title}
           </span>
           <div className="flex items-center gap-1 flex-wrap mt-2">
-            {objectives.map((objective) => (
+            {objectives.slice(0, 2).map((objective) => (
               <span
                 key={objective}
-                className="text-xs bg-white/40 text-black backdrop-blur-lg rounded-md px-3 py-1.5 w-fit font-medium text-shadow-lg shadow-lg"
+                className="text-xs bg-white/50 text-black backdrop-blur-lg rounded-md px-3 py-1.5 w-fit font-medium text-shadow-lg shadow-lg"
               >
                 {objective}
               </span>
             ))}
-            <span className="text-xs bg-black/40 text-white backdrop-blur-lg rounded-md px-2 py-1.5 w-fit font-medium text-shadow-lg shadow-lg">
-              +3
-            </span>
+            {objectives.length > 2 && (
+              <span className="text-xs bg-white/10 text-white backdrop-blur-lg rounded-md px-2 py-1.5 w-fit font-medium text-shadow-lg shadow-lg">
+                +{objectives.length - 2}
+              </span>
+            )}
           </div>
         </div>
       </div>
