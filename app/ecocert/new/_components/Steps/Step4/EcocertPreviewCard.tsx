@@ -30,7 +30,7 @@ export const EcocertArt = ({
   endDate: Date;
 }) => {
   return (
-    <div className="group p-2 rounded-3xl shadow-2xl bg-white border border-black/10">
+    <div className="group p-2 rounded-3xl shadow-2xl bg-white dark:bg-neutral-800 border border-black/10 dark:border-white/10">
       <div className="w-[256px] h-[360px] relative overflow-hidden rounded-2xl">
         <Image
           src={
@@ -49,18 +49,18 @@ export const EcocertArt = ({
           borderRadiusClassName="rounded-2xl"
         />
         {/* White gradient to improve contrast */}
-        <div className="absolute inset-0 bg-linear-to-b from-transparent to-black/40 z-0"></div>
+        <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/30 to-black/40 z-0"></div>
         <div className="absolute top-3 left-3 h-9 w-9 rounded-full bg-white border-2 border-black/10 shadow-lg">
           {logoUrl && (
             <Image src={logoUrl} alt="Logo" fill className="rounded-full" />
           )}
         </div>
         <div className="absolute bottom-3 left-3 right-3 flex flex-col">
-          <span className="text-xs border border-white/15 bg-black/15 text-white backdrop-blur-lg rounded-full px-2 py-1 w-fit">
-            {format(startDate, "LLL dd, y")} → {format(endDate, "LLL dd, y")}
-          </span>
           <span className="font-serif text-white text-shadow-lg text-3xl mt-2">
             {title}
+          </span>
+          <span className="text-xs text-gray-200 text-shadow-lg mt-1">
+            {format(startDate, "LLL dd, y")} → {format(endDate, "LLL dd, y")}
           </span>
           <div className="flex items-center gap-1 flex-wrap mt-2">
             {objectives.slice(0, 2).map((objective) => (

@@ -1,15 +1,24 @@
-import { BadgePlus, BuildingIcon, Compass } from "lucide-react";
+import { BadgePlus, BuildingIcon, Compass, Home } from "lucide-react";
 import { NavLinkConfig } from "./types";
 
 export const navLinks: NavLinkConfig[] = [
   {
-    id: "explore",
+    id: "home",
     href: "/",
+    text: "Home",
+    Icon: Home,
+    pathCheck: {
+      equals: "/",
+    },
+  },
+  {
+    id: "explore",
+    href: "/explore",
     text: "Explore",
     showIconOnlyOnDesktop: false,
     Icon: Compass,
     pathCheck: {
-      equals: "/",
+      equals: "/explore",
     },
   },
   {
