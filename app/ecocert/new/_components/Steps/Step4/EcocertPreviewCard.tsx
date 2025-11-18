@@ -44,12 +44,12 @@ export const EcocertArt = ({
         />
         <ProgressiveBlur
           position="bottom"
-          height="35%"
+          height="55%"
           className="z-0"
           borderRadiusClassName="rounded-2xl"
         />
         {/* White gradient to improve contrast */}
-        <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/30 to-black/40 z-0"></div>
+        <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/10 to-black/60 z-0"></div>
         <div className="absolute top-3 left-3 h-9 w-9 rounded-full bg-white border-2 border-black/10 shadow-lg">
           {logoUrl && (
             <Image src={logoUrl} alt="Logo" fill className="rounded-full" />
