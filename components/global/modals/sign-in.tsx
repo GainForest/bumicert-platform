@@ -24,7 +24,11 @@ import AuthenticatedModalContent from "./authenticated";
 export const SignInModalId = "auth/sign-in";
 
 const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
-  const [handlePrefix, setHandlePrefix] = useState(initialHandle);
+  const initialHandlePrefix =
+    initialHandle.includes(".") ? initialHandle.split(".")[0] : undefined;
+  const [inputHandlePrefix, setInputHandlePrefix] = useState(
+    initialHandlePrefix ?? ""
+  );
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(true);
   const { popModal, stack, hide } = useModal();
@@ -102,8 +106,8 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
             <InputGroupAddon>@</InputGroupAddon>
             <InputGroupInput
               placeholder="john-doe"
-              value={handlePrefix}
-              onChange={(e) => setHandlePrefix(e.target.value)}
+              value={inputHandlePrefix}
+              onChange={(e) => setInputHandlePrefix(e.target.value)}
               disabled={isSigningIn}
             />
             <InputGroupAddon align="inline-end" className="text-primary">
@@ -132,7 +136,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
                 <div
                   className={cn(
                     "w-full relative first:rounded-t-md last:rounded-b-md bg-background",
-                    handlePrefix === prefix && "border border-primary/50"
+                    inputHandlePrefix === prefix && "border border-primary/50"
                   )}
                   key={session.handle}
                 >
@@ -142,7 +146,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
                     )}
                     disabled={isSigningIn}
                     onClick={() => {
-                      setHandlePrefix(`${handlePrefix}`);
+                      setInputHandlePrefix(`${prefix}`);
                     }}
                   >
                     <span className="text-sm font-medium">
@@ -195,7 +199,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
               // If the handle is in the previous sessions, then the switch should be checked
               (
                 previousSessions.find(
-                  (session) => session.handle === handlePrefix
+                  (session) => session.handle === inputHandlePrefix
                 )
               ) ?
                 true
@@ -205,7 +209,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
             disabled={
               isSigningIn ||
               previousSessions.find(
-                (session) => session.handle === handlePrefix
+                (session) => session.handle === inputHandlePrefix
               ) !== undefined
             }
           />
@@ -215,10 +219,10 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
       <ModalFooter>
         <span className="text-sm text-destructive">{signInError?.message}</span>
         <Button
-          disabled={handlePrefix === "" || isSigningIn}
+          disabled={inputHandlePrefix === "" || isSigningIn}
           onClick={() => {
             signIn({
-              handlePrefix: handlePrefix.split(".")[0],
+              handlePrefix: inputHandlePrefix.split(".")[0],
               service: "climateai.org",
               password: password,
             });
