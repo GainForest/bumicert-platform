@@ -56,7 +56,7 @@ export const EcocertArt = ({
           )}
         </div>
         <div className="absolute bottom-3 left-3 right-3 flex flex-col">
-          <span className="font-serif text-white text-shadow-lg text-3xl mt-2">
+          <span className="font-serif font-semibold text-white text-shadow-lg text-3xl mt-2">
             {title}
           </span>
           <span className="text-xs text-gray-200 text-shadow-lg mt-1">

@@ -16,17 +16,18 @@ const NavbarLayout = ({ children }: { children: React.ReactNode }) => {
       <div
         className={cn(
           "h-full w-full flex",
-          viewport === "mobile" && "flex-col"
+          viewport === "mobile" && "flex-col",
+          "bg-[rgb(242_237_227.7)] dark:bg-[rgb(30_30_30.7)]"
         )}
-        style={{
-          background: `repeating-linear-gradient(
-            -55deg,
-            var(--background),
-            var(--background) 2px,
-            color-mix(in oklab, var(--primary) 10%, transparent) 2px,
-            color-mix(in oklab, var(--primary) 10%, transparent) 4px
-          )`,
-        }}
+        // style={{
+        //   background: `repeating-linear-gradient(
+        //     -55deg,
+        //     var(--background),
+        //     var(--background) 2px,
+        //     color-mix(in oklab, var(--primary) 10%, transparent) 2px,
+        //     color-mix(in oklab, var(--primary) 10%, transparent) 4px
+        //   )`,
+        // }}
         ref={parent}
       >
         {viewport === "desktop" && openState.desktop && <DesktopNavbar />}
@@ -34,13 +35,13 @@ const NavbarLayout = ({ children }: { children: React.ReactNode }) => {
         <main
           className={cn(
             "flex-1 bg-background border border-border shadow-inner rounded-xl relative overflow-y-auto",
-            viewport === "desktop"
-              ? openState.desktop
-                ? "m-2 md:ml-0"
-                : "m-0 rounded-none"
-              : openState.mobile
-              ? "brightness-90 blur-[1px] overflow-hidden pointer-events-none"
-              : ""
+            viewport === "desktop" ?
+              openState.desktop ?
+                "m-2 md:ml-0"
+              : "m-0 rounded-none"
+            : openState.mobile ?
+              "brightness-90 blur-[1px] overflow-hidden pointer-events-none"
+            : ""
           )}
         >
           <Header />
