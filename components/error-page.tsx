@@ -19,7 +19,7 @@ const ErrorPage = ({
   error?: unknown;
   cta?: React.ReactNode;
 }) => {
-  console.error(error);
+  error && console.error(error);
   return (
     <div
       className="flex flex-col items-center gap-4 w-full p-4 rounded-xl"
@@ -32,7 +32,7 @@ const ErrorPage = ({
     >
       <CircleAlert className="size-10 text-destructive/50" />
       <div className="flex flex-col items-center gap-2">
-        <h1 className="text-2xl text-center font-bold font-serif">
+        <h1 className="text-3xl text-center font-bold font-serif">
           {title ?? "Oops! Something went wrong."}
         </h1>
         <p className="text-muted-foreground text-center text-balance">

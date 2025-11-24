@@ -15,7 +15,7 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { KnownShapefileT, SiteData } from "./SiteCard";
-import getRkeyFromAtUri from "@/lib/atproto/getRkeyFromAtUri";
+import parseAtUri from "@/lib/atproto/getRkeyFromAtUri";
 import FileInput from "@/app/ecocert/new/_components/Steps/components/FileInput";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, CheckIcon, Loader2 } from "lucide-react";
@@ -36,7 +36,8 @@ export const SiteEditorModal = ({ initialData, did }: SiteEditorModalProps) => {
     | KnownShapefileT
     | undefined;
 
-  const rkey = initialData?.uri ? getRkeyFromAtUri(initialData.uri) : undefined;
+  const { rkey } =
+    initialData?.uri ? parseAtUri(initialData.uri) : { rkey: undefined };
   const mode = rkey ? "edit" : "add";
 
   // Initialize URL tab if editing and shapefile is a URI

@@ -1,9 +1,11 @@
-const getRkeyFromAtUri = (atUri: string) => {
-  const parts = atUri.split("/");
-  if (parts.length < 2) {
-    return "";
+const parseAtUri = (atUri: string) => {
+  const cleanedAtUri = atUri.replace("at://", "");
+  const [did, ...rest] = cleanedAtUri.split("/");
+  let rkey = "";
+  if (rest.length > 0) {
+    rkey = rest[rest.length - 1];
   }
-  return parts[parts.length - 1];
+  return { did, rkey };
 };
 
-export default getRkeyFromAtUri;
+export default parseAtUri;

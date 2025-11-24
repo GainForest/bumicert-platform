@@ -4,12 +4,12 @@ import Container from "@/components/ui/container";
 import GenericErrorPage from "@/components/error-page";
 
 const ErrorPage = ({ error }: { error: Error }) => {
-  console.error(error);
+  error && console.error(error);
   return (
     <Container>
       <GenericErrorPage
         title={error.message}
-        description="We are unable to display the organization you are looking for."
+        description="We are unable to display the Ecocert you are looking for."
         showRefreshButton={false}
       />
     </Container>

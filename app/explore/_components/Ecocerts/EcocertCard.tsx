@@ -10,6 +10,7 @@ import getBlobUrl from "@/lib/atproto/getBlobUrl";
 import { SmallImage, Uri } from "@/lexicon-api/types/org/hypercerts/defs";
 import { $Typed } from "@/lexicon-api/util";
 import { EcocertArt } from "@/app/ecocert/new/_components/Steps/Step4/EcocertPreviewCard";
+import parseAtUri from "@/lib/atproto/getRkeyFromAtUri";
 
 const StripedDiv = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -43,6 +44,8 @@ const EcocertCard = ({ ecocert }: { ecocert: Ecocert }) => {
   }
   if (!imageUrl) return null;
 
+  const claimRkey = parseAtUri(ecocert.claim.uri).rkey;
+
   return (
     <motion.div
       initial={{ opacity: 0, filter: "blur(10px)", scale: 0.75 }}
@@ -50,7 +53,7 @@ const EcocertCard = ({ ecocert }: { ecocert: Ecocert }) => {
       exit={{ opacity: 0, filter: "blur(10px)", scale: 0.75 }}
     >
       <Link
-        href={`/ecocert/${ecocert.repo.did}-${ecocert.claim.cid}`}
+        href={`/ecocert/${ecocert.repo.did}-${claimRkey}`}
         className="flex flex-col w-full"
       >
         <EcocertArt

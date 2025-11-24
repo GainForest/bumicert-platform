@@ -9,6 +9,7 @@ import { FullHypercert } from "@/graphql/hypercerts/queries/fullHypercertById";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ChevronDownIcon } from "lucide-react";
+import { OrgHypercertsClaimClaim } from "@/lexicon-api";
 
 // Custom hook to handle collapsible content
 const useCollapsible = (maxHeight: number = 320) => {
@@ -92,7 +93,7 @@ const CollapsibleDescription = ({
   );
 };
 
-const Body = ({ ecocert }: { ecocert: FullHypercert }) => {
+const Body = ({ ecocert }: { ecocert: OrgHypercertsClaimClaim.Record }) => {
   const { openState, viewport } = useNavbarContext();
 
   let displayMode: "stacked" | "side-by-side" = "stacked";
@@ -104,14 +105,16 @@ const Body = ({ ecocert }: { ecocert: FullHypercert }) => {
     <div
       className={cn(
         "mt-8 gap-2 grid",
-        displayMode === "stacked"
-          ? "grid-cols-1 min-[880px]:grid-cols-[1fr_300px]"
-          : "grid-cols-1 min-[1000px]:grid-cols-[1fr_300px]"
+        displayMode === "stacked" ?
+          "grid-cols-1 min-[880px]:grid-cols-[1fr_300px]"
+        : "grid-cols-1 min-[1000px]:grid-cols-[1fr_300px]"
       )}
     >
-      <CollapsibleDescription description={ecocert.metadata.description} />
+      <CollapsibleDescription description={ecocert.description ?? ""} />
       <div className="flex flex-col px-3 min-[1000px]:px-0">
-        <SiteBoundaries hypercertCid={ecocert.uri} />
+        {ecocert.location && (
+          <SiteBoundaries locationAtUri={ecocert.location.uri} />
+        )}
       </div>
     </div>
   );

@@ -5,7 +5,7 @@ export const xrpcErrorToTRPCError = (error: XRPCError): TRPCError => {
   if (error.error === "InvalidRequest") {
     return new TRPCError({
       code: "BAD_REQUEST",
-      message: "This organization does not exist.",
+      message: "This resource does not exist.",
     });
   } else if (error.error === "RecordNotFound") {
     return new TRPCError({

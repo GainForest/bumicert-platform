@@ -6,7 +6,6 @@ import { HandHeart, ArrowUpRight, Copy, Check } from "lucide-react";
 import React, { useEffect } from "react";
 import useAccount from "@/hooks/use-account";
 import Link from "next/link";
-import { FullHypercert } from "@/graphql/hypercerts/queries/fullHypercertById";
 import useCopy from "@/hooks/use-copy";
 
 const RightContent = () => {
@@ -16,11 +15,10 @@ const RightContent = () => {
     <Button
       size={"sm"}
       variant={
-        viewport === "mobile"
-          ? "default"
-          : authenticated
-          ? "default"
-          : "outline"
+        viewport === "mobile" ? "default"
+        : authenticated ?
+          "default"
+        : "outline"
       }
     >
       <HandHeart />
@@ -29,12 +27,12 @@ const RightContent = () => {
   );
 };
 
-const SubHeaderContent = ({ ecocert }: { ecocert: FullHypercert }) => {
+const SubHeaderContent = ({ ecocertId }: { ecocertId: string }) => {
   const { copy, isCopied } = useCopy();
   return (
     <div className="flex items-center justify-between gap-2 w-full bg-muted/90 p-2">
       <Link
-        href={`https://app.hypercerts.org/hypercerts/${ecocert.hypercertId}`}
+        href={`https://app.hypercerts.org/hypercerts/${ecocertId}`}
         target="_blank"
         className="text-sm inline-flex items-center gap-1 cursor-pointer"
       >
@@ -43,28 +41,24 @@ const SubHeaderContent = ({ ecocert }: { ecocert: FullHypercert }) => {
           <ArrowUpRight />
         </Button>
       </Link>
-      <Button
-        size={"sm"}
-        variant={"outline"}
-        onClick={() => copy(ecocert.hypercertId)}
-      >
-        {isCopied ? <Check /> : <Copy />}
-        {isCopied
-          ? "Copied"
-          : `${ecocert.hypercertId.slice(0, 6)}...${ecocert.hypercertId.slice(
-              -4
-            )}`}
+      <Button size={"sm"} variant={"outline"} onClick={() => copy(ecocertId)}>
+        {isCopied ?
+          <Check />
+        : <Copy />}
+        {isCopied ?
+          "Copied"
+        : `${ecocertId.slice(0, 8)}...${ecocertId.slice(-4)}`}
       </Button>
     </div>
   );
 };
 
-const HeaderContent = ({ ecocert }: { ecocert: FullHypercert }) => {
+const HeaderContent = ({ ecocertId }: { ecocertId: string }) => {
   const { setRightContent, setSubHeaderContent } = useHeaderContext();
 
   useEffect(() => {
     setRightContent(<RightContent />);
-    setSubHeaderContent(<SubHeaderContent ecocert={ecocert} />);
+    setSubHeaderContent(<SubHeaderContent ecocertId={ecocertId} />);
   }, []);
 
   return null;

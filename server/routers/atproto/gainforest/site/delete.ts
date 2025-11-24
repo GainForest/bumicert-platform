@@ -1,5 +1,5 @@
 import { AppGainforestOrganizationDefaultSite } from "@/lexicon-api";
-import getRkeyFromAtUri from "@/lib/atproto/getRkeyFromAtUri";
+import parseAtUri from "@/lib/atproto/getRkeyFromAtUri";
 import { protectedProcedure } from "@/server/trpc";
 import { getWriteAgent } from "@/server/utils/agent";
 import { TRPCError } from "@trpc/server";
@@ -48,7 +48,7 @@ export const deleteSite = protectedProcedure
     const deletionResponse = await agent.com.atproto.repo.deleteRecord({
       collection: "app.gainforest.organization.site",
       repo: agent.did,
-      rkey: getRkeyFromAtUri(input.siteAtUri),
+      rkey: parseAtUri(input.siteAtUri).rkey,
     });
     if (deletionResponse.success !== true)
       throw new TRPCError({

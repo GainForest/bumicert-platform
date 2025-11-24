@@ -7,8 +7,28 @@ import React from "react";
 import ProgressView from "./ProgressView";
 import TimeText from "@/components/time-text";
 import UserChip from "@/components/user-chip";
+import {
+  AppGainforestOrganizationInfo,
+  OrgHypercertsClaimClaim,
+} from "@/lexicon-api";
+import getBlobUrl from "@/lib/atproto/getBlobUrl";
+import { EcocertArt } from "@/app/ecocert/new/_components/Steps/Step4/EcocertPreviewCard";
+import { $Typed } from "@/lexicon-api/util";
+import { SmallImage } from "@/lexicon-api/types/app/gainforest/common/defs";
 
-const Hero = ({ ecocert }: { ecocert: FullHypercert }) => {
+const Hero = ({
+  creatorDid,
+  ecocert,
+  organizationInfo,
+}: {
+  creatorDid: string;
+  ecocert: OrgHypercertsClaimClaim.Record;
+  organizationInfo: AppGainforestOrganizationInfo.Record;
+}) => {
+  if (ecocert.image === undefined) {
+    throw new Error("This Ecocert is not supported.");
+  }
+
   return (
     <div className="w-full flex flex-col bg-green-500/10 rounded-xl overflow-hidden">
       <div className="w-full flex items-center justify-between py-1.5 px-2 gap-2">
@@ -56,40 +76,38 @@ const Hero = ({ ecocert }: { ecocert: FullHypercert }) => {
                     />
                   </span>
                   <span className="text-sm">by</span>
-                  <UserChip
+                  {/* <UserChip
                     address={ecocert.creatorAddress as `0x${string}`}
                     className="p-0.5 bg-background/0 backdrop-blur-sm border border-primary/20 text-xs"
-                  />
+                  /> */}
                 </div>
                 <h1 className="mt-4 text-2xl md:text-3xl font-bold font-serif text-primary drop-shadow-md">
-                  {ecocert.metadata.name.slice(0, 150)}
-                  {ecocert.metadata.name.length > 150 && "..."}
+                  {ecocert.title.slice(0, 150)}
+                  {ecocert.title.length > 150 && "..."}
                 </h1>
               </div>
               <div className="w-full">
-                {ecocert.metadata.work.from && ecocert.metadata.work.to && (
-                  <span className="bg-background/90 border border-primary/50 backdrop-blur-sm rounded-full px-2 py-0.5 text-sm text-primary font-medium shrink-0 inline-flex items-center gap-1 mb-2">
-                    <Calendar className="size-3 mr-1" />
-                    <TimeText
-                      format="absolute-date"
-                      date={new Date(Number(ecocert.metadata.work.from) * 1000)}
-                    />{" "}
-                    <ArrowRight className="size-3" />{" "}
-                    <TimeText
-                      format="absolute-date"
-                      date={new Date(Number(ecocert.metadata.work.to) * 1000)}
-                    />
-                  </span>
-                )}
+                <span className="bg-background/90 border border-primary/50 backdrop-blur-sm rounded-full px-2 py-0.5 text-sm text-primary font-medium shrink-0 inline-flex items-center gap-1 mb-2">
+                  <Calendar className="size-3 mr-1" />
+                  <TimeText
+                    format="absolute-date"
+                    date={new Date(ecocert.workTimeFrameFrom)}
+                  />{" "}
+                  <ArrowRight className="size-3" />{" "}
+                  <TimeText
+                    format="absolute-date"
+                    date={new Date(ecocert.workTimeFrameTo)}
+                  />
+                </span>
+
                 <div className="w-full overflow-x-auto scrollbar-hidden mask-r-from-90%">
                   <div className="w-full flex items-center justify-start gap-2">
-                    {ecocert.metadata.work.scope.map((work, index) => (
+                    {ecocert.workScope.split(", ").map((work, index) => (
                       <span
                         key={index}
                         className="bg-background/90 border border-primary/20 backdrop-blur-sm rounded-full px-2 py-0.5 text-sm text-primary font-medium shrink-0"
                       >
-                        {work.slice(0, 20)}
-                        {work.length > 20 && "..."}
+                        {work}
                       </span>
                     ))}
                   </div>
@@ -97,12 +115,20 @@ const Hero = ({ ecocert }: { ecocert: FullHypercert }) => {
               </div>
             </div>
             <div className="min-h-[240px] flex items-center justify-center mask-none md:mask-b-from-90% relative">
-              <Image
-                src={`/api/hypercerts/image/${ecocert.hypercertId}`}
-                alt={ecocert.metadata.name}
-                width={240}
-                height={300}
-                className="w-auto md:w-full h-full md:h-auto static md:absolute top-0 left-0 right-0"
+              <EcocertArt
+                logoUrl={
+                  organizationInfo.logo ?
+                    getBlobUrl(creatorDid, organizationInfo.logo)
+                  : null
+                }
+                coverImage={getBlobUrl(
+                  creatorDid,
+                  ecocert.image as $Typed<SmallImage>
+                )}
+                title={ecocert.title}
+                objectives={ecocert.workScope.split(", ")}
+                startDate={new Date(ecocert.workTimeFrameFrom)}
+                endDate={new Date(ecocert.workTimeFrameTo)}
               />
             </div>
           </div>

@@ -7,7 +7,7 @@ import {
 } from "@/lexicon-api";
 import { getReadAgent, getWriteAgent } from "@/server/utils/agent";
 import { TRPCError } from "@trpc/server";
-import getRkeyFromAtUri from "@/lib/atproto/getRkeyFromAtUri";
+import parseAtUri from "@/lib/atproto/getRkeyFromAtUri";
 import { validateRecordOrThrow } from "../../utils";
 
 export const setDefaultSite = protectedProcedure
@@ -34,7 +34,7 @@ export const setDefaultSite = protectedProcedure
     const site = await agent.com.atproto.repo.getRecord({
       collection: siteNSID,
       repo: agent.did,
-      rkey: getRkeyFromAtUri(siteUri),
+      rkey: parseAtUri(siteUri).rkey,
     });
     if (site.success !== true) {
       throw new TRPCError({
