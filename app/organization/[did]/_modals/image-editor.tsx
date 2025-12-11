@@ -6,13 +6,14 @@ import {
   ModalHeader,
   ModalTitle,
 } from "@/components/ui/modal/modal";
-import getBlobUrl from "@/lib/atproto/getBlobUrl";
+import { getBlobUrl } from "climateai-sdk/utilities";
 import { BlobRef } from "@atproto/api";
 import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Loader2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useModal } from "@/components/ui/modal/context";
+import { allowedPDSDomains } from "@/config/climateai-sdk";
 
 const isBlobRef = (value: unknown): value is BlobRef => {
   return Boolean(value && typeof value === "object" && "ref" in value);
@@ -43,7 +44,9 @@ export const ImageEditorModal = ({
 }) => {
   const { popModal, stack, hide } = useModal();
   const initialBlobImageURL =
-    isBlobRef(initialImage) && did ? getBlobUrl(did, initialImage) : null;
+    isBlobRef(initialImage) && did
+      ? getBlobUrl(did, initialImage, allowedPDSDomains[0])
+      : null;
   const [isInitialBlobImageLoading, setIsInitialBlobImageLoading] = useState(
     Boolean(initialBlobImageURL)
   );
@@ -89,12 +92,13 @@ export const ImageEditorModal = ({
         <ModalDescription>{description}</ModalDescription>
       </ModalHeader>
       <div className="flex flex-col gap-4 mt-4">
-        {isInitialBlobImageLoading ?
+        {isInitialBlobImageLoading ? (
           <div className="w-full h-40 rounded-lg bg-muted flex flex-col gap-1 items-center justify-center">
             <Loader2Icon className="size-5 animate-spin" />
             <span className="text-sm text-muted-foreground">Loading...</span>
           </div>
-        : <FileInput
+        ) : (
+          <FileInput
             supportedFileTypes={[
               "image/jpg",
               "image/jpeg",
@@ -107,7 +111,7 @@ export const ImageEditorModal = ({
               setImage(file ?? undefined);
             }}
           />
-        }
+        )}
       </div>
       <ModalFooter>
         <Button

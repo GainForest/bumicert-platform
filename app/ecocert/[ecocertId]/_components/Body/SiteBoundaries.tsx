@@ -15,11 +15,10 @@ import {
 } from "@/lib/hypercerts/getMetadata";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { trpcClient } from "@/lib/trpc/client";
-import parseAtUri from "@/lib/atproto/getRkeyFromAtUri";
-import getBlobUrl from "@/lib/atproto/getBlobUrl";
-import { SmallBlob, Uri } from "@/lexicon-api/types/app/gainforest/common/defs";
-import { $Typed } from "@/lexicon-api/util";
+import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
+import { parseAtUri, getBlobUrl } from "climateai-sdk/utilities";
+import { AppGainforestCommonDefs as Defs } from "climateai-sdk/lex-api";
+import { $Typed } from "climateai-sdk/lex-api/util";
 
 // type ValidatedProperties = {
 //   properties: Array<{
@@ -91,14 +90,22 @@ const SiteBoundaries = ({ locationAtUri }: { locationAtUri: string }) => {
   const { did, rkey } = parseAtUri(locationAtUri);
   const { data: locationResponse, isPending } = useQuery({
     queryKey: ["location", did, rkey],
-    queryFn: () => trpcClient.hypercerts.location.get.query({ did, rkey }),
+    queryFn: () =>
+      trpcClient.hypercerts.location.get.query({
+        did,
+        rkey,
+        pdsDomain: allowedPDSDomains[0],
+      }),
   });
 
   const location = locationResponse?.value;
   const locationData = location?.location;
-  const locationUri =
-    locationData ?
-      getBlobUrl(did, locationData as $Typed<Uri | SmallBlob>)
+  const locationUri = locationData
+    ? getBlobUrl(
+        did,
+        locationData as $Typed<Defs.Uri | Defs.SmallBlob>,
+        allowedPDSDomains[0]
+      )
     : undefined;
   const locationName = location?.name;
 
@@ -108,22 +115,23 @@ const SiteBoundaries = ({ locationAtUri }: { locationAtUri: string }) => {
         Site Boundaries
       </h2>
       <div className="mt-4 w-full h-[300px] bg-muted rounded-lg overflow-hidden flex flex-col gap-1 items-center justify-center">
-        {isPending ?
+        {isPending ? (
           <>
             <Loader2 className="animate-spin size-6 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">Loading Map</p>
           </>
-        : locationData ?
+        ) : locationData ? (
           <iframe
             src={`https://gainforest.app/geo/view?source-value=${locationUri}`}
             className="w-full h-full"
             title={`GeoJSON for ${locationName ?? "Location"}`}
           />
-        : <>
+        ) : (
+          <>
             <CircleAlert className="size-6 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">No map data found.</p>
           </>
-        }
+        )}
       </div>
       {locationUri && (
         <div className="flex items-center gap-2 mt-2">

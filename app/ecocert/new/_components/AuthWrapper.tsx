@@ -6,7 +6,7 @@ import { useAtprotoStore } from "@/components/stores/atproto";
 import { BuildingIcon, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import AtprotoSignInButton from "@/components/global/Header/AtprotoSignInButton";
-import { trpcClient } from "@/lib/trpc/client";
+import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -28,8 +28,9 @@ const AuthWrapper = ({
   } = useQuery({
     queryKey: ["organizationInfo", auth.user?.did],
     queryFn: async () => {
-      const response = await trpcClient.organizationInfo.get.query({
+      const response = await trpcClient.gainforest.organization.info.get.query({
         did: auth.user?.did ?? "",
+        pdsDomain: allowedPDSDomains[0],
       });
       return response.value;
     },
@@ -50,25 +51,27 @@ const AuthWrapper = ({
       return (
         <ErrorPage
           title={
-            isUnauthenticated ?
-              "You are not signed in."
-            : "Your organization is not set up yet."
+            isUnauthenticated
+              ? "You are not signed in."
+              : "Your organization is not set up yet."
           }
           description={
-            isUnauthenticated ?
-              "Please sign in to create an ecocert."
-            : "Please complete your organization information to create an ecocert."
+            isUnauthenticated
+              ? "Please sign in to create an ecocert."
+              : "Please complete your organization information to create an ecocert."
           }
           showRefreshButton={false}
           cta={
-            isUnauthenticated ?
+            isUnauthenticated ? (
               <AtprotoSignInButton />
-            : <Link href={`/organization/${auth.user?.did}`}>
+            ) : (
+              <Link href={`/organization/${auth.user?.did}`}>
                 <Button>
                   <BuildingIcon />
                   View my organization
                 </Button>
               </Link>
+            )
           }
         />
       );

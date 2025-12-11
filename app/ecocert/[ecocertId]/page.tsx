@@ -5,7 +5,8 @@ import Hero from "./_components/Hero";
 import WidgetItem from "./_components/Widgets/WidgetItem";
 import Body from "./_components/Body";
 import HeaderContent from "./_components/HeaderContent";
-import { getServerCaller } from "@/server/routers/_app";
+import { climateAiSdk } from "@/config/climateai-sdk.server";
+import { allowedPDSDomains } from "@/config/climateai-sdk";
 import { tryCatch } from "@/lib/tryCatch";
 import { TRPCError } from "@trpc/server";
 
@@ -16,19 +17,27 @@ const EcocertPage = async ({
 }) => {
   const { ecocertId } = await params;
   const decodedEcocertId = decodeURIComponent(ecocertId);
-  const parsedEcocertId =
-    decodedEcocertId.includes("-") ? decodedEcocertId.split("-") : null;
+  const parsedEcocertId = decodedEcocertId.includes("-")
+    ? decodedEcocertId.split("-")
+    : null;
   if (!parsedEcocertId) {
     throw new Error("This Ecocert does not exist.");
   }
 
   const [did, rkey] = parsedEcocertId;
 
-  const caller = getServerCaller();
+  const caller = climateAiSdk.getServerCaller();
   const [ecocertResponses, ecocertFetchError] = await tryCatch(
     Promise.all([
-      caller.organizationInfo.get({ did }),
-      caller.hypercerts.claim.get({ did: did, rkey: rkey }),
+      caller.gainforest.organization.info.get({
+        did,
+        pdsDomain: allowedPDSDomains[0],
+      }),
+      caller.hypercerts.claim.activity.get({
+        did: did,
+        rkey: rkey,
+        pdsDomain: allowedPDSDomains[0],
+      }),
     ])
   );
 

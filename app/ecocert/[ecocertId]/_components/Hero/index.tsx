@@ -9,12 +9,13 @@ import TimeText from "@/components/time-text";
 import UserChip from "@/components/user-chip";
 import {
   AppGainforestOrganizationInfo,
-  OrgHypercertsClaimClaim,
-} from "@/lexicon-api";
-import getBlobUrl from "@/lib/atproto/getBlobUrl";
+  OrgHypercertsClaimActivity,
+} from "climateai-sdk/lex-api";
+import { getBlobUrl } from "climateai-sdk/utilities";
 import { EcocertArt } from "@/app/ecocert/new/_components/Steps/Step4/EcocertPreviewCard";
-import { $Typed } from "@/lexicon-api/util";
-import { SmallImage } from "@/lexicon-api/types/app/gainforest/common/defs";
+import { $Typed } from "climateai-sdk/lex-api/util";
+import { AppGainforestCommonDefs as Defs } from "climateai-sdk/lex-api";
+import { allowedPDSDomains } from "@/config/climateai-sdk";
 
 const Hero = ({
   creatorDid,
@@ -22,7 +23,7 @@ const Hero = ({
   organizationInfo,
 }: {
   creatorDid: string;
-  ecocert: OrgHypercertsClaimClaim.Record;
+  ecocert: OrgHypercertsClaimActivity.Record;
   organizationInfo: AppGainforestOrganizationInfo.Record;
 }) => {
   if (ecocert.image === undefined) {
@@ -91,18 +92,18 @@ const Hero = ({
                   <Calendar className="size-3 mr-1" />
                   <TimeText
                     format="absolute-date"
-                    date={new Date(ecocert.workTimeFrameFrom)}
+                    date={new Date(ecocert.startDate)}
                   />{" "}
                   <ArrowRight className="size-3" />{" "}
                   <TimeText
                     format="absolute-date"
-                    date={new Date(ecocert.workTimeFrameTo)}
+                    date={new Date(ecocert.endDate)}
                   />
                 </span>
 
                 <div className="w-full overflow-x-auto scrollbar-hidden mask-r-from-90%">
                   <div className="w-full flex items-center justify-start gap-2">
-                    {ecocert.workScope.split(", ").map((work, index) => (
+                    {(ecocert.workScope?.anyOf ?? []).map((work, index) => (
                       <span
                         key={index}
                         className="bg-background/90 border border-primary/20 backdrop-blur-sm rounded-full px-2 py-0.5 text-sm text-primary font-medium shrink-0"
@@ -117,18 +118,23 @@ const Hero = ({
             <div className="min-h-[240px] flex items-center justify-center mask-none md:mask-b-from-90% relative">
               <EcocertArt
                 logoUrl={
-                  organizationInfo.logo ?
-                    getBlobUrl(creatorDid, organizationInfo.logo)
-                  : null
+                  organizationInfo.logo
+                    ? getBlobUrl(
+                        creatorDid,
+                        organizationInfo.logo.image,
+                        allowedPDSDomains[0]
+                      )
+                    : null
                 }
                 coverImage={getBlobUrl(
                   creatorDid,
-                  ecocert.image as $Typed<SmallImage>
+                  ecocert.image as $Typed<Defs.SmallImage>,
+                  allowedPDSDomains[0]
                 )}
                 title={ecocert.title}
-                objectives={ecocert.workScope.split(", ")}
-                startDate={new Date(ecocert.workTimeFrameFrom)}
-                endDate={new Date(ecocert.workTimeFrameTo)}
+                objectives={ecocert.workScope?.anyOf ?? []}
+                startDate={new Date(ecocert.startDate as string)}
+                endDate={new Date(ecocert.endDate as string)}
               />
             </div>
           </div>

@@ -2,10 +2,6 @@
 
 import React from "react";
 import EcocertCard, { EcocertCardSkeleton } from "./EcocertCard";
-import {
-  ALL_HYPERCERT_IDS,
-  fetchHypercertById,
-} from "@/graphql/hypercerts/queries/hypercertById";
 import { useQuery } from "@tanstack/react-query";
 import ErrorPage from "@/components/error-page";
 import useSortedEcocerts from "../../_hooks/use-sorted-ecocerts";
@@ -15,8 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Eraser } from "lucide-react";
 import { useQueryState } from "nuqs";
 import { AnimatePresence } from "framer-motion";
-import { trpcClient } from "@/lib/trpc/client";
-import { getEcocertsFromClaims } from "@/server/utils/claims";
+import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
+import { getEcocertsFromClaimActivities } from "climateai-sdk/utilities/hypercerts";
 
 const Ecocerts = () => {
   const {
@@ -27,8 +23,13 @@ const Ecocerts = () => {
     queryKey: ["ecocerts"],
     queryFn: async () => {
       const claimsWithOrgInfo =
-        await trpcClient.hypercerts.claim.getAllAcrossOrgs.query();
-      return getEcocertsFromClaims(claimsWithOrgInfo);
+        await trpcClient.hypercerts.claim.activity.getAllAcrossOrgs.query({
+          pdsDomain: allowedPDSDomains[0],
+        });
+      return getEcocertsFromClaimActivities(
+        claimsWithOrgInfo,
+        allowedPDSDomains[0]
+      );
     },
   });
 
@@ -51,15 +52,19 @@ const Ecocerts = () => {
       <div className="flex items-center justify-center">
         <div className="w-full flex flex-wrap items-stretch justify-center gap-4">
           <AnimatePresence mode="wait">
-            {isPending ?
+            {isPending ? (
               Array.from({ length: 12 }).map((_, index) => (
                 <EcocertCardSkeleton key={index} />
               ))
-            : sortedAndFilteredEcocerts.length > 0 ?
+            ) : sortedAndFilteredEcocerts.length > 0 ? (
               sortedAndFilteredEcocerts.map((ecocert) => (
-                <EcocertCard key={ecocert.claim.cid} ecocert={ecocert} />
+                <EcocertCard
+                  key={ecocert.claimActivity.cid}
+                  ecocert={ecocert}
+                />
               ))
-            : <NothingPage
+            ) : (
+              <NothingPage
                 title="No ecocerts found."
                 description="Please try changing your search."
                 cta={
@@ -73,7 +78,7 @@ const Ecocerts = () => {
                   </Button>
                 }
               />
-            }
+            )}
           </AnimatePresence>
         </div>
       </div>

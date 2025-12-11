@@ -1,5 +1,6 @@
-import getBlobUrl from "@/lib/atproto/getBlobUrl";
-import { BlobRefGenerator } from "@/server/routers/atproto/utils";
+import { getBlobUrl } from "climateai-sdk/utilities";
+import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { BlobRefGenerator } from "climateai-sdk/zod-schemas";
 import { BlobRef } from "@atproto/api";
 
 export const getShapefilePreviewUrl = <T extends BlobRef | BlobRefGenerator>(
@@ -10,5 +11,7 @@ export const getShapefilePreviewUrl = <T extends BlobRef | BlobRefGenerator>(
   if (typeof shapefile === "string") {
     return `${suffix}${encodeURIComponent(shapefile)}`;
   }
-  return `${suffix}${encodeURIComponent(getBlobUrl(did, shapefile))}`;
+  return `${suffix}${encodeURIComponent(
+    getBlobUrl(did, shapefile, allowedPDSDomains[0])
+  )}`;
 };

@@ -1,16 +1,18 @@
-import { getServerCaller } from "@/server/routers/_app";
+import { climateAiSdk } from "@/config/climateai-sdk.server";
 import React from "react";
 import SitesClient, { AllSitesData } from "./SitesClient";
 import { tryCatch } from "@/lib/tryCatch";
 import { TRPCError } from "@trpc/server";
-import { serialize } from "@/server/utils/transformer";
+import { serialize } from "climateai-sdk/utilities/transformer";
+import { allowedPDSDomains } from "@/config/climateai-sdk";
 
 const Sites = async ({ did }: { did: string }) => {
-  const apiCaller = getServerCaller();
+  const apiCaller = climateAiSdk.getServerCaller();
 
   const [response, error] = await tryCatch(
-    apiCaller.gainforest.site.getAll({
+    apiCaller.gainforest.organization.site.getAll({
       did,
+      pdsDomain: allowedPDSDomains[0],
     })
   );
 

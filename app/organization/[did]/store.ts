@@ -1,13 +1,13 @@
 import { create } from "zustand";
-import { AppGainforestOrganizationInfo } from "@/lexicon-api";
-import { trpcClient } from "@/lib/trpc/client";
+import { AppGainforestOrganizationInfo } from "climateai-sdk/lex-api";
+import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
 import {
   BlobRefGenerator,
   toBlobRefGenerator,
   toFileGenerator,
-} from "@/server/routers/atproto/utils";
+} from "climateai-sdk/zod-schemas";
 import { BlobRef } from "@atproto/api";
-import { PutRecordResponse } from "@/server/utils/response-types";
+import { PutRecordResponse } from "climateai-sdk/types";
 
 export type HeroEditingData = {
   displayName: string;
@@ -89,16 +89,16 @@ export const useOrganizationPageStore = create<
 
     const coverImage = heroEditingData.coverImage;
     const coverImageBlobRef =
-      coverImage instanceof BlobRef ?
-        toBlobRefGenerator(coverImage)
-      : undefined;
+      coverImage instanceof BlobRef
+        ? toBlobRefGenerator(coverImage)
+        : undefined;
     const coverImageFileGenerator =
-      coverImage instanceof File ?
-        await toFileGenerator(coverImage)
-      : undefined;
+      coverImage instanceof File
+        ? await toFileGenerator(coverImage)
+        : undefined;
 
     const organizationInfo: Parameters<
-      typeof trpcClient.organizationInfo.createOrUpdate.mutate
+      typeof trpcClient.gainforest.organization.info.createOrUpdate.mutate
     >[0] = {
       did,
       info: {
@@ -113,16 +113,19 @@ export const useOrganizationPageStore = create<
         visibility: subHeroEditingData.visibility,
       },
       uploads:
-        logoImageFileGenerator || coverImageFileGenerator ?
-          {
-            logo: logoImageFileGenerator,
-            coverImage: coverImageFileGenerator,
-          }
-        : undefined,
+        logoImageFileGenerator || coverImageFileGenerator
+          ? {
+              logo: logoImageFileGenerator,
+              coverImage: coverImageFileGenerator,
+            }
+          : undefined,
+      pdsDomain: allowedPDSDomains[0],
     };
 
     const response =
-      await trpcClient.organizationInfo.createOrUpdate.mutate(organizationInfo);
+      await trpcClient.gainforest.organization.info.createOrUpdate.mutate(
+        organizationInfo
+      );
     set({ data: response.value });
 
     return response;

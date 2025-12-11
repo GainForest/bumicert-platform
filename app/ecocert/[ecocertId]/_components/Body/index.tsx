@@ -9,7 +9,7 @@ import { FullHypercert } from "@/graphql/hypercerts/queries/fullHypercertById";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ChevronDownIcon } from "lucide-react";
-import { OrgHypercertsClaimClaim } from "@/lexicon-api";
+import { OrgHypercertsClaimActivity } from "climateai-sdk/lex-api";
 
 // Custom hook to handle collapsible content
 const useCollapsible = (maxHeight: number = 320) => {
@@ -93,7 +93,7 @@ const CollapsibleDescription = ({
   );
 };
 
-const Body = ({ ecocert }: { ecocert: OrgHypercertsClaimClaim.Record }) => {
+const Body = ({ ecocert }: { ecocert: OrgHypercertsClaimActivity.Record }) => {
   const { openState, viewport } = useNavbarContext();
 
   let displayMode: "stacked" | "side-by-side" = "stacked";
@@ -105,9 +105,9 @@ const Body = ({ ecocert }: { ecocert: OrgHypercertsClaimClaim.Record }) => {
     <div
       className={cn(
         "mt-8 gap-2 grid",
-        displayMode === "stacked" ?
-          "grid-cols-1 min-[880px]:grid-cols-[1fr_300px]"
-        : "grid-cols-1 min-[1000px]:grid-cols-[1fr_300px]"
+        displayMode === "stacked"
+          ? "grid-cols-1 min-[880px]:grid-cols-[1fr_300px]"
+          : "grid-cols-1 min-[1000px]:grid-cols-[1fr_300px]"
       )}
     >
       <CollapsibleDescription description={ecocert.description ?? ""} />

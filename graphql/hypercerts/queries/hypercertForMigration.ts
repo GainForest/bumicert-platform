@@ -9,7 +9,7 @@ TODO: Update it when the schemas are finalized.
 ================================================================================
 */
 
-// import { AppCertifiedHypercertRecord } from "@/lexicon-api";
+// import { AppCertifiedHypercertRecord } from "climateai-sdk/lex-api";
 // import { fetchFullHypercertById } from "./fullHypercertById";
 
 // export const fetchHypercertForMigration = async (hypercertId: string) => {

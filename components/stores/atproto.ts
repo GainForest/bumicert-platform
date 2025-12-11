@@ -1,8 +1,8 @@
 import { Agent, CredentialSession } from "@atproto/api";
 import { create } from "zustand";
-import { StoredSession } from "@/server/session";
+import { StoredSession } from "climateai-sdk/session";
 import { tryCatch } from "@/lib/tryCatch";
-import { trpcClient } from "@/lib/trpc/client";
+import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
 
 export type AtprotoAuthCatalog = {
   unauthenticated: {
@@ -64,7 +64,7 @@ export const useAtprotoStore = create<AtprotoStoreState & AtprotoStoreActions>(
           })
         );
         if (error || !result || !result.success) {
-          trpcClient.auth.logout.mutate({ service: "climateai.org" });
+          trpcClient.auth.logout.mutate({ service: allowedPDSDomains[0] });
           set({
             auth: {
               status: "UNAUTHENTICATED",

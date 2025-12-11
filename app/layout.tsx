@@ -15,7 +15,7 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { PriceFeedProvider } from "@/components/providers/PriceFeedProvider";
 import { ThemeProvider } from "next-themes";
 import HypercertExchangeClientProvider from "@/components/providers/HypercertExchangeClientProvider";
-import TrpcProvider from "@/components/providers/TrpcProvider";
+import { TrpcProvider } from "@/components/providers/TrpcProvider";
 import AtprotoHydrationProvider from "@/components/providers/AtprotoHydrationProvider";
 
 const geistSans = Geist({

@@ -1,8 +1,11 @@
 "use client";
-import { AppGainforestOrganizationInfo } from "@/lexicon-api";
+import { AppGainforestOrganizationInfo } from "climateai-sdk/lex-api";
 import { useOrganizationPageStore } from "./store";
 import { useEffect } from "react";
-import { deserialize, SerializedSuperjson } from "@/server/utils/transformer";
+import {
+  deserialize,
+  SerializedSuperjson,
+} from "climateai-sdk/utilities/transformer";
 
 export const OrganizationPageHydrator = ({
   initialSerializedData,

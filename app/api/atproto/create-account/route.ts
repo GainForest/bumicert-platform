@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import postgres from "postgres";
-import { PDS_URL } from "@/config/atproto";
+import { allowedPDSDomains } from "@/config/climateai-sdk";
 import { env } from "process";
 
 if (!env.POSTGRES_URL_NON_POOLING_ATPROTO_AUTH_MAPPING) {
@@ -51,10 +51,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const service = PDS_URL;
+    const service = allowedPDSDomains[0];
 
     const response = await fetch(
-      `${service}/xrpc/com.atproto.server.createAccount`,
+      `https://${service}/xrpc/com.atproto.server.createAccount`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

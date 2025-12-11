@@ -1,7 +1,7 @@
 "use client";
 import usePriceFeed from "@/components/providers/PriceFeedProvider";
 import { Button } from "@/components/ui/button";
-import { OrgHypercertsClaimClaim } from "@/lexicon-api";
+import { OrgHypercertsClaimActivity } from "climateai-sdk/lex-api";
 import { getStripedBackground } from "@/lib/getStripedBackground";
 import { getLastValidOrder } from "@/lib/hypercerts/getLastValidOrder";
 import { motion } from "framer-motion";
@@ -40,7 +40,7 @@ export const ProgressBar = ({
 const ProgressView = ({
   hypercert,
 }: {
-  hypercert: OrgHypercertsClaimClaim.Record;
+  hypercert: OrgHypercertsClaimActivity.Record;
 }) => {
   // const priceFeed = usePriceFeed();
   // const sales = hypercert.sales;

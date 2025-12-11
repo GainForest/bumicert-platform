@@ -1,7 +1,7 @@
 "use client";
 
-import type { AppGainforestOrganizationInfo } from "@/lexicon-api";
-import getBlobUrl from "@/lib/atproto/getBlobUrl";
+import type { AppGainforestOrganizationInfo } from "climateai-sdk/lex-api";
+import { getBlobUrl } from "climateai-sdk/utilities";
 import { BadgeCheck, Pencil } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect } from "react";
@@ -16,25 +16,13 @@ import {
 } from "../../_modals/image-editor";
 import { BlobRef } from "@atproto/api";
 import useHydratedData from "@/hooks/use-hydration";
-import {
-  toBlobRef,
-  type BlobRefGenerator,
-} from "@/server/routers/atproto/utils";
+import { toBlobRef, type BlobRefGenerator } from "climateai-sdk/zod-schemas";
 import {
   customTransformer,
   deserialize,
   SerializedSuperjson,
-} from "@/server/utils/transformer";
-
-const getImageUrl = (image: File | BlobRef | undefined, did: string) => {
-  if (image instanceof File) {
-    return URL.createObjectURL(image);
-  }
-  if (image === undefined) {
-    return undefined;
-  }
-  return getBlobUrl(did, image);
-};
+} from "climateai-sdk/utilities/transformer";
+import { AllowedPDSDomain, allowedPDSDomains } from "@/config/climateai-sdk";
 
 const Hero = ({
   initialData,
@@ -67,43 +55,48 @@ const Hero = ({
     });
   }, [isEditing, data]);
 
-  const coverImageUrl =
-    data.coverImage ? getBlobUrl(did, data.coverImage.image) : null;
-  const editingCoverImageUrl =
-    editingData.coverImage ?
-      editingData.coverImage instanceof File ?
-        getImageUrl(editingData.coverImage, did)
-      : getBlobUrl(did, editingData.coverImage)
+  const coverImageUrl = data.coverImage
+    ? getBlobUrl(did, data.coverImage.image, allowedPDSDomains[0])
     : null;
-  const logoImageUrl = data.logo ? getBlobUrl(did, data.logo.image) : null;
-  const editingLogoImageUrl =
-    editingData.logoImage ?
-      editingData.logoImage instanceof File ?
-        getImageUrl(editingData.logoImage, did)
-      : getBlobUrl(did, editingData.logoImage)
+  const editingCoverImageUrl = editingData.coverImage
+    ? editingData.coverImage instanceof File
+      ? URL.createObjectURL(editingData.coverImage)
+      : getBlobUrl(did, editingData.coverImage, allowedPDSDomains[0])
+    : null;
+  const logoImageUrl = data.logo
+    ? getBlobUrl(did, data.logo.image, allowedPDSDomains[0])
+    : null;
+  const editingLogoImageUrl = editingData.logoImage
+    ? editingData.logoImage instanceof File
+      ? URL.createObjectURL(editingData.logoImage)
+      : getBlobUrl(did, editingData.logoImage, allowedPDSDomains[0])
     : null;
 
   return (
     <div className="w-full h-60 rounded-t-2xl overflow-hidden relative">
-      {isEditing ?
-        editingCoverImageUrl ?
+      {isEditing ? (
+        editingCoverImageUrl ? (
           <Image
             src={editingCoverImageUrl}
             alt="Cover Image"
             fill
             className="object-cover"
           />
-        : <div className="absolute inset-0 bg-muted" />
-      : coverImageUrl ?
+        ) : (
+          <div className="absolute inset-0 bg-muted" />
+        )
+      ) : coverImageUrl ? (
         <Image
           src={coverImageUrl}
           alt="Cover Image"
           fill
           className="object-cover"
         />
-      : <div className="absolute inset-0 bg-muted" />}
+      ) : (
+        <div className="absolute inset-0 bg-muted" />
+      )}
       <div className="absolute inset-0 bg-linear-to-b from-transparent to-background">
-        {isEditing ?
+        {isEditing ? (
           <Button
             variant={"outline"}
             className="absolute top-2 left-2 rounded-full flex items-center gap-1.5 h-auto px-1 pr-2 py-1"
@@ -146,7 +139,8 @@ const Hero = ({
             </div>
             Logo
           </Button>
-        : <div className="absolute top-2 left-2 h-8 w-8 rounded-full bg-background border border-border shadow-xs overflow-hidden">
+        ) : (
+          <div className="absolute top-2 left-2 h-8 w-8 rounded-full bg-background border border-border shadow-xs overflow-hidden">
             {logoImageUrl && (
               <Image
                 src={logoImageUrl}
@@ -156,13 +150,13 @@ const Hero = ({
               />
             )}
           </div>
-        }
+        )}
 
         <div className="absolute bottom-6 left-0 right-0 p-4">
           <div className="flex items-center gap-2">
             <BadgeCheck className="size-8" />
 
-            {isEditing ?
+            {isEditing ? (
               <Input
                 value={editingData.displayName}
                 className="bg-background max-w-md"
@@ -174,13 +168,14 @@ const Hero = ({
                   })
                 }
               />
-            : <h1 className="text-3xl font-bold font-serif">
+            ) : (
+              <h1 className="text-3xl font-bold font-serif">
                 {data.displayName === "" ? "Untitled" : data.displayName}
               </h1>
-            }
+            )}
           </div>
 
-          {isEditing ?
+          {isEditing ? (
             <Input
               value={editingData.shortDescription}
               placeholder="Short description"
@@ -192,12 +187,13 @@ const Hero = ({
                 })
               }
             />
-          : <p className="text-sm text-muted-foreground">
-              {data.shortDescription === "" ?
-                "No short description provided."
-              : data.shortDescription}
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              {data.shortDescription === ""
+                ? "No short description provided."
+                : data.shortDescription}
             </p>
-          }
+          )}
         </div>
       </div>
       {isEditing && (

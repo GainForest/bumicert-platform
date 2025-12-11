@@ -27,7 +27,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useModal } from "@/components/ui/modal/context";
 import { GetAnInviteModal, GetAnInviteModalId } from "./get-an-invite";
 import SignInModal, { SignInModalId } from "./sign-in";
-import { PDS_DOMAIN } from "@/config/atproto";
+import { allowedPDSDomains } from "@/config/climateai-sdk";
 import { useAtprotoStore } from "@/components/stores/atproto";
 
 export const SignUpModalId = "auth/sign-up";
@@ -55,7 +55,7 @@ const SignUpModal = () => {
         body: JSON.stringify({
           email,
           password,
-          handle: handle.replace(/^@/, "").trim() + `.${PDS_DOMAIN}`,
+          handle: handle.replace(/^@/, "").trim() + `.${allowedPDSDomains[0]}`,
           inviteCode,
         }),
       });
@@ -88,11 +88,11 @@ const SignUpModal = () => {
     <ModalContent>
       <ModalHeader
         backAction={
-          stack.length === 1 ?
-            undefined
-          : () => {
-              popModal();
-            }
+          stack.length === 1
+            ? undefined
+            : () => {
+                popModal();
+              }
         }
       >
         <ModalTitle>Register</ModalTitle>
@@ -182,9 +182,7 @@ const SignUpModal = () => {
                 onClick={() => setShowPassword((prev) => !prev)}
                 className="cursor-pointer"
               >
-                {showPassword ?
-                  <EyeIcon />
-                : <EyeOffIcon />}
+                {showPassword ? <EyeIcon /> : <EyeOffIcon />}
               </Button>
             </InputGroupAddon>
           </InputGroup>
@@ -209,9 +207,7 @@ const SignUpModal = () => {
                 className="cursor-pointer"
                 onClick={() => setShowPassword((prev) => !prev)}
               >
-                {showPassword ?
-                  <EyeIcon />
-                : <EyeOffIcon />}
+                {showPassword ? <EyeIcon /> : <EyeOffIcon />}
               </Button>
             </InputGroupAddon>
           </InputGroup>
@@ -238,7 +234,9 @@ const SignUpModal = () => {
                 {
                   id: SignInModalId,
                   content: (
-                    <SignInModal initialHandle={`${handle}.${PDS_DOMAIN}`} />
+                    <SignInModal
+                      initialHandle={`${handle}.${allowedPDSDomains[0]}`}
+                    />
                   ),
                 },
                 true
@@ -248,16 +246,16 @@ const SignUpModal = () => {
             }
           }}
         >
-          {isSigningUp || isAuthenticated ?
+          {isSigningUp || isAuthenticated ? (
             <Loader2 className="size-4 animate-spin" />
-          : isSignUpSuccess ?
+          ) : isSignUpSuccess ? (
             <Check />
-          : null}
-          {isSigningUp ?
-            "Signing up..."
-          : isSignUpSuccess ?
-            "Done! Continue to sign in?"
-          : "Sign up"}
+          ) : null}
+          {isSigningUp
+            ? "Signing up..."
+            : isSignUpSuccess
+            ? "Done! Continue to sign in?"
+            : "Sign up"}
           {isSignUpSuccess && <ArrowRight />}
         </Button>
       </ModalFooter>

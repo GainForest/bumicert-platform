@@ -17,15 +17,16 @@ import useLocalStorage from "use-local-storage";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { useModal } from "@/components/ui/modal/context";
-import { api } from "@/lib/trpc/react";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import AuthenticatedModalContent from "./authenticated";
+import { trpcApi } from "@/components/providers/TrpcProvider";
 
 export const SignInModalId = "auth/sign-in";
 
 const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
-  const initialHandlePrefix =
-    initialHandle.includes(".") ? initialHandle.split(".")[0] : undefined;
+  const initialHandlePrefix = initialHandle.includes(".")
+    ? initialHandle.split(".")[0]
+    : undefined;
   const [inputHandlePrefix, setInputHandlePrefix] = useState(
     initialHandlePrefix ?? ""
   );
@@ -38,7 +39,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
     mutate: signIn,
     isPending: isSigningIn,
     error: signInError,
-  } = api.auth.login.useMutation({
+  } = trpcApi.auth.login.useMutation({
     onSuccess: (data) => {
       addPreviousSession(data.context.handle);
       setAuth(data.context, data.service as string);
@@ -56,8 +57,9 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
 
       // After popping all consecutive auth modals, if the last modal on stack
       // is an auth modal, then hide the modal.
-      const shouldHideModal =
-        stackCopy.at(-1)?.startsWith("auth/") ? true : false;
+      const shouldHideModal = stackCopy.at(-1)?.startsWith("auth/")
+        ? true
+        : false;
       if (shouldHideModal) hide();
     },
   });
@@ -89,11 +91,11 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
     <ModalContent>
       <ModalHeader
         backAction={
-          stack.length === 1 ?
-            undefined
-          : () => {
-              popModal();
-            }
+          stack.length === 1
+            ? undefined
+            : () => {
+                popModal();
+              }
         }
       >
         <ModalTitle>Sign In</ModalTitle>
@@ -197,13 +199,11 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
           <Switch
             checked={
               // If the handle is in the previous sessions, then the switch should be checked
-              (
-                previousSessions.find(
-                  (session) => session.handle === inputHandlePrefix
-                )
-              ) ?
-                true
-              : rememberMe
+              previousSessions.find(
+                (session) => session.handle === inputHandlePrefix
+              )
+                ? true
+                : rememberMe
             }
             onCheckedChange={setRememberMe}
             disabled={
@@ -228,9 +228,11 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
             });
           }}
         >
-          {isSigningIn ?
+          {isSigningIn ? (
             <Loader2 className="size-4 animate-spin" />
-          : "Sign In"}
+          ) : (
+            "Sign In"
+          )}
         </Button>
       </ModalFooter>
     </ModalContent>

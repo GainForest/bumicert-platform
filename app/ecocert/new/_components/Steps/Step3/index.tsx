@@ -19,7 +19,7 @@ import { useStep3Store } from "./store";
 import { Checkbox } from "@/components/ui/checkbox";
 import useNewEcocertStore from "../../../store";
 import { useQuery } from "@tanstack/react-query";
-import { trpcClient } from "@/lib/trpc/client";
+import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { useModal } from "@/components/ui/modal/context";
 import { AddSiteModalId } from "./AddSiteModal";
@@ -74,9 +74,11 @@ const Step3 = () => {
     queryKey: ["getAllSites", auth.user?.did],
     queryFn: async () => {
       if (!auth.user?.did) throw new Error("User is not authenticated");
-      const response = await trpcClient.gainforest.site.getAll.query({
-        did: auth.user?.did,
-      });
+      const response =
+        await trpcClient.gainforest.organization.site.getAll.query({
+          did: auth.user?.did,
+          pdsDomain: allowedPDSDomains[0],
+        });
       return response.sites;
     },
     enabled: !!auth.user?.did,
@@ -174,12 +176,12 @@ const Step3 = () => {
             )}
             {!isSitesLoading && (
               <>
-                {!sites || sites.length === 0 ?
+                {!sites || sites.length === 0 ? (
                   <div className="w-full h-full flex flex-col items-center justify-center">
                     <span className="text-sm text-muted-foreground">
-                      {sitesFetchError ?
-                        "Unable to load sites."
-                      : "No site found."}
+                      {sitesFetchError
+                        ? "Unable to load sites."
+                        : "No site found."}
                     </span>
                     <Button
                       variant="outline"
@@ -190,7 +192,8 @@ const Step3 = () => {
                       <PlusCircle /> Add a site
                     </Button>
                   </div>
-                : <div className="grid grid-cols-2 gap-1 p-2">
+                ) : (
+                  <div className="grid grid-cols-2 gap-1 p-2">
                     {sites.map((site) => {
                       const siteData = site.value;
                       return (
@@ -210,12 +213,13 @@ const Step3 = () => {
                             }
                           }}
                         >
-                          {siteBoundaries === site.uri ?
+                          {siteBoundaries === site.uri ? (
                             <div className="h-5 w-5 rounded-full bg-primary flex items-center justify-center shrink-0">
                               <Check className="size-3 text-white" />
                             </div>
-                          : <CircleDashed className="size-5 text-muted-foreground" />
-                          }
+                          ) : (
+                            <CircleDashed className="size-5 text-muted-foreground" />
+                          )}
                           <div className="flex flex-col items-start justify-start">
                             <span className="text-base font-medium">
                               {siteData.name}
@@ -242,7 +246,7 @@ const Step3 = () => {
                       <PlusCircle /> Add a site
                     </Button>
                   </div>
-                }
+                )}
               </>
             )}
           </div>

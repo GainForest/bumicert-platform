@@ -9,14 +9,11 @@ import FileInput from "../components/FileInput";
 import { useState } from "react";
 import { Loader2, UploadIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { trpcClient } from "@/lib/trpc/client";
+import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { useModal } from "@/components/ui/modal/context";
-import {
-  toBlobRefGenerator,
-  toFileGenerator,
-} from "@/server/routers/atproto/utils";
+import { toBlobRefGenerator, toFileGenerator } from "climateai-sdk/zod-schemas";
 
 export const UploadLogoModalId = "upload/organization/logo";
 
@@ -33,7 +30,8 @@ export const UploadLogoModal = () => {
   } = useQuery({
     queryKey: ["organizationInfo", auth.user?.did],
     queryFn: async () => {
-      const response = await trpcClient.organizationInfo.get.query({
+      const response = await trpcClient.gainforest.organization.info.get.query({
+        pdsDomain: allowedPDSDomains[0],
         did: auth.user?.did ?? "",
       });
       return response.value;
@@ -50,23 +48,24 @@ export const UploadLogoModal = () => {
       if (!logo) throw new Error("Logo is required");
       if (!organizationInfo)
         throw new Error("Organization information is required");
-      return await trpcClient.organizationInfo.createOrUpdate.mutate({
-        did: auth.user?.did ?? "",
-        uploads: {
-          logo: await toFileGenerator(logo),
-        },
-        info: {
-          ...organizationInfo,
-          logo:
-            organizationInfo.logo ?
-              toBlobRefGenerator(organizationInfo.logo.image)
-            : undefined,
-          coverImage:
-            organizationInfo.coverImage ?
-              toBlobRefGenerator(organizationInfo.coverImage.image)
-            : undefined,
-        },
-      });
+      return await trpcClient.gainforest.organization.info.createOrUpdate.mutate(
+        {
+          did: auth.user?.did ?? "",
+          uploads: {
+            logo: await toFileGenerator(logo),
+          },
+          info: {
+            ...organizationInfo,
+            logo: organizationInfo.logo
+              ? toBlobRefGenerator(organizationInfo.logo.image)
+              : undefined,
+            coverImage: organizationInfo.coverImage
+              ? toBlobRefGenerator(organizationInfo.coverImage.image)
+              : undefined,
+          },
+          pdsDomain: allowedPDSDomains[0],
+        }
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -78,11 +77,11 @@ export const UploadLogoModal = () => {
     <ModalContent>
       <ModalHeader
         backAction={
-          stack.length === 1 ?
-            undefined
-          : () => {
-              popModal();
-            }
+          stack.length === 1
+            ? undefined
+            : () => {
+                popModal();
+              }
         }
       >
         <ModalTitle>Upload Logo</ModalTitle>
@@ -90,14 +89,15 @@ export const UploadLogoModal = () => {
           Upload a logo for your organization.
         </ModalDescription>
       </ModalHeader>
-      {isLoadingOrganizationInfo ?
+      {isLoadingOrganizationInfo ? (
         <div className="flex-1 flex flex-col items-center justify-center">
           <Loader2 className="animate-spin" />
           <span className="text-sm text-muted-foreground">
             Loading organization information...
           </span>
         </div>
-      : <FileInput
+      ) : (
+        <FileInput
           placeholder="Upload a logo for your organization"
           supportedFileTypes={[
             "image/jpg",
@@ -109,10 +109,10 @@ export const UploadLogoModal = () => {
           value={logo}
           onFileChange={setLogo}
         />
-      }
+      )}
 
       <ModalFooter>
-        {isUploaded ?
+        {isUploaded ? (
           <Button
             onClick={() => {
               if (stack.length === 1) {
@@ -126,16 +126,19 @@ export const UploadLogoModal = () => {
           >
             Done
           </Button>
-        : <Button
+        ) : (
+          <Button
             disabled={isLoadingOrganizationInfo || !logo || isUploadingLogo}
             onClick={() => uploadLogo()}
           >
-            {isUploadingLogo ?
+            {isUploadingLogo ? (
               <Loader2 className="animate-spin" />
-            : <UploadIcon />}
+            ) : (
+              <UploadIcon />
+            )}
             {isUploadingLogo ? "Uploading..." : "Upload"}
           </Button>
-        }
+        )}
       </ModalFooter>
     </ModalContent>
   );

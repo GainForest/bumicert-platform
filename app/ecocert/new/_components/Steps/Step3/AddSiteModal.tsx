@@ -10,7 +10,7 @@ import { useModal } from "@/components/ui/modal/context";
 import FileInput from "../components/FileInput";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { trpcClient } from "@/lib/trpc/client";
+import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { Loader2, PenIcon, UploadIcon } from "lucide-react";
@@ -35,7 +35,7 @@ export const AddSiteModal = () => {
     mutationKey: ["createSite"],
     mutationFn: async () => {
       if (!geoJsonFile) throw new Error("GeoJSON file is required");
-      await trpcClient.gainforest.site.create.mutate({
+      await trpcClient.gainforest.organization.site.create.mutate({
         site: {
           name: siteName,
         },
@@ -48,6 +48,7 @@ export const AddSiteModal = () => {
               .then((buffer) => Buffer.from(buffer).toString("base64")),
           },
         },
+        pdsDomain: allowedPDSDomains[0],
       });
     },
     onSuccess: () => {
@@ -60,11 +61,11 @@ export const AddSiteModal = () => {
     <ModalContent>
       <ModalHeader
         backAction={
-          stack.length === 1 ?
-            undefined
-          : () => {
-              popModal();
-            }
+          stack.length === 1
+            ? undefined
+            : () => {
+                popModal();
+              }
         }
       >
         <ModalTitle>Add Site</ModalTitle>
@@ -93,13 +94,13 @@ export const AddSiteModal = () => {
       />
       {createSiteError && (
         <div className="text-sm text-destructive mt-2">
-          {createSiteError.message.startsWith("[") ?
-            "Bad Request"
-          : createSiteError.message}
+          {createSiteError.message.startsWith("[")
+            ? "Bad Request"
+            : createSiteError.message}
         </div>
       )}
       <ModalFooter>
-        {isCreated ?
+        {isCreated ? (
           <Button
             onClick={() => {
               if (stack.length === 1) {
@@ -113,16 +114,19 @@ export const AddSiteModal = () => {
           >
             Done
           </Button>
-        : <Button
+        ) : (
+          <Button
             disabled={isCreatingSite || !geoJsonFile || siteName.trim() === ""}
             onClick={() => createSite()}
           >
-            {isCreatingSite ?
+            {isCreatingSite ? (
               <Loader2 className="animate-spin" />
-            : <UploadIcon />}
+            ) : (
+              <UploadIcon />
+            )}
             {isCreatingSite ? "Creating..." : "Create"}
           </Button>
-        }
+        )}
       </ModalFooter>
     </ModalContent>
   );

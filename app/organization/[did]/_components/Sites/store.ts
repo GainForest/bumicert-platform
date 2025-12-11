@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { BlobRefGenerator } from "@/server/routers/atproto/utils";
+import { BlobRefGenerator } from "climateai-sdk/zod-schemas";
 
 export type SiteData = {
   name: string;

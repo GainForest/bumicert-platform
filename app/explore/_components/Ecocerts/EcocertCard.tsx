@@ -5,12 +5,13 @@ import CircularProgressBar from "@/components/circular-progressbar";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
-import { Ecocert } from "@/types/ecocert";
-import getBlobUrl from "@/lib/atproto/getBlobUrl";
-import { SmallImage, Uri } from "@/lexicon-api/types/org/hypercerts/defs";
-import { $Typed } from "@/lexicon-api/util";
+import { Ecocert } from "climateai-sdk/types";
+import { getBlobUrl } from "climateai-sdk/utilities";
+import { OrgHypercertsDefs as Defs } from "climateai-sdk/lex-api";
+import { $Typed } from "climateai-sdk/lex-api/util";
 import { EcocertArt } from "@/app/ecocert/new/_components/Steps/Step4/EcocertPreviewCard";
-import parseAtUri from "@/lib/atproto/getRkeyFromAtUri";
+import { parseAtUri } from "climateai-sdk/utilities";
+import { allowedPDSDomains } from "@/config/climateai-sdk";
 
 const StripedDiv = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -32,19 +33,20 @@ const StripedDiv = ({ children }: { children: React.ReactNode }) => {
 };
 
 const EcocertCard = ({ ecocert }: { ecocert: Ecocert }) => {
-  const image = ecocert.claim.value.image;
+  const image = ecocert.claimActivity.value.image;
   let imageUrl: string | null = null;
   if (image?.$type === "org.hypercerts.defs#smallImage") {
     imageUrl = getBlobUrl(
       ecocert.repo.did,
-      (image as $Typed<SmallImage>).image
+      (image as $Typed<Defs.SmallImage>).image,
+      allowedPDSDomains[0]
     );
   } else if (image?.$type === "org.hypercerts.defs#uri") {
-    imageUrl = (image as $Typed<Uri>).uri;
+    imageUrl = (image as $Typed<Defs.Uri>).uri;
   }
   if (!imageUrl) return null;
 
-  const claimRkey = parseAtUri(ecocert.claim.uri).rkey;
+  const claimRkey = parseAtUri(ecocert.claimActivity.uri).rkey;
 
   return (
     <motion.div
@@ -59,10 +61,10 @@ const EcocertCard = ({ ecocert }: { ecocert: Ecocert }) => {
         <EcocertArt
           logoUrl={ecocert.organizationInfo.logoUrl}
           coverImage={imageUrl}
-          title={ecocert.claim.value.title}
-          objectives={ecocert.claim.value.workScope.split(",")}
-          startDate={new Date(ecocert.claim.value.workTimeFrameFrom)}
-          endDate={new Date(ecocert.claim.value.workTimeFrameTo)}
+          title={ecocert.claimActivity.value.title}
+          objectives={ecocert.claimActivity.value.workScope?.anyOf ?? []}
+          startDate={new Date(ecocert.claimActivity.value.startDate)}
+          endDate={new Date(ecocert.claimActivity.value.endDate)}
         />
       </Link>
     </motion.div>

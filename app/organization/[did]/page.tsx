@@ -1,10 +1,9 @@
 import Container from "@/components/ui/container";
-import { getServerCaller } from "@/server/routers/_app";
 import React from "react";
 import Hero from "./_components/Hero";
 import SubHero from "./_components/SubHero";
 import AboutOrganization from "./_components/AboutOrganization";
-import { AppGainforestOrganizationInfo } from "@/lexicon-api";
+import { AppGainforestOrganizationInfo } from "climateai-sdk/lex-api";
 import HeaderContent from "./_components/HeaderContent";
 import { OrganizationPageHydrator } from "./hydrator";
 import Sites from "./_components/Sites";
@@ -13,8 +12,10 @@ import { TRPCError } from "@trpc/server";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getSessionFromRequest } from "@/server/session";
-import { serialize } from "@/server/utils/transformer";
+import { getSessionFromRequest } from "climateai-sdk/session";
+import { serialize } from "climateai-sdk/utilities/transformer";
+import { climateAiSdk } from "@/config/climateai-sdk.server";
+import { allowedPDSDomains } from "@/config/climateai-sdk";
 
 const EMPTY_ORGANIZATION_DATA: AppGainforestOrganizationInfo.Record = {
   $type: "app.gainforest.organization.info",
@@ -28,6 +29,7 @@ const EMPTY_ORGANIZATION_DATA: AppGainforestOrganizationInfo.Record = {
   startDate: "",
   country: "",
   visibility: "Public",
+  createdAt: new Date().toISOString(),
 };
 
 const OrganizationPage = async ({
@@ -38,9 +40,12 @@ const OrganizationPage = async ({
   const { did: encodedDid } = await params;
   const did = decodeURIComponent(encodedDid);
 
-  const apiCaller = getServerCaller();
+  const apiCaller = climateAiSdk.getServerCaller();
   const [response, error] = await tryCatch(
-    apiCaller.organizationInfo.get({ did })
+    apiCaller.gainforest.organization.info.get({
+      did,
+      pdsDomain: allowedPDSDomains[0],
+    })
   );
 
   let data = EMPTY_ORGANIZATION_DATA;

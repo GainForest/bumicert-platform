@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import type { AppGainforestOrganizationInfo } from "@/lexicon-api";
+import type { AppGainforestOrganizationInfo } from "climateai-sdk/lex-api";
 import {
   ArrowUpRightFromSquare,
   Calendar,
@@ -29,13 +29,16 @@ import {
   StartDateSelectorModalId,
 } from "../../_modals/start-date-selector";
 import useHydratedData from "@/hooks/use-hydration";
-import { deserialize, SerializedSuperjson } from "@/server/utils/transformer";
+import {
+  deserialize,
+  SerializedSuperjson,
+} from "climateai-sdk/utilities/transformer";
 
 const formatWebsite = (website: string | undefined) => {
   if (!website) return undefined;
   const websiteWithoutProtocol = website.replace(/^https?:\/\//, "");
-  return websiteWithoutProtocol.length > 16 ?
-      websiteWithoutProtocol.slice(0, 16) + "..."
+  return websiteWithoutProtocol.length > 16
+    ? websiteWithoutProtocol.slice(0, 16) + "..."
     : websiteWithoutProtocol;
 };
 
@@ -48,8 +51,8 @@ const getCountryData = (country: string) => {
 
 const formatCountryName = (countryName: string | undefined) => {
   if (!countryName) return undefined;
-  return countryName.length > 16 ?
-      countryName.slice(0, 16) + "..."
+  return countryName.length > 16
+    ? countryName.slice(0, 16) + "..."
     : countryName;
 };
 
@@ -135,7 +138,7 @@ const SubHero = ({
         PropertyIcon={Globe}
         propertyName="Website"
         propertyValue={
-          formatWebsite(data.website) ?
+          formatWebsite(data.website) ? (
             <>
               {formatWebsite(data.website)}
               {data.website && (
@@ -146,12 +149,16 @@ const SubHero = ({
                 </Link>
               )}
             </>
-          : "NOT_DEFINED"
+          ) : (
+            "NOT_DEFINED"
+          )
         }
         editingPropertyValue={
-          formatWebsite(editingData.website) ?
+          formatWebsite(editingData.website) ? (
             <>{formatWebsite(editingData.website)}</>
-          : "NOT_DEFINED"
+          ) : (
+            "NOT_DEFINED"
+          )
         }
         modalId={WebsiteEditorModalId}
         modalContent={
@@ -244,13 +251,17 @@ export const SubHeroChip = <T extends React.ReactNode>({
           {propertyName}
         </span>
         <span className="text-lg font-medium">
-          {isEditing ?
-            editingPropertyValue === "NOT_DEFINED" ?
+          {isEditing ? (
+            editingPropertyValue === "NOT_DEFINED" ? (
               <span className="text-muted-foreground">Not defined</span>
-            : editingPropertyValue
-          : propertyValue === "NOT_DEFINED" ?
+            ) : (
+              editingPropertyValue
+            )
+          ) : propertyValue === "NOT_DEFINED" ? (
             <span className="text-muted-foreground">Not defined</span>
-          : propertyValue}
+          ) : (
+            propertyValue
+          )}
         </span>
       </div>
       {children}

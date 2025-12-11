@@ -15,7 +15,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { AllSitesData } from "./SitesClient";
 import { $Typed } from "@atproto/api";
-import { AppGainforestCommonDefs } from "@/lexicon-api";
+import { AppGainforestCommonDefs } from "climateai-sdk/lex-api";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -27,7 +27,7 @@ import { useModal } from "@/components/ui/modal/context";
 import { SiteEditorModal, SiteEditorModalId } from "./SiteEditorModal";
 import { getShapefilePreviewUrl } from "./utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { trpcClient } from "@/lib/trpc/client";
+import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
 import { useAtprotoStore } from "@/components/stores/atproto";
 
 export type SiteData = AllSitesData["sites"][number];
@@ -36,24 +36,12 @@ type SiteCardProps = {
   defaultSite: string | null;
   did: string;
 };
-type ShapefileT = SiteCardProps["siteData"]["value"]["shapefile"];
-type ForAssertionShapefileT =
-  | $Typed<AppGainforestCommonDefs.Uri>
-  | $Typed<AppGainforestCommonDefs.SmallBlob>;
-type AssertKnownIsSubset<T extends ShapefileT> = T;
-// Compile time assertion that KnownShapefileT is a subset of ShapefileT
-export type KnownShapefileT = AssertKnownIsSubset<ForAssertionShapefileT>;
 
 const SiteCard = ({ siteData, defaultSite, did }: SiteCardProps) => {
   const site = siteData.value;
-  const shapefile = site.shapefile as KnownShapefileT;
+  const shapefile = site.shapefile;
   const isDefaultSite = siteData.uri === defaultSite;
-  const shapefileUri = getShapefilePreviewUrl(
-    shapefile.$type === "app.gainforest.common.defs#uri" ?
-      shapefile.uri
-    : shapefile.blob,
-    did
-  );
+  const shapefileUri = getShapefilePreviewUrl(shapefile.blob, did);
 
   const auth = useAtprotoStore((state) => state.auth);
   const shouldEdit = auth.status === "AUTHENTICATED" && auth.user.did === did;
@@ -63,7 +51,10 @@ const SiteCard = ({ siteData, defaultSite, did }: SiteCardProps) => {
   const { mutate: setDefaultSite, isPending: isSettingDefaultSite } =
     useMutation({
       mutationFn: async (siteAtUri: string) =>
-        await trpcClient.gainforest.site.setDefault.mutate({ siteAtUri }),
+        await trpcClient.gainforest.organization.site.setDefault.mutate({
+          siteAtUri,
+          pdsDomain: allowedPDSDomains[0],
+        }),
       onSuccess: () => {
         queryClient.invalidateQueries({
           queryKey: ["getAllSites", did],
@@ -73,7 +64,10 @@ const SiteCard = ({ siteData, defaultSite, did }: SiteCardProps) => {
 
   const { mutate: deleteSite, isPending: isDeletingSite } = useMutation({
     mutationFn: async (siteAtUri: string) =>
-      await trpcClient.gainforest.site.delete.mutate({ siteAtUri }),
+      await trpcClient.gainforest.organization.site.delete.mutate({
+        siteAtUri,
+        pdsDomain: allowedPDSDomains[0],
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["getAllSites", did],
@@ -150,9 +144,11 @@ const SiteCard = ({ siteData, defaultSite, did }: SiteCardProps) => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant={"ghost"}>
-                    {disableActions ?
+                    {disableActions ? (
                       <Loader2 className="animate-spin" />
-                    : <MoreVertical />}
+                    ) : (
+                      <MoreVertical />
+                    )}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>

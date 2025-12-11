@@ -1,9 +1,9 @@
 "use client";
 import React, { useEffect } from "react";
 import { useAtprotoStore } from "../stores/atproto";
-import { trpcClient } from "@/lib/trpc/client";
 import { useMutation } from "@tanstack/react-query";
 import { TRPCClientError } from "@trpc/client";
+import { trpcClient } from "@/config/climateai-sdk";
 
 const AtprotoHydrationProvider = ({
   children,

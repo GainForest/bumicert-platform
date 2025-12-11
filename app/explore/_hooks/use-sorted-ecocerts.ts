@@ -1,8 +1,6 @@
 "use client";
 
-import usePriceFeed from "@/components/providers/PriceFeedProvider";
-import { Hypercert } from "@/graphql/hypercerts/queries/hypercertById";
-import { Ecocert } from "@/types/ecocert";
+import { Ecocert } from "climateai-sdk/types";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 
 export type TEcocertSortingOptions = {
@@ -61,8 +59,8 @@ const useSortedEcocerts = (ecocerts: Ecocert[]): Ecocert[] => {
     if (sortKey === "date-created") {
       return ecocerts.sort((a, b) => {
         return (
-          new Date(a.claim.value.createdAt).getTime() -
-          new Date(b.claim.value.createdAt).getTime()
+          new Date(a.claimActivity.value.createdAt).getTime() -
+          new Date(b.claimActivity.value.createdAt).getTime()
         );
       });
     }

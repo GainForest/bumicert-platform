@@ -6,9 +6,9 @@ import { ProgressiveBlur } from "@/components/ui/progressive-blur";
 import { domToJpeg } from "modern-screenshot";
 import { useStep4Store } from "./store";
 import { useAtprotoStore } from "@/components/stores/atproto";
-import { trpcClient } from "@/lib/trpc/client";
+import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
 import { useQuery } from "@tanstack/react-query";
-import getBlobUrl from "@/lib/atproto/getBlobUrl";
+import { getBlobUrl } from "climateai-sdk/utilities";
 import { Loader2, UploadIcon } from "lucide-react";
 import { useModal } from "@/components/ui/modal/context";
 import { UploadLogoModal, UploadLogoModalId } from "./UploadLogoModal";
@@ -34,9 +34,9 @@ export const EcocertArt = ({
       <div className="w-[256px] h-[360px] relative overflow-hidden rounded-2xl">
         <Image
           src={
-            typeof coverImage === "string" ? coverImage : (
-              URL.createObjectURL(coverImage)
-            )
+            typeof coverImage === "string"
+              ? coverImage
+              : URL.createObjectURL(coverImage)
           }
           alt="Ecocert"
           fill
@@ -100,16 +100,18 @@ const EcocertPreviewCard = () => {
   } = useQuery({
     queryKey: ["organizationInfo", auth.user?.did],
     queryFn: async () => {
-      const response = await trpcClient.organizationInfo.get.query({
+      const response = await trpcClient.gainforest.organization.info.get.query({
         did: auth.user?.did ?? "",
+        pdsDomain: allowedPDSDomains[0],
       });
       return response.value;
     },
     enabled: !!auth.user?.did,
   });
   const logoFromData = isOlderData ? undefined : organizationInfo?.logo;
-  const logoUrl =
-    logoFromData ? getBlobUrl(auth.user?.did ?? "", logoFromData.image) : null;
+  const logoUrl = logoFromData
+    ? getBlobUrl(auth.user?.did ?? "", logoFromData.image, allowedPDSDomains[0])
+    : null;
 
   const isLoadingOrganizationInfo = isPendingOrganizationInfo || isOlderData;
 
@@ -149,7 +151,7 @@ const EcocertPreviewCard = () => {
           </div>
         )}
 
-        {isEcocertArtReady ?
+        {isEcocertArtReady ? (
           <EcocertArt
             logoUrl={logoUrl}
             coverImage={coverImage}
@@ -158,19 +160,20 @@ const EcocertPreviewCard = () => {
             startDate={startDate}
             endDate={endDate}
           />
-        : isLoadingOrganizationInfo ?
+        ) : isLoadingOrganizationInfo ? (
           <div className="flex-1 flex flex-col items-center justify-center">
             <Loader2 className="animate-spin" />
             <span className="text-sm text-muted-foreground text-center text-pretty">
               Generating the preview...
             </span>
           </div>
-        : <div className="flex-1 flex flex-col items-center justify-center">
+        ) : (
+          <div className="flex-1 flex flex-col items-center justify-center">
             <span className="text-sm text-muted-foreground text-center text-pretty">
               You need to complete the first step to preview the ecocert.
             </span>
           </div>
-        }
+        )}
       </div>
     </div>
   );

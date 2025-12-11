@@ -1,4 +1,5 @@
 "use client";
+import { trpcApi } from "@/components/providers/TrpcProvider";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { Button } from "@/components/ui/button";
 import { useModal } from "@/components/ui/modal/context";
@@ -9,7 +10,6 @@ import {
   ModalHeader,
   ModalTitle,
 } from "@/components/ui/modal/modal";
-import { api } from "@/lib/trpc/react";
 import { Building, GalleryVerticalEnd, Loader2, LogOut } from "lucide-react";
 import Link from "next/link";
 
@@ -21,7 +21,7 @@ export const ProfileModal = () => {
   const setAuth = useAtprotoStore((state) => state.setAuth);
 
   const { mutate: signOut, isPending: isSigningOut } =
-    api.auth.logout.useMutation({
+    trpcApi.auth.logout.useMutation({
       onSuccess: () => {
         setAuth(null);
         hide().then(() => popModal());
@@ -33,11 +33,11 @@ export const ProfileModal = () => {
       <ModalContent>
         <ModalHeader
           backAction={
-            stack.length === 1 ?
-              undefined
-            : () => {
-                popModal();
-              }
+            stack.length === 1
+              ? undefined
+              : () => {
+                  popModal();
+                }
           }
         >
           <ModalTitle>Not signed in.</ModalTitle>
@@ -50,11 +50,11 @@ export const ProfileModal = () => {
     <ModalContent>
       <ModalHeader
         backAction={
-          stack.length === 1 ?
-            undefined
-          : () => {
-              popModal();
-            }
+          stack.length === 1
+            ? undefined
+            : () => {
+                popModal();
+              }
         }
       >
         <ModalTitle></ModalTitle>
@@ -115,9 +115,7 @@ export const ProfileModal = () => {
           }}
           disabled={isSigningOut}
         >
-          {isSigningOut ?
-            <Loader2 className="animate-spin" />
-          : <LogOut />}
+          {isSigningOut ? <Loader2 className="animate-spin" /> : <LogOut />}
           Sign out
         </Button>
       </ModalFooter>

@@ -1,5 +1,5 @@
-import { getSessionFromRequest } from "@/server/session";
 import { NextResponse, NextRequest } from "next/server";
+import { getSessionFromRequest } from "climateai-sdk/session";
 
 export async function proxy(request: NextRequest) {
   try {

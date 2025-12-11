@@ -7,13 +7,16 @@ import { cn } from "@/lib/utils";
 import useHydratedData from "@/hooks/use-hydration";
 import SiteCard from "./SiteCard";
 import { useQuery } from "@tanstack/react-query";
-import { trpcClient } from "@/lib/trpc/client";
+import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
 import { useModal } from "@/components/ui/modal/context";
 import { SiteEditorModal, SiteEditorModalId } from "./SiteEditorModal";
 import { useAtprotoStore } from "@/components/stores/atproto";
-import { SerializedSuperjson, deserialize } from "@/server/utils/transformer";
+import {
+  SerializedSuperjson,
+  deserialize,
+} from "climateai-sdk/utilities/transformer";
 
-const getAllSites = trpcClient.gainforest.site.getAll.query;
+const getAllSites = trpcClient.gainforest.organization.site.getAll.query;
 export type AllSitesData = Awaited<ReturnType<typeof getAllSites>>;
 
 const SitesClient = ({
@@ -29,7 +32,8 @@ const SitesClient = ({
   const { data: reactiveData, isPlaceholderData: isOlderReactiveData } =
     useQuery({
       queryKey: ["getAllSites", did],
-      queryFn: async () => await getAllSites({ did }),
+      queryFn: async () =>
+        await getAllSites({ did, pdsDomain: allowedPDSDomains[0] }),
     });
   const isReactiveDataUpdating = isOlderReactiveData;
 
@@ -62,7 +66,7 @@ const SitesClient = ({
       <section
         className={cn("w-full", isReactiveDataUpdating && "animate-pulse")}
       >
-        {allSites.length === 0 ?
+        {allSites.length === 0 ? (
           <div className="w-full bg-muted h-40 rounded-lg mt-2 flex flex-col items-center justify-center text-center text-pretty text-sm">
             <span className="font-serif font-bold text-xl text-muted-foreground">
               No sites yet. {shouldEdit && "Click the button below to add one."}
@@ -80,7 +84,8 @@ const SitesClient = ({
               </Button>
             )}
           </div>
-        : <div className="grid grid-cols-[1fr_1fr_1fr] gap-2 mt-4">
+        ) : (
+          <div className="grid grid-cols-[1fr_1fr_1fr] gap-2 mt-4">
             {allSites.map((site) => {
               return (
                 <SiteCard
@@ -103,7 +108,7 @@ const SitesClient = ({
               </Button>
             )}
           </div>
-        }
+        )}
       </section>
     </div>
   );

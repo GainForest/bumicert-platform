@@ -6,16 +6,13 @@ import {
   ModalHeader,
   ModalTitle,
 } from "@/components/ui/modal/modal";
-import { useState } from "react";
-import { trpcClient } from "@/lib/trpc/client";
-import {
-  toBlobRefGenerator,
-  toFileGenerator,
-} from "@/server/routers/atproto/utils";
+import { useState, type ChangeEvent } from "react";
+import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
+import { toBlobRefGenerator, toFileGenerator } from "climateai-sdk/zod-schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { KnownShapefileT, SiteData } from "./SiteCard";
-import parseAtUri from "@/lib/atproto/getRkeyFromAtUri";
+import { SiteData } from "./SiteCard";
+import { parseAtUri } from "climateai-sdk/utilities";
 import FileInput from "@/app/ecocert/new/_components/Steps/components/FileInput";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, CheckIcon, Loader2 } from "lucide-react";
@@ -32,39 +29,23 @@ type SiteEditorModalProps = {
 export const SiteEditorModal = ({ initialData, did }: SiteEditorModalProps) => {
   const initialSite = initialData?.value;
   const initialName = initialSite?.name;
-  const initialShapefile = initialSite?.shapefile as
-    | KnownShapefileT
-    | undefined;
+  const initialShapefile = initialSite?.shapefile;
 
-  const { rkey } =
-    initialData?.uri ? parseAtUri(initialData.uri) : { rkey: undefined };
+  const { rkey } = initialData?.uri
+    ? parseAtUri(initialData.uri)
+    : { rkey: undefined };
   const mode = rkey ? "edit" : "add";
 
-  // Initialize URL tab if editing and shapefile is a URI
-  const initialShapefileUrl =
-    initialShapefile?.$type === "app.gainforest.common.defs#uri" ?
-      initialShapefile.uri
-    : "";
-
-  const previewUrl =
-    initialShapefile ?
-      initialShapefile.$type === "app.gainforest.common.defs#uri" ?
-        getShapefilePreviewUrl(initialShapefile.uri, did)
-      : getShapefilePreviewUrl(initialShapefile.blob, did)
+  const previewUrl = initialShapefile
+    ? getShapefilePreviewUrl(initialShapefile.blob, did)
     : null;
 
   const [name, setName] = useState(initialName ?? "");
   const [shapefile, setShapefile] = useState<File | null>(null);
-  const [shapefileEditUrl, setShapefileEditUrl] =
-    useState<string>(initialShapefileUrl);
-  const [tab, setTab] = useState<"url" | "file">(
-    initialShapefileUrl ? "url" : "file"
-  );
   const [showEditor, setShowEditor] = useState(mode === "add" || !previewUrl);
 
   // For edit mode, shapefile is optional if we're keeping the existing one
-  const hasShapefileInput =
-    tab === "file" ? shapefile !== null : shapefileEditUrl.trim() !== "";
+  const hasShapefileInput = shapefile !== null;
   const disableSubmission =
     !name.trim() || (mode === "add" && !hasShapefileInput);
 
@@ -85,21 +66,20 @@ export const SiteEditorModal = ({ initialData, did }: SiteEditorModalProps) => {
         }
 
         const shapefileInput =
-          tab === "file" && shapefile ? await toFileGenerator(shapefile)
-          : tab === "url" && shapefileEditUrl ? shapefileEditUrl
-          : null;
+          shapefile === null ? null : await toFileGenerator(shapefile);
 
         if (!shapefileInput) {
           throw new Error("Shapefile is required");
         }
 
-        await trpcClient.gainforest.site.create.mutate({
+        await trpcClient.gainforest.organization.site.create.mutate({
           site: {
             name: name.trim(),
           },
           uploads: {
             shapefile: shapefileInput,
           },
+          pdsDomain: allowedPDSDomains[0],
         });
       } else {
         // Edit mode
@@ -109,36 +89,36 @@ export const SiteEditorModal = ({ initialData, did }: SiteEditorModalProps) => {
 
         // If no new shapefile is provided, keep the existing one
         if (!hasShapefileInput && initialShapefile) {
-          await trpcClient.gainforest.site.update.mutate({
-            rkey,
-            site: {
-              name: name.trim(),
-              shapefile:
-                initialShapefile.$type === "app.gainforest.common.defs#uri" ?
-                  {
-                    $type: "app.gainforest.common.defs#uri",
-                    uri: initialShapefile.uri,
-                  }
-                : {
-                    $type: "app.gainforest.common.defs#smallBlob",
+          const sitePayload = {
+            name: name.trim(),
+            lat: initialSite!.lat,
+            lon: initialSite!.lon,
+            area: initialSite!.area,
+            ...(initialShapefile.$type ===
+            "app.gainforest.common.defs#smallBlob"
+              ? {
+                  shapefile: {
+                    $type: "app.gainforest.common.defs#smallBlob" as const,
                     blob: toBlobRefGenerator(initialShapefile.blob),
                   },
-              lat: initialSite!.lat,
-              lon: initialSite!.lon,
-              area: initialSite!.area,
-            },
+                }
+              : {}),
+          };
+
+          await trpcClient.gainforest.organization.site.update.mutate({
+            rkey,
+            site: sitePayload,
+            pdsDomain: allowedPDSDomains[0],
           });
         } else {
           const shapefileInput =
-            tab === "file" && shapefile ? await toFileGenerator(shapefile)
-            : tab === "url" && shapefileEditUrl ? shapefileEditUrl
-            : null;
+            shapefile === null ? null : await toFileGenerator(shapefile);
 
           if (!shapefileInput) {
             throw new Error("Shapefile is required");
           }
 
-          await trpcClient.gainforest.site.update.mutate({
+          await trpcClient.gainforest.organization.site.update.mutate({
             rkey,
             site: {
               name: name.trim(),
@@ -149,6 +129,7 @@ export const SiteEditorModal = ({ initialData, did }: SiteEditorModalProps) => {
             uploads: {
               shapefile: shapefileInput,
             },
+            pdsDomain: allowedPDSDomains[0],
           });
         }
       }
@@ -168,9 +149,9 @@ export const SiteEditorModal = ({ initialData, did }: SiteEditorModalProps) => {
       >
         <ModalTitle>{mode === "edit" ? "Edit" : "Add"} Site</ModalTitle>
         <ModalDescription>
-          {mode === "edit" ?
-            "Edit the site information."
-          : "Add a new site to the organization."}
+          {mode === "edit"
+            ? "Edit the site information."
+            : "Add a new site to the organization."}
         </ModalDescription>
       </ModalHeader>
       <AnimatePresence mode="wait">
@@ -196,7 +177,9 @@ export const SiteEditorModal = ({ initialData, did }: SiteEditorModalProps) => {
                   placeholder="Grassroots Farm"
                   id="name-for-site"
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    setName(e.target.value)
+                  }
                 />
               </div>
             </div>
@@ -229,38 +212,15 @@ export const SiteEditorModal = ({ initialData, did }: SiteEditorModalProps) => {
                       <ArrowLeft />
                     </Button>
                   )}
-                  <Button
-                    className="flex-1 border-primary"
-                    variant={tab === "file" ? "outline" : "ghost"}
-                    onClick={() => setTab("file")}
-                  >
-                    File
-                  </Button>
-                  <Button
-                    className="flex-1 border-primary"
-                    variant={tab === "url" ? "outline" : "ghost"}
-                    onClick={() => setTab("url")}
-                  >
-                    URL
-                  </Button>
                 </div>
                 <div className="mt-2">
-                  {tab === "file" && (
-                    <FileInput
-                      placeholder="Upload a GeoJSON file"
-                      value={shapefile ?? undefined}
-                      supportedFileTypes={["application/geo+json"]}
-                      maxSizeInMB={10}
-                      onFileChange={(file) => setShapefile(file)}
-                    />
-                  )}
-                  {tab === "url" && (
-                    <Input
-                      placeholder="https://example.com/shapefile.geojson"
-                      value={shapefileEditUrl}
-                      onChange={(e) => setShapefileEditUrl(e.target.value)}
-                    />
-                  )}
+                  <FileInput
+                    placeholder="Upload a GeoJSON file"
+                    value={shapefile ?? undefined}
+                    supportedFileTypes={["application/geo+json"]}
+                    maxSizeInMB={10}
+                    onFileChange={(file) => setShapefile(file)}
+                  />
                 </div>
               </>
             )}
@@ -303,13 +263,13 @@ export const SiteEditorModal = ({ initialData, did }: SiteEditorModalProps) => {
             disabled={disableSubmission || isPending}
           >
             {isPending && <Loader2 className="animate-spin mr-2" />}
-            {mode === "edit" ?
-              isPending ?
-                "Saving..."
-              : "Save"
-            : isPending ?
-              "Adding..."
-            : "Add"}
+            {mode === "edit"
+              ? isPending
+                ? "Saving..."
+                : "Save"
+              : isPending
+              ? "Adding..."
+              : "Add"}
           </Button>
         )}
         {isCompleted && (

@@ -1,6 +1,6 @@
 "use client";
 import { useAtprotoStore } from "@/components/stores/atproto";
-import { trpcClient } from "@/lib/trpc/client";
+import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
 import { cn } from "@/lib/utils";
 import {
   CircleAlertIcon,
@@ -18,7 +18,7 @@ import { useStep1Store } from "../Step1/store";
 import { useStep2Store } from "../Step2/store";
 import { useStep3Store } from "../Step3/store";
 import { useStep5Store } from "./store";
-import { toFileGenerator } from "@/server/routers/atproto/utils";
+import { toFileGenerator } from "climateai-sdk/zod-schemas";
 
 const ProgressItem = ({
   iconset,
@@ -74,11 +74,13 @@ const ProgressItem = ({
           status === "pending" && "bg-background border border-border"
         )}
       >
-        {status === "error" ?
+        {status === "error" ? (
           <iconset.Error className="size-8 text-white" />
-        : status === "success" ?
+        ) : status === "success" ? (
           <iconset.Success className="size-8 text-primary-foreground" />
-        : <Loader2 className="size-8 animate-spin text-primary" />}
+        ) : (
+          <Loader2 className="size-8 animate-spin text-primary" />
+        )}
       </div>
 
       <div>
@@ -102,9 +104,11 @@ const ProgressItem = ({
 const Step5 = () => {
   const auth = useAtprotoStore((state) => state.auth);
   const authStatus =
-    auth.status === "RESUMING" ? "pending"
-    : auth.status === "AUTHENTICATED" ? "success"
-    : "error";
+    auth.status === "RESUMING"
+      ? "pending"
+      : auth.status === "AUTHENTICATED"
+      ? "success"
+      : "error";
 
   const step1FormValues = useStep1Store((state) => state.formValues);
   const step2FormValues = useStep2Store((state) => state.formValues);
@@ -116,7 +120,8 @@ const Step5 = () => {
     setOverallStatus("pending");
   }, []);
 
-  const createEcocertMutationFn = trpcClient.hypercerts.claim.create.mutate;
+  const createEcocertMutationFn =
+    trpcClient.hypercerts.claim.activity.create.mutate;
   type CreateEcocertResponse = Awaited<
     ReturnType<typeof createEcocertMutationFn>
   >;
@@ -125,9 +130,10 @@ const Step5 = () => {
   const [createEcocertError, setCreateEcocertError] = useState<string | null>(
     null
   );
-  const createEcocertStatus =
-    createEcocertError ? "error"
-    : createdEcocertResponse === null ? "pending"
+  const createEcocertStatus = createEcocertError
+    ? "error"
+    : createdEcocertResponse === null
+    ? "pending"
     : "success";
   const { mutate: createEcocert } = useMutation({
     mutationKey: ["create-ecocert"],
@@ -135,19 +141,20 @@ const Step5 = () => {
       if (!step1FormValues.coverImage)
         throw new Error("Cover image is required");
       const response = await createEcocertMutationFn({
-        claim: {
+        activity: {
           title: step1FormValues.projectName,
           shortDescription: step2FormValues.shortDescription,
           description: step2FormValues.impactStory,
-          workScope: step1FormValues.workType,
-          workTimeFrameFrom: step1FormValues.projectDateRange[0].toISOString(),
-          workTimeFrameTo: step1FormValues.projectDateRange[1].toISOString(),
+          workScopes: step1FormValues.workType,
+          startDate: step1FormValues.projectDateRange[0].toISOString(),
+          endDate: step1FormValues.projectDateRange[1].toISOString(),
         },
         uploads: {
           contributors: step3FormValues.contributors,
           siteAtUri: step3FormValues.siteBoundaries,
           image: await toFileGenerator(step1FormValues.coverImage),
         },
+        pdsDomain: allowedPDSDomains[0],
       });
       if (response.success !== true)
         throw new Error("Failed to create ecocert");
@@ -183,9 +190,9 @@ const Step5 = () => {
         }}
         title="Authenticated"
         description={
-          authStatus === "pending" ?
-            "We are checking if you are authenticated."
-          : "You are not signed in. Please sign in to continue."
+          authStatus === "pending"
+            ? "We are checking if you are authenticated."
+            : "You are not signed in. Please sign in to continue."
         }
         status={authStatus}
       />
@@ -196,16 +203,18 @@ const Step5 = () => {
             Success: CircleCheckIcon,
           }}
           title={
-            createEcocertError ? "Failed to publish."
-            : createdEcocertResponse === null ?
-              "Publishing your ecocert"
-            : "Published!"
+            createEcocertError
+              ? "Failed to publish."
+              : createdEcocertResponse === null
+              ? "Publishing your ecocert"
+              : "Published!"
           }
           description={
-            createEcocertError ? createEcocertError
-            : createdEcocertResponse === null ?
-              "We are publishing your ecocert."
-            : ""
+            createEcocertError
+              ? createEcocertError
+              : createdEcocertResponse === null
+              ? "We are publishing your ecocert."
+              : ""
           }
           status={createEcocertStatus}
           isLastStep={true}
