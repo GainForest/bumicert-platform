@@ -15,9 +15,12 @@ import { SiteData } from "./SiteCard";
 import { parseAtUri } from "climateai-sdk/utilities";
 import FileInput from "@/app/ecocert/new/_components/Steps/components/FileInput";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, CheckIcon, Loader2 } from "lucide-react";
+import { ArrowLeft, CheckIcon, Loader2, Pencil } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getShapefilePreviewUrl } from "./utils";
+import DrawPolygonModal, {
+  DrawPolygonModalId,
+} from "@/components/global/modals/draw-polygon";
 
 export const SiteEditorModalId = "site/editor";
 
@@ -51,7 +54,7 @@ export const SiteEditorModal = ({ initialData, did }: SiteEditorModalProps) => {
 
   const [isCompleted, setIsCompleted] = useState(false);
 
-  const { stack, popModal, hide } = useModal();
+  const { stack, popModal, hide, pushModal, show } = useModal();
   const queryClient = useQueryClient();
 
   const {
@@ -213,14 +216,37 @@ export const SiteEditorModal = ({ initialData, did }: SiteEditorModalProps) => {
                     </Button>
                   )}
                 </div>
-                <div className="mt-2">
-                  <FileInput
-                    placeholder="Upload a GeoJSON file"
-                    value={shapefile ?? undefined}
-                    supportedFileTypes={["application/geo+json"]}
-                    maxSizeInMB={10}
-                    onFileChange={(file) => setShapefile(file)}
-                  />
+                <div className="mt-2 flex flex-col gap-3">
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1">
+                      <FileInput
+                        placeholder="Upload a GeoJSON file"
+                        value={shapefile ?? undefined}
+                        supportedFileTypes={["application/geo+json"]}
+                        maxSizeInMB={10}
+                        onFileChange={(file) => setShapefile(file)}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="h-px bg-border flex-1" />
+                    <span className="text-xs text-muted-foreground">or</span>
+                    <div className="h-px bg-border flex-1" />
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => {
+                      pushModal({
+                        id: DrawPolygonModalId,
+                        content: <DrawPolygonModal />,
+                      });
+                      show();
+                    }}
+                  >
+                    <Pencil className="size-4 mr-2" />
+                    Draw a site
+                  </Button>
                 </div>
               </>
             )}
