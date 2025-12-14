@@ -4,11 +4,10 @@ import type { AppGainforestOrganizationInfo } from "climateai-sdk/lex-api";
 import { useOrganizationPageStore } from "../../store";
 import { Textarea } from "@/components/ui/textarea";
 import useHydratedData from "@/hooks/use-hydration";
-import { BlobRef } from "@atproto/api";
 import {
   deserialize,
   SerializedSuperjson,
-} from "climateai-sdk/utilities/transformer";
+} from "climateai-sdk/utilities/transform";
 
 const AboutOrganization = ({
   initialData,

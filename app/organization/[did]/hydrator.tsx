@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import {
   deserialize,
   SerializedSuperjson,
-} from "climateai-sdk/utilities/transformer";
+} from "climateai-sdk/utilities/transform";
 
 export const OrganizationPageHydrator = ({
   initialSerializedData,

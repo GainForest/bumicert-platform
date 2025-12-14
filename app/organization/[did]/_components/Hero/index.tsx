@@ -1,7 +1,7 @@
 "use client";
 
 import type { AppGainforestOrganizationInfo } from "climateai-sdk/lex-api";
-import { getBlobUrl } from "climateai-sdk/utilities";
+import { getBlobUrl } from "climateai-sdk/utilities/atproto";
 import { BadgeCheck, Pencil } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect } from "react";
@@ -14,14 +14,12 @@ import {
   ImageEditorModal,
   ImageEditorModalId,
 } from "../../_modals/image-editor";
-import { BlobRef } from "@atproto/api";
 import useHydratedData from "@/hooks/use-hydration";
-import { toBlobRef, type BlobRefGenerator } from "climateai-sdk/zod-schemas";
 import {
   customTransformer,
   deserialize,
   SerializedSuperjson,
-} from "climateai-sdk/utilities/transformer";
+} from "climateai-sdk/utilities/transform";
 import { AllowedPDSDomain, allowedPDSDomains } from "@/config/climateai-sdk";
 
 const Hero = ({

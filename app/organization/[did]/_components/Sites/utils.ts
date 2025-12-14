@@ -1,7 +1,6 @@
-import { getBlobUrl } from "climateai-sdk/utilities";
+import { getBlobUrl } from "climateai-sdk/utilities/atproto";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
-import { BlobRefGenerator } from "climateai-sdk/zod-schemas";
-import { BlobRef } from "@atproto/api";
+import { BlobRefGenerator, BlobRef } from "climateai-sdk/zod";
 
 export const getShapefilePreviewUrl = <T extends BlobRef | BlobRefGenerator>(
   shapefile: T | string,

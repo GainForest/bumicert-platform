@@ -8,7 +8,7 @@ import { useStep4Store } from "./store";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
 import { useQuery } from "@tanstack/react-query";
-import { getBlobUrl } from "climateai-sdk/utilities";
+import { getBlobUrl } from "climateai-sdk/utilities/atproto";
 import { Loader2, UploadIcon } from "lucide-react";
 import { useModal } from "@/components/ui/modal/context";
 import { UploadLogoModal, UploadLogoModalId } from "./UploadLogoModal";

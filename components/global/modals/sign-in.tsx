@@ -41,8 +41,14 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
     error: signInError,
   } = trpcApi.auth.login.useMutation({
     onSuccess: (data) => {
-      addPreviousSession(data.context.handle);
-      setAuth(data.context, data.service as string);
+      addPreviousSession(data.handle);
+      setAuth(
+        {
+          did: data.did,
+          handle: data.handle,
+        },
+        data.service as string
+      );
 
       // Pop all auth modals from the stack and hide if there
       const stackCopy = structuredClone(stack);

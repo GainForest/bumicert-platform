@@ -13,7 +13,7 @@ import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { useModal } from "@/components/ui/modal/context";
-import { toBlobRefGenerator, toFileGenerator } from "climateai-sdk/zod-schemas";
+import { toBlobRefGenerator, toFileGenerator } from "climateai-sdk/zod";
 
 export const UploadLogoModalId = "upload/organization/logo";
 

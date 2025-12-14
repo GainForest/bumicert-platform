@@ -6,8 +6,8 @@ import {
   ModalHeader,
   ModalTitle,
 } from "@/components/ui/modal/modal";
-import { getBlobUrl } from "climateai-sdk/utilities";
-import { BlobRef } from "@atproto/api";
+import { getBlobUrl } from "climateai-sdk/utilities/atproto";
+import { BlobRef } from "climateai-sdk/zod";
 import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Loader2Icon } from "lucide-react";

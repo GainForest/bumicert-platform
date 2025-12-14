@@ -31,7 +31,13 @@ const AtprotoHydrationProvider = ({
       }
     },
     onSuccess: (data) => {
-      setAuth(data.context, data.service as string);
+      setAuth(
+        {
+          did: data.did,
+          handle: data.handle,
+        },
+        data.service as string
+      );
     },
     retry: 3,
   });

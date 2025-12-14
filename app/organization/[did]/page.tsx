@@ -13,7 +13,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getSessionFromRequest } from "climateai-sdk/session";
-import { serialize } from "climateai-sdk/utilities/transformer";
+import { serialize } from "climateai-sdk/utilities/transform";
 import { climateAiSdk } from "@/config/climateai-sdk.server";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
 

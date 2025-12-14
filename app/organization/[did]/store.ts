@@ -5,8 +5,8 @@ import {
   BlobRefGenerator,
   toBlobRefGenerator,
   toFileGenerator,
-} from "climateai-sdk/zod-schemas";
-import { BlobRef } from "@atproto/api";
+} from "climateai-sdk/zod";
+import { BlobRef } from "climateai-sdk/zod";
 import { PutRecordResponse } from "climateai-sdk/types";
 
 export type HeroEditingData = {

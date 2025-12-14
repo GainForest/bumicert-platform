@@ -14,8 +14,6 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { AllSitesData } from "./SitesClient";
-import { $Typed } from "@atproto/api";
-import { AppGainforestCommonDefs } from "climateai-sdk/lex-api";
 import {
   DropdownMenu,
   DropdownMenuTrigger,

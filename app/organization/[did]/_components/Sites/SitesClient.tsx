@@ -14,7 +14,7 @@ import { useAtprotoStore } from "@/components/stores/atproto";
 import {
   SerializedSuperjson,
   deserialize,
-} from "climateai-sdk/utilities/transformer";
+} from "climateai-sdk/utilities/transform";
 
 const getAllSites = trpcClient.gainforest.organization.site.getAll.query;
 export type AllSitesData = Awaited<ReturnType<typeof getAllSites>>;

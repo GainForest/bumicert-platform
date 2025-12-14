@@ -8,11 +8,11 @@ import {
 } from "@/components/ui/modal/modal";
 import { useState, type ChangeEvent } from "react";
 import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
-import { toBlobRefGenerator, toFileGenerator } from "climateai-sdk/zod-schemas";
+import { toBlobRefGenerator, toFileGenerator } from "climateai-sdk/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { SiteData } from "./SiteCard";
-import { parseAtUri } from "climateai-sdk/utilities";
+import { parseAtUri } from "climateai-sdk/utilities/atproto";
 import FileInput from "@/app/ecocert/new/_components/Steps/components/FileInput";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, CheckIcon, Loader2, Pencil } from "lucide-react";
@@ -64,10 +64,6 @@ export const SiteEditorModal = ({ initialData, did }: SiteEditorModalProps) => {
   } = useMutation({
     mutationFn: async () => {
       if (mode === "add") {
-        if (!hasShapefileInput) {
-          throw new Error("Shapefile is required");
-        }
-
         const shapefileInput =
           shapefile === null ? null : await toFileGenerator(shapefile);
 
@@ -239,7 +235,24 @@ export const SiteEditorModal = ({ initialData, did }: SiteEditorModalProps) => {
                     onClick={() => {
                       pushModal({
                         id: DrawPolygonModalId,
-                        content: <DrawPolygonModal />,
+                        content: (
+                          <DrawPolygonModal
+                            onSubmit={(polygonJSONString: string) => {
+                              // Convert JSON string to File
+                              const blob = new Blob([polygonJSONString], {
+                                type: "application/geo+json",
+                              });
+                              const file = new File(
+                                [blob],
+                                "drawn-polygon.geojson",
+                                {
+                                  type: "application/geo+json",
+                                }
+                              );
+                              setShapefile(file);
+                            }}
+                          />
+                        ),
                       });
                       show();
                     }}

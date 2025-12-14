@@ -11,9 +11,9 @@ import {
   AppGainforestOrganizationInfo,
   OrgHypercertsClaimActivity,
 } from "climateai-sdk/lex-api";
-import { getBlobUrl } from "climateai-sdk/utilities";
+import { getBlobUrl } from "climateai-sdk/utilities/atproto";
 import { EcocertArt } from "@/app/ecocert/new/_components/Steps/Step4/EcocertPreviewCard";
-import { $Typed } from "climateai-sdk/lex-api/util";
+import { $Typed } from "climateai-sdk/lex-api/utils";
 import { AppGainforestCommonDefs as Defs } from "climateai-sdk/lex-api";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
 

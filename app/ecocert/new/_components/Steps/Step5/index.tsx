@@ -18,7 +18,7 @@ import { useStep1Store } from "../Step1/store";
 import { useStep2Store } from "../Step2/store";
 import { useStep3Store } from "../Step3/store";
 import { useStep5Store } from "./store";
-import { toFileGenerator } from "climateai-sdk/zod-schemas";
+import { toFileGenerator } from "climateai-sdk/zod";
 
 const ProgressItem = ({
   iconset,

@@ -3,7 +3,7 @@ import React from "react";
 import SitesClient, { AllSitesData } from "./SitesClient";
 import { tryCatch } from "@/lib/tryCatch";
 import { TRPCError } from "@trpc/server";
-import { serialize } from "climateai-sdk/utilities/transformer";
+import { serialize } from "climateai-sdk/utilities/transform";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
 
 const Sites = async ({ did }: { did: string }) => {

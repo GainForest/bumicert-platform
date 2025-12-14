@@ -16,9 +16,9 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
-import { parseAtUri, getBlobUrl } from "climateai-sdk/utilities";
+import { parseAtUri, getBlobUrl } from "climateai-sdk/utilities/atproto";
 import { AppGainforestCommonDefs as Defs } from "climateai-sdk/lex-api";
-import { $Typed } from "climateai-sdk/lex-api/util";
+import { $Typed } from "climateai-sdk/lex-api/utils";
 
 // type ValidatedProperties = {
 //   properties: Array<{

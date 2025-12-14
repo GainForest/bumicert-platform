@@ -32,7 +32,7 @@ import useHydratedData from "@/hooks/use-hydration";
 import {
   deserialize,
   SerializedSuperjson,
-} from "climateai-sdk/utilities/transformer";
+} from "climateai-sdk/utilities/transform";
 
 const formatWebsite = (website: string | undefined) => {
   if (!website) return undefined;
