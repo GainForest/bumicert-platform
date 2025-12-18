@@ -16,7 +16,6 @@ import { PriceFeedProvider } from "@/components/providers/PriceFeedProvider";
 import { ThemeProvider } from "next-themes";
 import HypercertExchangeClientProvider from "@/components/providers/HypercertExchangeClientProvider";
 import { TrpcProvider } from "@/components/providers/TrpcProvider";
-import AtprotoHydrationProvider from "@/components/providers/AtprotoHydrationProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -59,17 +58,15 @@ export default function RootLayout({
           <NuqsAdapter>
             {/* <PrivyProvider> */}
             <TrpcProvider>
-              <AtprotoHydrationProvider>
-                <ModalProvider>
-                  {/* <PriceFeedProvider> */}
-                  {/* <ChainSwitchProvider> */}
-                  {/* <HypercertExchangeClientProvider> */}
-                  {children}
-                  {/* </HypercertExchangeClientProvider> */}
-                  {/* </ChainSwitchProvider> */}
-                  {/* </PriceFeedProvider> */}
-                </ModalProvider>
-              </AtprotoHydrationProvider>
+              <ModalProvider>
+                {/* <PriceFeedProvider> */}
+                {/* <ChainSwitchProvider> */}
+                {/* <HypercertExchangeClientProvider> */}
+                {children}
+                {/* </HypercertExchangeClientProvider> */}
+                {/* </ChainSwitchProvider> */}
+                {/* </PriceFeedProvider> */}
+              </ModalProvider>
             </TrpcProvider>
             {/* </PrivyProvider> */}
           </NuqsAdapter>
