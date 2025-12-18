@@ -2,12 +2,20 @@
 import { Button } from "@/components/ui/button";
 import { ArrowUpRight, Menu, UserX2, X } from "lucide-react";
 import React from "react";
-import { footerLinks, navLinks } from "./data";
 import { cn } from "@/lib/utils";
 import { useNavbarContext } from "./context";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { NavLinkConfig } from "./types";
 
-const MobileNavbar = () => {
+export type MobileNavbarProps = {
+  navLinks: NavLinkConfig[];
+  footerLinks: {
+    href: string;
+    text: string;
+  }[];
+};
+
+const MobileNavbar = ({ navLinks, footerLinks }: MobileNavbarProps) => {
   const { openState, setOpenState } = useNavbarContext();
   const [parent] = useAutoAnimate();
   return (
@@ -17,9 +25,7 @@ const MobileNavbar = () => {
           Ecocertain
         </span>
         <Button variant={"outline"} size={"sm"} onClick={() => setOpenState()}>
-          {openState.mobile ?
-            <X />
-          : <Menu />}
+          {openState.mobile ? <X /> : <Menu />}
         </Button>
         <Button
           variant={"outline"}

@@ -57,23 +57,21 @@ export default function RootLayout({
       >
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <NuqsAdapter>
-            <PrivyProvider>
-              <TrpcProvider>
-                <AtprotoHydrationProvider>
-                  <ModalProvider>
-                    <PriceFeedProvider>
-                      <ChainSwitchProvider>
-                        <HypercertExchangeClientProvider>
-                          <NavbarContextProvider>
-                            <NavbarLayout>{children}</NavbarLayout>
-                          </NavbarContextProvider>
-                        </HypercertExchangeClientProvider>
-                      </ChainSwitchProvider>
-                    </PriceFeedProvider>
-                  </ModalProvider>
-                </AtprotoHydrationProvider>
-              </TrpcProvider>
-            </PrivyProvider>
+            {/* <PrivyProvider> */}
+            <TrpcProvider>
+              <AtprotoHydrationProvider>
+                <ModalProvider>
+                  {/* <PriceFeedProvider> */}
+                  {/* <ChainSwitchProvider> */}
+                  {/* <HypercertExchangeClientProvider> */}
+                  {children}
+                  {/* </HypercertExchangeClientProvider> */}
+                  {/* </ChainSwitchProvider> */}
+                  {/* </PriceFeedProvider> */}
+                </ModalProvider>
+              </AtprotoHydrationProvider>
+            </TrpcProvider>
+            {/* </PrivyProvider> */}
           </NuqsAdapter>
         </ThemeProvider>
       </body>

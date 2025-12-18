@@ -1,4 +1,4 @@
-import ProofOfImpact from "@/app/ecocert/[ecocertId]/_components/Widgets/ProofsOfImpact/ProofOfImpact";
+import ProofOfImpact from "@/app/(marketplace)/ecocert/[ecocertId]/_components/Widgets/ProofsOfImpact/ProofOfImpact";
 import { Button } from "@/components/ui/button";
 import { useModal } from "@/components/ui/modal/context";
 import {

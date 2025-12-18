@@ -6,13 +6,26 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { footerLinks, navLinks } from "./data";
 import { Switch } from "@/components/ui/switch";
 import { useTheme } from "next-themes";
 import useIsMounted from "@/hooks/use-is-mounted";
 import { useAtprotoStore } from "@/components/stores/atproto";
+import { NavLinkConfig } from "./types";
 
-const DesktopNavbar = () => {
+export type DesktopNavbarProps = {
+  navLinks: NavLinkConfig[];
+  footerLinks: {
+    href: string;
+    text: string;
+  }[];
+  title?: string;
+};
+
+const DesktopNavbar = ({
+  navLinks,
+  footerLinks,
+  title = "Ecocertain",
+}: DesktopNavbarProps) => {
   const { theme, setTheme } = useTheme();
   const isMounted = useIsMounted();
   const pathname = usePathname();
@@ -27,12 +40,12 @@ const DesktopNavbar = () => {
         <div className="h-12 w-12 border border-border rounded-xl shadow-lg bg-background flex items-center justify-center">
           <Image
             src="/assets/media/images/logo.svg"
-            alt="Ecocertain"
+            alt={title}
             width={32}
             height={32}
           />
         </div>
-        <b className="font-serif text-2xl drop-shadow-lg">Ecocertain</b>
+        <b className="font-serif text-2xl drop-shadow-lg">{title}</b>
 
         {/* Nav Links */}
         <ul className="mt-2 flex flex-col gap-1">

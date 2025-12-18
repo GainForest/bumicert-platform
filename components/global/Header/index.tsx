@@ -14,11 +14,7 @@ const Header = () => {
       <div className="flex items-center justify-between gap-1 p-2 bg-background/80">
         <div className="flex items-center gap-1">
           {viewport === "desktop" && (
-            <Button
-              variant="outline"
-              size={"sm"}
-              onClick={() => setOpenState()}
-            >
+            <Button variant="ghost" size={"sm"} onClick={() => setOpenState()}>
               <Sidebar className="size-4" />
             </Button>
           )}
