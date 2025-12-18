@@ -1,11 +1,11 @@
 "use client";
 import Image from "next/image";
 import React from "react";
-import BiokoNeutralImage from "@/app/ecocert/new/_assets/bioko-neutral.png";
-import BiokoHoldingLoudspeakerImage from "@/app/ecocert/new/_assets/bioko-holding-loudspeaker.png";
-import BiokoHoldingEarthImage from "@/app/ecocert/new/_assets/bioko-holding-earth.png";
-import BiokoHoldingMagnifierImage from "@/app/ecocert/new/_assets/bioko-holding-magnifier.png";
-import BiokoHoldingConfettiImage from "@/app/ecocert/new/_assets/bioko-holding-confetti.png";
+import BiokoNeutralImage from "@/app/(marketplace)/ecocert/new/_assets/bioko-neutral.png";
+import BiokoHoldingLoudspeakerImage from "@/app/(marketplace)/ecocert/new/_assets/bioko-holding-loudspeaker.png";
+import BiokoHoldingEarthImage from "@/app/(marketplace)/ecocert/new/_assets/bioko-holding-earth.png";
+import BiokoHoldingMagnifierImage from "@/app/(marketplace)/ecocert/new/_assets/bioko-holding-magnifier.png";
+import BiokoHoldingConfettiImage from "@/app/(marketplace)/ecocert/new/_assets/bioko-holding-confetti.png";
 import { getStripedBackground } from "@/lib/getStripedBackground";
 import { AnimatePresence, motion } from "framer-motion";
 import { Lightbulb } from "lucide-react";

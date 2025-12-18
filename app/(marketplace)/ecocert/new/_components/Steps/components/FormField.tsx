@@ -1,7 +1,7 @@
 import { LucideIcon } from "lucide-react";
 import React from "react";
-import BiokoPeekingImage from "@/app/ecocert/new/_assets/bioko-peeking.png";
-import BiokoGrabbingImage from "@/app/ecocert/new/_assets/bioko-grabbing.png";
+import BiokoPeekingImage from "@/app/(marketplace)/ecocert/new/_assets/bioko-peeking.png";
+import BiokoGrabbingImage from "@/app/(marketplace)/ecocert/new/_assets/bioko-grabbing.png";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
@@ -32,9 +32,9 @@ const FormField = ({
     <div
       className={cn(
         "group flex flex-col gap-1.5 p-2 rounded-md transition-colors relative z-10",
-        showError && error ? "bg-destructive/5" : (
-          "hover:bg-primary/5 focus-within:bg-primary/5"
-        ),
+        showError && error
+          ? "bg-destructive/5"
+          : "hover:bg-primary/5 focus-within:bg-primary/5",
         className
       )}
     >
@@ -61,20 +61,21 @@ const FormField = ({
           htmlFor={htmlFor ?? kebabCaseLabel}
           className={cn(
             "ml-1 flex items-center gap-1 text-sm transition-colors",
-            showError && error ? "text-destructive" : (
-              "text-muted-foreground group-hover:text-foreground group-focus-within:text-foreground"
-            )
+            showError && error
+              ? "text-destructive"
+              : "text-muted-foreground group-hover:text-foreground group-focus-within:text-foreground"
           )}
         >
           <Icon className="size-3.5" />
           {label}
         </label>
-        {showError && error ?
+        {showError && error ? (
           <span className="text-destructive text-xs">{error}</span>
-        : <span className="text-xs text-muted-foreground">
+        ) : (
+          <span className="text-xs text-muted-foreground">
             {inlineEndMessage}
           </span>
-        }
+        )}
       </div>
 
       {children}
