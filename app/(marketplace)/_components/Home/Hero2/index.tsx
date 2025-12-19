@@ -96,9 +96,11 @@ const Hero2 = () => {
               setShouldDisplayLearnMoreContent((prev) => !prev);
             }}
           >
-            {shouldDisplayLearnMoreContent ?
+            {shouldDisplayLearnMoreContent ? (
               <ChevronLeftIcon className="size-3 text-white/80" />
-            : <InfoIcon className="size-3 text-white/80" />}
+            ) : (
+              <InfoIcon className="size-3 text-white/80" />
+            )}
             <span className="text-white/80 text-sm">
               {shouldDisplayLearnMoreContent ? "Back" : "Learn more"}
             </span>

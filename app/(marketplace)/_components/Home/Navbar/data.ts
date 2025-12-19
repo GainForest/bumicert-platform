@@ -23,11 +23,11 @@ export const navLinks: NavLinkConfig[] = [
   },
   {
     id: "submit",
-    href: "/ecocert/new",
+    href: "/ecocert/create",
     text: "Create",
     Icon: BadgePlus,
     pathCheck: {
-      equals: "/ecocert/new",
+      equals: "/ecocert/create",
     },
   },
   // {

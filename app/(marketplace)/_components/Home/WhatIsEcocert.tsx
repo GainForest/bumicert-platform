@@ -1,4 +1,4 @@
-import { EcocertArt } from "@/app/(marketplace)/ecocert/new/_components/Steps/Step4/EcocertPreviewCard";
+import { EcocertArt } from "@/app/(marketplace)/ecocert/create/[draftId]/_components/Steps/Step4/EcocertPreviewCard";
 import {
   Accordion,
   AccordionContent,

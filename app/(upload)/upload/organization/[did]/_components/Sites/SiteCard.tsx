@@ -22,8 +22,11 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { useModal } from "@/components/ui/modal/context";
-import { SiteEditorModal, SiteEditorModalId } from "./SiteEditorModal";
-import { getShapefilePreviewUrl } from "./utils";
+import {
+  SiteEditorModal,
+  SiteEditorModalId,
+} from "../../../../../../../components/global/modals/upload/site/editor";
+import { getShapefilePreviewUrl } from "../../../../../../../lib/shapefile";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { trpcApi } from "@/components/providers/TrpcProvider";
@@ -77,7 +80,7 @@ const SiteCard = ({ siteData, defaultSite, did }: SiteCardProps) => {
     pushModal(
       {
         id: SiteEditorModalId,
-        content: <SiteEditorModal initialData={siteData} did={did} />,
+        content: <SiteEditorModal initialData={siteData} />,
       },
       true
     );

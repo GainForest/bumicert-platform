@@ -116,9 +116,9 @@ const CountryButton = ({
     >
       <span className="text-2xl">{countryData.emoji}</span>
       <span className="text-base truncate">
-        {countryData.name.length > 16 ?
-          countryData.name.slice(0, 16) + "..."
-        : countryData.name}
+        {countryData.name.length > 16
+          ? countryData.name.slice(0, 16) + "..."
+          : countryData.name}
       </span>
     </Button>
   );

@@ -9,7 +9,7 @@ import { Ecocert } from "climateai-sdk/types";
 import { getBlobUrl } from "climateai-sdk/utilities/atproto";
 import { OrgHypercertsDefs as Defs } from "climateai-sdk/lex-api";
 import { $Typed } from "climateai-sdk/lex-api/utils";
-import { EcocertArt } from "@/app/(marketplace)/ecocert/new/_components/Steps/Step4/EcocertPreviewCard";
+import { EcocertArt } from "@/app/(marketplace)/ecocert/create/[draftId]/_components/Steps/Step4/EcocertPreviewCard";
 import { parseAtUri } from "climateai-sdk/utilities/atproto";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
 

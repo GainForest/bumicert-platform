@@ -9,7 +9,10 @@ import SiteCard from "./SiteCard";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
 import { useModal } from "@/components/ui/modal/context";
 import { trpcApi } from "@/components/providers/TrpcProvider";
-import { SiteEditorModal, SiteEditorModalId } from "./SiteEditorModal";
+import {
+  SiteEditorModal,
+  SiteEditorModalId,
+} from "../../../../../../../components/global/modals/upload/site/editor";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import {
   SerializedSuperjson,
@@ -56,7 +59,7 @@ const SitesClient = ({
     pushModal(
       {
         id: SiteEditorModalId,
-        content: <SiteEditorModal initialData={null} did={did} />,
+        content: <SiteEditorModal initialData={null} />,
       },
       true
     );

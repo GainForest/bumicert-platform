@@ -1,4 +1,4 @@
-import FileInput from "@/app/(marketplace)/ecocert/new/_components/Steps/components/FileInput";
+import FileInput from "@/components/ui/FileInput";
 import {
   ModalContent,
   ModalDescription,

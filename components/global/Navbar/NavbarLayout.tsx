@@ -44,7 +44,7 @@ const NavbarLayout = ({
         {viewport === "mobile" && <MobileNavbar {...mobileNavbarProps} />}
         <main
           className={cn(
-            "flex-1 bg-background border border-border shadow-inner rounded-xl relative overflow-y-auto",
+            "flex-1 flex flex-col bg-background border border-border shadow-inner rounded-xl relative overflow-y-auto",
             viewport === "desktop"
               ? openState.desktop
                 ? "m-2 md:ml-0"

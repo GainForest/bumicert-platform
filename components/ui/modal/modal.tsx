@@ -25,7 +25,7 @@ export const ModalHeader = ({
         backAction ? props.className : ""
       )}
     >
-      {backAction ?
+      {backAction ? (
         <>
           <Button
             variant={"secondary"}
@@ -39,7 +39,9 @@ export const ModalHeader = ({
           </Button>
           <div {...props} />
         </>
-      : props.children}
+      ) : (
+        props.children
+      )}
     </div>
   );
 };

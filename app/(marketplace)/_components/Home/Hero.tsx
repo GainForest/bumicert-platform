@@ -78,4 +78,19 @@ const Hero = () => {
   );
 };
 
+export const HeroEcocertCards = () => {
+  return (
+    <div className="flex items-center gap-[50px] scale-100 md:scale-125 group">
+      {ecocertCardTitles.map((title, index) => (
+        <div
+          className="w-1 flex items-center justify-center group-hover:not-hover:blur-sm group-hover:not-hover:scale-95 group-hover:not-hover:opacity-50 group-hover:hover:blur-none group-hover:hover:scale-105 group-hover:hover:opacity-100 transition-all duration-500"
+          key={index}
+        >
+          <EcocertCard title={title} index={index} />
+        </div>
+      ))}
+    </div>
+  );
+};
+
 export default Hero;

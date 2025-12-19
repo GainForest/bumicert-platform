@@ -41,12 +41,12 @@ export function CalendarRange({ value, onValueChange }: CalendarRangeProps) {
         mode="range"
         defaultMonth={value?.[0]}
         selected={
-          value ?
-            {
-              from: value[0],
-              to: value[1],
-            }
-          : undefined
+          value
+            ? {
+                from: value[0],
+                to: value[1],
+              }
+            : undefined
         }
         onSelect={handleSelect}
         numberOfMonths={2}

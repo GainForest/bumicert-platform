@@ -42,10 +42,11 @@ const RightContent = () => {
     <Button
       size={"sm"}
       variant={
-        viewport === "mobile" ? "default"
-        : authenticated ?
-          "default"
-        : "outline"
+        viewport === "mobile"
+          ? "default"
+          : authenticated
+          ? "default"
+          : "outline"
       }
     >
       <BadgePlus />
@@ -144,11 +145,13 @@ const SortingOptions = () => {
           )}
           onClick={() => setSortDirection("asc")}
         >
-          {sortKey === "date-created" ?
+          {sortKey === "date-created" ? (
             <CalendarArrowUp />
-          : sortKey === "funds-raised" || sortKey === "funding-goal" ?
+          ) : sortKey === "funds-raised" || sortKey === "funding-goal" ? (
             <ArrowDown01 />
-          : <ArrowDownNarrowWide />}
+          ) : (
+            <ArrowDownNarrowWide />
+          )}
         </Button>
         <div className="h-4 w-0.5 bg-border"></div>
         <Button
@@ -161,11 +164,13 @@ const SortingOptions = () => {
           )}
           onClick={() => setSortDirection("desc")}
         >
-          {sortKey === "date-created" ?
+          {sortKey === "date-created" ? (
             <CalendarArrowDown />
-          : sortKey === "funds-raised" || sortKey === "funding-goal" ?
+          ) : sortKey === "funds-raised" || sortKey === "funding-goal" ? (
             <ArrowUp10 />
-          : <ArrowUpWideNarrow />}
+          ) : (
+            <ArrowUpWideNarrow />
+          )}
         </Button>
       </div>
     </div>

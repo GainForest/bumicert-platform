@@ -1,4 +1,4 @@
-import MyOrganizationPageClient from "./_components/MyOrganizationPageClient";
+import MyOrganizationPageClient from "../../../(marketplace)/organization/_components/MyOrganizationPageClient";
 
 export default async function MyOrganizationPage() {
   return <MyOrganizationPageClient />;

@@ -33,7 +33,7 @@ const UserOptionCards = () => {
           Create an Ecocert to showcase your organization&apos;s commitment to
           regenerative practices and attract donors who share your vision.
         </p>
-        <Link href="/ecocert/new">
+        <Link href="/ecocert/create">
           <Button
             variant={"outline"}
             className="absolute top-2 right-2 rounded-xl"
