@@ -1,5 +1,4 @@
 "use client";
-import { AppGainforestOrganizationDraftEcocert } from "climateai-sdk/lex-api";
 import React, { useEffect, useState } from "react";
 import {
   Step1FormValues,
@@ -57,24 +56,9 @@ const StoreHydrator = ({
   draftResponse,
   children,
 }: {
-  draftResponse:
-    | GetRecordResponse<AppGainforestOrganizationDraftEcocert.Main>
-    | null
-    | undefined;
+  draftResponse: { id: string } | null | undefined;
   children: React.ReactNode;
 }) => {
-  const uri = draftResponse?.uri;
-  const coverImageBlobRef = draftResponse?.value?.coverImage?.image;
-  const did = uri ? parseAtUri(uri).did : undefined;
-
-  const coverImageBlob = useBlob({
-    blob: coverImageBlobRef,
-    did: did,
-    pdsDomain: allowedPDSDomains[0],
-  });
-  const coverImageError = coverImageBlob?.error;
-  const coverImageFile = coverImageBlob?.data;
-
   const isHydrated = useFormStore((state) => state.isHydrated);
   const hydrate = useFormStore((state) => state.hydrate);
 
@@ -86,44 +70,48 @@ const StoreHydrator = ({
       hydrate(null);
       return;
     }
-    if (coverImageError) {
-      pushModal({
-        id: CreateEcocertHydrationErrorModalId,
-        content: <CreateEcocertHydrationErrorModalContent />,
+    fetch("/fetch/draft/data/from/database")
+      .then((res) => res.json())
+      .then((data) => {
+        // if (!coverImageFile) {
+        //   return;
+        // }
+        // const draftData = draftResponse.value;
+        // const step1Data: Step1FormValues = {
+        //   projectName: draftData.title,
+        //   coverImage: coverImageFile,
+        //   workType: draftData.workScopes,
+        //   projectDateRange: [
+        //     new Date(draftData.workStartDate),
+        //     new Date(draftData.workEndDate),
+        //   ],
+        // };
+        // const step2Data: Step2FormValues = {
+        //   shortDescription: draftData.shortDescription,
+        //   impactStory: draftData.description,
+        // };
+        // const step3Data: Step3FormValues = {
+        //   contributors: draftData.contributors,
+        //   siteBoundaries: draftData.site,
+        //   confirmPermissions: false,
+        //   agreeTnc: false,
+        // };
+        // const formValues = [step1Data, step2Data, step3Data] satisfies [
+        //   Step1FormValues,
+        //   Step2FormValues,
+        //   Step3FormValues
+        // ];
+        // hydrate(formValues);
+      })
+      .catch(() => {
+        pushModal({
+          id: CreateEcocertHydrationErrorModalId,
+          content: <CreateEcocertHydrationErrorModalContent />,
+        });
+        show();
+        hydrate(null);
       });
-      show();
-      return;
-    }
-    if (!coverImageFile) {
-      return;
-    }
-    const draftData = draftResponse.value;
-    const step1Data: Step1FormValues = {
-      projectName: draftData.title,
-      coverImage: coverImageFile,
-      workType: draftData.workScopes,
-      projectDateRange: [
-        new Date(draftData.workStartDate),
-        new Date(draftData.workEndDate),
-      ],
-    };
-    const step2Data: Step2FormValues = {
-      shortDescription: draftData.shortDescription,
-      impactStory: draftData.description,
-    };
-    const step3Data: Step3FormValues = {
-      contributors: draftData.contributors,
-      siteBoundaries: draftData.site,
-      confirmPermissions: false,
-      agreeTnc: false,
-    };
-    const formValues = [step1Data, step2Data, step3Data] satisfies [
-      Step1FormValues,
-      Step2FormValues,
-      Step3FormValues
-    ];
-    hydrate(formValues);
-  }, [isHydrated, draftResponse, coverImageFile, coverImageError]);
+  }, [isHydrated, draftResponse]);
 
   return children;
 };

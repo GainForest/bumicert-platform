@@ -13,9 +13,9 @@ import { Button } from "@/components/ui/button";
 import { trpcApi } from "@/components/providers/TrpcProvider";
 import {
   AppGainforestOrganizationDefaultSite,
-  AppGainforestOrganizationSite,
+  AppCertifiedLocation,
 } from "climateai-sdk/lex-api";
-import { parseAtUri } from "climateai-sdk/utilities/atproto";
+import { getBlobUrl, parseAtUri } from "climateai-sdk/utilities/atproto";
 import FileInput from "@/components/ui/FileInput";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, CheckIcon, Loader2, Pencil } from "lucide-react";
@@ -26,11 +26,13 @@ import DrawPolygonModal, {
 } from "@/components/global/modals/draw-polygon";
 import { GetRecordResponse } from "climateai-sdk/types";
 import { useAtprotoStore } from "@/components/stores/atproto";
+import { $Typed } from "climateai-sdk/lex-api/utils";
+import { OrgHypercertsDefs as Defs } from "climateai-sdk/lex-api";
 
 export const SiteEditorModalId = "site/editor";
 
 type AllSitesData = {
-  sites: GetRecordResponse<AppGainforestOrganizationSite.Record>[];
+  sites: GetRecordResponse<AppCertifiedLocation.Record>[];
   defaultSite: GetRecordResponse<AppGainforestOrganizationDefaultSite.Record> | null;
 };
 type SiteData = AllSitesData["sites"][number];
@@ -42,7 +44,19 @@ type SiteEditorModalProps = {
 export const SiteEditorModal = ({ initialData }: SiteEditorModalProps) => {
   const initialSite = initialData?.value;
   const initialName = initialSite?.name;
-  const initialShapefile = initialSite?.shapefile;
+
+  const initialLocationBlobUrl =
+    initialData?.value?.location?.$type === "org.hypercerts.defs#smallBlob"
+      ? getBlobUrl(
+          parseAtUri(initialData.uri).did,
+          (initialData.value.location as $Typed<Defs.SmallBlob>).blob,
+          allowedPDSDomains[0]
+        )
+      : null;
+  const initialLocationURI =
+    initialSite?.location.$type === "org.hypercerts.defs#uri"
+      ? (initialSite.location as $Typed<Defs.Uri>).uri
+      : initialLocationBlobUrl;
 
   const auth = useAtprotoStore((state) => state.auth);
   const did = auth.user?.did;
@@ -52,10 +66,9 @@ export const SiteEditorModal = ({ initialData }: SiteEditorModalProps) => {
     : { rkey: undefined };
   const mode = rkey ? "edit" : "add";
 
-  const previewUrl =
-    initialShapefile && did
-      ? getShapefilePreviewUrl(initialShapefile.blob, did)
-      : null;
+  const previewUrl = initialLocationURI
+    ? getShapefilePreviewUrl(initialLocationURI)
+    : null;
 
   const [name, setName] = useState(initialName ?? "");
   const [shapefile, setShapefile] = useState<File | null>(null);
@@ -75,9 +88,9 @@ export const SiteEditorModal = ({ initialData }: SiteEditorModalProps) => {
     mutate: handleAdd,
     isPending: isAdding,
     error: addError,
-  } = trpcApi.gainforest.organization.site.create.useMutation({
+  } = trpcApi.hypercerts.site.create.useMutation({
     onSuccess: () => {
-      utils.gainforest.organization.site.getAll.invalidate({
+      utils.hypercerts.site.getAll.invalidate({
         did,
         pdsDomain: allowedPDSDomains[0],
       });
@@ -89,9 +102,9 @@ export const SiteEditorModal = ({ initialData }: SiteEditorModalProps) => {
     mutate: handleUpdate,
     isPending: isUpdating,
     error: updateError,
-  } = trpcApi.gainforest.organization.site.update.useMutation({
+  } = trpcApi.hypercerts.site.update.useMutation({
     onSuccess: () => {
-      utils.gainforest.organization.site.getAll.invalidate({
+      utils.hypercerts.site.getAll.invalidate({
         did,
         pdsDomain: allowedPDSDomains[0],
       });
@@ -124,20 +137,28 @@ export const SiteEditorModal = ({ initialData }: SiteEditorModalProps) => {
       }
 
       // If no new shapefile is provided, keep the existing one
-      if (!hasShapefileInput && initialShapefile) {
+      if (!hasShapefileInput && initialLocationURI) {
+        const initialLocationUri =
+          initialSite?.location.$type === "org.hypercerts.defs#uri"
+            ? (initialSite.location as $Typed<Defs.Uri>).uri
+            : null;
+        const initialLocationBlob =
+          initialSite?.location.$type === "org.hypercerts.defs#smallBlob"
+            ? (initialSite.location as $Typed<Defs.SmallBlob>).blob
+            : null;
         const sitePayload = {
           name: name.trim(),
-          lat: initialSite!.lat,
-          lon: initialSite!.lon,
-          area: initialSite!.area,
-          ...(initialShapefile.$type === "app.gainforest.common.defs#smallBlob"
+          location: initialLocationUri
             ? {
-                shapefile: {
-                  $type: "app.gainforest.common.defs#smallBlob" as const,
-                  blob: toBlobRefGenerator(initialShapefile.blob),
-                },
+                $type: "org.hypercerts.defs#uri" as const,
+                uri: initialLocationUri,
               }
-            : {}),
+            : initialLocationBlob
+            ? {
+                $type: "org.hypercerts.defs#smallBlob" as const,
+                blob: initialLocationBlob,
+              }
+            : undefined,
         };
 
         await handleUpdate({
@@ -157,9 +178,6 @@ export const SiteEditorModal = ({ initialData }: SiteEditorModalProps) => {
           rkey,
           site: {
             name: name.trim(),
-            lat: initialSite!.lat,
-            lon: initialSite!.lon,
-            area: initialSite!.area,
           },
           uploads: {
             shapefile: shapefileInput,

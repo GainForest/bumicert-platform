@@ -20,7 +20,7 @@ const Projects = async ({ did }: { did: string }) => {
   };
 
   const [response, error] = await tryCatch(
-    apiCaller.gainforest.organization.project.getAll({
+    apiCaller.hypercerts.claim.project.getAll({
       did,
       pdsDomain: allowedPDSDomains[0],
     })

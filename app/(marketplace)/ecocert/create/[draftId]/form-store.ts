@@ -7,11 +7,7 @@ export const step1Schema = z.object({
     .min(1, "Required")
     .max(50, "No more than 50 characters allowed")
     .describe("Project Name"),
-  coverImage: z
-    .instanceof(File)
-    .nullable()
-    .refine((v) => v !== null, { message: "Required" })
-    .describe("Cover Image"),
+  coverImage: z.union([z.instanceof(File), z.null()]).describe("Cover Image"),
   workType: z.array(z.string()).min(1, "Required").describe("Work Type"),
   projectDateRange: z
     .tuple([z.date(), z.date()])
@@ -49,7 +45,15 @@ export const step3Schema = z.object({
     .array(z.string().min(1, "All contributors must have a name"))
     .min(1, "Required")
     .describe("List of Contributors"),
-  siteBoundaries: z.string().min(1, "Required").describe("Site Boundaries"),
+  siteBoundaries: z
+    .array(
+      z.object({
+        cid: z.string(),
+        uri: z.string(),
+      })
+    )
+    .min(1, "Required")
+    .describe("Site Boundaries"),
   confirmPermissions: z
     .boolean()
     .refine((v) => v === true, {
@@ -66,7 +70,7 @@ export const step3Schema = z.object({
 export type Step3FormValues = z.infer<typeof step3Schema>;
 export const step3InitialValues: Step3FormValues = {
   contributors: [],
-  siteBoundaries: "",
+  siteBoundaries: [],
   confirmPermissions: false,
   agreeTnc: false,
 };

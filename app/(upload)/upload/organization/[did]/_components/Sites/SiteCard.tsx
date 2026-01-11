@@ -30,6 +30,11 @@ import { getShapefilePreviewUrl } from "../../../../../../../lib/shapefile";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { trpcApi } from "@/components/providers/TrpcProvider";
+import { $Typed } from "climateai-sdk/lex-api/utils";
+import { OrgHypercertsDefs as Defs } from "climateai-sdk/lex-api";
+import { getBlobUrl } from "climateai-sdk/utilities/atproto";
+import { useQuery } from "@tanstack/react-query";
+import { computePolygonMetrics } from "climateai-sdk/utilities/geojson";
 
 export type SiteData = AllSitesData["sites"][number];
 type SiteCardProps = {
@@ -40,19 +45,44 @@ type SiteCardProps = {
 
 const SiteCard = ({ siteData, defaultSite, did }: SiteCardProps) => {
   const site = siteData.value;
-  const shapefile = site.shapefile;
+  const shapefile = site.location as $Typed<Defs.SmallBlob | Defs.Uri>;
+  const shapefileUrl =
+    shapefile.$type === "org.hypercerts.defs#uri"
+      ? shapefile.uri
+      : getBlobUrl(did, shapefile.blob, allowedPDSDomains[0]);
   const isDefaultSite = siteData.uri === defaultSite;
-  const shapefileUri = getShapefilePreviewUrl(shapefile.blob, did);
+  const shapefilePreviewUrl = getShapefilePreviewUrl(shapefileUrl);
 
   const auth = useAtprotoStore((state) => state.auth);
   const shouldEdit = auth.status === "AUTHENTICATED" && auth.user.did === did;
   const { pushModal, show } = useModal();
   const utils = trpcApi.useUtils();
 
+  const { data: locationData, isPending: isLoadingLocation } = useQuery({
+    queryKey: ["location", shapefileUrl],
+    queryFn: async () => {
+      if (!shapefileUrl) throw new Error("Shapefile URL is required");
+      const response = await fetch(shapefileUrl);
+      const data = await response.json();
+      return data as GeoJSON.FeatureCollection;
+    },
+    enabled: !!shapefileUrl,
+  });
+  const metrics = locationData ? computePolygonMetrics(locationData) : null;
+  const simplifiedMetrics = metrics
+    ? metrics.areaHectares && metrics.centroid
+      ? {
+          area: metrics.areaHectares,
+          lat: metrics.centroid.lat,
+          lon: metrics.centroid.lon,
+        }
+      : "Invalid"
+    : null;
+
   const { mutate: setDefaultSite, isPending: isSettingDefaultSite } =
-    trpcApi.gainforest.organization.site.setDefault.useMutation({
+    trpcApi.hypercerts.site.setDefault.useMutation({
       onSuccess: () => {
-        utils.gainforest.organization.site.getAll.invalidate({
+        utils.hypercerts.site.getAll.invalidate({
           did,
           pdsDomain: allowedPDSDomains[0],
         });
@@ -60,9 +90,9 @@ const SiteCard = ({ siteData, defaultSite, did }: SiteCardProps) => {
     });
 
   const { mutate: deleteSite, isPending: isDeletingSite } =
-    trpcApi.gainforest.organization.site.delete.useMutation({
+    trpcApi.hypercerts.site.delete.useMutation({
       onSuccess: () => {
-        utils.gainforest.organization.site.getAll.invalidate({
+        utils.hypercerts.site.getAll.invalidate({
           did,
           pdsDomain: allowedPDSDomains[0],
         });
@@ -105,7 +135,7 @@ const SiteCard = ({ siteData, defaultSite, did }: SiteCardProps) => {
       <div className="bg-background rounded-xl shadow-sm">
         <div className="p-2 relative">
           <iframe
-            src={shapefileUri}
+            src={shapefilePreviewUrl}
             className="w-full h-32 rounded-lg border border-border pointer-events-none"
           />
           {isDefaultSite && (
@@ -118,18 +148,27 @@ const SiteCard = ({ siteData, defaultSite, did }: SiteCardProps) => {
 
         <div className="px-3 py-2 pt-1">
           <h3 className="font-medium text-lg">{site.name}</h3>
-          <div className="flex items-center justify-between mt-1">
-            <span className="flex items-center gap-1 text-sm text-muted-foreground">
-              <Crosshair className="size-4" />
-              <span>
-                {formatCoordinate(site.lat)}°, {formatCoordinate(site.lon)}°
-              </span>
-            </span>
+          {simplifiedMetrics ? (
+            typeof simplifiedMetrics === "string" ? (
+              "Invalid"
+            ) : (
+              <div className="flex items-center justify-between mt-1">
+                <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                  <Crosshair className="size-4" />
+                  <span>
+                    {formatCoordinate(simplifiedMetrics.lat.toString())}°,{" "}
+                    {formatCoordinate(simplifiedMetrics.lon.toString())}°
+                  </span>
+                </span>
 
-            <p className="text-sm text-muted-foreground">
-              {site.area} hectares
-            </p>
-          </div>
+                <p className="text-sm text-muted-foreground">
+                  {simplifiedMetrics.area} hectares
+                </p>
+              </div>
+            )
+          ) : (
+            <Loader2 className="size-4 animate-spin" />
+          )}
           <hr className="mt-3 opacity-50" />
           <div className="w-full flex items-center justify-between text-sm text-muted-foreground mt-1">
             <span>No ecocerts use this site.</span>
@@ -188,7 +227,7 @@ const SiteCard = ({ siteData, defaultSite, did }: SiteCardProps) => {
       </div>
       <div className="px-2 py-1 flex items-center justify-center text-xs">
         <Link
-          href={shapefileUri}
+          href={shapefilePreviewUrl}
           target="_blank"
           className={cn(
             "flex items-center gap-1 text-primary cursor-pointer font-medium"

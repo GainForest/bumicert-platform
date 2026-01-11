@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { Suspense, useEffect } from "react";
 import FormField from "../../../../../../../components/ui/FormField";
 import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,14 @@ import {
   SiteEditorModal,
   SiteEditorModalId,
 } from "@/components/global/modals/upload/site/editor";
+import { computePolygonMetrics } from "climateai-sdk/utilities/geojson";
+import { GetRecordResponse } from "climateai-sdk/types";
+import { AppCertifiedLocation } from "climateai-sdk/lex-api";
+import useBlob from "@/hooks/use-blob";
+import { $Typed } from "climateai-sdk/lex-api/utils";
+import { OrgHypercertsDefs as Defs } from "climateai-sdk/lex-api";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { getBlobUrl, parseAtUri } from "climateai-sdk/utilities/atproto";
 
 const formatCoordinate = (coordinate: string) => {
   const num = parseFloat(coordinate);
@@ -84,7 +92,7 @@ const Step3 = () => {
     isPending: isSitesPending,
     isPlaceholderData: isOlderSites,
     error: sitesFetchError,
-  } = trpcApi.gainforest.organization.site.getAll.useQuery(
+  } = trpcApi.hypercerts.site.getAll.useQuery(
     {
       did: auth.user?.did ?? "",
       pdsDomain: allowedPDSDomains[0],
@@ -98,6 +106,8 @@ const Step3 = () => {
   console.log(JSON.stringify(sites, null, 2));
   console.log("==============");
   const isSitesLoading = isSitesPending || isOlderSites;
+
+  const selectedSitesSet = new Set(siteBoundaries.map((sb) => sb.uri));
 
   return (
     <div>
@@ -206,47 +216,39 @@ const Step3 = () => {
                 ) : (
                   <div className="grid grid-cols-2 gap-1 p-2">
                     {sites.map((site) => {
-                      const siteData = site.value;
+                      if (typeof site.cid !== "string") return null;
+                      const cid = site.cid;
+                      const uri = site.uri;
                       return (
-                        <Button
+                        <Suspense
                           key={site.cid}
-                          variant={"outline"}
-                          size="sm"
-                          className={cn(
-                            "h-auto flex items-center justify-start px-4 pl-6 py-2 gap-3",
-                            siteBoundaries === site.uri && "border-primary"
-                          )}
-                          onClick={() => {
-                            if (siteBoundaries === site.uri) {
-                              setFormValue("siteBoundaries", "");
-                            } else {
-                              setFormValue("siteBoundaries", site.uri);
-                            }
-                          }}
+                          fallback={
+                            <div className="h-6 rounded-md bg-muted animate-pulse"></div>
+                          }
                         >
-                          {siteBoundaries === site.uri ? (
-                            <div className="h-5 w-5 rounded-full bg-primary flex items-center justify-center shrink-0">
-                              <Check className="size-3 text-white" />
-                            </div>
-                          ) : (
-                            <CircleDashed className="size-5 text-muted-foreground" />
-                          )}
-                          <div className="flex flex-col items-start justify-start">
-                            <span className="text-base font-medium">
-                              {siteData.name}
-                            </span>
-                            <div className="flex items-center gap-1">
-                              <span className="text-sm text-muted-foreground mr-1">
-                                {siteData.area} ha
-                              </span>
-                              <span className="text-sm text-muted-foreground">
-                                {"("}
-                                {formatCoordinate(siteData.lat)}°,{" "}
-                                {formatCoordinate(siteData.lon)}°{")"}
-                              </span>
-                            </div>
-                          </div>
-                        </Button>
+                          <SiteItem
+                            site={site}
+                            isSelected={selectedSitesSet.has(uri)}
+                            onSelectChange={(value) => {
+                              if (value) {
+                                if (
+                                  siteBoundaries.some((sb) => sb.uri === uri)
+                                ) {
+                                  return;
+                                }
+                                setFormValue("siteBoundaries", [
+                                  ...siteBoundaries,
+                                  { cid, uri },
+                                ]);
+                              } else {
+                                setFormValue(
+                                  "siteBoundaries",
+                                  siteBoundaries.filter((sb) => sb.uri !== uri)
+                                );
+                              }
+                            }}
+                          />
+                        </Suspense>
                       );
                     })}
                     <Button
@@ -313,6 +315,100 @@ const Step3 = () => {
         </FormField>
       </div>
     </div>
+  );
+};
+
+const SiteItem = ({
+  site,
+  isSelected,
+  onSelectChange,
+}: {
+  site: GetRecordResponse<AppCertifiedLocation.Main>;
+  isSelected: boolean;
+  onSelectChange: (value: boolean) => void;
+}) => {
+  const locationRef = site.value.location;
+  const locationBlob =
+    locationRef.$type === "org.hypercerts.defs#smallBlob"
+      ? (locationRef as $Typed<Defs.SmallBlob>).blob
+      : null;
+  const locationURI =
+    locationRef.$type === "org.hypercerts.defs#uri"
+      ? (locationRef as $Typed<Defs.Uri>).uri
+      : null;
+  const locationBlobURL = locationBlob
+    ? getBlobUrl(parseAtUri(site.uri).did, locationBlob, allowedPDSDomains[0])
+    : null;
+  const urlToFetch = locationBlobURL ?? locationURI ?? null;
+
+  const { data: locationData } = useSuspenseQuery({
+    queryKey: ["location", urlToFetch],
+    queryFn: async () => {
+      if (!urlToFetch) {
+        throw new Error("A valid location could not be found.");
+      }
+      const response = await fetch(urlToFetch);
+      if (!response.ok) {
+        throw new Error("Failed to fetch location data");
+      }
+      const data = await response.json();
+      return data as GeoJSON.FeatureCollection;
+    },
+  });
+
+  const metrics = computePolygonMetrics(locationData);
+  const locationValidity =
+    metrics.areaHectares && metrics.centroid
+      ? {
+          valid: true as const,
+          area: metrics.areaHectares,
+          lat: metrics.centroid.lat,
+          lon: metrics.centroid.lon,
+        }
+      : {
+          valid: false as const,
+        };
+
+  return (
+    <Button
+      key={site.cid}
+      variant={"outline"}
+      size="sm"
+      className={cn(
+        "h-auto flex items-center justify-start px-4 pl-6 py-2 gap-3",
+        isSelected && "border-primary"
+      )}
+      onClick={() => onSelectChange(!isSelected)}
+    >
+      {isSelected ? (
+        <div className="h-5 w-5 rounded-full bg-primary flex items-center justify-center shrink-0">
+          <Check className="size-3 text-white" />
+        </div>
+      ) : (
+        <CircleDashed className="size-5 text-muted-foreground" />
+      )}
+      <div className="flex flex-col items-start justify-start">
+        <span className="text-base font-medium">{site.value.name}</span>
+        <div className="flex items-center gap-1">
+          {locationValidity.valid ? (
+            <>
+              <span className="text-sm text-muted-foreground mr-1">
+                {locationValidity.area.toFixed(2)} ha
+              </span>
+              <span className="text-sm text-muted-foreground">
+                {"("}
+                {formatCoordinate(locationValidity.lat.toString())}°,{" "}
+                {formatCoordinate(locationValidity.lon.toString())}°{")"}
+              </span>
+            </>
+          ) : (
+            <span className="text-sm text-muted-foreground">
+              Invalid location
+            </span>
+          )}
+        </div>
+      </div>
+    </Button>
   );
 };
 

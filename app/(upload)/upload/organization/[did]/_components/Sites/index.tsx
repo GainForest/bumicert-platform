@@ -10,7 +10,7 @@ const Sites = async ({ did }: { did: string }) => {
   const apiCaller = climateAiSdk.getServerCaller();
 
   const [response, error] = await tryCatch(
-    apiCaller.gainforest.organization.site.getAll({
+    apiCaller.hypercerts.site.getAll({
       did,
       pdsDomain: allowedPDSDomains[0],
     })

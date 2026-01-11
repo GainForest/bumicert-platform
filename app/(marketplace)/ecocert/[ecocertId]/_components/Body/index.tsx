@@ -112,8 +112,8 @@ const Body = ({ ecocert }: { ecocert: OrgHypercertsClaimActivity.Record }) => {
     >
       <CollapsibleDescription description={ecocert.description ?? ""} />
       <div className="flex flex-col px-3 min-[1000px]:px-0">
-        {ecocert.location && (
-          <SiteBoundaries locationAtUri={ecocert.location.uri} />
+        {ecocert.locations && ecocert.locations.length > 0 && (
+          <SiteBoundaries locationAtUri={ecocert.locations[0].uri} />
         )}
       </div>
     </div>

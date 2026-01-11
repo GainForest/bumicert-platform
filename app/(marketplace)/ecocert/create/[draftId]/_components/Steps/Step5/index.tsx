@@ -146,10 +146,14 @@ const Step5 = () => {
           workScopes: step1FormValues.workType,
           startDate: step1FormValues.projectDateRange[0].toISOString(),
           endDate: step1FormValues.projectDateRange[1].toISOString(),
+          contributors: step3FormValues.contributors,
+          locations: step3FormValues.siteBoundaries.map((sb) => ({
+            $type: "com.atproto.repo.strongRef" as const,
+            cid: sb.cid,
+            uri: sb.uri,
+          })),
         },
         uploads: {
-          contributors: step3FormValues.contributors,
-          siteAtUri: step3FormValues.siteBoundaries,
           image: await toFileGenerator(step1FormValues.coverImage),
         },
         pdsDomain: allowedPDSDomains[0],

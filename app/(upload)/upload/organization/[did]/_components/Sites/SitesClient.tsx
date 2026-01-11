@@ -20,12 +20,12 @@ import {
 } from "climateai-sdk/utilities/transform";
 import {
   AppGainforestOrganizationDefaultSite,
-  AppGainforestOrganizationSite,
+  AppCertifiedLocation,
 } from "climateai-sdk/lex-api";
 import { GetRecordResponse } from "climateai-sdk/types";
 
 export type AllSitesData = {
-  sites: GetRecordResponse<AppGainforestOrganizationSite.Record>[];
+  sites: GetRecordResponse<AppCertifiedLocation.Record>[];
   defaultSite: GetRecordResponse<AppGainforestOrganizationDefaultSite.Record> | null;
 };
 
@@ -40,7 +40,7 @@ const SitesClient = ({
   const auth = useAtprotoStore((state) => state.auth);
   const shouldEdit = auth.status === "AUTHENTICATED" && auth.user.did === did;
   const { data: reactiveData, isPlaceholderData: isOlderReactiveData } =
-    trpcApi.gainforest.organization.site.getAll.useQuery({
+    trpcApi.hypercerts.site.getAll.useQuery({
       did,
       pdsDomain: allowedPDSDomains[0],
     });

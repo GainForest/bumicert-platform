@@ -103,14 +103,16 @@ const Hero = ({
 
                 <div className="w-full overflow-x-auto scrollbar-hidden mask-r-from-90%">
                   <div className="w-full flex items-center justify-start gap-2">
-                    {(ecocert.workScope?.anyOf ?? []).map((work, index) => (
-                      <span
-                        key={index}
-                        className="bg-background/90 border border-primary/20 backdrop-blur-sm rounded-full px-2 py-0.5 text-sm text-primary font-medium shrink-0"
-                      >
-                        {work}
-                      </span>
-                    ))}
+                    {(ecocert.workScope?.withinAnyOf ?? []).map(
+                      (work, index) => (
+                        <span
+                          key={index}
+                          className="bg-background/90 border border-primary/20 backdrop-blur-sm rounded-full px-2 py-0.5 text-sm text-primary font-medium shrink-0"
+                        >
+                          {work}
+                        </span>
+                      )
+                    )}
                   </div>
                 </div>
               </div>
@@ -132,7 +134,7 @@ const Hero = ({
                   allowedPDSDomains[0]
                 )}
                 title={ecocert.title}
-                objectives={ecocert.workScope?.anyOf ?? []}
+                objectives={ecocert.workScope?.withinAnyOf ?? []}
                 startDate={new Date(ecocert.startDate as string)}
                 endDate={new Date(ecocert.endDate as string)}
               />

@@ -15,11 +15,11 @@ import {
 } from "climateai-sdk/utilities/transform";
 import { GetRecordResponse } from "climateai-sdk/types";
 import Link from "next/link";
-import { AppGainforestOrganizationProject } from "climateai-sdk/lex-api";
+import { OrgHypercertsClaimProject } from "climateai-sdk/lex-api";
 import SectionForData from "../../../_components/SectionForData";
 
 export type AllProjectsData = {
-  projects: GetRecordResponse<AppGainforestOrganizationProject.Record>[];
+  projects: GetRecordResponse<OrgHypercertsClaimProject.Record>[];
 };
 
 type ProjectSectionClientProps = {

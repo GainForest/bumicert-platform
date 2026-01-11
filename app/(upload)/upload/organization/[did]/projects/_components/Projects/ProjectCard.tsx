@@ -3,6 +3,8 @@ import React from "react";
 import { getStripedBackground } from "@/lib/getStripedBackground";
 import { cn } from "@/lib/utils";
 import { AllProjectsData } from "./ProjectsClient";
+import { PubLeafletBlocksText } from "climateai-sdk/lex-api";
+import { $Typed } from "climateai-sdk/lex-api/utils";
 
 export type ProjectData = AllProjectsData["projects"][number];
 type ProjectCardProps = {
@@ -13,10 +15,10 @@ type ProjectCardProps = {
 const ProjectCard = ({ projectData, did }: ProjectCardProps) => {
   const project = projectData.value;
 
-  const ecocertsCount = project.ecocerts.length;
-  const measuredTreesClustersCount = project.measuredTreesClusters.length;
-  const sitesCount = project.sites.length;
-  const layersCount = project.layers.length;
+  const ecocertsCount = project.activities?.length ?? 0;
+  const measuredTreesClustersCount = 0;
+  const sitesCount = 0;
+  const layersCount = 0;
 
   return (
     <div
@@ -36,10 +38,17 @@ const ProjectCard = ({ projectData, did }: ProjectCardProps) => {
     >
       <div className="bg-background rounded-xl shadow-sm">
         <div className="px-3 py-4">
-          <h3 className="font-medium text-lg mb-2">{project.name}</h3>
+          <h3 className="font-medium text-lg mb-2">{project.title}</h3>
           {project.description && (
             <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-              {project.description}
+              {project.description.blocks.map((doc) => {
+                const block = doc.block;
+                if (block.$type === "pub.leaflet.blocks#text") {
+                  const typedBlock = block as $Typed<PubLeafletBlocksText.Main>;
+                  return typedBlock.plaintext;
+                }
+                return null;
+              })}
             </p>
           )}
 

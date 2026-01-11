@@ -62,7 +62,7 @@ const EcocertCard = ({ ecocert }: { ecocert: Ecocert }) => {
           logoUrl={ecocert.organizationInfo.logoUrl}
           coverImage={imageUrl}
           title={ecocert.claimActivity.value.title}
-          objectives={ecocert.claimActivity.value.workScope?.anyOf ?? []}
+          objectives={ecocert.claimActivity.value.workScope?.withinAnyOf ?? []}
           startDate={new Date(ecocert.claimActivity.value.startDate)}
           endDate={new Date(ecocert.claimActivity.value.endDate)}
         />
