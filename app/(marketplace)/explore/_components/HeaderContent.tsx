@@ -15,13 +15,13 @@ import {
   Filter,
 } from "lucide-react";
 import React, { Suspense, useEffect } from "react";
-import useAccount from "@/hooks/use-account";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { cn } from "@/lib/utils";
 import {
   sortingOptions,
   TEcocertSortingOptions,
 } from "../_hooks/use-sorted-ecocerts";
+import { useAtprotoStore } from "@/components/stores/atproto";
 
 const LeftContent = () => {
   const [search, setSearch] = useQueryState("q", { defaultValue: "" });
@@ -37,14 +37,14 @@ const LeftContent = () => {
 
 const RightContent = () => {
   const { viewport } = useNavbarContext();
-  const { authenticated } = useAccount();
+  const auth = useAtprotoStore((state) => state.auth);
   return (
     <Button
       size={"sm"}
       variant={
         viewport === "mobile"
           ? "default"
-          : authenticated
+          : auth.status === "AUTHENTICATED"
           ? "default"
           : "outline"
       }
