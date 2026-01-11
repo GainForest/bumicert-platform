@@ -156,7 +156,7 @@ const AnimatedEcocertainBranding = ({
         animate={{ opacity: 1, filter: "blur(0px)" }}
         transition={{ delay: delayOffset + 0.3 }}
       >
-        Fund impactful.
+        Fund impactful regenerative projects.
       </motion.span>
       <motion.div
         initial={{
