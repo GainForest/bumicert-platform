@@ -19,6 +19,7 @@ const resumeSession = (params: ResumeSessionParams) => {
           currentRetry++;
           return attempt();
         } else {
+          trpcClient.auth.logout.mutate({ service: params.service });
           throw error;
         }
       });

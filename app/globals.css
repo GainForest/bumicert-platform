@@ -139,6 +139,9 @@
       display: none;
     }
   }
+  a button {
+    cursor: pointer;
+  }
 }
 
 #overlay {

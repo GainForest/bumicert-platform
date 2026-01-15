@@ -69,7 +69,7 @@ const DesktopNavbar = ({
                     variant="outline"
                     size="sm"
                     className={cn(
-                      "w-full text-left justify-start relative overflow-hidden",
+                      "w-full text-left justify-start relative overflow-hidden cursor-pointer",
                       isHighlighted && "bg-accent hover:bg-accent"
                     )}
                   >
