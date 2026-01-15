@@ -55,12 +55,12 @@ const Step4 = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold font-serif text-muted-foreground">
+      <h1 className="text-2xl font-medium text-muted-foreground">
         Review the information.
       </h1>
       <div
         className={cn(
-          "grid grid-cols-1 gap-4 mt-4",
+          "grid grid-cols-1 gap-4 mt-8",
           viewport === "desktop" && openState.desktop
             ? "grid-cols-1 min-[54rem]:grid-cols-2 lg:grid-cols-1 min-[74rem]:grid-cols-2"
             : "grid-cols-1"

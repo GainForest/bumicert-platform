@@ -218,7 +218,7 @@ const Step3 = () => {
                     </Button>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 gap-1 p-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-1 p-2">
                     {sites.map((site) => {
                       if (typeof site.cid !== "string") return null;
                       const cid = site.cid;
@@ -227,7 +227,7 @@ const Step3 = () => {
                         <Suspense
                           key={site.cid}
                           fallback={
-                            <div className="h-6 rounded-md bg-muted animate-pulse"></div>
+                            <div className="h-12 rounded-md bg-muted animate-pulse"></div>
                           }
                         >
                           <SiteItem
@@ -379,7 +379,7 @@ const SiteItem = ({
       variant={"outline"}
       size="sm"
       className={cn(
-        "h-auto flex items-center justify-start px-4 pl-6 py-2 gap-3",
+        "h-auto flex items-center justify-start px-4 pl-6 py-2 gap-3 overflow-hidden",
         isSelected && "border-primary"
       )}
       onClick={() => onSelectChange(!isSelected)}
