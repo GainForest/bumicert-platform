@@ -4,6 +4,7 @@ import {
   Geist_Mono,
   Instrument_Serif,
   Cormorant_Garamond,
+  Lisu_Bosa,
 } from "next/font/google";
 import "./globals.css";
 import PrivyProvider from "@/components/providers/PrivyProvider";
@@ -39,6 +40,12 @@ const cormorantGaramond = Cormorant_Garamond({
   weight: ["400", "500", "600", "700"],
 });
 
+const lisuBosa = Lisu_Bosa({
+  variable: "--font-lisu-bosa",
+  subsets: ["latin"],
+  weight: ["400"],
+});
+
 export const metadata: Metadata = {
   title: "Ecocertain",
   description: "Fund impactful regenerative projects.",
@@ -52,7 +59,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} ${cormorantGaramond.variable} antialiased h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} ${cormorantGaramond.variable} ${lisuBosa.variable} antialiased h-screen`}
       >
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <NuqsAdapter>

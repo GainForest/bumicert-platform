@@ -26,17 +26,19 @@ const Step2 = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold font-serif">
+      <h1 className="text-2xl font-medium text-muted-foreground">
         Share your impact story.
       </h1>
       <FormField
         Icon={HandHeart}
         label="Your Impact Story"
-        className="mt-4"
+        className="mt-8"
         description="Tell us about your impact — what changed, who was involved, and how it's helping. Take your time. Your story helps inspire others and verify your work."
         error={errors.impactStory}
         showError={shouldShowValidationErrors}
         inlineEndMessage={`${impactStory.length}/8000`}
+        required
+        info="Tell us what you did and what happened as a result"
       >
         <Textarea
           id="your-impact-story"
@@ -54,6 +56,8 @@ const Step2 = () => {
         error={errors.shortDescription}
         showError={shouldShowValidationErrors}
         inlineEndMessage={`${shortDescription.length}/3000`}
+        required
+        info="Summarize your work and its results in a few lines"
       >
         <div className="w-full relative">
           <Textarea

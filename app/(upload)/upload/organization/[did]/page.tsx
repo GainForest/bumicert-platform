@@ -59,6 +59,7 @@ const OrganizationPage = async ({
       if (error instanceof TRPCError && error.code === "BAD_REQUEST") {
         throw new Error("This organization does not exist.");
       }
+      console.error(error);
       throw new Error("An unknown error occurred.");
     }
   } else {

@@ -3,6 +3,7 @@ import { useAtprotoStore } from "@/components/stores/atproto";
 import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
 import { cn } from "@/lib/utils";
 import {
+  ArrowRightIcon,
   CircleAlertIcon,
   CircleCheckIcon,
   Loader2,
@@ -16,6 +17,9 @@ import { useMutation } from "@tanstack/react-query";
 import { useFormStore } from "../../../form-store";
 import { useStep5Store } from "./store";
 import { toFileGenerator } from "climateai-sdk/zod";
+import { links } from "@/lib/links";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const ProgressItem = ({
   iconset,
@@ -222,6 +226,20 @@ const Step5 = () => {
           isLastStep={true}
         />
       )}
+      {createEcocertStatus === "success" &&
+        createdEcocertResponse?.data.cid && (
+          <div className="mt-4 flex flex-col items-center border border-border rounded-lg">
+            <CircleCheckIcon className="size-6" />
+            <span className="mt-1">
+              Your ecocert has been published successfully.
+            </span>
+            <Button className="mt-2">
+              <Link href={links.ecocert.view(createdEcocertResponse.data.cid)}>
+                View ecocert <ArrowRightIcon />
+              </Link>
+            </Button>
+          </div>
+        )}
     </div>
   );
 };

@@ -111,16 +111,18 @@ const Step3 = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold font-serif">
-        Contributors, Sites, and Permissions
+      <h1 className="text-2xl font-medium text-muted-foreground">
+        Share your contributors and sites.
       </h1>
-      <div className="flex flex-col gap-2 mt-4">
+      <div className="mt-8 flex flex-col gap-2">
         <FormField
           Icon={Users}
           label="List of Contributors"
           description="Add everyone involved in this project — including your own community or organization and any collaborators. Tip: Start by adding your own group first before listing your partners or supporters."
           error={errors.contributors}
           showError={shouldShowValidationErrors}
+          required
+          info={`Add contributors: collaborators, teammates, individuals, or a group`}
         >
           {contributors.length === 0 && (
             <button
@@ -169,10 +171,12 @@ const Step3 = () => {
           description="Please upload your site boundary in GeoJSON format so we can visualize your project on the map."
           error={errors.siteBoundaries}
           showError={shouldShowValidationErrors}
+          required
+          info="Add the boundaries that best represent where the work took place."
         >
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">
-              Select a site for this ecocert, or add a new one.
+              Select the boundaries for this ecocert, or add new ones.
             </span>
             {auth.user?.did && (
               <span className="text-sm text-muted-foreground">

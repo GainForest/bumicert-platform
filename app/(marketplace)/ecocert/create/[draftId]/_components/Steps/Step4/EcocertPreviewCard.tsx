@@ -21,6 +21,7 @@ export const EcocertArt = ({
   startDate,
   endDate,
   className,
+  performant = true,
 }: {
   logoUrl: string | null;
   coverImage: File | string;
@@ -29,6 +30,7 @@ export const EcocertArt = ({
   startDate: Date;
   endDate: Date;
   className?: string;
+  performant?: boolean;
 }) => {
   return (
     <div
@@ -46,16 +48,23 @@ export const EcocertArt = ({
           }
           alt="Ecocert"
           fill
-          className="rounded-2xl scale-105 group-hover:scale-100 transition-all duration-300"
+          className="object-cover rounded-2xl scale-105 group-hover:scale-100 transition-all duration-300"
         />
-        <ProgressiveBlur
-          position="bottom"
-          height="55%"
-          className="z-0"
-          borderRadiusClassName="rounded-2xl"
-        />
-        {/* White gradient to improve contrast */}
-        <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/10 to-black/60 z-0"></div>
+        {!performant && (
+          <ProgressiveBlur
+            position="bottom"
+            height="55%"
+            className="z-0"
+            borderRadiusClassName="rounded-2xl"
+          />
+        )}
+        {/* Gradient to improve contrast */}
+        <div
+          className={cn(
+            "rounded-b-2xl absolute inset-0 top-[50%] bg-black/50 z-0 mask-t-from-50%",
+            performant ? "backdrop-blur-xl" : ""
+          )}
+        ></div>
         <div className="absolute top-3 left-3 h-9 w-9 rounded-full bg-white border-2 border-black/10 shadow-lg">
           {logoUrl && (
             <Image src={logoUrl} alt="Logo" fill className="rounded-full" />

@@ -11,6 +11,8 @@ import {
 } from "../../../form-store";
 import { format } from "date-fns";
 import EcocertPreviewCard from "./EcocertPreviewCard";
+import { useNavbarContext } from "@/components/global/Navbar/context";
+import { cn } from "@/lib/utils";
 
 const FormValue = ({
   label,
@@ -25,6 +27,7 @@ const FormValue = ({
   </div>
 );
 const Step4 = () => {
+  const { viewport, openState } = useNavbarContext();
   const { setCurrentStepIndex } = useNewEcocertStore();
   const completionPercentages = useFormStore(
     (state) => state.formCompletionPercentages
@@ -52,8 +55,17 @@ const Step4 = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold font-serif">Review the information.</h1>
-      <div className="grid grid-cols-2 gap-4 mt-4">
+      <h1 className="text-3xl font-bold font-serif text-muted-foreground">
+        Review the information.
+      </h1>
+      <div
+        className={cn(
+          "grid grid-cols-1 gap-4 mt-4",
+          viewport === "desktop" && openState.desktop
+            ? "grid-cols-1 min-[54rem]:grid-cols-2 lg:grid-cols-1 min-[74rem]:grid-cols-2"
+            : "grid-cols-1"
+        )}
+      >
         <ReviewStepCard
           schema={step1Schema}
           errors={step1Errors}

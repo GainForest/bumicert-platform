@@ -1,9 +1,8 @@
-import { LucideIcon } from "lucide-react";
+import { Asterisk, CircleAlert, InfoIcon, LucideIcon } from "lucide-react";
 import React from "react";
-import BiokoPeekingImage from "@/app/(marketplace)/ecocert/create/[draftId]/_assets/bioko-peeking.png";
-import BiokoGrabbingImage from "@/app/(marketplace)/ecocert/create/[draftId]/_assets/bioko-grabbing.png";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { Button } from "./button";
+import QuickTooltip from "./quick-tooltip";
 
 const FormField = ({
   Icon,
@@ -14,7 +13,8 @@ const FormField = ({
   error,
   className,
   showError = true,
-  biokoMode = true,
+  info,
+  required = false,
 }: {
   label: string;
   Icon: LucideIcon;
@@ -25,7 +25,8 @@ const FormField = ({
   error?: string;
   showError?: boolean;
   className?: string;
-  biokoMode?: boolean;
+  info?: string;
+  required?: boolean;
 }) => {
   const kebabCaseLabel = label.toLowerCase().replace(/ /g, "-");
   return (
@@ -38,24 +39,6 @@ const FormField = ({
         className
       )}
     >
-      {biokoMode && (
-        <div className="absolute -top-8 right-0 w-30 h-20 not-[group-focus-within]:pointer-events-none">
-          <div className="w-full h-8 rounded-md absolute top-0 overflow-hidden">
-            <Image
-              src={BiokoPeekingImage}
-              alt="Bioko Peeking"
-              className="h-8 w-auto absolute top-8 right-6 group-focus-within:top-0 transition-all duration-300"
-            />
-          </div>
-
-          <Image
-            src={BiokoGrabbingImage}
-            alt="Bioko Grabbing"
-            className="h-4 w-auto absolute top-6 -right-1 opacity-0 group-focus-within:opacity-100 transition-all duration-300"
-          />
-        </div>
-      )}
-
       <div className="flex items-center justify-between w-full">
         <label
           htmlFor={htmlFor ?? kebabCaseLabel}
@@ -69,13 +52,44 @@ const FormField = ({
           <Icon className="size-3.5" />
           {label}
         </label>
-        {showError && error ? (
-          <span className="text-destructive text-xs">{error}</span>
-        ) : (
+        <div className="flex items-center gap-1">
           <span className="text-xs text-muted-foreground">
             {inlineEndMessage}
           </span>
-        )}
+          {info && (
+            <QuickTooltip content={info} asChild>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                className="bg-transparent hover:bg-transparent h-5 w-5 hidden group-hover:flex group-focus-within:flex items-center justify-center"
+              >
+                <InfoIcon className="text-muted-foreground" />
+              </Button>
+            </QuickTooltip>
+          )}
+          {showError && error && (
+            <QuickTooltip content={error} asChild>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                className="bg-transparent hover:bg-transparent h-5 w-5 flex items-center justify-center"
+              >
+                <CircleAlert className="text-destructive" />
+              </Button>
+            </QuickTooltip>
+          )}
+          {required && (
+            <QuickTooltip content={"This field is required"} asChild>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                className="bg-transparent hover:bg-transparent h-5 w-5 flex items-center justify-center"
+              >
+                <Asterisk className="text-muted-foreground" />
+              </Button>
+            </QuickTooltip>
+          )}
+        </div>
       </div>
 
       {children}

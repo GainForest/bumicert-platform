@@ -25,8 +25,11 @@ import {
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { CalendarRange } from "@/components/ui/calendar-range";
+import { useNavbarContext } from "@/components/global/Navbar/context";
 
 const Step1 = () => {
+  const { viewport, openState } = useNavbarContext();
+
   const { maxStepIndexReached, currentStepIndex } = useNewEcocertStore();
   const shouldShowValidationErrors = currentStepIndex < maxStepIndexReached;
 
@@ -45,22 +48,36 @@ const Step1 = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold font-serif">
-        Tell us about your project.
+      <h1 className="text-2xl font-medium text-muted-foreground">
+        Share your impact at a glance.
       </h1>
-      <div className="flex flex-col gap-2 mt-4">
-        <div className="grid grid-cols-[16rem_1fr] gap-2">
+      <div className="flex flex-col gap-2 mt-8">
+        <div
+          className={cn(
+            "grid grid-cols-1 gap-2",
+            viewport === "desktop" && openState.desktop
+              ? "min-[52rem]:grid-cols-[16rem_1fr] lg:grid-cols-1 xl:grid-cols-[16rem_1fr]"
+              : "lg:grid-cols-[16rem_1fr]"
+          )}
+        >
           <FormField
             Icon={ImagePlusIcon}
             label="Cover Image"
             error={errors.coverImage}
             showError={shouldShowValidationErrors}
+            info="Choose an image that best represents your work"
+            required
           >
             <FileInput
               className="h-80"
               placeholder="Upload or drag and drop an image"
               value={coverImage}
-              onFileChange={(file) => setFormValue("coverImage", file)}
+              onFileChange={(file) =>
+                setFormValue(
+                  "coverImage",
+                  file ?? new File([], "cover-image.png")
+                )
+              }
               supportedFileTypes={[
                 "image/jpg",
                 "image/jpeg",
@@ -76,6 +93,8 @@ const Step1 = () => {
               label="Project Title"
               error={errors.projectName}
               showError={shouldShowValidationErrors}
+              info="You can choose more than one"
+              required
             >
               <InputGroup className="bg-background">
                 <InputGroupInput
@@ -98,6 +117,8 @@ const Step1 = () => {
               className="flex-1"
               error={errors.projectDateRange}
               showError={shouldShowValidationErrors}
+              required
+              info="Select the period when your work and impact took place"
             >
               <div className="mt-1">
                 <Popover>
@@ -135,6 +156,8 @@ const Step1 = () => {
               className="flex-1"
               error={errors.workType}
               showError={shouldShowValidationErrors}
+              required
+              info="Feel free to choose more than one"
             >
               <Capsules
                 className="mt-1"

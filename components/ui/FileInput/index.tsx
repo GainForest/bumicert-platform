@@ -138,6 +138,9 @@ const FileInput = ({
   maxSizeInMB = 10,
   className,
 }: FileInputProps) => {
+  const normalizedValue =
+    value instanceof File && value.size === 0 ? null : value;
+
   const [error, setError] = useState<string>("");
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -240,8 +243,8 @@ const FileInput = ({
 
   // Effect to handle preview URL creation when value changes
   useEffect(() => {
-    if (value && isImageFile(value)) {
-      const url = URL.createObjectURL(value);
+    if (normalizedValue && isImageFile(normalizedValue)) {
+      const url = URL.createObjectURL(normalizedValue);
       // Use setTimeout to avoid synchronous setState in effect
       setTimeout(() => {
         setPreviewUrl(url);
@@ -252,7 +255,7 @@ const FileInput = ({
         setPreviewUrl("");
       }, 0);
     }
-  }, [value]);
+  }, [normalizedValue]);
 
   // Cleanup effect
   useEffect(() => {
@@ -271,10 +274,10 @@ const FileInput = ({
     >
       <div
         className={cn(
-          "w-full h-full min-h-40 border border-dashed border-border rounded-md transition-colors relative overflow-hidden",
+          "w-full h-full flex flex-col items-center justify-center min-h-40 border border-dashed border-border rounded-md transition-colors relative overflow-hidden",
           isDragOver ? "border-primary bg-primary/5" : "",
           error ? "border-destructive" : "",
-          value ? "bg-background" : "bg-foreground/1"
+          normalizedValue ? "bg-background" : "bg-foreground/1"
         )}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -294,7 +297,7 @@ const FileInput = ({
         />
 
         {/* Remove button - always visible when file is selected */}
-        {value && (
+        {normalizedValue && (
           <button
             type="button"
             className="absolute top-2 right-2 px-1.5 z-10 h-5 flex items-center justify-center gap-1 bg-background/50 hover:bg-red-100 dark:hover:bg-red-900 backdrop-blur-lg transition-colors rounded-full shadow-lg cursor-pointer"
@@ -308,11 +311,11 @@ const FileInput = ({
         )}
 
         {/* Image Preview */}
-        {value && isImageFile(value) && previewUrl && (
+        {normalizedValue && isImageFile(normalizedValue) && previewUrl && (
           <div className="w-full h-full relative">
             <img
               src={previewUrl}
-              alt={value.name}
+              alt={normalizedValue.name}
               className="w-full h-full object-cover"
             />
             {/* Overlay for drag and drop when image is shown */}
@@ -327,17 +330,17 @@ const FileInput = ({
         )}
 
         {/* File Preview (non-image) */}
-        {value && !isImageFile(value) && (
+        {normalizedValue && !isImageFile(normalizedValue) && (
           <div className="w-full h-full flex flex-col items-center justify-center gap-3 p-4">
             <FileIcon className="size-12 text-muted-foreground" />
             <div className="text-center">
               <p className="font-medium text-sm truncate max-w-full">
-                {value.name.length > 20
-                  ? value.name.slice(0, 20) + "..."
-                  : value.name}
+                {normalizedValue.name.length > 20
+                  ? normalizedValue.name.slice(0, 20) + "..."
+                  : normalizedValue.name}
               </p>
               <p className="text-xs text-muted-foreground">
-                {formatFileSize(value.size)}
+                {formatFileSize(normalizedValue.size)}
               </p>
             </div>
             {/* Overlay for drag and drop when file is shown */}
@@ -352,7 +355,7 @@ const FileInput = ({
         )}
 
         {/* Upload Interface (when no file selected) */}
-        {!value && (
+        {!normalizedValue && (
           <div className="w-full h-full flex flex-col items-center justify-center gap-2">
             <div className="flex items-center gap-1">
               <QuickTooltip content="Paste from clipboard" asChild>

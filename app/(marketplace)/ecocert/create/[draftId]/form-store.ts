@@ -7,7 +7,12 @@ export const step1Schema = z.object({
     .min(1, "Required")
     .max(50, "No more than 50 characters allowed")
     .describe("Project Name"),
-  coverImage: z.union([z.instanceof(File), z.null()]).describe("Cover Image"),
+  coverImage: z
+    .instanceof(File)
+    .refine((v) => v.size > 0, {
+      message: "Required",
+    })
+    .describe("Cover Image"),
   workType: z.array(z.string()).min(1, "Required").describe("Work Type"),
   projectDateRange: z
     .tuple([z.date(), z.date()])
@@ -17,7 +22,7 @@ export type Step1FormValues = z.infer<typeof step1Schema>;
 const thisYear = new Date().getFullYear();
 export const step1InitialValues: Step1FormValues = {
   projectName: "",
-  coverImage: null,
+  coverImage: new File([], "cover-image.png"),
   workType: [],
   projectDateRange: [new Date(`${thisYear}-01-01`), new Date()],
 };
