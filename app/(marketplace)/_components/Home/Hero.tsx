@@ -3,14 +3,14 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
-const EcocertCard = ({ title, index }: { title: string; index: number }) => {
+const BumicertCard = ({ title, index }: { title: string; index: number }) => {
   return (
     <div className="w-[100px] rounded-xl p-1 shadow-lg bg-background/90 shrink-0 relative">
       <div className="w-full h-[100px] rounded-xl bg-primary relative overflow-hidden">
         <Image
-          src={`/assets/media/images/hero-ecocert-card/image${index}.png`}
+          src={`/assets/media/images/hero-bumicert-card/image${index}.png`}
           className="object-cover"
-          alt="Ecocert"
+          alt="Bumicert"
           fill
         />
         <div className="absolute bottom-0 left-0 right-0 p-2 pt-6 font-serif font-bold text-white drop-shadow-sm bg-gradient-to-b from-black/0 to-black/50">
@@ -27,7 +27,7 @@ const EcocertCard = ({ title, index }: { title: string; index: number }) => {
   );
 };
 
-const ecocertCardTitles = ["Planting trees", "Saving birds", "Cleaning water"];
+const bumicertCardTitles = ["Planting trees", "Saving birds", "Cleaning water"];
 
 const Hero = () => {
   return (
@@ -46,12 +46,12 @@ const Hero = () => {
       >
         <div className="flex-3/5 lg:flex-1 flex items-center justify-center">
           <div className="flex items-center gap-[50px] scale-100 md:scale-125 group">
-            {ecocertCardTitles.map((title, index) => (
+            {bumicertCardTitles.map((title, index) => (
               <div
                 className="w-1 flex items-center justify-center group-hover:not-hover:blur-sm group-hover:not-hover:scale-95 group-hover:not-hover:opacity-50 group-hover:hover:blur-none group-hover:hover:scale-105 group-hover:hover:opacity-100 transition-all duration-500"
                 key={index}
               >
-                <EcocertCard title={title} index={index} />
+                <BumicertCard title={title} index={index} />
               </div>
             ))}
           </div>
@@ -66,7 +66,7 @@ const Hero = () => {
       </div>
       <div className="w-full flex items-center justify-center p-1 text-sm text-muted-foreground text-center text-balance">
         <span>
-          🎉🎉🎉 We are thrilled to announce the newest version of Ecocertain.
+          🎉🎉🎉 We are thrilled to announce the newest version of Bumicertain.
           Read our{" "}
           <Link href={"/changelog"} className="underline">
             changelog
@@ -78,15 +78,15 @@ const Hero = () => {
   );
 };
 
-export const HeroEcocertCards = () => {
+export const HeroBumicertCards = () => {
   return (
     <div className="flex items-center gap-[50px] scale-100 md:scale-125 group">
-      {ecocertCardTitles.map((title, index) => (
+      {bumicertCardTitles.map((title, index) => (
         <div
           className="w-1 flex items-center justify-center group-hover:not-hover:blur-sm group-hover:not-hover:scale-95 group-hover:not-hover:opacity-50 group-hover:hover:blur-none group-hover:hover:scale-105 group-hover:hover:opacity-100 transition-all duration-500"
           key={index}
         >
-          <EcocertCard title={title} index={index} />
+          <BumicertCard title={title} index={index} />
         </div>
       ))}
     </div>

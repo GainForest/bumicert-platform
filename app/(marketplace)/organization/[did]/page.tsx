@@ -78,13 +78,9 @@ const OrganizationPage = async ({
       <SubHero initialData={serializedData} />
       <AboutOrganization initialData={serializedData} />
       <hr />
-      <SectionForData
-        title="Ecocerts"
-        userDid={did}
-        manageUrl={`/organization/${encodeURIComponent(did)}/ecocerts`}
-      >
+      <SectionForData title="Bumicerts" userDid={did}>
         <div className="w-full h-40 bg-muted rounded-lg mt-2 flex flex-col items-center justify-center text-center text-pretty font-serif text-xl text-muted-foreground font-bold">
-          The ecocerts of this organization will appear here.
+          The bumicerts of this organization will appear here.
         </div>
       </SectionForData>
     </Container>

@@ -1,4 +1,5 @@
 import { NavLinkConfig } from "@/components/global/Navbar/types";
+import { links } from "@/lib/links";
 import { BadgePlus, BuildingIcon, Compass, Home } from "lucide-react";
 
 export const navLinks: NavLinkConfig[] = [
@@ -23,11 +24,11 @@ export const navLinks: NavLinkConfig[] = [
   },
   {
     id: "submit",
-    href: "/ecocert/create",
+    href: links.bumicert.create,
     text: "Create",
     Icon: BadgePlus,
     pathCheck: {
-      equals: "/ecocert/create",
+      startsWith: links.bumicert.create,
     },
   },
   // {
@@ -64,11 +65,11 @@ export const footerLinks: {
   text: string;
 }[] = [
   {
-    href: "https://github.com/ecocertain",
+    href: "https://github.com/ecocertain-2",
     text: "GitHub",
   },
   {
-    href: "https://twitter.com/ecocertain",
+    href: "https://twitter.com/GainForestNow",
     text: "Twitter",
   },
   {

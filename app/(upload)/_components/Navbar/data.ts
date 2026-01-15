@@ -1,4 +1,6 @@
+import { footerLinks } from "@/app/(marketplace)/_components/Home/Navbar/data";
 import { NavLinkConfig } from "@/components/global/Navbar/types";
+import { links } from "@/lib/links";
 import {
   BadgePlus,
   Building2,
@@ -14,52 +16,52 @@ import {
 export const navLinks: NavLinkConfig[] = [
   {
     id: "upload/organization",
-    href: "/upload/organization/a",
+    href: links.upload.organization("a"),
     text: "Organization",
     Icon: Building2,
     pathCheck: {
-      equals: "/upload/organization/a",
+      equals: links.upload.organization("a"),
     },
   },
   {
     id: "upload/organization/a/projects",
-    href: "/upload/organization/a/projects",
+    href: links.upload.projects("a"),
     text: "Projects",
     Icon: Folder,
     pathCheck: {
-      equals: "/upload/organization/a/projects",
+      equals: links.upload.projects("a"),
     },
   },
   {
     id: "upload/organization/a/sites",
-    href: "/upload/organization/a/sites",
+    href: links.upload.sites("a"),
     text: "Sites",
     Icon: Map,
     pathCheck: {
-      equals: "/upload/organization/a/sites",
+      equals: links.upload.sites("a"),
     },
   },
   {
     id: "upload/organization/a/layers",
-    href: "/upload/organization/a/layers",
+    href: links.upload.layers("a"),
     text: "Layers",
     Icon: Satellite,
     pathCheck: {
-      equals: "/upload/organization/a/layers",
+      equals: links.upload.layers("a"),
     },
   },
   {
-    id: "upload/organization/a/ecocerts",
-    href: "/upload/organization/a/ecocerts",
-    text: "Ecocerts",
+    id: "upload/organization/a/bumicerts",
+    href: links.upload.bumicerts("a"),
+    text: "Bumicerts",
     Icon: FileBadge2,
     pathCheck: {
-      equals: "/upload/organization/a/ecocerts",
+      equals: links.upload.bumicerts("a"),
     },
   },
 ];
 
-export const footerLinks: {
+export const footerLinksForUploadPlatform: {
   href: string;
   text: string;
 }[] = [
@@ -67,16 +69,5 @@ export const footerLinks: {
     href: "/",
     text: "Home",
   },
-  {
-    href: "https://github.com/ecocertain",
-    text: "GitHub",
-  },
-  {
-    href: "https://twitter.com/ecocertain",
-    text: "Twitter",
-  },
-  {
-    href: "https://www.canva.com/design/DAGNpwdK0jo/QkBOQ1gfl0gy8jDTBAo10g/view",
-    text: "Impact Report",
-  },
+  ...footerLinks,
 ];

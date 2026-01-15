@@ -92,13 +92,9 @@ const OrganizationPage = async ({
         <hr className="my-8" />
         <Projects did={did} />
         <hr className="my-8" />
-        <SectionForData
-          title="Ecocerts"
-          userDid={did}
-          manageUrl={`/organization/${encodeURIComponent(did)}/ecocerts`}
-        >
+        <SectionForData title="Bumicerts" userDid={did}>
           <div className="w-full h-40 bg-muted rounded-lg mt-2 flex flex-col items-center justify-center text-center text-pretty font-serif text-xl text-muted-foreground font-bold">
-            Your ecocerts will appear here.
+            Your bumicerts will appear here.
           </div>
         </SectionForData>
 

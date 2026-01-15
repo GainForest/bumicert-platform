@@ -51,7 +51,7 @@ const AddProofsOfImpactStep3 = () => {
       !signer
     )
       return;
-    start(hcExchangeClient, signer, step1State.ecocertId, {
+    start(hcExchangeClient, signer, step1State.bumicertId, {
       title: step1State.title,
       description: step1State.description,
       sources: step2State.sources,

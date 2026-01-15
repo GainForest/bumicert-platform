@@ -11,7 +11,7 @@ const Navbar = ({ children }: { children: React.ReactNode }) => {
         desktopNavbarProps={{
           navLinks,
           footerLinks,
-          title: "Ecocertain",
+          title: "Bumicertain",
         }}
         mobileNavbarProps={{
           navLinks,

@@ -24,7 +24,7 @@ export type DesktopNavbarProps = {
 const DesktopNavbar = ({
   navLinks,
   footerLinks,
-  title = "Ecocertain",
+  title = "Bumicertain",
 }: DesktopNavbarProps) => {
   const { theme, setTheme } = useTheme();
   const isMounted = useIsMounted();

@@ -19,15 +19,15 @@ import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { cn } from "@/lib/utils";
 import {
   sortingOptions,
-  TEcocertSortingOptions,
-} from "../_hooks/use-sorted-ecocerts";
+  TBumicertSortingOptions,
+} from "../_hooks/use-sorted-bumicerts";
 import { useAtprotoStore } from "@/components/stores/atproto";
 
 const LeftContent = () => {
   const [search, setSearch] = useQueryState("q", { defaultValue: "" });
   return (
     <Input
-      placeholder="Search Ecocerts"
+      placeholder="Search Bumicerts"
       className="h-8 bg-background/60"
       value={search}
       onChange={(e) => setSearch(e.target.value)}
@@ -51,7 +51,7 @@ const RightContent = () => {
     >
       <BadgePlus />
       <span className="inline min-[48.01rem]:max-[54rem]:hidden max-[28rem]:hidden">
-        Create Ecocert
+        Create Bumicert
       </span>
     </Button>
   );
@@ -109,15 +109,15 @@ const SortingOptions = () => {
   const sortKeys = sortingOptions.map((option) => option.value);
   const [sortKey, setSortKey] = useQueryState(
     "sort",
-    parseAsStringLiteral<TEcocertSortingOptions["key"]>(sortKeys).withDefault(
+    parseAsStringLiteral<TBumicertSortingOptions["key"]>(sortKeys).withDefault(
       "date-created"
     )
   );
 
-  const orderKeys: Array<TEcocertSortingOptions["order"]> = ["asc", "desc"];
+  const orderKeys: Array<TBumicertSortingOptions["order"]> = ["asc", "desc"];
   const [sortDirection, setSortDirection] = useQueryState(
     "order",
-    parseAsStringLiteral<TEcocertSortingOptions["order"]>(
+    parseAsStringLiteral<TBumicertSortingOptions["order"]>(
       orderKeys
     ).withDefault("desc")
   );

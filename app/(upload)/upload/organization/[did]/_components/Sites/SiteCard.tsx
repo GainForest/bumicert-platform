@@ -171,7 +171,7 @@ const SiteCard = ({ siteData, defaultSite, did }: SiteCardProps) => {
           )}
           <hr className="mt-3 opacity-50" />
           <div className="w-full flex items-center justify-between text-sm text-muted-foreground mt-1">
-            <span>No ecocerts use this site.</span>
+            <span>No bumicerts use this site.</span>
 
             {shouldEdit && (
               <DropdownMenu>

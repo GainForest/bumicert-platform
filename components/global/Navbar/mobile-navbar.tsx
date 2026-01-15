@@ -22,7 +22,7 @@ const MobileNavbar = ({ navLinks, footerLinks }: MobileNavbarProps) => {
     <div className="flex flex-col gap-2 w-full" ref={parent}>
       <div className="w-full flex items-center justify-between p-2 relative">
         <span className="font-serif absolute top-0 bottom-0 left-1/2 -translate-x-1/2 flex items-center justify-center text-primary text-lg font-bold">
-          Ecocertain
+          Bumicertain
         </span>
         <Button variant={"outline"} size={"sm"} onClick={() => setOpenState()}>
           {openState.mobile ? <X /> : <Menu />}

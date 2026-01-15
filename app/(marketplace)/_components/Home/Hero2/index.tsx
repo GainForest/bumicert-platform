@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 const Hero2 = () => {
   const [shouldDisplayLearnMoreContent, setShouldDisplayLearnMoreContent] =
     useState(false);
-  const [ecocertainBrandingDelayOffset, setEcocertBrandingDelayOffset] =
+  const [bumicertainBrandingDelayOffset, setBumicertBrandingDelayOffset] =
     useState(1.6);
 
   return (
@@ -55,9 +55,9 @@ const Hero2 = () => {
 
           <AnimatePresence mode="wait">
             {!shouldDisplayLearnMoreContent && (
-              <AnimatedEcocertainBranding
-                key={"animated-ecocertain-branding"}
-                delayOffset={ecocertainBrandingDelayOffset}
+              <AnimatedBumicertainBranding
+                key={"animated-bumicertain-branding"}
+                delayOffset={bumicertainBrandingDelayOffset}
               />
             )}
             {shouldDisplayLearnMoreContent && (
@@ -76,7 +76,7 @@ const Hero2 = () => {
                 }}
                 className="px-6 z-5 font-serif text-white text-center text-pretty max-w-xl text-xl"
               >
-                Ecocertain is a marketplace that connects nature stewards with
+                Bumicertain is a marketplace that connects nature stewards with
                 funders. It allows local communities and organizations to
                 showcase verified conservation efforts through digital
                 certificates, enabling them to receive continuous support for
@@ -91,8 +91,8 @@ const Hero2 = () => {
             transition={{ delay: 2 }}
             className="absolute bottom-2 flex items-center gap-2 px-2 py-1 bg-transparent backdrop-blur-md hover:bg-white/10 border border-white/20 rounded-full p-2"
             onClick={() => {
-              // Set the ecocert branding delay to 0 when the user clicks Learn More for first time (or in fact, any time).
-              setEcocertBrandingDelayOffset(0);
+              // Set the bumicert branding delay to 0 when the user clicks Learn More for first time (or in fact, any time).
+              setBumicertBrandingDelayOffset(0);
               setShouldDisplayLearnMoreContent((prev) => !prev);
             }}
           >
@@ -111,7 +111,7 @@ const Hero2 = () => {
   );
 };
 
-const AnimatedEcocertainBranding = ({
+const AnimatedBumicertainBranding = ({
   delayOffset,
 }: {
   delayOffset: number;
@@ -148,7 +148,7 @@ const AnimatedEcocertainBranding = ({
         animate={{ opacity: 1, filter: "blur(0px)" }}
         transition={{ delay: delayOffset + 0.2 }}
       >
-        Ecocertain
+        Bumicertain
       </motion.h1>
       <motion.span
         className="font-serif text-xl italic text-white/60"

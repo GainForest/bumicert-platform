@@ -1,4 +1,4 @@
-import ProofOfImpact from "@/app/(marketplace)/ecocert/[ecocertId]/_components/Widgets/ProofsOfImpact/ProofOfImpact";
+import ProofOfImpact from "@/app/(marketplace)/bumicert/[bumicertId]/_components/Widgets/ProofsOfImpact/ProofOfImpact";
 import { Button } from "@/components/ui/button";
 import { useModal } from "@/components/ui/modal/context";
 import {
@@ -9,7 +9,7 @@ import {
   ModalTitle,
 } from "@/components/ui/modal/modal";
 import {
-  EcocertAttestation,
+  BumicertAttestation,
   FullHypercert,
 } from "@/graphql/hypercerts/queries/fullHypercertById";
 import { PlusCircle } from "lucide-react";
@@ -22,19 +22,19 @@ export const AllProofsOfImpactModalId = "proofs-of-impact/view-all";
 
 const AllProofsOfImpactModal = ({
   proofsOfImpact,
-  ecocert,
+  bumicert,
 }: {
-  proofsOfImpact: EcocertAttestation[];
-  ecocert: FullHypercert;
+  proofsOfImpact: BumicertAttestation[];
+  bumicert: FullHypercert;
 }) => {
   const { pushModal } = useModal();
-  const creatorAddress = ecocert.creatorAddress as `0x${string}`;
+  const creatorAddress = bumicert.creatorAddress as `0x${string}`;
   return (
     <ModalContent>
       <ModalHeader>
         <ModalTitle>All Proofs of Impact</ModalTitle>
         <ModalDescription>
-          View all proofs of impact for this ecocert.
+          View all proofs of impact for this bumicert.
         </ModalDescription>
       </ModalHeader>
       <div className="max-h-[72vh] overflow-y-auto mask-b-from-90%">
@@ -62,7 +62,7 @@ const AllProofsOfImpactModal = ({
             pushModal({
               id: AddProofsOfImpactStep1ModalId,
               content: (
-                <AddProofsOfImpactStep1 ecocertId={ecocert.hypercertId} />
+                <AddProofsOfImpactStep1 bumicertId={bumicert.hypercertId} />
               ),
             });
           }}

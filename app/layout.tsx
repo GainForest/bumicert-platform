@@ -47,7 +47,7 @@ const lisuBosa = Lisu_Bosa({
 });
 
 export const metadata: Metadata = {
-  title: "Ecocertain",
+  title: "Bumicertain",
   description: "Fund impactful regenerative projects.",
 };
 

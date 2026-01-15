@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 type AddPoiStore = {
   step1State: {
-    ecocertId: string;
+    bumicertId: string;
     title: string;
     description: string;
   } | null;

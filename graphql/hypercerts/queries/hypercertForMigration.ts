@@ -29,7 +29,7 @@ TODO: Update it when the schemas are finalized.
 //   });
 
 //   const imageUrl =
-//     "https://ecocertain-2.vercel.app/api/hypercerts/image/" + hypercertId;
+//     "https://bumicertain.vercel.app/api/hypercerts/image/" + hypercertId;
 
 //   const record: Omit<AppCertifiedHypercertRecord.Record, "image"> = {
 //     $type: "app.certified.hypercert.record",

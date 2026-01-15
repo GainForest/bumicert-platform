@@ -10,7 +10,14 @@ import {
   ModalHeader,
   ModalTitle,
 } from "@/components/ui/modal/modal";
-import { Building, GalleryVerticalEnd, Loader2, LogOut } from "lucide-react";
+import { links } from "@/lib/links";
+import {
+  Building,
+  GalleryVerticalEnd,
+  Loader2,
+  LogOut,
+  UploadIcon,
+} from "lucide-react";
 import Link from "next/link";
 
 export const ProfileModalId = "profile";
@@ -72,7 +79,7 @@ export const ProfileModal = () => {
         </div>
         <div className="flex items-center gap-2 w-full my-4">
           <Link
-            href={`/organization/${auth.user.did}`}
+            href={links.organization(auth.user.did)}
             className="flex-1 flex items-center"
           >
             <Button
@@ -89,7 +96,7 @@ export const ProfileModal = () => {
             </Button>
           </Link>
           <Link
-            href={`/ecocerts/${auth.user.did}`}
+            href={links.upload.organization(auth.user.did)}
             className="flex-1 flex items-center"
           >
             <Button
@@ -101,8 +108,8 @@ export const ProfileModal = () => {
                 });
               }}
             >
-              <GalleryVerticalEnd className="size-8 text-muted-foreground mt-2" />
-              <span>My Ecocerts</span>
+              <UploadIcon className="size-8 text-muted-foreground mt-2" />
+              <span>Upload</span>
             </Button>
           </Link>
         </div>

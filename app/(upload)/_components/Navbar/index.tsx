@@ -2,7 +2,7 @@
 import { NavbarContextProvider } from "@/components/global/Navbar/context";
 import NavbarLayout from "@/components/global/Navbar/NavbarLayout";
 import React from "react";
-import { navLinks, footerLinks } from "../Navbar/data";
+import { navLinks, footerLinksForUploadPlatform } from "../Navbar/data";
 
 const Navbar = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -10,12 +10,12 @@ const Navbar = ({ children }: { children: React.ReactNode }) => {
       <NavbarLayout
         desktopNavbarProps={{
           navLinks,
-          footerLinks,
+          footerLinks: footerLinksForUploadPlatform,
           title: "Upload",
         }}
         mobileNavbarProps={{
           navLinks,
-          footerLinks,
+          footerLinks: footerLinksForUploadPlatform,
         }}
       >
         {children}
