@@ -15,7 +15,7 @@ type ProjectCardProps = {
 const ProjectCard = ({ projectData, did }: ProjectCardProps) => {
   const project = projectData.value;
 
-  const ecocertsCount = project.activities?.length ?? 0;
+  const bumicertsCount = project.activities?.length ?? 0;
   const measuredTreesClustersCount = 0;
   const sitesCount = 0;
   const layersCount = 0;
@@ -56,8 +56,8 @@ const ProjectCard = ({ projectData, did }: ProjectCardProps) => {
 
           <div className="flex flex-col gap-2 text-sm">
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Ecocerts</span>
-              <span className="font-medium">{ecocertsCount}</span>
+              <span className="text-muted-foreground">Bumicerts</span>
+              <span className="font-medium">{bumicertsCount}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">

@@ -78,7 +78,7 @@ const Hero = ({
                   </span>
                   <span className="text-sm">by</span>
                   {/* <UserChip
-                    address={ecocert.creatorAddress as `0x${string}`}
+                    address={bumicert.creatorAddress as `0x${string}`}
                     className="p-0.5 bg-background/0 backdrop-blur-sm border border-primary/20 text-xs"
                   /> */}
                 </div>

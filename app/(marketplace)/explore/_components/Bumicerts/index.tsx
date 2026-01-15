@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import BumicertCard, { BumicertCardSkeleton } from "./EcocertCard";
+import BumicertCard, { BumicertCardSkeleton } from "./BumicertCard";
 import ErrorPage from "@/components/error-page";
 import useSortedBumicerts from "../../_hooks/use-sorted-bumicerts";
 import { useFilteredBumicerts } from "../../_hooks/use-filtered-bumicerts";
