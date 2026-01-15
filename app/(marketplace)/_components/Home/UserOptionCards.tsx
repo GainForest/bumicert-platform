@@ -31,7 +31,7 @@ const UserOptionCards = () => {
           I am an organization.
         </span>
         <p className="mt-2 text-muted-foreground">
-          Create an Bumicert to showcase your regenerative impact and attract
+          Create a bumicert to showcase your regenerative impact and attract
           donors.
         </p>
         <Link href={links.bumicert.create}>

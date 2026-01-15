@@ -35,7 +35,7 @@ const WhatIsBumicert = () => {
                 A digital certificate
               </AccordionTrigger>
               <AccordionContent>
-                An Bumicert is a certificate that records the creation of a
+                A bumicert is a certificate that records the creation of a
                 specific environmental action by a community, giving it a
                 permanent digital identity.
               </AccordionContent>
@@ -55,7 +55,7 @@ const WhatIsBumicert = () => {
                 A Funding Bridge Between Donors and Stewards
               </AccordionTrigger>
               <AccordionContent>
-                An Bumicert creates a direct pathway for supporters to fund
+                A bumicert creates a direct pathway for supporters to fund
                 on-ground work, ensuring contributions reach the exact people
                 and locations responsible for the impact.
               </AccordionContent>
