@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeftIcon, InfoIcon, XIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { useNavbarContext } from "@/components/global/Navbar/context";
 
 const Hero2 = () => {
   const [shouldDisplayLearnMoreContent, setShouldDisplayLearnMoreContent] =
@@ -30,7 +31,7 @@ const Hero2 = () => {
           transition={{ delay: 0.2 }}
           src={ApproachersImage.src}
           alt="Approachers"
-          className="absolute bottom-2 left-4 h-56 origin-bottom"
+          className="absolute bottom-2 left-4 h-28 xs:h-32 sm:h-40 md:h-56 origin-bottom"
         />
         <motion.img
           initial={{ scale: 0.5, opacity: 0 }}
@@ -38,7 +39,7 @@ const Hero2 = () => {
           transition={{ delay: 0.2 }}
           src={PlantersImage.src}
           alt="Planters"
-          className="absolute bottom-4 right-4 h-56 origin-bottom"
+          className="absolute bottom-4 right-4 h-28 xs:h-32 sm:h-40 md:h-56 origin-bottom"
         />
         <motion.div
           className="absolute inset-0  flex flex-col items-center justify-center"
@@ -48,8 +49,8 @@ const Hero2 = () => {
         >
           <motion.div
             className={cn(
-              "absolute inset-0 bg-black/50 blur-3xl z-0 transition-colors",
-              shouldDisplayLearnMoreContent && "bg-black/70"
+              "absolute inset-0 bg-black/70 blur-3xl z-0 transition-colors",
+              shouldDisplayLearnMoreContent && "bg-black/80"
             )}
           ></motion.div>
 
@@ -116,6 +117,8 @@ const AnimatedBumicertainBranding = ({
 }: {
   delayOffset: number;
 }) => {
+  const { viewport, openState } = useNavbarContext();
+
   return (
     <motion.div
       className="z-5 flex flex-col items-center justify-center relative"
@@ -151,49 +154,61 @@ const AnimatedBumicertainBranding = ({
         Bumicertain
       </motion.h1>
       <motion.span
-        className="font-serif text-xl italic text-white/60"
+        className="font-serif text-xl text-center text-pretty italic text-white/60"
         initial={{ opacity: 0, filter: "blur(10px)" }}
         animate={{ opacity: 1, filter: "blur(0px)" }}
         transition={{ delay: delayOffset + 0.3 }}
       >
         Fund impactful regenerative projects.
       </motion.span>
-      <motion.div
-        initial={{
-          scale: 0,
-          filter: "blur(10px)",
-          y: 0,
-          x: 0,
-        }}
-        animate={{
-          scale: 1,
-          filter: "blur(0px)",
-          y: -10,
-          x: -200,
-        }}
-        transition={{ delay: delayOffset + 0.6, duration: 0.5, type: "spring" }}
-        className="absolute top-0 left-0 text-nowrap text-white/80 text-shadow-sm bg-black/20 backdrop-blur-lg border border-white/20 shadow-sm px-4 py-1 rounded-tl-2xl rounded-bl-2xl rounded-tr-2xl rounded-br-xs origin-bottom-right"
-      >
-        Supporters unite.
-      </motion.div>
-      <motion.div
-        initial={{
-          scale: 0,
-          filter: "blur(10px)",
-          y: 0,
-          x: 0,
-        }}
-        animate={{
-          scale: 1,
-          filter: "blur(0px)",
-          y: 30,
-          x: 200,
-        }}
-        transition={{ delay: delayOffset + 1.1, duration: 0.5, type: "spring" }}
-        className="absolute top-0 right-0 text-nowrap text-white/80 text-shadow-sm bg-black/20 backdrop-blur-lg border border-white/20 shadow-sm px-4 py-1 rounded-tl-2xl rounded-bl-xs rounded-tr-2xl rounded-br-2xl origin-bottom-left"
-      >
-        Communities thrive.{" "}
-      </motion.div>
+      {viewport === "desktop" && (
+        <motion.div
+          initial={{
+            scale: 0,
+            filter: "blur(10px)",
+            y: 0,
+            x: 0,
+          }}
+          animate={{
+            scale: 1,
+            filter: "blur(0px)",
+            y: -10,
+            x: -200,
+          }}
+          transition={{
+            delay: delayOffset + 0.6,
+            duration: 0.5,
+            type: "spring",
+          }}
+          className="hidden lg:block absolute top-0 left-0 text-nowrap text-white/80 text-shadow-sm bg-black/20 backdrop-blur-lg border border-white/20 shadow-sm px-4 py-1 rounded-tl-2xl rounded-bl-2xl rounded-tr-2xl rounded-br-xs origin-bottom-right"
+        >
+          Supporters unite.
+        </motion.div>
+      )}
+      {viewport === "desktop" && (
+        <motion.div
+          initial={{
+            scale: 0,
+            filter: "blur(10px)",
+            y: 0,
+            x: 0,
+          }}
+          animate={{
+            scale: 1,
+            filter: "blur(0px)",
+            y: 30,
+            x: 200,
+          }}
+          transition={{
+            delay: delayOffset + 1.1,
+            duration: 0.5,
+            type: "spring",
+          }}
+          className="hidden lg:block absolute top-0 right-0 text-nowrap text-white/80 text-shadow-sm bg-black/20 backdrop-blur-lg border border-white/20 shadow-sm px-4 py-1 rounded-tl-2xl rounded-bl-xs rounded-tr-2xl rounded-br-2xl origin-bottom-left"
+        >
+          Communities thrive.{" "}
+        </motion.div>
+      )}
     </motion.div>
   );
 };

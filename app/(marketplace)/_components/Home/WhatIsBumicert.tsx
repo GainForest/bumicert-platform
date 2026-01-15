@@ -13,7 +13,7 @@ const WhatIsBumicert = () => {
       <h2 className="text-muted-foreground text-center text-pretty font-serif font-bold text-3xl mb-4">
         What is a Bumicert?
       </h2>
-      <div className="grid grid-cols-2 gap-4 rounded-3xl bg-foreground/2">
+      <div className="grid grid-cols-1 min-[60rem]:grid-cols-2 gap-4 rounded-3xl bg-foreground/2">
         <div className="h-full w-full flex items-center justify-center bg-foreground/2 p-4 rounded-3xl">
           <BumicertArt
             logoUrl={"/assets/media/images/logo.svg"}

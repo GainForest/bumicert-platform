@@ -6,8 +6,8 @@ import React from "react";
 
 const UserOptionCards = () => {
   return (
-    <div className="flex items-center mt-4 gap-4">
-      <div className="flex-1 bg-foreground/3 backdrop-blur-md rounded-3xl p-4 pt-20 relative">
+    <div className="grid grid-cols-1 md:grid-cols-2 mt-4 gap-4">
+      <div className="flex flex-col justify-end bg-foreground/3 backdrop-blur-md rounded-3xl p-4 pt-20 relative">
         <HandHeartIcon className="size-10 absolute top-3 left-4 text-primary opacity-50" />
         <span className="font-serif text-primary font-bold text-3xl">
           I want to support a project.
@@ -25,7 +25,7 @@ const UserOptionCards = () => {
           </Button>
         </Link>
       </div>
-      <div className="flex-1 bg-foreground/3 backdrop-blur-md rounded-3xl p-4 pt-20 relative">
+      <div className="flex flex-col justify-end bg-foreground/3 backdrop-blur-md rounded-3xl p-4 pt-20 relative">
         <TreesIcon className="size-10 absolute top-3 left-4 text-primary opacity-50" />
         <span className="font-serif text-primary font-bold text-3xl">
           I am an organization.
