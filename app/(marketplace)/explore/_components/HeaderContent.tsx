@@ -23,6 +23,8 @@ import {
 } from "../_hooks/use-sorted-bumicerts";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { useExploreStore } from "../store";
+import Link from "next/link";
+import { links } from "@/lib/links";
 
 const LeftContent = () => {
   const [search, setSearch] = useQueryState("q", { defaultValue: "" });
@@ -40,21 +42,23 @@ const RightContent = () => {
   const { viewport } = useNavbarContext();
   const auth = useAtprotoStore((state) => state.auth);
   return (
-    <Button
-      size={"sm"}
-      variant={
-        viewport === "mobile"
-          ? "default"
-          : auth.status === "AUTHENTICATED"
-          ? "default"
-          : "outline"
-      }
-    >
-      <BadgePlus />
-      <span className="inline min-[48.01rem]:max-[54rem]:hidden max-[28rem]:hidden">
-        Create Bumicert
-      </span>
-    </Button>
+    <Link href={links.bumicert.create}>
+      <Button
+        size={"sm"}
+        variant={
+          viewport === "mobile"
+            ? "default"
+            : auth.status === "AUTHENTICATED"
+            ? "default"
+            : "outline"
+        }
+      >
+        <BadgePlus />
+        <span className="inline min-[48.01rem]:max-[54rem]:hidden max-[28rem]:hidden">
+          Create Bumicert
+        </span>
+      </Button>
+    </Link>
   );
 };
 

@@ -5,7 +5,7 @@ import { ChevronLeft, Sidebar } from "lucide-react";
 import { useNavbarContext } from "../Navbar/context";
 import { useHeaderContext } from "../../providers/HeaderProvider";
 import AtprotoSignInButton from "./AtprotoSignInButton";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 const Header = () => {
   const router = useRouter();
