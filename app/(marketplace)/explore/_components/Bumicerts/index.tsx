@@ -13,18 +13,12 @@ import { AnimatePresence } from "framer-motion";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
 import { getEcocertsFromClaimActivities as getBumicertsFromClaimActivities } from "climateai-sdk/utilities/hypercerts";
 import { trpcApi } from "@/components/providers/TrpcProvider";
+import { useExploreStore } from "../../store";
 
 const Bumicerts = () => {
-  const {
-    data: claimsWithOrgInfo,
-    isPending,
-    error,
-  } = trpcApi.hypercerts.claim.activity.getAllAcrossOrgs.useQuery({
-    pdsDomain: allowedPDSDomains[0],
-  });
-  const bumicerts = claimsWithOrgInfo
-    ? getBumicertsFromClaimActivities(claimsWithOrgInfo, allowedPDSDomains[0])
-    : undefined;
+  const { bumicerts, error } = useExploreStore();
+
+  const loading = bumicerts === null;
 
   const filteredBumicerts = useFilteredBumicerts(bumicerts ?? []);
   const sortedAndFilteredBumicerts = useSortedBumicerts(
@@ -47,7 +41,7 @@ const Bumicerts = () => {
       <div className="flex items-center justify-center">
         <div className="w-full flex flex-wrap items-stretch justify-center gap-4">
           <AnimatePresence mode="wait">
-            {isPending ? (
+            {loading ? (
               Array.from({ length: 12 }).map((_, index) => (
                 <BumicertCardSkeleton key={index} />
               ))

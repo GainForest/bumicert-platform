@@ -10,6 +10,10 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ChevronDownIcon } from "lucide-react";
 import { OrgHypercertsClaimActivity } from "climateai-sdk/lex-api";
+import {
+  deserialize,
+  SerializedSuperjson,
+} from "climateai-sdk/utilities/transform";
 
 // Custom hook to handle collapsible content
 const useCollapsible = (maxHeight: number = 320) => {
@@ -61,7 +65,8 @@ const CollapsibleDescription = ({
         <h2 className="text-2xl font-bold font-serif px-3 text-primary">
           Description
         </h2>
-        <MarkdownEditor markdown={description} showToolbar={false} readOnly />
+        <div className="p-3">{description}</div>
+        {/* <MarkdownEditor markdown={description} showToolbar={false} readOnly /> */}
       </div>
       {shouldShowButton && (
         <div
@@ -94,10 +99,11 @@ const CollapsibleDescription = ({
 };
 
 const Body = ({
-  bumicert,
+  serializedBumicert,
 }: {
-  bumicert: OrgHypercertsClaimActivity.Record;
+  serializedBumicert: SerializedSuperjson<OrgHypercertsClaimActivity.Record>;
 }) => {
+  const bumicert = deserialize(serializedBumicert);
   const { openState, viewport } = useNavbarContext();
 
   let displayMode: "stacked" | "side-by-side" = "stacked";

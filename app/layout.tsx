@@ -5,6 +5,7 @@ import {
   Instrument_Serif,
   Cormorant_Garamond,
   Lisu_Bosa,
+  Baskervville,
 } from "next/font/google";
 import "./globals.css";
 import PrivyProvider from "@/components/providers/PrivyProvider";
@@ -46,6 +47,12 @@ const lisuBosa = Lisu_Bosa({
   weight: ["400"],
 });
 
+const baskerville = Baskervville({
+  variable: "--font-baskerville",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
 export const metadata: Metadata = {
   title: "Bumicertain",
   description: "Fund impactful regenerative projects.",
@@ -59,7 +66,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} ${cormorantGaramond.variable} ${lisuBosa.variable} antialiased h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} ${cormorantGaramond.variable} ${lisuBosa.variable} ${baskerville.variable} antialiased h-screen`}
       >
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <NuqsAdapter>

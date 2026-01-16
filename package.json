@@ -45,6 +45,7 @@
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
+    "extract-colors": "^4.2.1",
     "framer-motion": "^12.11.3",
     "geojson": "^0.5.0",
     "gql.tada": "^1.8.13",

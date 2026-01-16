@@ -22,6 +22,7 @@ import {
   TBumicertSortingOptions,
 } from "../_hooks/use-sorted-bumicerts";
 import { useAtprotoStore } from "@/components/stores/atproto";
+import { useExploreStore } from "../store";
 
 const LeftContent = () => {
   const [search, setSearch] = useQueryState("q", { defaultValue: "" });
@@ -59,28 +60,18 @@ const RightContent = () => {
 
 const FilterOptions = () => {
   const { viewport } = useNavbarContext();
+  const { organizations } = useExploreStore();
   if (viewport === "mobile") {
     return (
       <div className="flex items-center gap-2">
-        <Button size={"sm"} variant={"outline"}>
+        <Button size={"sm"} variant={"outline"} disabled={!organizations}>
           <Filter />
           <span className="inline max-[22rem]:hidden">Filter</span>
         </Button>
       </div>
     );
   }
-  const organizations = [
-    "organization 1",
-    "organization 2",
-    "organization 3",
-    "organization 4",
-    "organization 5",
-    "organization 6",
-    "organization 7",
-    "organization 8",
-    "organization 9",
-    "organization 10",
-  ];
+
   return (
     <div className="grid grid-cols-[auto_1fr] items-center gap-2">
       <span className="font-semibold text-sm text-muted-foreground">
@@ -88,16 +79,26 @@ const FilterOptions = () => {
       </span>
       <div className="flex-1 overflow-x-auto scrollbar-hidden rounded-full mask-r-from-90%">
         <div className="flex items-center gap-1">
-          {organizations.map((organization) => (
-            <Button
-              key={organization}
-              size={"sm"}
-              variant={"secondary"}
-              className="rounded-full border border-primary/30 hover:border-primary/60"
-            >
-              {organization}
-            </Button>
-          ))}
+          {!organizations &&
+            Array.from({ length: 10 }).map((_, index) => (
+              <Button
+                key={index}
+                size={"sm"}
+                variant={"secondary"}
+                className="rounded-full bg-primary/20 animate-pulse w-26"
+              ></Button>
+            ))}
+          {organizations &&
+            organizations.map((organization) => (
+              <Button
+                key={organization.repo.did}
+                size={"sm"}
+                variant={"secondary"}
+                className="rounded-full border border-primary/30 hover:border-primary/60"
+              >
+                {organization.info.displayName}
+              </Button>
+            ))}
           <div className="">&nbsp;&nbsp;&nbsp;&nbsp;</div>
         </div>
       </div>

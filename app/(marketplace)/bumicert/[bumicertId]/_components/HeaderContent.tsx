@@ -4,20 +4,21 @@ import { useHeaderContext } from "@/components/providers/HeaderProvider";
 import { Button } from "@/components/ui/button";
 import { HandHeart, ArrowUpRight, Copy, Check } from "lucide-react";
 import React, { useEffect } from "react";
-import useAccount from "@/hooks/use-account";
 import Link from "next/link";
 import useCopy from "@/hooks/use-copy";
+import { useAtprotoStore } from "@/components/stores/atproto";
+import { OrgHypercertsClaimActivity } from "climateai-sdk/lex-api";
 
 const RightContent = () => {
   const { viewport } = useNavbarContext();
-  const { authenticated } = useAccount();
+  const auth = useAtprotoStore((state) => state.auth);
   return (
     <Button
       size={"sm"}
       variant={
         viewport === "mobile"
           ? "default"
-          : authenticated
+          : auth.authenticated
           ? "default"
           : "outline"
       }
@@ -30,15 +31,19 @@ const RightContent = () => {
 
 const SubHeaderContent = ({ bumicertId }: { bumicertId: string }) => {
   const { copy, isCopied } = useCopy();
+  const [did, rkey] = bumicertId.split("-");
+  const nsid: OrgHypercertsClaimActivity.Main["$type"] =
+    "org.hypercerts.claim.activity";
+  const aturi = `at://${did}/${nsid}/${rkey}`;
   return (
     <div className="flex items-center justify-between gap-2 w-full bg-muted/90 p-2">
       <Link
-        href={`https://app.hypercerts.org/hypercerts/${bumicertId}`}
+        href={`https://pdsls.dev/${aturi}`}
         target="_blank"
         className="text-sm inline-flex items-center gap-1 cursor-pointer"
       >
         <Button size={"sm"} variant={"link"} className="cursor-pointer">
-          View in Hypercerts App
+          View on PDSls
           <ArrowUpRight />
         </Button>
       </Link>

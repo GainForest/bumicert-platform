@@ -9,6 +9,7 @@ import { climateAiSdk } from "@/config/climateai-sdk.server";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
 import { tryCatch } from "@/lib/tryCatch";
 import { TRPCError } from "@trpc/server";
+import { serialize } from "climateai-sdk/utilities/transform";
 
 const BumicertPage = async ({
   params,
@@ -54,6 +55,9 @@ const BumicertPage = async ({
 
   const [organizationInfoResponse, bumicertResponse] = bumicertResponses;
 
+  const serializedOrganizationInfo = serialize(organizationInfoResponse.value);
+  const serializedBumicert = serialize(bumicertResponse.value);
+
   if (bumicertResponse.value.image === undefined) {
     // We don't support Bumicerts that don't have an image.
     throw new Error("This Bumicert is not supported.");
@@ -64,10 +68,10 @@ const BumicertPage = async ({
       <HeaderContent bumicertId={decodedBumicertId} />
       <Hero
         creatorDid={did}
-        bumicert={bumicertResponse.value}
-        organizationInfo={organizationInfoResponse.value}
+        serializedBumicert={serializedBumicert}
+        serializedOrganizationInfo={serializedOrganizationInfo}
       />
-      <Body bumicert={bumicertResponse.value} />
+      <Body serializedBumicert={serializedBumicert} />
       <hr className="my-4" />
       <div
         className={"grid gap-4"}
@@ -77,9 +81,9 @@ const BumicertPage = async ({
         }}
       >
         {/* <ProofsOfImpact bumicert={bumicert} /> */}
-        <WidgetItem title="Reviews">Hello</WidgetItem>
+        {/* <WidgetItem title="Reviews">Hello</WidgetItem>
         <WidgetItem title="Support">Hello</WidgetItem>
-        <WidgetItem title="Contributors & Evaluators">Hello</WidgetItem>
+        <WidgetItem title="Contributors & Evaluators">Hello</WidgetItem> */}
       </div>
     </Container>
   );

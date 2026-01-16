@@ -7,6 +7,7 @@ export const links = {
     layers: (did: string) => `/upload/organization/${did}/layers`,
     bumicerts: (did: string) => `/upload/organization/${did}/bumicerts`,
   },
+  user: (did: string) => `/user/${did}`,
   explore: "/explore",
   bumicert: {
     create: "/bumicert/create",

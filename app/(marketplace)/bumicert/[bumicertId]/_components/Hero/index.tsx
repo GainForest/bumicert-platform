@@ -1,12 +1,10 @@
-import { FullHypercert } from "@/graphql/hypercerts/queries/fullHypercertById";
+"use client";
 import { getStripedBackground } from "@/lib/getStripedBackground";
 import { BadgeCheck, Calendar, ShieldCheck } from "lucide-react";
-import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import React from "react";
 import ProgressView from "./ProgressView";
 import TimeText from "@/components/time-text";
-import UserChip from "@/components/user-chip";
 import {
   AppGainforestOrganizationInfo,
   OrgHypercertsClaimActivity,
@@ -16,17 +14,40 @@ import { BumicertArt } from "@/app/(marketplace)/bumicert/create/[draftId]/_comp
 import { $Typed } from "climateai-sdk/lex-api/utils";
 import { AppGainforestCommonDefs as Defs } from "climateai-sdk/lex-api";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
+import {
+  deserialize,
+  SerializedSuperjson,
+} from "climateai-sdk/utilities/transform";
+import UserChip from "@/components/user-chip2";
+import Image from "next/image";
+import { useAdaptiveColors } from "@/hooks/use-adaptive-colors";
+import { ProgressiveBlur } from "@/components/ui/progressive-blur";
 
 const Hero = ({
   creatorDid,
-  bumicert,
-  organizationInfo,
+  serializedBumicert,
+  serializedOrganizationInfo,
 }: {
   creatorDid: string;
-  bumicert: OrgHypercertsClaimActivity.Record;
-  organizationInfo: AppGainforestOrganizationInfo.Record;
+  serializedBumicert: SerializedSuperjson<OrgHypercertsClaimActivity.Record>;
+  serializedOrganizationInfo: SerializedSuperjson<AppGainforestOrganizationInfo.Record>;
 }) => {
-  if (bumicert.image === undefined) {
+  const organizationInfo = deserialize(serializedOrganizationInfo);
+  const bumicert = deserialize(serializedBumicert);
+
+  const coverImageUrl =
+    bumicert.image === undefined
+      ? null
+      : getBlobUrl(
+          creatorDid,
+          bumicert.image as $Typed<Defs.SmallImage>,
+          allowedPDSDomains[0]
+        );
+
+  const { background, foreground, backgroundMuted, foregroundMuted } =
+    useAdaptiveColors(coverImageUrl);
+
+  if (coverImageUrl === null) {
     throw new Error("This Bumicert is not supported.");
   }
 
@@ -51,45 +72,41 @@ const Hero = ({
       <div className="bg-muted rounded-xl overflow-hidden w-full">
         <div className="bg-background w-full rounded-xl border border-black/15 overflow-hidden">
           <div
-            className="w-full grid grid-cols-1 md:grid-cols-[1fr_240px] gap-3 p-4"
+            className="w-full grid grid-cols-1 md:grid-cols-[1fr_240px]"
             style={{
               background: getStripedBackground(
-                {
-                  variable: "--primary",
-                  opacity: 0,
-                },
-                {
-                  variable: "--primary",
-                  opacity: 10,
-                },
+                `${background}ff`,
+                `${background}fc`,
                 12
               ),
+              color: foreground,
             }}
           >
-            <div className="flex flex-col items-start justify-between w-0 min-w-full gap-4">
+            <div className="flex flex-col items-start justify-between w-0 min-w-full gap-4 p-4">
               <div className="flex flex-col items-start">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="bg-background/0 backdrop-blur-sm border border-primary/20 rounded-full text-sm px-2 h-[1.75rem] flex items-center">
-                    <TimeText
-                      date={
-                        new Date(Number(bumicert.creationBlockTimestamp) * 1000)
-                      }
-                    />
+                <div
+                  className="flex items-center gap-2 flex-wrap"
+                  style={{
+                    color: `${foreground}98`,
+                  }}
+                >
+                  <span className="bg-gray-500/10 rounded-full text-sm px-2 h-7 flex items-center">
+                    <TimeText date={new Date(bumicert.createdAt)} />
                   </span>
                   <span className="text-sm">by</span>
-                  {/* <UserChip
-                    address={bumicert.creatorAddress as `0x${string}`}
-                    className="p-0.5 bg-background/0 backdrop-blur-sm border border-primary/20 text-xs"
-                  /> */}
+                  <UserChip
+                    did={creatorDid as `did:pds:${string}`}
+                    className="p-0.5 bg-gray-500/10 hover:bg-gray-500/20 text-xs"
+                  />
                 </div>
-                <h1 className="mt-4 text-2xl md:text-3xl font-bold font-serif text-primary drop-shadow-md">
+                <h1 className="mt-4 text-2xl md:text-3xl font-bold font-serif drop-shadow-md">
                   {bumicert.title.slice(0, 150)}
                   {bumicert.title.length > 150 && "..."}
                 </h1>
               </div>
               <div className="w-full">
-                <span className="bg-background/90 border border-primary/50 backdrop-blur-sm rounded-full px-2 py-0.5 text-sm text-primary font-medium shrink-0 inline-flex items-center gap-1 mb-2">
-                  <Calendar className="size-3 mr-1" />
+                <span className="rounded-full px-2 py-0.5 text-sm font-medium shrink-0 inline-flex items-center gap-1">
+                  <Calendar className="size-4 mr-1 opacity-50" />
                   <TimeText
                     format="absolute-date"
                     date={new Date(bumicert.startDate)}
@@ -101,13 +118,17 @@ const Hero = ({
                   />
                 </span>
 
-                <div className="w-full overflow-x-auto scrollbar-hidden mask-r-from-90%">
+                <div className="w-full overflow-x-auto scrollbar-hidden mask-r-from-90% mt-4">
                   <div className="w-full flex items-center justify-start gap-2">
                     {(bumicert.workScope?.withinAnyOf ?? []).map(
                       (work, index) => (
                         <span
                           key={index}
-                          className="bg-background/90 border border-primary/20 backdrop-blur-sm rounded-full px-2 py-0.5 text-sm text-primary font-medium shrink-0"
+                          className="rounded-lg px-3 py-1.5 text-sm font-medium shrink-0"
+                          style={{
+                            background: `${backgroundMuted}`,
+                            color: `${foreground}96`,
+                          }}
                         >
                           {work}
                         </span>
@@ -117,27 +138,30 @@ const Hero = ({
                 </div>
               </div>
             </div>
-            <div className="min-h-[240px] flex items-center justify-center mask-none md:mask-b-from-90% relative">
-              <BumicertArt
-                logoUrl={
-                  organizationInfo.logo
-                    ? getBlobUrl(
-                        creatorDid,
-                        organizationInfo.logo.image,
-                        allowedPDSDomains[0]
-                      )
-                    : null
-                }
-                coverImage={getBlobUrl(
-                  creatorDid,
-                  bumicert.image as $Typed<Defs.SmallImage>,
-                  allowedPDSDomains[0]
-                )}
-                title={bumicert.title}
-                objectives={bumicert.workScope?.withinAnyOf ?? []}
-                startDate={new Date(bumicert.startDate as string)}
-                endDate={new Date(bumicert.endDate as string)}
-              />
+            <div className="min-h-72 flex items-center justify-center relative">
+              <div className="absolute inset-1 overflow-hidden">
+                <Image
+                  src={getBlobUrl(
+                    creatorDid,
+                    bumicert.image as $Typed<Defs.SmallImage>,
+                    allowedPDSDomains[0]
+                  )}
+                  alt="Logo"
+                  fill
+                  className="object-cover rounded-3xl"
+                />
+                <div
+                  className="absolute inset-0 rounded-2xl"
+                  style={{
+                    boxShadow: `inset 0px 0px 1rem 1rem ${background}`,
+                  }}
+                ></div>
+                {/* <ProgressiveBlur position="bottom" height="2rem" />
+                <ProgressiveBlur position="top" height="2rem" />
+                <div className="absolute inset-0 rotate-90">
+                  <ProgressiveBlur position="bottom" height="2rem" />
+                </div> */}
+              </div>
             </div>
           </div>
         </div>

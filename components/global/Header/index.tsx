@@ -5,8 +5,10 @@ import { ChevronLeft, Sidebar } from "lucide-react";
 import { useNavbarContext } from "../Navbar/context";
 import { useHeaderContext } from "../../providers/HeaderProvider";
 import AtprotoSignInButton from "./AtprotoSignInButton";
+import { useRouter } from "next/router";
 
 const Header = () => {
+  const router = useRouter();
   const { setOpenState, viewport } = useNavbarContext();
   const { leftContent, rightContent, subHeaderContent } = useHeaderContext();
   return (
@@ -18,7 +20,7 @@ const Header = () => {
               <Sidebar className="size-4" />
             </Button>
           )}
-          <Button size={"sm"} variant={"outline"}>
+          <Button size={"sm"} variant={"outline"} onClick={() => router.back()}>
             <ChevronLeft />
             {viewport === "desktop" && <span>Back</span>}
           </Button>
