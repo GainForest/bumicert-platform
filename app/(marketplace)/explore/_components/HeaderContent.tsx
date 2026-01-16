@@ -14,7 +14,7 @@ import {
   CalendarArrowUp,
   Filter,
 } from "lucide-react";
-import React, { Suspense, useEffect } from "react";
+import React, { Suspense, useEffect, useMemo } from "react";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { cn } from "@/lib/utils";
 import {
@@ -64,7 +64,21 @@ const RightContent = () => {
 
 const FilterOptions = () => {
   const { viewport } = useNavbarContext();
-  const { organizations } = useExploreStore();
+  const { organizations, bumicerts } = useExploreStore();
+  const organizationsWithBumicertCounts = useMemo(() => {
+    const hashmap = new Map<string, number>();
+    for (const bumicert of bumicerts ?? []) {
+      hashmap.set(bumicert.repo.did, (hashmap.get(bumicert.repo.did) ?? 0) + 1);
+    }
+    const orgsWithCounts = organizations?.map((organization) => ({
+      ...organization,
+      bumicertCount: hashmap.get(organization.repo.did) ?? 0,
+    }));
+    const sortedOrgsWithCounts = orgsWithCounts?.sort(
+      (a, b) => b.bumicertCount - a.bumicertCount
+    );
+    return sortedOrgsWithCounts;
+  }, [organizations, bumicerts]);
   if (viewport === "mobile") {
     return (
       <div className="flex items-center gap-2">
@@ -83,7 +97,7 @@ const FilterOptions = () => {
       </span>
       <div className="flex-1 overflow-x-auto scrollbar-hidden rounded-full mask-r-from-90%">
         <div className="flex items-center gap-1">
-          {!organizations &&
+          {!organizationsWithBumicertCounts &&
             Array.from({ length: 10 }).map((_, index) => (
               <Button
                 key={index}
@@ -92,8 +106,8 @@ const FilterOptions = () => {
                 className="rounded-full bg-primary/20 animate-pulse w-26"
               ></Button>
             ))}
-          {organizations &&
-            organizations.map((organization) => (
+          {organizationsWithBumicertCounts &&
+            organizationsWithBumicertCounts.map((organization) => (
               <Button
                 key={organization.repo.did}
                 size={"sm"}
@@ -101,6 +115,7 @@ const FilterOptions = () => {
                 className="rounded-full border border-primary/30 hover:border-primary/60"
               >
                 {organization.info.displayName}
+                <span className="ml-2">{organization.bumicertCount}</span>
               </Button>
             ))}
           <div className="">&nbsp;&nbsp;&nbsp;&nbsp;</div>
