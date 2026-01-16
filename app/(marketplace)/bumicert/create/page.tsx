@@ -39,7 +39,7 @@ const CreateBumicertPage = () => {
   return (
     <AuthWrapper>
       <HeaderContent />
-      <div className="w-full flex items-start gap-6 mt-4">
+      <div className="w-full grid grid-cols-1 lg:grid-cols-[1fr_20rem] gap-6 mt-4">
         <div className="flex-1 flex flex-col gap-4">
           {/* Create New Section */}
           <section className="rounded-xl gap-1 border border-border shadow-xl relative overflow-hidden">
@@ -76,7 +76,7 @@ const CreateBumicertPage = () => {
           {/* My Bumicerts Section */}
           <MyBumicerts />
         </div>
-        <div className="w-68">
+        <div className="w-full">
           <Accordion type="multiple" defaultValue={["item-2"]}>
             <AccordionItem value="item-1">
               <AccordionTrigger>
