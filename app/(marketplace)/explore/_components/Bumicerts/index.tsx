@@ -11,7 +11,7 @@ import { Eraser } from "lucide-react";
 import { useQueryState } from "nuqs";
 import { AnimatePresence } from "framer-motion";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
-import { getEcocertsFromClaimActivities } from "climateai-sdk/utilities/hypercerts";
+import { getEcocertsFromClaimActivities as getBumicertsFromClaimActivities } from "climateai-sdk/utilities/hypercerts";
 import { trpcApi } from "@/components/providers/TrpcProvider";
 
 const Bumicerts = () => {
@@ -22,20 +22,22 @@ const Bumicerts = () => {
   } = trpcApi.hypercerts.claim.activity.getAllAcrossOrgs.useQuery({
     pdsDomain: allowedPDSDomains[0],
   });
-  const ecocerts = claimsWithOrgInfo
-    ? getEcocertsFromClaimActivities(claimsWithOrgInfo, allowedPDSDomains[0])
+  const bumicerts = claimsWithOrgInfo
+    ? getBumicertsFromClaimActivities(claimsWithOrgInfo, allowedPDSDomains[0])
     : undefined;
 
-  const filteredEcocerts = useFilteredBumicerts(ecocerts ?? []);
-  const sortedAndFilteredEcocerts = useSortedBumicerts(filteredEcocerts ?? []);
+  const filteredBumicerts = useFilteredBumicerts(bumicerts ?? []);
+  const sortedAndFilteredBumicerts = useSortedBumicerts(
+    filteredBumicerts ?? []
+  );
   const [, setSearchParams] = useQueryState("q");
 
   if (error) {
     return (
       <ErrorPage
         error={error}
-        title="Unable to load ecocerts."
-        description="Something went wrong while fetching ecocerts."
+        title="Unable to load bumicerts."
+        description="Something went wrong while fetching bumicerts."
       />
     );
   }
@@ -49,16 +51,16 @@ const Bumicerts = () => {
               Array.from({ length: 12 }).map((_, index) => (
                 <BumicertCardSkeleton key={index} />
               ))
-            ) : sortedAndFilteredEcocerts.length > 0 ? (
-              sortedAndFilteredEcocerts.map((ecocert) => (
+            ) : sortedAndFilteredBumicerts.length > 0 ? (
+              sortedAndFilteredBumicerts.map((bumicert) => (
                 <BumicertCard
-                  key={ecocert.claimActivity.cid}
-                  bumicert={ecocert}
+                  key={bumicert.claimActivity.cid}
+                  bumicert={bumicert}
                 />
               ))
             ) : (
               <NothingPage
-                title="No ecocerts found."
+                title="No bumicerts found."
                 description="Please try changing your search."
                 cta={
                   <Button
