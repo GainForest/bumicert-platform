@@ -33,14 +33,7 @@ const mockDrafts: {
   title: string;
   updatedAt: string;
   progress: number;
-}[] = [
-  {
-    id: "1",
-    title: "Draft 1",
-    updatedAt: "2024-01-01",
-    progress: 50,
-  },
-];
+}[] = [];
 
 const CreateBumicertPage = () => {
   return (

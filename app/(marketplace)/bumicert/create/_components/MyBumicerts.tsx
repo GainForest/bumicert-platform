@@ -7,7 +7,7 @@ import { allowedPDSDomains } from "@/config/climateai-sdk";
 import { links } from "@/lib/links";
 import { parseAtUri } from "climateai-sdk/utilities/atproto";
 import { getEcocertsFromClaimActivities as getBumicertsFromClaimActivities } from "climateai-sdk/utilities/hypercerts";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Inbox, Loader2 } from "lucide-react";
 import Link from "next/link";
 import React, { useMemo } from "react";
 
@@ -56,39 +56,56 @@ const MyBumicerts = () => {
     );
     return bumicerts;
   }, [activityClaims, organizationInfo, auth]);
-  if (!bumicerts) return null;
   return (
     <section className="mt-4 flex flex-col rounded-xl gap-2">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold font-serif text-muted-foreground">
           My Bumicerts
         </h1>
-        <span className="py-1 px-4 bg-muted text-muted-foreground font-bold rounded-lg">
-          {bumicerts.length}
-        </span>
+        {bumicerts !== undefined && (
+          <span className="py-1 px-4 bg-muted text-muted-foreground font-bold rounded-lg">
+            {bumicerts.length}
+          </span>
+        )}
       </div>
 
-      <div className="flex flex-col divide-y divide-border border border-border rounded-xl p-1 mt-2">
-        {bumicerts.map((bumicert) => (
-          <div
-            key={bumicert.claimActivity.uri}
-            className="flex items-center justify-between p-1"
-          >
-            <span className="ml-2">{bumicert.claimActivity.value.title}</span>
-            <Link
-              href={links.bumicert.view(
-                `${bumicert.repo.did}-${
-                  parseAtUri(bumicert.claimActivity.uri).rkey
-                }`
-              )}
+      {bumicerts === undefined ? (
+        <div className="mt-2 flex flex-col items-center justify-center py-12 text-center rounded-lg border border-border/50 bg-muted/50">
+          <Loader2 className="size-5 text-primary animate-spin opacity-50" />
+          <span className="mt-2 text-muted-foreground">
+            Loading bumicerts...
+          </span>
+        </div>
+      ) : bumicerts.length === 0 ? (
+        <div className="mt-2 flex flex-col items-center justify-center py-12 text-center rounded-lg border border-border/50 bg-muted/50">
+          <Inbox className="size-8 text-muted-foreground opacity-50" />
+          <span className="mt-2 text-muted-foreground">
+            No bumicerts found.
+          </span>
+        </div>
+      ) : (
+        <div className="flex flex-col divide-y divide-border border border-border rounded-xl p-1 mt-2">
+          {bumicerts.map((bumicert) => (
+            <div
+              key={bumicert.claimActivity.uri}
+              className="flex items-center justify-between p-1"
             >
-              <Button variant="link" size={"sm"}>
-                View <ArrowUpRight />
-              </Button>
-            </Link>
-          </div>
-        ))}
-      </div>
+              <span className="ml-2">{bumicert.claimActivity.value.title}</span>
+              <Link
+                href={links.bumicert.view(
+                  `${bumicert.repo.did}-${
+                    parseAtUri(bumicert.claimActivity.uri).rkey
+                  }`
+                )}
+              >
+                <Button variant="link" size={"sm"}>
+                  View <ArrowUpRight />
+                </Button>
+              </Link>
+            </div>
+          ))}
+        </div>
+      )}
     </section>
   );
 };
