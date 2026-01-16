@@ -53,18 +53,29 @@ const DesktopNavbar = ({
             let isHighlighted = false;
 
             if ("equals" in link.pathCheck) {
-              isHighlighted = pathname === link.pathCheck.equals;
+              const targetPath =
+                typeof link.pathCheck.equals === "function"
+                  ? link.pathCheck.equals(did)
+                  : link.pathCheck.equals;
+              isHighlighted = pathname === targetPath;
               // Special case for organization link
               if (link.id === "organization" && did && !isHighlighted) {
                 isHighlighted = pathname.startsWith(`/organization/${did}`);
               }
             } else {
-              isHighlighted = pathname.startsWith(link.pathCheck.startsWith);
+              const targetPath =
+                typeof link.pathCheck.startsWith === "function"
+                  ? link.pathCheck.startsWith(did)
+                  : link.pathCheck.startsWith;
+              isHighlighted = pathname.startsWith(targetPath);
             }
+
+            const href =
+              typeof link.href === "function" ? link.href(did) : link.href;
 
             return (
               <li key={link.id} className="w-full">
-                <Link href={link.href} className="w-full">
+                <Link href={href} className="w-full">
                   <Button
                     variant="outline"
                     size="sm"

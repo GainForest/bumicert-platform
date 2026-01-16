@@ -16,47 +16,47 @@ import {
 export const navLinks: NavLinkConfig[] = [
   {
     id: "upload/organization",
-    href: links.upload.organization("a"),
+    href: links.upload.organization,
     text: "Organization",
     Icon: Building2,
     pathCheck: {
-      equals: links.upload.organization("a"),
+      equals: links.upload.organization,
     },
   },
   {
     id: "upload/organization/a/projects",
-    href: links.upload.projects("a"),
+    href: links.upload.projects,
     text: "Projects",
     Icon: Folder,
     pathCheck: {
-      equals: links.upload.projects("a"),
+      equals: links.upload.projects,
     },
   },
   {
     id: "upload/organization/a/sites",
-    href: links.upload.sites("a"),
+    href: links.upload.sites,
     text: "Sites",
     Icon: Map,
     pathCheck: {
-      equals: links.upload.sites("a"),
+      equals: links.upload.sites,
     },
   },
   {
     id: "upload/organization/a/layers",
-    href: links.upload.layers("a"),
+    href: links.upload.layers,
     text: "Layers",
     Icon: Satellite,
     pathCheck: {
-      equals: links.upload.layers("a"),
+      equals: links.upload.layers,
     },
   },
   {
     id: "upload/organization/a/bumicerts",
-    href: links.upload.bumicerts("a"),
+    href: links.upload.bumicerts,
     text: "Bumicerts",
     Icon: FileBadge2,
     pathCheck: {
-      equals: links.upload.bumicerts("a"),
+      equals: links.upload.bumicerts,
     },
   },
 ];

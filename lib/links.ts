@@ -1,13 +1,18 @@
+type DidDynamicLink = (did?: string) => string;
+const didCatcher = (callback: (did: string) => string): DidDynamicLink => {
+  return (did) => (did === undefined ? "#" : callback(did));
+};
+
 export const links = {
-  organization: (did: string) => `/organization/${did}`,
+  organization: didCatcher((did) => `/organization/${did}`),
   upload: {
-    organization: (did: string) => `/upload/organization/${did}`,
-    projects: (did: string) => `/upload/organization/${did}/projects`,
-    sites: (did: string) => `/upload/organization/${did}/sites`,
-    layers: (did: string) => `/upload/organization/${did}/layers`,
-    bumicerts: (did: string) => `/upload/organization/${did}/bumicerts`,
+    organization: didCatcher((did) => `/upload/organization/${did}`),
+    projects: didCatcher((did) => `/upload/organization/${did}/projects`),
+    sites: didCatcher((did) => `/upload/organization/${did}/sites`),
+    layers: didCatcher((did) => `/upload/organization/${did}/layers`),
+    bumicerts: didCatcher((did) => `/upload/organization/${did}/bumicerts`),
   },
-  user: (did: string) => `/user/${did}`,
+  user: didCatcher((did) => `/user/${did}`),
   explore: "/explore",
   bumicert: {
     create: "/bumicert/create",

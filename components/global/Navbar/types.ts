@@ -12,12 +12,12 @@ export type NavLinkConfig = {
   openInNewTab?: boolean;
   pathCheck:
     | {
-        equals: string;
+        equals: string | ((did?: string) => string);
       }
     | {
-        startsWith: string;
+        startsWith: string | ((did?: string) => string);
       };
-  href: string;
+  href: string | ((did?: string) => string);
   text: string;
   Icon: FC<LucideProps>;
 };

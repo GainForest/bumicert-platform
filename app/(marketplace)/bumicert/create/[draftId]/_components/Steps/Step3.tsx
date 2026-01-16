@@ -36,6 +36,7 @@ import { $Typed } from "climateai-sdk/lex-api/utils";
 import { OrgHypercertsDefs as Defs } from "climateai-sdk/lex-api";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { getBlobUrl, parseAtUri } from "climateai-sdk/utilities/atproto";
+import { links } from "@/lib/links";
 
 const formatCoordinate = (coordinate: string) => {
   const num = parseFloat(coordinate);
@@ -181,7 +182,7 @@ const Step3 = () => {
             {auth.user?.did && (
               <span className="text-sm text-muted-foreground">
                 <Link
-                  href={`/organization/${auth.user.did}`}
+                  href={links.upload.sites(auth.user.did)}
                   className="flex items-center text-primary hover:underline"
                 >
                   Manage sites <ChevronRight className="size-4" />

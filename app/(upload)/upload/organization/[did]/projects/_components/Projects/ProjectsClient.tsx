@@ -17,6 +17,7 @@ import { GetRecordResponse } from "climateai-sdk/types";
 import Link from "next/link";
 import { OrgHypercertsClaimProject } from "climateai-sdk/lex-api";
 import SectionForData from "../../../_components/SectionForData";
+import { links } from "@/lib/links";
 
 export type AllProjectsData = {
   projects: GetRecordResponse<OrgHypercertsClaimProject.Record>[];
@@ -54,7 +55,7 @@ const ProjectsClient = ({
             No projects yet.{" "}
           </span>
           {shouldEdit && showManageButton && (
-            <Link href={`/organization/${encodeURIComponent(did)}/projects`}>
+            <Link href={links.upload.projects(did)}>
               <Button variant={"outline"} size={"sm"} className="mt-2">
                 Manage projects
               </Button>
@@ -79,7 +80,7 @@ export const ProjectsSectionClient = (props: ProjectSectionClientProps) => {
     <SectionForData
       title="Projects"
       userDid={props.did}
-      manageUrl={`/organization/${encodeURIComponent(props.did)}/projects`}
+      manageUrl={links.upload.projects(props.did)}
     >
       <ProjectsClient {...props} showManageButton />
     </SectionForData>

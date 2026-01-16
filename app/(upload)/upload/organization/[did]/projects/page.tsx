@@ -11,6 +11,7 @@ import { serialize } from "climateai-sdk/utilities/transform";
 import { climateAiSdk } from "@/config/climateai-sdk.server";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
 import HeaderContent from "../_components/HeaderContent";
+import ProjectsHeaderContent from "./HeaderContent";
 
 const ProjectsPage = async ({
   params,
@@ -65,7 +66,7 @@ const ProjectsPage = async ({
 
   return (
     <Container>
-      <HeaderContent />
+      <ProjectsHeaderContent />
       <div className="p-2">
         <h1 className="font-serif font-bold text-3xl mb-6">My Projects</h1>
         <ProjectsClient
