@@ -58,9 +58,11 @@ const SubHeaderContent = ({ bumicertId }: { bumicertId: string }) => {
 };
 
 const HeaderContent = ({ bumicertId }: { bumicertId: string }) => {
-  const { setRightContent, setSubHeaderContent } = useHeaderContext();
+  const { setLeftContent, setRightContent, setSubHeaderContent } =
+    useHeaderContext();
 
   useEffect(() => {
+    setLeftContent(null);
     setRightContent(<RightContent />);
     setSubHeaderContent(<SubHeaderContent bumicertId={bumicertId} />);
   }, []);

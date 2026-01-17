@@ -11,6 +11,7 @@ import Hero from "@/app/(upload)/upload/organization/[did]/_components/Hero";
 import SubHero from "@/app/(upload)/upload/organization/[did]/_components/SubHero";
 import AboutOrganization from "@/app/(upload)/upload/organization/[did]/_components/AboutOrganization";
 import SectionForData from "@/app/(upload)/upload/organization/[did]/_components/SectionForData";
+import { OrganizationPageHydrator } from "@/app/(upload)/upload/organization/[did]/hydrator";
 
 const EMPTY_ORGANIZATION_DATA: AppGainforestOrganizationInfo.Record = {
   $type: "app.gainforest.organization.info",
@@ -72,18 +73,23 @@ const OrganizationPage = async ({
   }
 
   return (
-    <Container>
-      <HeaderContent did={did} />
-      <Hero initialData={serializedData} initialDid={did} />
-      <SubHero initialData={serializedData} />
-      <AboutOrganization initialData={serializedData} />
-      <hr />
-      <SectionForData title="Bumicerts" userDid={did}>
-        <div className="w-full h-40 bg-muted rounded-lg mt-2 flex flex-col items-center justify-center text-center text-pretty font-serif text-xl text-muted-foreground font-bold">
-          The bumicerts of this organization will appear here.
-        </div>
-      </SectionForData>
-    </Container>
+    <OrganizationPageHydrator
+      initialSerializedData={serializedData}
+      initialDid={did}
+    >
+      <Container>
+        <HeaderContent did={did} />
+        <Hero initialData={serializedData} initialDid={did} />
+        <SubHero initialData={serializedData} />
+        <AboutOrganization initialData={serializedData} />
+        <hr />
+        <SectionForData title="Bumicerts" userDid={did}>
+          <div className="w-full h-40 bg-muted rounded-lg mt-2 flex flex-col items-center justify-center text-center text-pretty font-serif text-xl text-muted-foreground font-bold">
+            The bumicerts of this organization will appear here.
+          </div>
+        </SectionForData>
+      </Container>
+    </OrganizationPageHydrator>
   );
 };
 
