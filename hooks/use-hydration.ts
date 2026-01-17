@@ -28,7 +28,6 @@ const useHydratedData = <T>(
 };
 
 const isDeepEqual = (a: unknown, b: unknown): boolean => {
-  console.log("check");
   return JSON.stringify(a) === JSON.stringify(b);
 };
 

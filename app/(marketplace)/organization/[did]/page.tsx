@@ -12,6 +12,7 @@ import SubHero from "@/app/(upload)/upload/organization/[did]/_components/SubHer
 import AboutOrganization from "@/app/(upload)/upload/organization/[did]/_components/AboutOrganization";
 import SectionForData from "@/app/(upload)/upload/organization/[did]/_components/SectionForData";
 import { OrganizationPageHydrator } from "@/app/(upload)/upload/organization/[did]/hydrator";
+import ErrorPage from "./error";
 
 const EMPTY_ORGANIZATION_DATA: AppGainforestOrganizationInfo.Record = {
   $type: "app.gainforest.organization.info",
@@ -46,31 +47,38 @@ const OrganizationPage = async ({
 
   let data = EMPTY_ORGANIZATION_DATA;
 
-  if (error) {
-    if (error instanceof TRPCError && error.code === "NOT_FOUND") {
-      // Display empty organization data
-    } else {
-      if (error instanceof TRPCError && error.code === "BAD_REQUEST") {
-        throw new Error("This organization does not exist.");
+  try {
+    if (error) {
+      if (error instanceof TRPCError && error.code === "NOT_FOUND") {
+        // Display empty organization data
+      } else {
+        if (error instanceof TRPCError && error.code === "BAD_REQUEST") {
+          throw new Error("This organization does not exist.");
+        }
+        throw new Error("An unknown error occurred.");
       }
-      throw new Error("An unknown error occurred.");
+    } else {
+      data = response.value;
     }
-  } else {
-    data = response.value;
-  }
 
-  const serializedData = serialize(data);
-
-  if (data.visibility === "Hidden") {
-    try {
-      const session = await getSessionFromRequest();
-      if (session && session.did !== did) {
+    if (data.visibility === "Hidden") {
+      try {
+        const session = await getSessionFromRequest();
+        if (session && session.did !== did) {
+          throw new Error("This organization is hidden.");
+        }
+      } catch {
         throw new Error("This organization is hidden.");
       }
-    } catch {
-      throw new Error("This organization is hidden.");
     }
+  } catch (error) {
+    console.error(
+      "Redirecting to error page due to the following error:",
+      error
+    );
+    return <ErrorPage error={error as Error} />;
   }
+  const serializedData = serialize(data);
 
   return (
     <OrganizationPageHydrator

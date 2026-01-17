@@ -3,7 +3,7 @@
 import { useHeaderContext } from "@/components/providers/HeaderProvider";
 import React, { useEffect } from "react";
 
-const ProjectsHeaderContent = () => {
+const SitesHeaderContent = () => {
   const { setLeftContent, setRightContent, setSubHeaderContent } =
     useHeaderContext();
 
@@ -16,4 +16,4 @@ const ProjectsHeaderContent = () => {
   return null;
 };
 
-export default ProjectsHeaderContent;
+export default SitesHeaderContent;

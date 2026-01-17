@@ -18,6 +18,7 @@ import { serialize } from "climateai-sdk/utilities/transform";
 import { climateAiSdk } from "@/config/climateai-sdk.server";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
 import SectionForData from "./_components/SectionForData";
+import ErrorPage from "./error";
 
 const EMPTY_ORGANIZATION_DATA: AppGainforestOrganizationInfo.Record = {
   $type: "app.gainforest.organization.info",
@@ -52,32 +53,40 @@ const OrganizationPage = async ({
 
   let data = EMPTY_ORGANIZATION_DATA;
 
-  if (error) {
-    if (error instanceof TRPCError && error.code === "NOT_FOUND") {
-      // Display empty organization data
-    } else {
-      if (error instanceof TRPCError && error.code === "BAD_REQUEST") {
-        throw new Error("This organization does not exist.");
+  try {
+    if (error) {
+      if (error instanceof TRPCError && error.code === "NOT_FOUND") {
+        // Display empty organization data
+      } else {
+        if (error instanceof TRPCError && error.code === "BAD_REQUEST") {
+          throw new Error("This organization does not exist.");
+        }
+        console.error(error);
+        throw new Error("An unknown error occurred.");
       }
-      console.error(error);
-      throw new Error("An unknown error occurred.");
+    } else {
+      data = response.value;
     }
-  } else {
-    data = response.value;
+
+    if (data.visibility === "Hidden") {
+      try {
+        const session = await getSessionFromRequest();
+        if (session && session.did !== did) {
+          throw new Error("This organization is hidden.");
+        }
+      } catch {
+        throw new Error("This organization is hidden.");
+      }
+    }
+  } catch (error) {
+    console.error(
+      "Redirecting to error page due to the following error:",
+      error
+    );
+    return <ErrorPage error={error as Error} />;
   }
 
   const serializedData = serialize(data);
-
-  if (data.visibility === "Hidden") {
-    try {
-      const session = await getSessionFromRequest();
-      if (session && session.did !== did) {
-        throw new Error("This organization is hidden.");
-      }
-    } catch {
-      throw new Error("This organization is hidden.");
-    }
-  }
 
   return (
     <OrganizationPageHydrator

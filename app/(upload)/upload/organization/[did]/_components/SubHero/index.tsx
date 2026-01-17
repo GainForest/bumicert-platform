@@ -33,6 +33,8 @@ import {
   deserialize,
   SerializedSuperjson,
 } from "climateai-sdk/utilities/transform";
+import { AnimatePresence, motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 const formatWebsite = (website: string | undefined) => {
   if (!website) return undefined;
@@ -128,6 +130,7 @@ const SubHero = ({
             }}
           />
         }
+        error={editingCountryData === null ? "Required" : undefined}
       >
         <span className="absolute z-0 top-0 bottom-0 right-2 flex items-center justify-center text-6xl opacity-25 pointer-events-none select-none">
           {isEditing ? editingCountryData?.emoji : countryData?.emoji}
@@ -232,6 +235,7 @@ export const SubHeroChip = <T extends React.ReactNode>({
   children,
   modalId,
   modalContent,
+  error,
 }: {
   PropertyIcon: LucideIcon;
   propertyName: string;
@@ -240,11 +244,19 @@ export const SubHeroChip = <T extends React.ReactNode>({
   children?: React.ReactNode;
   modalId: string;
   modalContent: React.ReactNode;
+  error?: string;
 }) => {
   const isEditing = useOrganizationPageStore((state) => state.isEditing);
   const { pushModal, show } = useModal();
   return (
-    <div className="flex-1 bg-foreground/5 rounded-lg p-2 flex items-center justify-between relative">
+    <div
+      className={cn(
+        "flex-1 bg-foreground/5 rounded-lg p-2 flex items-center justify-between relative",
+        isEditing &&
+          error &&
+          "bg-destructive/2 border-2 border-destructive/50 focus-within:border-destructive"
+      )}
+    >
       <div className="flex flex-col items-start justify-between">
         <span className="w-full flex items-center gap-1 text-muted-foreground">
           <PropertyIcon className="size-4" />
@@ -265,25 +277,34 @@ export const SubHeroChip = <T extends React.ReactNode>({
         </span>
       </div>
       {children}
-      {isEditing && (
-        <Button
-          variant={"outline"}
-          size={"icon-sm"}
-          className="rounded-full z-10"
-          onClick={() => {
-            pushModal(
-              {
-                id: modalId,
-                content: modalContent,
-              },
-              true
-            );
-            show();
-          }}
-        >
-          <ChevronRight className="size-4" />
-        </Button>
-      )}
+      <AnimatePresence>
+        {isEditing && (
+          <Button
+            component={motion.button}
+            componentProps={{
+              initial: { opacity: 0, scale: 0, filter: "blur(10px)" },
+              animate: { opacity: 1, scale: 1, filter: "blur(0px)" },
+              exit: { opacity: 0, scale: 0, filter: "blur(10px)" },
+              transition: { duration: 0.2 },
+            }}
+            variant={"outline"}
+            size={"icon-sm"}
+            className="rounded-full z-10"
+            onClick={() => {
+              pushModal(
+                {
+                  id: modalId,
+                  content: modalContent,
+                },
+                true
+              );
+              show();
+            }}
+          >
+            <ChevronRight className="size-4" />
+          </Button>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

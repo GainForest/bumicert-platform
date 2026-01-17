@@ -6,6 +6,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./tooltip";
+import { cn } from "@/lib/utils";
 
 const QuickTooltip = ({
   children,
@@ -13,19 +14,33 @@ const QuickTooltip = ({
   asChild = false,
   openOnClick = false,
   triggerClassName,
+  disabled = false,
+  contentClassName,
+  backgroundColor,
 }: {
   children: React.ReactNode;
   content: React.ReactNode;
   asChild?: boolean;
   openOnClick?: boolean;
   triggerClassName?: string;
+  disabled?: boolean;
+  contentClassName?: string;
+  backgroundColor?: string;
 }) => {
   const [open, setOpen] = useState(false);
+
+  const handleOpenChange = (open: boolean) => {
+    if (disabled) {
+      setOpen(false);
+      return;
+    }
+    setOpen(open);
+  };
 
   if (openOnClick) {
     return (
       <TooltipProvider>
-        <Tooltip open={open} onOpenChange={setOpen}>
+        <Tooltip open={disabled ? false : open} onOpenChange={handleOpenChange}>
           <TooltipTrigger
             onClick={() => setOpen(true)}
             // onBlur={() => setOpen(false)}
@@ -34,16 +49,26 @@ const QuickTooltip = ({
           >
             {children}
           </TooltipTrigger>
-          <TooltipContent className="text-center">{content}</TooltipContent>
+          <TooltipContent
+            className={cn("text-center", contentClassName)}
+            backgroundColor={backgroundColor}
+          >
+            {content}
+          </TooltipContent>
         </Tooltip>
       </TooltipProvider>
     );
   }
   return (
     <TooltipProvider>
-      <Tooltip>
+      <Tooltip open={disabled ? false : undefined}>
         <TooltipTrigger asChild={asChild}>{children}</TooltipTrigger>
-        <TooltipContent className="text-center">{content}</TooltipContent>
+        <TooltipContent
+          className={cn("text-center", contentClassName)}
+          backgroundColor={backgroundColor}
+        >
+          {content}
+        </TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );
