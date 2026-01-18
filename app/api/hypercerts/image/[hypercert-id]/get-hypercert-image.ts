@@ -10,7 +10,7 @@ const PLACEHOLDER_IMAGE_PATH = path.join(
   "assets",
   "media",
   "images",
-  "ecocert-image-placeholder.jpg"
+  "bumicert-image-placeholder.jpg"
 );
 
 // GraphQL query to fetch the image metadata for a given hypercert ID

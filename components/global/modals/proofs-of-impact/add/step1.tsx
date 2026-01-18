@@ -16,7 +16,7 @@ const MAX_TITLE_LENGTH = 50;
 const MAX_DESCRIPTION_LENGTH = 450;
 
 export const AddProofsOfImpactStep1ModalId = "proofs-of-impact/add/step1";
-const AddProofsOfImpactStep1 = ({ ecocertId }: { ecocertId: string }) => {
+const AddProofsOfImpactStep1 = ({ bumicertId }: { bumicertId: string }) => {
   const { stack, pushModal } = useModal();
   const { setStep1State } = useAddPoiStore();
   const formSchema = z.object({
@@ -54,7 +54,7 @@ const AddProofsOfImpactStep1 = ({ ecocertId }: { ecocertId: string }) => {
 
   const onFormSubmit = handleSubmit(() => {
     setStep1State({
-      ecocertId,
+      bumicertId: bumicertId,
       title: titleValue,
       description: descriptionValue,
     });

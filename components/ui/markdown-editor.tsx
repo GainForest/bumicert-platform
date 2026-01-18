@@ -22,7 +22,7 @@ import {
   toolbarPlugin,
 } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTheme } from "next-themes";
 
 function MarkdownEditor({
@@ -33,12 +33,15 @@ function MarkdownEditor({
   showToolbar?: boolean;
   toolbarSize?: "sm" | "md";
 }) {
-  const [isMounted, setMounted] = useState(false);
   const { theme } = useTheme();
+  const [isMounted, setMounted] = useState(() => typeof window !== "undefined");
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  // Use queueMicrotask to defer state update and avoid synchronous setState
+  if (typeof window !== "undefined" && !isMounted) {
+    queueMicrotask(() => {
+      setMounted(true);
+    });
+  }
 
   if (!isMounted) return null;
 

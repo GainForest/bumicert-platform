@@ -1,21 +1,36 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ArrowUpRight, Moon, Sun } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { footerLinks, navLinks } from "./data";
 import { Switch } from "@/components/ui/switch";
 import { useTheme } from "next-themes";
+import useIsMounted from "@/hooks/use-is-mounted";
+import { useAtprotoStore } from "@/components/stores/atproto";
+import { NavLinkConfig } from "./types";
 
-const DesktopNavbar = () => {
+export type DesktopNavbarProps = {
+  navLinks: NavLinkConfig[];
+  footerLinks: {
+    href: string;
+    text: string;
+  }[];
+  title?: string;
+};
+
+const DesktopNavbar = ({
+  navLinks,
+  footerLinks,
+  title = "Bumicertain",
+}: DesktopNavbarProps) => {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const isMounted = useIsMounted();
+  const pathname = usePathname();
+  const auth = useAtprotoStore((state) => state.auth);
+  const did = auth.user?.did;
 
   return (
     <nav className={cn("w-[240px] p-4 flex flex-col justify-between")}>
@@ -25,41 +40,63 @@ const DesktopNavbar = () => {
         <div className="h-12 w-12 border border-border rounded-xl shadow-lg bg-background flex items-center justify-center">
           <Image
             src="/assets/media/images/logo.svg"
-            alt="Ecocertain"
+            alt={title}
             width={32}
             height={32}
           />
         </div>
-        <b className="font-serif text-2xl drop-shadow-lg">Ecocertain</b>
+        <b className="font-serif text-2xl drop-shadow-lg">{title}</b>
 
         {/* Nav Links */}
         <ul className="mt-2 flex flex-col gap-1">
           {navLinks.map((link) => {
-            if (link.type !== "static") return;
+            let isHighlighted = false;
+
+            if ("equals" in link.pathCheck) {
+              const targetPath =
+                typeof link.pathCheck.equals === "function"
+                  ? link.pathCheck.equals(did)
+                  : link.pathCheck.equals;
+              isHighlighted = pathname === targetPath;
+              // Special case for organization link
+              if (link.id === "organization" && did && !isHighlighted) {
+                isHighlighted = pathname.startsWith(`/organization/${did}`);
+              }
+            } else {
+              const targetPath =
+                typeof link.pathCheck.startsWith === "function"
+                  ? link.pathCheck.startsWith(did)
+                  : link.pathCheck.startsWith;
+              isHighlighted = pathname.startsWith(targetPath);
+            }
+
+            const href =
+              typeof link.href === "function" ? link.href(did) : link.href;
+
             return (
               <li key={link.id} className="w-full">
-                <Link href={link.href} className="w-full">
+                <Link href={href} className="w-full">
                   <Button
                     variant="outline"
                     size="sm"
                     className={cn(
-                      "w-full text-left justify-start relative overflow-hidden",
-                      link.id === "explore" && "bg-accent hover:bg-accent"
+                      "w-full text-left justify-start relative overflow-hidden cursor-pointer",
+                      isHighlighted && "bg-accent hover:bg-accent"
                     )}
                   >
-                    {link.id === "explore" && (
+                    {isHighlighted && (
                       <div className="absolute left-0.5 top-2 bottom-2 w-0.5 bg-primary rounded-full" />
                     )}
                     <link.Icon
                       size={16}
                       className={cn(
                         "text-primary/70",
-                        link.id === "explore" && "text-primary"
+                        isHighlighted && "text-primary"
                       )}
                     />
                     <span
                       className={cn(
-                        link.id === "explore" && "text-primary font-semibold"
+                        isHighlighted && "text-primary font-semibold"
                       )}
                     >
                       {link.text}
@@ -106,7 +143,7 @@ const DesktopNavbar = () => {
           </span>
           <div className="flex items-center gap-1">
             <Sun className="size-3" />
-            {mounted && (
+            {isMounted && (
               <Switch
                 checked={theme === "dark"}
                 onCheckedChange={() =>

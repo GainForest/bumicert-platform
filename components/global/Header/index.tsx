@@ -5,24 +5,22 @@ import { ChevronLeft, Sidebar } from "lucide-react";
 import { useNavbarContext } from "../Navbar/context";
 import { useHeaderContext } from "../../providers/HeaderProvider";
 import AtprotoSignInButton from "./AtprotoSignInButton";
+import { useRouter } from "next/navigation";
 
 const Header = () => {
+  const router = useRouter();
   const { setOpenState, viewport } = useNavbarContext();
   const { leftContent, rightContent, subHeaderContent } = useHeaderContext();
   return (
-    <div className="w-full flex flex-col sticky top-0 border-b border-b-border shadow-xl backdrop-blur-xl z-20 min-h-10">
-      <div className="flex items-center justify-between gap-1 p-2 bg-background/80">
+    <div className="w-full flex flex-col sticky top-0 border-b border-b-border shadow-xl backdrop-blur-xl bg-background/80 z-20">
+      <div className="flex items-center justify-between gap-1 p-2">
         <div className="flex items-center gap-1">
           {viewport === "desktop" && (
-            <Button
-              variant="outline"
-              size={"sm"}
-              onClick={() => setOpenState()}
-            >
+            <Button variant="ghost" size={"sm"} onClick={() => setOpenState()}>
               <Sidebar className="size-4" />
             </Button>
           )}
-          <Button size={"sm"} variant={"outline"}>
+          <Button size={"sm"} variant={"outline"} onClick={() => router.back()}>
             <ChevronLeft />
             {viewport === "desktop" && <span>Back</span>}
           </Button>

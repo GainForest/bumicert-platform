@@ -20,7 +20,7 @@ const AtprotoSignInButton = () => {
   return (
     <Button
       size={"sm"}
-      variant={isAuthenticated ? "outline" : "default"}
+      variant={isAuthenticated ? "ghost" : "default"}
       onClick={() => {
         pushModal(
           {
@@ -32,9 +32,7 @@ const AtprotoSignInButton = () => {
         show();
       }}
     >
-      {isAuthenticated ?
-        <User />
-      : <LogIn />}
+      {isAuthenticated ? <User /> : <LogIn />}
       {isAuthenticated ? auth.user.handle.split(".")[0] : "Sign in or Register"}
     </Button>
   );

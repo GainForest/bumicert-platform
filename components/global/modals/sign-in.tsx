@@ -17,14 +17,19 @@ import useLocalStorage from "use-local-storage";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { useModal } from "@/components/ui/modal/context";
-import { api } from "@/lib/trpc/react";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import AuthenticatedModalContent from "./authenticated";
+import { trpcApi } from "@/components/providers/TrpcProvider";
 
 export const SignInModalId = "auth/sign-in";
 
 const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
-  const [handlePrefix, setHandlePrefix] = useState(initialHandle);
+  const initialHandlePrefix = initialHandle.includes(".")
+    ? initialHandle.split(".")[0]
+    : undefined;
+  const [inputHandlePrefix, setInputHandlePrefix] = useState(
+    initialHandlePrefix ?? ""
+  );
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(true);
   const { popModal, stack, hide } = useModal();
@@ -34,10 +39,16 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
     mutate: signIn,
     isPending: isSigningIn,
     error: signInError,
-  } = api.auth.login.useMutation({
+  } = trpcApi.auth.login.useMutation({
     onSuccess: (data) => {
-      addPreviousSession(data.context.handle);
-      setAuth(data.context, data.service as string);
+      addPreviousSession(data.handle);
+      setAuth(
+        {
+          did: data.did,
+          handle: data.handle,
+        },
+        data.service as string
+      );
 
       // Pop all auth modals from the stack and hide if there
       const stackCopy = structuredClone(stack);
@@ -52,8 +63,9 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
 
       // After popping all consecutive auth modals, if the last modal on stack
       // is an auth modal, then hide the modal.
-      const shouldHideModal =
-        stackCopy.at(-1)?.startsWith("auth/") ? true : false;
+      const shouldHideModal = stackCopy.at(-1)?.startsWith("auth/")
+        ? true
+        : false;
       if (shouldHideModal) hide();
     },
   });
@@ -62,15 +74,20 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
     { handle: string }[]
   >("previous-sessions", []);
 
-  const addPreviousSession = useCallback((handle: string) => {
-    setPreviousSessions((prev) => {
-      const alreadyExists = prev?.find((session) => session.handle === handle);
-      if (alreadyExists) {
-        return prev;
-      }
-      return [...(prev ?? []), { handle }];
-    });
-  }, []);
+  const addPreviousSession = useCallback(
+    (handle: string) => {
+      setPreviousSessions((prev) => {
+        const alreadyExists = prev?.find(
+          (session) => session.handle === handle
+        );
+        if (alreadyExists) {
+          return prev;
+        }
+        return [...(prev ?? []), { handle }];
+      });
+    },
+    [setPreviousSessions]
+  );
 
   if (isAuthenticated) {
     return <AuthenticatedModalContent message="You are already signed in." />;
@@ -80,11 +97,11 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
     <ModalContent>
       <ModalHeader
         backAction={
-          stack.length === 1 ?
-            undefined
-          : () => {
-              popModal();
-            }
+          stack.length === 1
+            ? undefined
+            : () => {
+                popModal();
+              }
         }
       >
         <ModalTitle>Sign In</ModalTitle>
@@ -97,8 +114,8 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
             <InputGroupAddon>@</InputGroupAddon>
             <InputGroupInput
               placeholder="john-doe"
-              value={handlePrefix}
-              onChange={(e) => setHandlePrefix(e.target.value)}
+              value={inputHandlePrefix}
+              onChange={(e) => setInputHandlePrefix(e.target.value)}
               disabled={isSigningIn}
             />
             <InputGroupAddon align="inline-end" className="text-primary">
@@ -127,7 +144,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
                 <div
                   className={cn(
                     "w-full relative first:rounded-t-md last:rounded-b-md bg-background",
-                    handlePrefix === prefix && "border border-primary/50"
+                    inputHandlePrefix === prefix && "border border-primary/50"
                   )}
                   key={session.handle}
                 >
@@ -137,7 +154,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
                     )}
                     disabled={isSigningIn}
                     onClick={() => {
-                      setHandlePrefix(`${handlePrefix}`);
+                      setInputHandlePrefix(`${prefix}`);
                     }}
                   >
                     <span className="text-sm font-medium">
@@ -188,19 +205,17 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
           <Switch
             checked={
               // If the handle is in the previous sessions, then the switch should be checked
-              (
-                previousSessions.find(
-                  (session) => session.handle === handlePrefix
-                )
-              ) ?
-                true
-              : rememberMe
+              previousSessions.find(
+                (session) => session.handle === inputHandlePrefix
+              )
+                ? true
+                : rememberMe
             }
             onCheckedChange={setRememberMe}
             disabled={
               isSigningIn ||
               previousSessions.find(
-                (session) => session.handle === handlePrefix
+                (session) => session.handle === inputHandlePrefix
               ) !== undefined
             }
           />
@@ -210,18 +225,20 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
       <ModalFooter>
         <span className="text-sm text-destructive">{signInError?.message}</span>
         <Button
-          disabled={handlePrefix === "" || isSigningIn}
+          disabled={inputHandlePrefix === "" || isSigningIn}
           onClick={() => {
             signIn({
-              handlePrefix: handlePrefix.split(".")[0],
+              handlePrefix: inputHandlePrefix.split(".")[0],
               service: "climateai.org",
               password: password,
             });
           }}
         >
-          {isSigningIn ?
+          {isSigningIn ? (
             <Loader2 className="size-4 animate-spin" />
-          : "Sign In"}
+          ) : (
+            "Sign In"
+          )}
         </Button>
       </ModalFooter>
     </ModalContent>

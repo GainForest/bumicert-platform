@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { CircularProgressbar } from "react-circular-progressbar";
+import { buildStyles, CircularProgressbar } from "react-circular-progressbar";
 
 const CircularProgressBar = ({
   value,
@@ -8,12 +8,16 @@ const CircularProgressBar = ({
   text,
   strokeWidth = 9,
   textSize = 0.3,
+  strokeColor = "var(--primary)",
+  backgroundColor,
 }: {
   value: number;
   size?: number;
-  text?: string;
+  text?: React.ReactNode;
   textSize?: number;
   strokeWidth?: number;
+  strokeColor?: string;
+  backgroundColor?: string;
 }) => {
   return (
     <div
@@ -25,16 +29,14 @@ const CircularProgressBar = ({
     >
       <CircularProgressbar
         value={value}
-        styles={{
-          path: {
-            stroke: "var(--primary)",
-            strokeWidth: strokeWidth,
-            strokeLinecap: "round",
-          },
-          trail: {
-            stroke: "color-mix(in oklab, var(--primary) 30%, transparent)",
-          },
-        }}
+        strokeWidth={strokeWidth}
+        background
+        styles={buildStyles({
+          pathColor: strokeColor,
+          strokeLinecap: "round",
+          backgroundColor: backgroundColor ? backgroundColor : "transparent",
+          trailColor: "color-mix(in oklab, var(--primary) 30%, transparent)",
+        })}
       />
       <span
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-xs scale-75"

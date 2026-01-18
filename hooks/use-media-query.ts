@@ -6,14 +6,19 @@ const useMediaQuery = (query: string): boolean => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    // Use setTimeout to avoid synchronous setState in effect
+    setTimeout(() => {
+      setMounted(true);
+    }, 0);
 
     // Only run on client-side
     if (typeof window !== "undefined") {
       const mediaQuery = window.matchMedia(query);
 
-      // Set initial value
-      setMatches(mediaQuery.matches);
+      // Set initial value - use setTimeout to avoid synchronous setState
+      setTimeout(() => {
+        setMatches(mediaQuery.matches);
+      }, 0);
 
       // Create event listener function
       const handler = (event: MediaQueryListEvent) => {

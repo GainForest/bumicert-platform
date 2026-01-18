@@ -80,7 +80,7 @@ type AttestationData = Omit<AttestationDataResponse, "sources"> & {
   }[];
 };
 
-export type EcocertAttestation = {
+export type BumicertAttestation = {
   uid: string;
   schemaUid: string;
   data: AttestationData;
@@ -118,7 +118,7 @@ export type FullHypercert = {
     itemIds: string[];
     createdAt: number;
   }[];
-  attestations: EcocertAttestation[];
+  attestations: BumicertAttestation[];
   sales: {
     unitsBought: string;
     buyer: string;

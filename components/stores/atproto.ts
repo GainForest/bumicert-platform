@@ -1,15 +1,43 @@
-import { Agent, CredentialSession } from "@atproto/api";
 import { create } from "zustand";
-import { StoredSession } from "@/server/session";
-import { tryCatch } from "@/lib/tryCatch";
-import { trpcClient } from "@/lib/trpc/client";
+
+import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
+
+type ResumeSessionParams = Parameters<typeof trpcClient.auth.resume.query>[0];
+type ResumeSessionResult = Awaited<
+  ReturnType<typeof trpcClient.auth.resume.query>
+>;
+const resumeSession = (params: ResumeSessionParams) => {
+  const RETRY_COUNT = 3;
+  let currentRetry = 0;
+
+  function attempt(): Promise<ResumeSessionResult | undefined> {
+    return trpcClient.auth.resume
+      .query(params)
+      .then((result) => result)
+      .catch((error) => {
+        if (currentRetry < RETRY_COUNT - 1) {
+          currentRetry++;
+          return attempt();
+        } else {
+          trpcClient.auth.logout.mutate({ service: params.service });
+          throw error;
+        }
+      });
+  }
+
+  return attempt();
+};
+
+export type User = {
+  did: string;
+  handle: string;
+};
 
 export type AtprotoAuthCatalog = {
   unauthenticated: {
     status: "UNAUTHENTICATED";
     authenticated: false;
     user: null;
-    agent: null;
   };
   authenticated: {
     status: "AUTHENTICATED";
@@ -18,13 +46,11 @@ export type AtprotoAuthCatalog = {
       did: string;
       handle: string;
     };
-    agent: Agent;
   };
   resuming: {
     status: "RESUMING";
     authenticated: false;
     user: null;
-    agent: null;
   };
 };
 
@@ -34,66 +60,69 @@ export type AtprotoStoreState = {
 };
 
 export type AtprotoStoreActions = {
-  setAuth: (session: StoredSession | null, service?: string) => void;
+  setAuth: (session: User | null, service?: string) => void;
 };
 
 export const useAtprotoStore = create<AtprotoStoreState & AtprotoStoreActions>(
-  (set) => ({
-    isReady: false,
-    auth: {
-      status: "RESUMING",
-      authenticated: false,
-      user: null,
-      agent: null,
-    },
-    setAuth: async (session: StoredSession | null, service?: string) => {
-      if (session) {
-        if (!service) {
-          throw new Error("Service is required");
-        }
-        const credentialSession = new CredentialSession(
-          new URL(`https://${service}`)
-        );
-        const [result, error] = await tryCatch(
-          credentialSession.resumeSession({
-            accessJwt: session.accessJwt,
-            refreshJwt: session.refreshJwt,
-            handle: session.handle,
-            did: session.did,
-            active: true,
-          })
-        );
-        if (error || !result || !result.success) {
-          trpcClient.auth.logout.mutate({ service: "climateai.org" });
+  (set) => {
+    const resumeSessionPromise = resumeSession({
+      service: allowedPDSDomains[0],
+    });
+    resumeSessionPromise
+      .then((result) => {
+        if (result) {
           set({
             auth: {
-              status: "UNAUTHENTICATED",
-              authenticated: false,
-              user: null,
-              agent: null,
+              status: "AUTHENTICATED",
+              authenticated: true,
+              user: {
+                did: result.did,
+                handle: result.handle,
+              },
             },
           });
-          return;
         }
-        const agent = new Agent(credentialSession);
-        set({
-          auth: {
-            status: "AUTHENTICATED",
-            authenticated: true,
-            user: { did: session.did, handle: session.handle },
-            agent: agent,
-          },
-        });
-      } else {
+      })
+      .catch((error) => {
+        console.error("Error resuming session:", error);
         set({
           auth: {
             status: "UNAUTHENTICATED",
             authenticated: false,
             user: null,
-            agent: null,
           },
         });
-      }
-    },
-  })
+      });
+
+    return {
+      isReady: false,
+      auth: {
+        status: "RESUMING",
+        authenticated: false,
+        user: null,
+      },
+      setAuth: async (user: User | null, service?: string) => {
+        if (user) {
+          if (!service) {
+            throw new Error("Service is required");
+          }
+          set({
+            auth: {
+              status: "AUTHENTICATED",
+              authenticated: true,
+              user,
+            },
+          });
+        } else {
+          set({
+            auth: {
+              status: "UNAUTHENTICATED",
+              authenticated: false,
+              user: null,
+            },
+          });
+        }
+      },
+    };
+  }
 );

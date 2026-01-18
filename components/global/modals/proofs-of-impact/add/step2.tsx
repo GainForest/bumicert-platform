@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { useModal } from "@/components/ui/modal/context";
 import { ModalFooter } from "@/components/ui/modal/modal";
 import { ArrowRight, PlusCircle, Trash2 } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -44,6 +44,7 @@ export const AddProofsOfImpactStep2ModalId = "proofs-of-impact/add/step2";
 const AddProofsOfImpactStep2 = () => {
   const { stack, hide, popModal, pushModal } = useModal();
   const { step1State, setStep2State } = useAddPoiStore();
+  const [initialKey] = useState(() => `source-${crypto.randomUUID()}`);
   const {
     control,
     register,
@@ -53,7 +54,7 @@ const AddProofsOfImpactStep2 = () => {
     resolver: zodResolver(formSchema),
     mode: "onChange",
     defaultValues: {
-      sources: [{ key: String(Date.now()), url: "", description: "" }],
+      sources: [{ key: initialKey, url: "", description: "" }],
     },
   });
 

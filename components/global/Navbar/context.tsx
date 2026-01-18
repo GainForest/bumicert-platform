@@ -24,7 +24,6 @@ export const NavbarContextProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [viewport, setViewport] = useState<"mobile" | "desktop">("desktop");
   const [openState, setOpenState] = useState<{
     mobile: boolean;
     desktop: boolean;
@@ -34,6 +33,7 @@ export const NavbarContextProvider = ({
   });
 
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const viewport = isMobile ? "mobile" : "desktop";
 
   const updateOpenState = useCallback(
     (value?: boolean, _viewport?: "mobile" | "desktop") => {
@@ -48,10 +48,6 @@ export const NavbarContextProvider = ({
     },
     [viewport, setOpenState]
   );
-
-  useEffect(() => {
-    setViewport(isMobile ? "mobile" : "desktop");
-  }, [isMobile]);
 
   return (
     <NavbarContext.Provider

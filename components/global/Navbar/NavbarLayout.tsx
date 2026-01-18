@@ -1,14 +1,22 @@
 "use client";
 import React from "react";
-import DesktopNavbar from "./desktop-navbar";
 import { useNavbarContext } from "./context";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import Header from "../Header";
 import { cn } from "@/lib/utils";
-import MobileNavbar from "./mobile-navbar";
 import { HeaderContextProvider } from "@/components/providers/HeaderProvider";
+import MobileNavbar, { MobileNavbarProps } from "./mobile-navbar";
+import DesktopNavbar, { DesktopNavbarProps } from "./desktop-navbar";
 
-const NavbarLayout = ({ children }: { children: React.ReactNode }) => {
+const NavbarLayout = ({
+  children,
+  desktopNavbarProps,
+  mobileNavbarProps,
+}: {
+  children: React.ReactNode;
+  desktopNavbarProps: DesktopNavbarProps;
+  mobileNavbarProps: MobileNavbarProps;
+}) => {
   const { openState, viewport } = useNavbarContext();
   const [parent] = useAutoAnimate<HTMLDivElement>();
   return (
@@ -16,24 +24,27 @@ const NavbarLayout = ({ children }: { children: React.ReactNode }) => {
       <div
         className={cn(
           "h-full w-full flex",
-          viewport === "mobile" && "flex-col"
+          viewport === "mobile" && "flex-col",
+          "bg-[rgb(242_237_227.7)] dark:bg-[rgb(30_30_30.7)]"
         )}
-        style={{
-          background: `repeating-linear-gradient(
-            -55deg,
-            var(--background),
-            var(--background) 2px,
-            color-mix(in oklab, var(--primary) 10%, transparent) 2px,
-            color-mix(in oklab, var(--primary) 10%, transparent) 4px
-          )`,
-        }}
+        // style={{
+        //   background: `repeating-linear-gradient(
+        //     -55deg,
+        //     var(--background),
+        //     var(--background) 2px,
+        //     color-mix(in oklab, var(--primary) 10%, transparent) 2px,
+        //     color-mix(in oklab, var(--primary) 10%, transparent) 4px
+        //   )`,
+        // }}
         ref={parent}
       >
-        {viewport === "desktop" && openState.desktop && <DesktopNavbar />}
-        {viewport === "mobile" && <MobileNavbar />}
+        {viewport === "desktop" && openState.desktop && (
+          <DesktopNavbar {...desktopNavbarProps} />
+        )}
+        {viewport === "mobile" && <MobileNavbar {...mobileNavbarProps} />}
         <main
           className={cn(
-            "flex-1 bg-background border border-border shadow-inner rounded-xl relative overflow-y-auto",
+            "flex-1 flex flex-col bg-background border border-border shadow-inner rounded-xl relative overflow-y-auto",
             viewport === "desktop"
               ? openState.desktop
                 ? "m-2 md:ml-0"

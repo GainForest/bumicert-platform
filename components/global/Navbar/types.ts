@@ -6,29 +6,18 @@ export type ClientLink = {
   Mobile: FC;
 };
 
-export type NavLinkConfig<T extends "static" | "dynamic"> = {
+export type NavLinkConfig = {
   id: string;
   showIconOnlyOnDesktop?: boolean;
   openInNewTab?: boolean;
-  pathCheck?:
+  pathCheck:
     | {
-        equals: string;
+        equals: string | ((did?: string) => string);
       }
     | {
-        startsWith: string;
+        startsWith: string | ((did?: string) => string);
       };
-} & (T extends "static"
-  ? {
-      type: "static";
-      href: string;
-      text: string;
-      Icon: FC<LucideProps>;
-      clientNode?: never;
-    }
-  : {
-      type: "dynamic";
-      href?: never;
-      text?: never;
-      Icon?: never;
-      clientNode: ClientLink;
-    });
+  href: string | ((did?: string) => string);
+  text: string;
+  Icon: FC<LucideProps>;
+};
