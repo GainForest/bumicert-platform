@@ -20,4 +20,7 @@ export const links = {
     createWithDraftId: (draftId: string) => `/bumicert/create/${draftId}`,
     view: (bumicertId: string) => `/bumicert/${bumicertId}`,
   },
+  api: {
+    onboarding: "/api/airtable/onboarding",
+  },
 };
