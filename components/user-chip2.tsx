@@ -20,7 +20,7 @@ const UserChip = ({
   ellipsisLocation = "middle",
   style,
 }: {
-  did: `did:pds:${string}`;
+  did: `did:plc:${string}`;
   className?: string;
   style?: React.CSSProperties;
   avatarSize?: number;

@@ -95,7 +95,7 @@ const Hero = ({
                   </span>
                   <span className="text-sm">by</span>
                   <UserChip
-                    did={creatorDid as `did:pds:${string}`}
+                    did={creatorDid as `did:plc:${string}`}
                     className="p-0.5 bg-gray-500/10 hover:bg-gray-500/20 text-xs"
                   />
                 </div>

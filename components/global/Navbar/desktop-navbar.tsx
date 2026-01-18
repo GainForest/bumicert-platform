@@ -77,30 +77,24 @@ const DesktopNavbar = ({
               <li key={link.id} className="w-full">
                 <Link href={href} className="w-full">
                   <Button
-                    variant="outline"
+                    variant={isHighlighted ? "default" : "ghost"}
                     size="sm"
                     className={cn(
                       "w-full text-left justify-start relative overflow-hidden cursor-pointer",
-                      isHighlighted && "bg-accent hover:bg-accent"
+                      !isHighlighted && "hover:bg-background "
                     )}
                   >
                     {isHighlighted && (
-                      <div className="absolute left-0.5 top-2 bottom-2 w-0.5 bg-primary rounded-full" />
+                      <div className="absolute left-0.5 top-2 bottom-2 w-0.5 bg-primary-foreground/50 rounded-full" />
                     )}
                     <link.Icon
                       size={16}
                       className={cn(
                         "text-primary/70",
-                        isHighlighted && "text-primary"
+                        isHighlighted && "text-primary-foreground/80"
                       )}
                     />
-                    <span
-                      className={cn(
-                        isHighlighted && "text-primary font-semibold"
-                      )}
-                    >
-                      {link.text}
-                    </span>
+                    <span>{link.text}</span>
                   </Button>
                 </Link>
               </li>

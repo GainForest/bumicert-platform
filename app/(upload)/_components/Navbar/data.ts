@@ -20,7 +20,7 @@ export const navLinks: NavLinkConfig[] = [
     text: "Organization",
     Icon: Building2,
     pathCheck: {
-      equals: links.upload.organization,
+      startsWith: links.upload.organization,
     },
   },
   {
