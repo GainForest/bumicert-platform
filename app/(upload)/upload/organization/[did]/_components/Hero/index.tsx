@@ -28,15 +28,20 @@ import QuickTooltip from "@/components/ui/quick-tooltip";
 const Hero = ({
   initialData,
   initialDid,
+  dynamic = true,
 }: {
   initialData: SerializedSuperjson<AppGainforestOrganizationInfo.Record>;
   initialDid: string;
+  dynamic?: boolean;
 }) => {
   const reactiveData = useOrganizationPageStore((state) => state.data);
-  const data = useHydratedData(deserialize(initialData), reactiveData);
+  const data = useHydratedData(
+    deserialize(initialData),
+    dynamic ? reactiveData : null
+  );
 
   const reactiveDid = useOrganizationPageStore((state) => state.did);
-  const did = useHydratedData(initialDid, reactiveDid);
+  const did = useHydratedData(initialDid, dynamic ? reactiveDid : null);
 
   const isEditing = useOrganizationPageStore((state) => state.isEditing);
   const editingData = useOrganizationPageStore(

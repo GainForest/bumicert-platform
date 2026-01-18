@@ -82,11 +82,16 @@ const formatDate = (date: Date | undefined) => {
 
 const SubHero = ({
   initialData,
+  dynamic = true,
 }: {
   initialData: SerializedSuperjson<AppGainforestOrganizationInfo.Record>;
+  dynamic?: boolean;
 }) => {
   const reactiveData = useOrganizationPageStore((state) => state.data);
-  const data = useHydratedData(deserialize(initialData), reactiveData);
+  const data = useHydratedData(
+    deserialize(initialData),
+    dynamic ? reactiveData : null
+  );
 
   const isEditing = useOrganizationPageStore((state) => state.isEditing);
   const editingData = useOrganizationPageStore(
