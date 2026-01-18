@@ -79,7 +79,7 @@ export const ProfileModal = () => {
         </div>
         <div className="flex items-center gap-2 w-full my-4">
           <Link
-            href={links.organization(auth.user.did)}
+            href={links.myOrganization(auth.user.did)}
             className="flex-1 flex items-center"
           >
             <Button

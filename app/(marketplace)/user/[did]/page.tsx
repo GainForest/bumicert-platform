@@ -6,7 +6,7 @@ const UserPage = async ({ params }: { params: Promise<{ did: string }> }) => {
   const { did: encodedDid } = await params;
   const did = decodeURIComponent(encodedDid);
 
-  redirect(links.organization(did));
+  redirect(links.myOrganization(did));
 
   return null;
 };

@@ -11,6 +11,7 @@ import { useTheme } from "next-themes";
 import useIsMounted from "@/hooks/use-is-mounted";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { NavLinkConfig } from "./types";
+import { links } from "@/lib/links";
 
 export type DesktopNavbarProps = {
   navLinks: NavLinkConfig[];
@@ -58,16 +59,21 @@ const DesktopNavbar = ({
                   ? link.pathCheck.equals(did)
                   : link.pathCheck.equals;
               isHighlighted = pathname === targetPath;
-              // Special case for organization link
-              if (link.id === "organization" && did && !isHighlighted) {
-                isHighlighted = pathname.startsWith(`/organization/${did}`);
-              }
             } else {
               const targetPath =
                 typeof link.pathCheck.startsWith === "function"
                   ? link.pathCheck.startsWith(did)
                   : link.pathCheck.startsWith;
               isHighlighted = pathname.startsWith(targetPath);
+            }
+
+            // Special case for my organization link
+            if (link.id === "my-organization") {
+              if (did) {
+                isHighlighted = pathname.startsWith(links.myOrganization(did));
+              } else {
+                isHighlighted = pathname === links.myOrganization();
+              }
             }
 
             const href =

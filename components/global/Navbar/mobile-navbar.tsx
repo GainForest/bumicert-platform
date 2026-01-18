@@ -14,6 +14,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useModal } from "@/components/ui/modal/context";
 import { ProfileModal, ProfileModalId } from "../modals/profile";
 import AuthModal, { AuthModalId } from "../modals/auth";
+import { links } from "@/lib/links";
 
 export type MobileNavbarProps = {
   navLinks: NavLinkConfig[];
@@ -99,16 +100,23 @@ const MobileNavbar = ({ navLinks, footerLinks }: MobileNavbarProps) => {
                       ? link.pathCheck.equals(did)
                       : link.pathCheck.equals;
                   isHighlighted = pathname === targetPath;
-                  // Special case for organization link
-                  if (link.id === "organization" && did && !isHighlighted) {
-                    isHighlighted = pathname.startsWith(`/organization/${did}`);
-                  }
                 } else {
                   const targetPath =
                     typeof link.pathCheck.startsWith === "function"
                       ? link.pathCheck.startsWith(did)
                       : link.pathCheck.startsWith;
                   isHighlighted = pathname.startsWith(targetPath);
+                }
+
+                // Special case for my organization link
+                if (link.id === "my-organization") {
+                  if (did) {
+                    isHighlighted = pathname.startsWith(
+                      links.myOrganization(did)
+                    );
+                  } else {
+                    isHighlighted = pathname === links.myOrganization();
+                  }
                 }
 
                 const href =
