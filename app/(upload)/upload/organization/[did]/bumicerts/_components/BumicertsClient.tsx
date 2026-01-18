@@ -1,0 +1,60 @@
+import { BumicertArt } from "@/app/(marketplace)/bumicert/create/[draftId]/_components/Steps/Step4/BumicertPreviewCard";
+import { Ecocert as Bumicert } from "climateai-sdk/types";
+import {
+  deserialize,
+  SerializedSuperjson,
+} from "climateai-sdk/utilities/transform";
+import { OrgHypercertsDefs as Defs } from "climateai-sdk/lex-api";
+import React from "react";
+import { getBlobUrl } from "climateai-sdk/utilities/atproto";
+import { allowedPDSDomains } from "@/config/climateai-sdk";
+
+const BumicertsClient = ({
+  did,
+  serializedInitialData,
+}: {
+  did: string;
+  serializedInitialData: SerializedSuperjson<Array<Bumicert>>;
+}) => {
+  const initialData = deserialize(serializedInitialData);
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {initialData.map((bumicert) => {
+        const image = bumicert.claimActivity.value.image;
+        let coverImageUrl: string;
+        const smallImageType: Defs.SmallImage["$type"] =
+          "org.hypercerts.defs#smallImage";
+        const uriType: Defs.Uri["$type"] = "org.hypercerts.defs#uri";
+        if (image?.$type === smallImageType) {
+          const blob = (image as Defs.SmallImage).image;
+          coverImageUrl = getBlobUrl(did, blob, allowedPDSDomains[0]);
+        } else if (image?.$type === uriType) {
+          coverImageUrl = (image as Defs.Uri).uri;
+        } else {
+          return null;
+        }
+
+        return (
+          <div
+            className="flex items-center justify-center"
+            key={bumicert.claimActivity.uri}
+          >
+            <BumicertArt
+              logoUrl={bumicert.organizationInfo.logoUrl}
+              coverImage={coverImageUrl}
+              title={bumicert.claimActivity.value.title}
+              objectives={
+                bumicert.claimActivity.value.workScope?.withinAnyOf ?? []
+              }
+              startDate={new Date(bumicert.claimActivity.value.startDate)}
+              endDate={new Date(bumicert.claimActivity.value.endDate)}
+            />
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+export default BumicertsClient;

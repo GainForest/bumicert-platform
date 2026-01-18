@@ -12,6 +12,7 @@ import { climateAiSdk } from "@/config/climateai-sdk.server";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
 import HeaderContent from "../_components/HeaderContent";
 import ProjectsHeaderContent from "./HeaderContent";
+import ErrorPage from "./error";
 
 const ProjectsPage = async ({
   params,
@@ -44,22 +45,33 @@ const ProjectsPage = async ({
     projects: [],
   };
 
-  const [response, error] = await tryCatch(
-    apiCaller.hypercerts.claim.project.getAll({
-      did,
-      pdsDomain: allowedPDSDomains[0],
-    })
-  );
-  if (error) {
-    if (error instanceof TRPCError && error.code === "NOT_FOUND") {
-      // Display empty projects
+  try {
+    const [response, error] = await tryCatch(
+      apiCaller.hypercerts.claim.project.getAll({
+        did,
+        pdsDomain: allowedPDSDomains[0],
+      })
+    );
+    if (error) {
+      if (error instanceof TRPCError && error.code === "NOT_FOUND") {
+        // Display empty projects
+      } else {
+        if (error instanceof TRPCError && error.code === "BAD_REQUEST") {
+          throw new Error("Unable to fetch projects.");
+        }
+        throw new Error("An unknown error occurred.");
+      }
     } else {
-      throw new Error("An unknown error occurred.");
+      allProjectsData = {
+        projects: response,
+      };
     }
-  } else {
-    allProjectsData = {
-      projects: response,
-    };
+  } catch (error) {
+    console.error(
+      "Redirecting to error page due to the following error:",
+      error
+    );
+    return <ErrorPage error={error as Error} />;
   }
 
   const serializedInitialData = serialize(allProjectsData);

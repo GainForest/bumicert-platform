@@ -17,7 +17,7 @@ const NavbarLayout = ({
   desktopNavbarProps: DesktopNavbarProps;
   mobileNavbarProps: MobileNavbarProps;
 }) => {
-  const { openState, viewport } = useNavbarContext();
+  const { openState, viewport, setOpenState } = useNavbarContext();
   const [parent] = useAutoAnimate<HTMLDivElement>();
   return (
     <HeaderContextProvider>
@@ -43,6 +43,13 @@ const NavbarLayout = ({
         )}
         {viewport === "mobile" && <MobileNavbar {...mobileNavbarProps} />}
         <main
+          onClick={(e) => {
+            if (viewport === "mobile" && openState.mobile) {
+              e.preventDefault();
+              e.stopPropagation();
+              setOpenState(false, "mobile");
+            }
+          }}
           className={cn(
             "flex-1 flex flex-col bg-background border border-border shadow-inner rounded-xl relative overflow-y-auto",
             viewport === "desktop"
@@ -50,7 +57,7 @@ const NavbarLayout = ({
                 ? "m-2 md:ml-0"
                 : "m-0 rounded-none"
               : openState.mobile
-              ? "brightness-90 blur-[1px] overflow-hidden pointer-events-none"
+              ? "brightness-90 blur-[1px] overflow-hidden cursor-default"
               : ""
           )}
         >

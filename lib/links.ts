@@ -4,7 +4,8 @@ const didCatcher = (callback: (did: string) => string): DidDynamicLink => {
 };
 
 export const links = {
-  organization: didCatcher((did) => `/organization/${did}`),
+  myOrganization: (did?: string) =>
+    did ? `/organization/${did}` : "/organization",
   upload: {
     organization: didCatcher((did) => `/upload/organization/${did}`),
     projects: didCatcher((did) => `/upload/organization/${did}/projects`),
@@ -18,5 +19,8 @@ export const links = {
     create: "/bumicert/create",
     createWithDraftId: (draftId: string) => `/bumicert/create/${draftId}`,
     view: (bumicertId: string) => `/bumicert/${bumicertId}`,
+  },
+  api: {
+    onboarding: "/api/airtable/onboarding",
   },
 };

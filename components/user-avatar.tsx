@@ -11,13 +11,14 @@ const GenericAvatar = ({
 }: {
   src: string;
   alt: string;
-  size?: number;
+  size?: number | string;
   className?: string;
 }) => {
+  const sizeStyle = typeof size === "number" ? `${size}px` : size;
   return (
     <Avatar
       className={className}
-      style={{ height: `${size}px`, width: `${size}px` }}
+      style={{ height: sizeStyle, width: sizeStyle }}
     >
       <AvatarImage src={src} alt={alt} />
       <AvatarFallback>
@@ -32,11 +33,11 @@ const UserAvatar = ({
   size = 80,
   className,
 }: {
-  did: `did:pds:${string}`;
-  size?: number;
+  did: `did:plc:${string}`;
+  size?: number | string;
   className?: string;
 }) => {
-  const address = did.startsWith("did:pds:") ? did.split(":")[2] : did;
+  const address = did.startsWith("did:plc:") ? did.split(":")[2] : did;
   const addressHex = `0x${address}` as `0x${string}`;
   return (
     <GenericAvatar

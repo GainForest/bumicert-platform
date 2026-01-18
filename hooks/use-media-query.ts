@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 const useMediaQuery = (query: string): boolean => {
   // Initialize with null during SSR to avoid hydration mismatch
-  const [matches, setMatches] = useState<boolean>(false);
+  const [matches, setMatches] = useState<boolean>(true);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {

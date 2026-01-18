@@ -27,8 +27,8 @@ const SectionForData = ({
     <div className="p-2">
       <div className="flex items-center justify-between">
         <h2 className="font-serif font-bold text-2xl">{title}</h2>
-        {userDid && manageUrl && (
-          <Link href={`/organization/${encodeURIComponent(userDid)}/projects`}>
+        {manageUrl && (
+          <Link href={manageUrl}>
             <Button variant={"ghost"}>
               {isOwner ? "Manage all" : "View all"} <ArrowRight />
             </Button>

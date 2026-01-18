@@ -11,6 +11,7 @@ import { useTheme } from "next-themes";
 import useIsMounted from "@/hooks/use-is-mounted";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { NavLinkConfig } from "./types";
+import { links } from "@/lib/links";
 
 export type DesktopNavbarProps = {
   navLinks: NavLinkConfig[];
@@ -58,16 +59,21 @@ const DesktopNavbar = ({
                   ? link.pathCheck.equals(did)
                   : link.pathCheck.equals;
               isHighlighted = pathname === targetPath;
-              // Special case for organization link
-              if (link.id === "organization" && did && !isHighlighted) {
-                isHighlighted = pathname.startsWith(`/organization/${did}`);
-              }
             } else {
               const targetPath =
                 typeof link.pathCheck.startsWith === "function"
                   ? link.pathCheck.startsWith(did)
                   : link.pathCheck.startsWith;
               isHighlighted = pathname.startsWith(targetPath);
+            }
+
+            // Special case for my organization link
+            if (link.id === "my-organization") {
+              if (did) {
+                isHighlighted = pathname.startsWith(links.myOrganization(did));
+              } else {
+                isHighlighted = pathname === links.myOrganization();
+              }
             }
 
             const href =
@@ -77,30 +83,24 @@ const DesktopNavbar = ({
               <li key={link.id} className="w-full">
                 <Link href={href} className="w-full">
                   <Button
-                    variant="outline"
+                    variant={isHighlighted ? "default" : "ghost"}
                     size="sm"
                     className={cn(
                       "w-full text-left justify-start relative overflow-hidden cursor-pointer",
-                      isHighlighted && "bg-accent hover:bg-accent"
+                      !isHighlighted && "hover:bg-background "
                     )}
                   >
                     {isHighlighted && (
-                      <div className="absolute left-0.5 top-2 bottom-2 w-0.5 bg-primary rounded-full" />
+                      <div className="absolute left-0.5 top-2 bottom-2 w-0.5 bg-primary-foreground/50 rounded-full" />
                     )}
                     <link.Icon
                       size={16}
                       className={cn(
                         "text-primary/70",
-                        isHighlighted && "text-primary"
+                        isHighlighted && "text-primary-foreground/80"
                       )}
                     />
-                    <span
-                      className={cn(
-                        isHighlighted && "text-primary font-semibold"
-                      )}
-                    >
-                      {link.text}
-                    </span>
+                    <span>{link.text}</span>
                   </Button>
                 </Link>
               </li>

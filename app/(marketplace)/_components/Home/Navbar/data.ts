@@ -41,12 +41,12 @@ export const navLinks: NavLinkConfig[] = [
   //   },
   // },
   {
-    id: "organization",
-    href: "/organization",
+    id: "my-organization",
+    href: links.myOrganization,
     text: "My Organization",
     Icon: BuildingIcon,
     pathCheck: {
-      equals: "/organization",
+      startsWith: links.myOrganization,
     },
   },
   // {
