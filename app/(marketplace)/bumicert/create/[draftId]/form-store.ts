@@ -206,10 +206,29 @@ export const useFormStore = create<FormStoreState & FormStoreActions>(
           const errorsAndCompletion = getFormErrorsAndCompletion(formIndex);
           if (!errorsAndCompletion) return;
           set((state) => {
-            const newFormErrors = [...state.formErrors];
-            const newFormCompletionPercentages = [...state.formCompletionPercentages];
-            newFormErrors[formIndex] = errorsAndCompletion.errors;
-            newFormCompletionPercentages[formIndex] = errorsAndCompletion.completionPercentage;
+            const newFormErrors: FormStoreState["formErrors"] = [
+              formIndex === 0
+                ? errorsAndCompletion.errors
+                : state.formErrors[0],
+              formIndex === 1
+                ? errorsAndCompletion.errors
+                : state.formErrors[1],
+              formIndex === 2
+                ? errorsAndCompletion.errors
+                : state.formErrors[2],
+            ];
+            const newFormCompletionPercentages: FormStoreState["formCompletionPercentages"] =
+              [
+                formIndex === 0
+                  ? errorsAndCompletion.completionPercentage
+                  : state.formCompletionPercentages[0],
+                formIndex === 1
+                  ? errorsAndCompletion.completionPercentage
+                  : state.formCompletionPercentages[1],
+                formIndex === 2
+                  ? errorsAndCompletion.completionPercentage
+                  : state.formCompletionPercentages[2],
+              ];
             return {
               formErrors: newFormErrors,
               formCompletionPercentages: newFormCompletionPercentages,
