@@ -22,5 +22,29 @@ export const links = {
   },
   api: {
     onboarding: "/api/airtable/onboarding",
+    drafts: {
+      bumicert: {
+        get: (params?: {
+          draftIds?: number[];
+          orderBy?: "created_at" | "updated_at";
+          orderDirection?: "asc" | "desc";
+        }) => {
+          const searchParams = new URLSearchParams();
+          if (params?.draftIds) {
+            searchParams.set("draftIds", JSON.stringify(params.draftIds));
+          }
+          if (params?.orderBy) {
+            searchParams.set("orderBy", params.orderBy);
+          }
+          if (params?.orderDirection) {
+            searchParams.set("orderDirection", params.orderDirection);
+          }
+          const queryString = searchParams.toString();
+          return `/api/supabase/drafts/bumicert${queryString ? `?${queryString}` : ""}`;
+        },
+        post: "/api/supabase/drafts/bumicert",
+        delete: "/api/supabase/drafts/bumicert",
+      },
+    },
   },
 };

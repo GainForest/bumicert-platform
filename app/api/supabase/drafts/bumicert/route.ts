@@ -12,12 +12,7 @@ import {
   updateDraftBumicertRequestSchema,
   deleteDraftBumicertRequestSchema,
 } from "./schema";
-import { GetDraftBumicertRequest } from "./type";
-
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<GetDraftBumicertRequest | undefined> }
-) {
+export async function GET(req: NextRequest) {
   let userDid: string;
   // Check user's authentication
   try {
@@ -44,10 +39,34 @@ export async function GET(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Validate request body
-  const requestBodyValidation = getDraftBumicertRequestSchema.safeParse(
-    params ?? {}
-  );
+  // Get query parameters
+  const searchParams = req.nextUrl.searchParams;
+  const queryParams: Record<string, unknown> = {};
+
+  // Parse draftIds if present
+  const draftIdsParam = searchParams.get("draftIds");
+  if (draftIdsParam) {
+    try {
+      queryParams.draftIds = JSON.parse(draftIdsParam);
+    } catch {
+      // Invalid JSON, ignore
+    }
+  }
+
+  // Parse orderBy and orderDirection
+  const orderBy = searchParams.get("orderBy");
+  if (orderBy) {
+    queryParams.orderBy = orderBy;
+  }
+
+  const orderDirection = searchParams.get("orderDirection");
+  if (orderDirection) {
+    queryParams.orderDirection = orderDirection;
+  }
+
+  // Validate query parameters
+  const requestBodyValidation =
+    getDraftBumicertRequestSchema.safeParse(queryParams);
   if (!requestBodyValidation.success) {
     return NextResponse.json(
       { error: requestBodyValidation.error.message },

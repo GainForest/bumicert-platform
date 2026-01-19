@@ -1,4 +1,5 @@
 import z from "zod";
+import { Tables } from "../../types";
 import {
   draftBumicertDataSchemaV0,
   getDraftBumicertRequestSchema,
@@ -25,3 +26,12 @@ export type UpdateDraftBumicertRequest = z.infer<
 export type DeleteDraftBumicertRequest = z.infer<
   typeof deleteDraftBumicertRequestSchema
 >;
+
+export type DraftBumicertResponse = Tables<"drafts_bumicert"> & {
+  data: DraftBumicertDataV0;
+};
+
+export type GetDraftBumicertResponse = {
+  drafts: DraftBumicertResponse[];
+  success: boolean;
+};

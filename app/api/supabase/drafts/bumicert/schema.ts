@@ -35,7 +35,12 @@ export const draftBumicertDataSchemaV0 = z.object({
     .array(z.string("Contributors must be an array of strings"))
     .optional(),
   siteBoundaries: z
-    .array(z.string("Site boundaries must be an array of strings"))
+    .array(
+      z.object({
+        uri: z.string("URI must be a string"),
+        cid: z.string("CID must be a string"),
+      })
+    )
     .optional(),
 });
 
