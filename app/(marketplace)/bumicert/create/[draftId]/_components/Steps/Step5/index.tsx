@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { parseAtUri } from "climateai-sdk/utilities/atproto";
 import { trpcApi } from "@/components/providers/TrpcProvider";
+import { usePathname } from "next/navigation";
 
 const ProgressItem = ({
   iconset,
@@ -105,6 +106,7 @@ const ProgressItem = ({
 
 const Step5 = () => {
   const auth = useAtprotoStore((state) => state.auth);
+  const pathname = usePathname();
   const authStatus =
     auth.status === "RESUMING"
       ? "pending"
@@ -148,8 +150,26 @@ const Step5 = () => {
 
   const { mutate: createBumicert } =
     trpcApi.hypercerts.claim.activity.create.useMutation({
-      onSuccess: (data) => {
+      onSuccess: async (data) => {
         setCreatedBumicertResponse(data);
+
+        // Delete draft if it exists (non-zero draftId in URL)
+        const draftIdMatch = pathname.match(/\/create\/(\d+)$/);
+        const draftId = draftIdMatch ? parseInt(draftIdMatch[1], 10) : null;
+        
+        if (draftId && draftId !== 0 && !isNaN(draftId)) {
+          try {
+            await fetch(links.api.drafts.bumicert.delete, {
+              method: "DELETE",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({ draftIds: [draftId] }),
+            });
+          } catch (error) {
+            // Silently fail - draft deletion is not critical
+            console.error("Failed to delete draft after publishing:", error);
+          }
+        }
       },
       onError: (error) => {
         console.error(error);

@@ -91,17 +91,17 @@ const SaveAsDraftModal = () => {
       }
 
       const result = await response.json();
-      return { result, isUpdate };
+      return { result, isUpdate, draftId: draftId ?? 0 };
     },
     onSuccess: async (data) => {
-      // If it was a create, redirect to the new draft URL
-      if (!data.isUpdate && data.result.draft?.id) {
+      const savedDraftId = data.result.draft?.id;
+
+      // If the draft ID from URL doesn't match the saved draft ID, update the URL
+      if (savedDraftId && data.draftId !== savedDraftId) {
         // Close modal first, then navigate
         await hide();
         popModal();
-        router.push(
-          links.bumicert.createWithDraftId(data.result.draft.id.toString())
-        );
+        router.push(links.bumicert.createWithDraftId(savedDraftId.toString()));
       }
     },
   });

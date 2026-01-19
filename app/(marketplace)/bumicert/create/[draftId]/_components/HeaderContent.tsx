@@ -7,13 +7,22 @@ import { useAtprotoStore } from "@/components/stores/atproto";
 import StepHeader from "./StepProgress";
 import { useModal } from "@/components/ui/modal/context";
 import SaveAsDraftModal, { SaveAsDraftModalId } from "./SaveAsDraftModal";
+import DeleteDraftModal, { DeleteDraftModalId } from "./DeleteDraftModal";
+import { usePathname } from "next/navigation";
+import { Trash2 } from "lucide-react";
 
 const RightContent = () => {
   const isHydrated = useFormStore((state) => state.isHydrated);
   const auth = useAtprotoStore((state) => state.auth);
   const { pushModal, show } = useModal();
+  const pathname = usePathname();
 
   if (!isHydrated || !auth.authenticated) return null;
+
+  // Extract draftId from URL to determine if delete button should be shown
+  const draftIdMatch = pathname.match(/\/create\/(\d+)$/);
+  const draftId = draftIdMatch ? parseInt(draftIdMatch[1], 10) : null;
+  const showDeleteButton = draftId !== null && draftId !== 0 && !isNaN(draftId);
 
   const handleSaveDraft = () => {
     pushModal(
@@ -26,16 +35,41 @@ const RightContent = () => {
     show();
   };
 
+  const handleDeleteDraft = () => {
+    pushModal(
+      {
+        id: DeleteDraftModalId,
+        content: <DeleteDraftModal />,
+      },
+      true
+    );
+    show();
+  };
+
   return (
-    <Button size={"sm"} onClick={handleSaveDraft}>
-      Save as Draft
-    </Button>
+    <div className="flex items-center gap-2">
+      {showDeleteButton && (
+        <Button
+          size={"icon-sm"}
+          variant="ghost"
+          onClick={handleDeleteDraft}
+          className="text-destructive hover:text-destructive"
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      )}
+      <Button size={"sm"} onClick={handleSaveDraft}>
+        Save as Draft
+      </Button>
+    </div>
   );
 };
 
 const SubHeaderContent = () => {
   const isHydrated = useFormStore((state) => state.isHydrated);
-  if (!isHydrated) return null;
+  const auth = useAtprotoStore((state) => state.auth);
+
+  if (!isHydrated || !auth.authenticated) return null;
   return (
     <div className="w-full pt-1">
       <StepHeader />
