@@ -90,7 +90,7 @@ const Step1 = () => {
           <div className="flex flex-col gap-2">
             <FormField
               Icon={Club}
-              label="Project Title"
+              label="Bumicert Title"
               error={errors.projectName}
               showError={shouldShowValidationErrors}
               info="You can choose more than one"
@@ -98,7 +98,7 @@ const Step1 = () => {
             >
               <InputGroup className="bg-background">
                 <InputGroupInput
-                  placeholder="My Awesome Project"
+                  placeholder="My Awesome Certificate"
                   id="project-title"
                   value={projectName}
                   onChange={(e) => setFormValue("projectName", e.target.value)}
@@ -113,7 +113,7 @@ const Step1 = () => {
             </FormField>
             <FormField
               Icon={CalendarClock}
-              label="Project Date Range"
+              label="Date Range"
               className="flex-1"
               error={errors.projectDateRange}
               showError={shouldShowValidationErrors}
