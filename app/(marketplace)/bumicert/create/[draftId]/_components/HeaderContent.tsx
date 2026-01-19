@@ -5,13 +5,29 @@ import React, { useEffect } from "react";
 import { useFormStore } from "../form-store";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import StepHeader from "./StepProgress";
+import { useModal } from "@/components/ui/modal/context";
+import SaveAsDraftModal, { SaveAsDraftModalId } from "./SaveAsDraftModal";
 
 const RightContent = () => {
   const isHydrated = useFormStore((state) => state.isHydrated);
   const auth = useAtprotoStore((state) => state.auth);
+  const { pushModal, show } = useModal();
+
   if (!isHydrated || !auth.authenticated) return null;
+
+  const handleSaveDraft = () => {
+    pushModal(
+      {
+        id: SaveAsDraftModalId,
+        content: <SaveAsDraftModal />,
+      },
+      true
+    );
+    show();
+  };
+
   return (
-    <Button size={"sm"} disabled>
+    <Button size={"sm"} onClick={handleSaveDraft}>
       Save as Draft
     </Button>
   );

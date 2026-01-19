@@ -126,28 +126,31 @@ export const useFormStore = create<FormStoreState & FormStoreActions>(
   (set, get) => {
     const setForm1Value: FormStoreActions["setFormValue"][0] = (key, value) => {
       set((state) => ({
-        formValues: {
-          ...state.formValues,
-          0: { ...state.formValues[0], [key]: value },
-        },
+        formValues: [
+          { ...state.formValues[0], [key]: value },
+          state.formValues[1],
+          state.formValues[2],
+        ],
       }));
       get().updateErrorsAndCompletion();
     };
     const setForm2Value: FormStoreActions["setFormValue"][1] = (key, value) => {
       set((state) => ({
-        formValues: {
-          ...state.formValues,
-          1: { ...state.formValues[1], [key]: value },
-        },
+        formValues: [
+          state.formValues[0],
+          { ...state.formValues[1], [key]: value },
+          state.formValues[2],
+        ],
       }));
       get().updateErrorsAndCompletion();
     };
     const setForm3Value: FormStoreActions["setFormValue"][2] = (key, value) => {
       set((state) => ({
-        formValues: {
-          ...state.formValues,
-          2: { ...state.formValues[2], [key]: value },
-        },
+        formValues: [
+          state.formValues[0],
+          state.formValues[1],
+          { ...state.formValues[2], [key]: value },
+        ],
       }));
       get().updateErrorsAndCompletion();
     };
@@ -191,25 +194,27 @@ export const useFormStore = create<FormStoreState & FormStoreActions>(
       hydrate: (formValues) => {
         if (!formValues) {
           set({ ...initialState, isHydrated: true });
+          get().updateErrorsAndCompletion();
           return;
         }
         set({ ...initialState, isHydrated: true, formValues });
+        get().updateErrorsAndCompletion();
       },
       setFormValue: [setForm1Value, setForm2Value, setForm3Value],
       updateErrorsAndCompletion: (formIndex) => {
-        if (formIndex) {
+        if (formIndex !== undefined) {
           const errorsAndCompletion = getFormErrorsAndCompletion(formIndex);
           if (!errorsAndCompletion) return;
-          set((state) => ({
-            formErrors: {
-              ...state.formErrors,
-              [formIndex]: errorsAndCompletion.errors,
-            },
-            formCompletionPercentages: {
-              ...state.formCompletionPercentages,
-              [formIndex]: errorsAndCompletion.completionPercentage,
-            },
-          }));
+          set((state) => {
+            const newFormErrors = [...state.formErrors];
+            const newFormCompletionPercentages = [...state.formCompletionPercentages];
+            newFormErrors[formIndex] = errorsAndCompletion.errors;
+            newFormCompletionPercentages[formIndex] = errorsAndCompletion.completionPercentage;
+            return {
+              formErrors: newFormErrors,
+              formCompletionPercentages: newFormCompletionPercentages,
+            };
+          });
         } else {
           const step1ErrorsAndCompletion = getFormErrorsAndCompletion(0);
           const step2ErrorsAndCompletion = getFormErrorsAndCompletion(1);
