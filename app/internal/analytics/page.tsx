@@ -54,16 +54,32 @@ const formatLastUpdated = (isoString: string): string => {
 };
 
 const fetchAnalyticsData = async (): Promise<AnalyticsData> => {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-  const response = await fetch(`${baseUrl}/api/analytics/stats`, {
-    cache: "no-store",
-  });
+  // Construct the full URL for the API endpoint
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch analytics data");
+  try {
+    const response = await fetch(`${baseUrl}/api/analytics/stats`, {
+      cache: "no-store",
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`API returned ${response.status}: ${response.statusText}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === "AbortError") {
+      throw new Error("Request timed out after 10 seconds");
+    }
+    throw error;
   }
-
-  return response.json();
 };
 
 const AnalyticsPage = async () => {

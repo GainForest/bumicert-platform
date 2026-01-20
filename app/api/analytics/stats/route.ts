@@ -41,20 +41,28 @@ type AnalyticsStats = {
  * Returns aggregated analytics data for the dashboard
  */
 export async function GET(): Promise<NextResponse<AnalyticsStats>> {
-  // Count flow_started events
-  const { count: flowStartsCount } = await supabaseAdmin
-    .from("analytics_events")
-    .select("*", { count: "exact", head: true })
-    .eq("event_type", "flow_started");
+  // Run all queries in parallel for better performance
+  const [
+    { count: flowStartsCount },
+    { count: completionsCount },
+    { data: completedSessions },
+  ] = await Promise.all([
+    supabaseAdmin
+      .from("analytics_events")
+      .select("*", { count: "exact", head: true })
+      .eq("event_type", "flow_started"),
+    supabaseAdmin
+      .from("analytics_events")
+      .select("*", { count: "exact", head: true })
+      .eq("event_type", "bumicert_published"),
+    supabaseAdmin
+      .from("analytics_sessions")
+      .select("completion_duration_seconds")
+      .eq("completed", true)
+      .not("completion_duration_seconds", "is", null),
+  ]);
 
   const totalFlowStarts = flowStartsCount ?? 0;
-
-  // Count bumicert_published events
-  const { count: completionsCount } = await supabaseAdmin
-    .from("analytics_events")
-    .select("*", { count: "exact", head: true })
-    .eq("event_type", "bumicert_published");
-
   const totalCompletions = completionsCount ?? 0;
 
   // Calculate completion rate
@@ -62,13 +70,6 @@ export async function GET(): Promise<NextResponse<AnalyticsStats>> {
     totalFlowStarts > 0
       ? Math.round((totalCompletions / totalFlowStarts) * 1000) / 10
       : 0;
-
-  // Get average and median completion time from sessions
-  const { data: completedSessions } = await supabaseAdmin
-    .from("analytics_sessions")
-    .select("completion_duration_seconds")
-    .eq("completed", true)
-    .not("completion_duration_seconds", "is", null);
 
   const durations = (completedSessions ?? [])
     .map((s) => s.completion_duration_seconds as number)
@@ -107,19 +108,24 @@ export async function GET(): Promise<NextResponse<AnalyticsStats>> {
  * Build funnel data by counting step_viewed events per step
  */
 async function buildFunnelData(totalFlowStarts: number): Promise<FunnelStep[]> {
-  // Get count of unique sessions that viewed each step
+  // Get count of unique sessions that viewed each step (parallel queries)
   const stepCounts: number[] = [totalFlowStarts];
 
-  for (let stepIndex = 0; stepIndex < 5; stepIndex++) {
-    const { data: stepEvents } = await supabaseAdmin
+  // Fetch all step queries in parallel
+  const stepQueries = Array.from({ length: 5 }, (_, stepIndex) =>
+    supabaseAdmin
       .from("analytics_events")
       .select("session_id")
       .eq("event_type", "step_viewed")
-      .contains("event_data", { stepIndex });
+      .contains("event_data", { stepIndex })
+  );
 
-    // Count unique sessions
+  const stepResults = await Promise.all(stepQueries);
+
+  // Count unique sessions for each step
+  for (const result of stepResults) {
     const uniqueSessions = new Set(
-      (stepEvents ?? []).map((e) => e.session_id)
+      (result.data ?? []).map((e) => e.session_id)
     );
     stepCounts.push(uniqueSessions.size);
   }
