@@ -55,18 +55,10 @@ const waitForHotjar = (callback: () => void, maxAttempts = 50): void => {
  */
 export const trackEvent = (eventName: string): void => {
   const executeTracking = () => {
-    console.log(`[Hotjar] Attempting to track event: "${eventName}"`);
-    console.log(`[Hotjar] window.hj available:`, typeof window.hj);
-
-    if (!isHotjarReady()) {
-      console.warn(`[Hotjar] Hotjar not ready when trying to track: ${eventName}`);
-      return;
-    }
+    if (!isHotjarReady()) return;
 
     try {
-      console.log(`[Hotjar] Calling window.hj("event", "${eventName}")`);
       window.hj?.("event", eventName);
-      console.log(`[Hotjar] Successfully tracked event: "${eventName}"`);
     } catch (error) {
       console.error(`[Hotjar] Failed to track event "${eventName}":`, error);
     }
@@ -75,7 +67,6 @@ export const trackEvent = (eventName: string): void => {
   if (isHotjarReady()) {
     executeTracking();
   } else {
-    console.log(`[Hotjar] Hotjar not ready yet, waiting for: "${eventName}"`);
     waitForHotjar(executeTracking);
   }
 };
