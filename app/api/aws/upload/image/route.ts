@@ -1,4 +1,4 @@
-import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { type NextRequest, NextResponse } from "next/server";
 
 import { s3Client, S3_BUCKET } from "@/config/s3";
@@ -41,25 +41,30 @@ export async function POST(
     // Validate file exists
     if (!file) {
       return NextResponse.json(
-        { error: "No file provided. Please include a file in the 'file' field." },
+        {
+          error: "No file provided. Please include a file in the 'file' field.",
+        },
         { status: 400 }
       );
     }
 
     // Validate file is not empty
     if (file.size === 0) {
-      return NextResponse.json(
-        { error: "File is empty" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "File is empty" }, { status: 400 });
     }
 
     // Validate MIME type
-    if (!ALLOWED_MIME_TYPES.includes(file.type as typeof ALLOWED_MIME_TYPES[number])) {
+    if (
+      !ALLOWED_MIME_TYPES.includes(
+        file.type as (typeof ALLOWED_MIME_TYPES)[number]
+      )
+    ) {
       return NextResponse.json(
         {
           error: "Invalid file type",
-          details: `Allowed types: ${ALLOWED_MIME_TYPES.join(", ")}. Received: ${file.type}`,
+          details: `Allowed types: ${ALLOWED_MIME_TYPES.join(
+            ", "
+          )}. Received: ${file.type}`,
         },
         { status: 400 }
       );
@@ -70,7 +75,11 @@ export async function POST(
       return NextResponse.json(
         {
           error: "File too large",
-          details: `Max size: ${MAX_FILE_SIZE / 1024 / 1024}MB. Received: ${(file.size / 1024 / 1024).toFixed(2)}MB`,
+          details: `Max size: ${MAX_FILE_SIZE / 1024 / 1024}MB. Received: ${(
+            file.size /
+            1024 /
+            1024
+          ).toFixed(2)}MB`,
         },
         { status: 400 }
       );

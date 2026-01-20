@@ -15,21 +15,38 @@ import { usePathname, useRouter } from "next/navigation";
 import { links } from "@/lib/links";
 import { ArrowRight, CircleCheck, Loader2, Save } from "lucide-react";
 import CircularProgressBar from "@/components/circular-progressbar";
+import { cheapHash } from "@/lib/cheapHash";
+import { DraftBumicertResponse } from "@/app/api/supabase/drafts/bumicert/type";
 
 export const SaveAsDraftModalId = "bumicert/save-as-draft";
 
-const fileToDataUrl = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
+const uploadImageToS3 = async (file: File): Promise<string> => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await fetch(links.api.aws.upload.image, {
+    method: "POST",
+    body: formData,
   });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || "Failed to upload image");
+  }
+
+  const data = await response.json();
+  return data.url;
 };
 
 const SaveAsDraftModal = () => {
   const { stack, popModal, hide } = useModal();
   const formValues = useFormStore((state) => state.formValues);
+  const draftCoverImageHash = useFormStore(
+    (state) => state.draftCoverImageHash
+  );
+  const setDraftCoverImageHash = useFormStore(
+    (state) => state.setDraftCoverImageHash
+  );
   const formCompletionPercentages = useFormStore(
     (state) => state.formCompletionPercentages
   );
@@ -48,15 +65,45 @@ const SaveAsDraftModal = () => {
     mutationFn: async () => {
       const [step1, step2, step3] = formValues;
 
-      // Extract draftId from URL (e.g., /bumicert/create/123 -> 123)
       const draftIdMatch = pathname.match(/\/create\/(\d+)$/);
       const draftId = draftIdMatch ? parseInt(draftIdMatch[1], 10) : null;
       const isUpdate = draftId !== null && draftId !== 0 && !isNaN(draftId);
 
-      // Convert cover image File to data URL
       let coverImageUrl: string | undefined;
+      let newCoverImageHash: string | undefined;
+
       if (step1.coverImage && step1.coverImage.size > 0) {
-        coverImageUrl = await fileToDataUrl(step1.coverImage);
+        const currentCoverImageHash = await cheapHash(step1.coverImage);
+        newCoverImageHash = currentCoverImageHash;
+
+        if (
+          isUpdate &&
+          draftCoverImageHash &&
+          currentCoverImageHash === draftCoverImageHash
+        ) {
+          const draftResponse = await fetch(
+            links.api.drafts.bumicert.get({ draftIds: [draftId!] }),
+            {
+              method: "GET",
+              credentials: "include",
+            }
+          );
+
+          if (draftResponse.ok) {
+            const draftData = await draftResponse.json();
+            const draft: DraftBumicertResponse | undefined =
+              draftData.drafts?.[0];
+            if (draft?.data?.coverImage) {
+              coverImageUrl = draft.data.coverImage;
+            } else {
+              coverImageUrl = await uploadImageToS3(step1.coverImage);
+            }
+          } else {
+            coverImageUrl = await uploadImageToS3(step1.coverImage);
+          }
+        } else {
+          coverImageUrl = await uploadImageToS3(step1.coverImage);
+        }
       }
 
       // Map form data to API format
@@ -91,14 +138,16 @@ const SaveAsDraftModal = () => {
       }
 
       const result = await response.json();
-      return { result, isUpdate, draftId: draftId ?? 0 };
+      return { result, isUpdate, draftId: draftId ?? 0, newCoverImageHash };
     },
     onSuccess: async (data) => {
+      if (data.newCoverImageHash) {
+        setDraftCoverImageHash(data.newCoverImageHash);
+      }
+
       const savedDraftId = data.result.draft?.id;
 
-      // If the draft ID from URL doesn't match the saved draft ID, update the URL
       if (savedDraftId && data.draftId !== savedDraftId) {
-        // Close modal first, then navigate
         await hide();
         popModal();
         router.push(links.bumicert.createWithDraftId(savedDraftId.toString()));
