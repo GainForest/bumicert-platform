@@ -55,10 +55,20 @@ const formatLastUpdated = (isoString: string): string => {
 
 const fetchAnalyticsData = async (): Promise<AnalyticsData> => {
   // Construct the full URL for the API endpoint
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  // Priority: VERCEL_URL (preview deploys) > NEXT_PUBLIC_APP_URL > localhost
+  let baseUrl: string;
+  
+  if (process.env.VERCEL_URL) {
+    // Vercel preview/production deployment
+    baseUrl = `https://${process.env.VERCEL_URL}`;
+  } else if (process.env.NEXT_PUBLIC_APP_URL) {
+    baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+  } else {
+    baseUrl = "http://localhost:3000";
+  }
   
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+  const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
 
   try {
     const response = await fetch(`${baseUrl}/api/analytics/stats`, {
@@ -76,7 +86,7 @@ const fetchAnalyticsData = async (): Promise<AnalyticsData> => {
   } catch (error) {
     clearTimeout(timeoutId);
     if (error instanceof Error && error.name === "AbortError") {
-      throw new Error("Request timed out after 10 seconds");
+      throw new Error("Request timed out after 15 seconds");
     }
     throw error;
   }
