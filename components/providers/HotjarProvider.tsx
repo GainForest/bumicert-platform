@@ -46,6 +46,12 @@ const HotjarProvider = ({ children }: HotjarProviderProps) => {
 
   const handleScriptLoad = () => {
     console.log("[Contentsquare/Hotjar] Script loaded successfully");
+    console.log("[Contentsquare/Hotjar] window.hj available:", typeof window.hj);
+    console.log("[Contentsquare/Hotjar] window.hj:", window.hj);
+    
+    // Check for Contentsquare-specific objects
+    console.log("[Contentsquare/Hotjar] window._uxa available:", typeof (window as unknown as Record<string, unknown>)._uxa);
+    console.log("[Contentsquare/Hotjar] window.CS available:", typeof (window as unknown as Record<string, unknown>).CS);
 
     // Track initial page view once script is loaded
     if (!hasTrackedInitialPageView.current) {
