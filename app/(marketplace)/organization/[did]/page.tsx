@@ -13,6 +13,8 @@ import AboutOrganization from "@/app/(upload)/upload/organization/[did]/_compone
 import SectionForData from "@/app/(upload)/upload/organization/[did]/_components/SectionForData";
 import { OrganizationPageHydrator } from "@/app/(upload)/upload/organization/[did]/hydrator";
 import ErrorPage from "./error";
+import { CollaboratorsManager } from "./_components/CollaboratorsManager";
+import { getHypercertsRepoContext } from "@/lib/hypercerts/repo-context";
 
 const EMPTY_ORGANIZATION_DATA: AppGainforestOrganizationInfo.Record = {
   $type: "app.gainforest.organization.info",
@@ -80,6 +82,11 @@ const OrganizationPage = async ({
   }
   const serializedData = serialize(data);
 
+  // Check if user is authenticated with hypercerts SDK
+  const hypercertsContext = await getHypercertsRepoContext();
+  const isAuthenticated = hypercertsContext !== null;
+  const isOwner = hypercertsContext?.userDid === did;
+
   return (
     <OrganizationPageHydrator
       initialSerializedData={serializedData}
@@ -96,6 +103,15 @@ const OrganizationPage = async ({
             The bumicerts of this organization will appear here.
           </div>
         </SectionForData>
+        
+        {isAuthenticated && (
+          <>
+            <hr className="my-8" />
+            <SectionForData title="Collaborators" userDid={did}>
+              <CollaboratorsManager orgDid={did} isOwner={isOwner} />
+            </SectionForData>
+          </>
+        )}
       </Container>
     </OrganizationPageHydrator>
   );
