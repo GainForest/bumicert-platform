@@ -1,7 +1,7 @@
 "use client";
-import { useAtprotoStore } from "@/components/stores/atproto";
-import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
-import { cn } from "@/lib/utils";
+
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import {
   ArrowRightIcon,
   CircleAlertIcon,
@@ -11,16 +11,19 @@ import {
   ShieldCheckIcon,
   ShieldXIcon,
 } from "lucide-react";
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import Link from "next/link";
+
+import { useAtprotoStore } from "@/components/stores/atproto";
+import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
+import { cn } from "@/lib/utils";
 import { useFormStore } from "../../../form-store";
 import { useStep5Store } from "./store";
 import { toFileGenerator } from "climateai-sdk/zod";
 import { links } from "@/lib/links";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { parseAtUri } from "climateai-sdk/utilities/atproto";
 import { trpcApi } from "@/components/providers/TrpcProvider";
+import { trackBumicertPublished, getFlowDurationSeconds } from "@/lib/analytics";
 
 const ProgressItem = ({
   iconset,
@@ -150,6 +153,13 @@ const Step5 = () => {
     trpcApi.hypercerts.claim.activity.create.useMutation({
       onSuccess: (data) => {
         setCreatedBumicertResponse(data);
+
+        // Track successful bumicert publication
+        const duration = getFlowDurationSeconds() ?? 0;
+        trackBumicertPublished({
+          draftId: data.data?.cid ?? "unknown",
+          totalDurationSeconds: duration,
+        });
       },
       onError: (error) => {
         console.error(error);
