@@ -1,6 +1,7 @@
 /**
  * Hotjar/Contentsquare Analytics Integration
  * Wrapper functions for Hotjar tracking via Contentsquare script
+ * Also sends events to Supabase for custom analytics dashboard
  */
 
 import {
@@ -20,6 +21,8 @@ import {
   type ErrorPayload,
   type BumicertStepName,
 } from "./events";
+
+import * as supabaseTracking from "./supabase-tracking";
 
 // Extend Window interface to include Hotjar
 declare global {
@@ -174,6 +177,7 @@ export const trackBumicertDetailViewed = (bumicertId: string): void => {
 export const trackBumicertFlowStarted = (
   payload: BumicertFlowStartedPayload
 ): void => {
+  // Hotjar tracking
   trackEvent(BUMICERT_FLOW_EVENTS.FLOW_STARTED);
   tagRecording(["bumicert-creation", "flow-started"]);
 
@@ -184,10 +188,15 @@ export const trackBumicertFlowStarted = (
       sessionStorage.setItem("bumicert_flow_draft_id", payload.draftId);
     }
   }
+
+  // Supabase tracking (async, non-blocking)
+  supabaseTracking.trackFlowStarted(payload.draftId ?? "0");
 };
 
 export const trackStepViewed = (payload: StepViewedPayload): void => {
   const stepName = BUMICERT_STEP_NAMES[payload.stepIndex] ?? payload.stepName;
+
+  // Hotjar tracking
   trackEvent(BUMICERT_FLOW_EVENTS.STEP_VIEWED);
   trackEvent(`step_${payload.stepIndex + 1}_${stepName}_viewed`);
   tagRecording(["bumicert-creation", `step-${payload.stepIndex + 1}`]);
@@ -196,18 +205,28 @@ export const trackStepViewed = (payload: StepViewedPayload): void => {
   if (typeof window !== "undefined") {
     sessionStorage.setItem("bumicert_step_start_time", Date.now().toString());
   }
+
+  // Supabase tracking (async, non-blocking)
+  supabaseTracking.trackStepViewed(
+    payload.stepIndex,
+    stepName,
+    payload.draftId ?? "0"
+  );
 };
 
 export const trackStepCompleted = (payload: StepCompletedPayload): void => {
   const stepName = BUMICERT_STEP_NAMES[payload.stepIndex] ?? payload.stepName;
+
+  // Hotjar tracking
   trackEvent(BUMICERT_FLOW_EVENTS.STEP_COMPLETED);
   trackEvent(`step_${payload.stepIndex + 1}_${stepName}_completed`);
 
   // Calculate time spent on step
+  let timeSpentSeconds = 0;
   if (typeof window !== "undefined") {
     const stepStartTime = sessionStorage.getItem("bumicert_step_start_time");
     if (stepStartTime) {
-      const timeSpentSeconds = Math.round(
+      timeSpentSeconds = Math.round(
         (Date.now() - parseInt(stepStartTime, 10)) / 1000
       );
       identifyUser(null, {
@@ -215,11 +234,19 @@ export const trackStepCompleted = (payload: StepCompletedPayload): void => {
       });
     }
   }
+
+  // Supabase tracking (async, non-blocking)
+  supabaseTracking.trackStepCompleted(
+    payload.stepIndex,
+    stepName,
+    timeSpentSeconds
+  );
 };
 
 export const trackBumicertPublished = (
   payload: BumicertPublishedPayload
 ): void => {
+  // Hotjar tracking
   trackEvent(BUMICERT_FLOW_EVENTS.BUMICERT_PUBLISHED);
   tagRecording(["bumicert-creation", "completed"]);
 
@@ -246,13 +273,27 @@ export const trackBumicertPublished = (
     sessionStorage.removeItem("bumicert_step_start_time");
     sessionStorage.removeItem("bumicert_flow_draft_id");
   }
+
+  // Supabase tracking (async, non-blocking)
+  supabaseTracking.trackBumicertPublished(
+    payload.draftId ?? "0",
+    totalDuration ?? 0
+  );
 };
 
 export const trackFlowAbandoned = (payload: FlowAbandonedPayload): void => {
   const stepName = BUMICERT_STEP_NAMES[payload.stepIndex] ?? payload.stepName;
+
+  // Hotjar tracking
   trackEvent(BUMICERT_FLOW_EVENTS.FLOW_ABANDONED);
   trackEvent(`flow_abandoned_at_step_${payload.stepIndex + 1}_${stepName}`);
   tagRecording(["bumicert-creation", "abandoned"]);
+
+  // Supabase tracking (async, non-blocking)
+  supabaseTracking.trackFlowAbandoned(
+    payload.stepIndex,
+    payload.timeSpentSeconds ?? 0
+  );
 };
 
 // ============================================

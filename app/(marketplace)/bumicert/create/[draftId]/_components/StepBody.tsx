@@ -30,14 +30,8 @@ const StepBody = () => {
   useEffect(() => {
     const stepName = getStepName(currentStep);
 
-    // Track step viewed
-    trackStepViewed({
-      stepIndex: currentStep,
-      stepName,
-      draftId,
-    });
-
-    // Track previous step as completed (if moving forward)
+    // Track previous step as completed FIRST (if moving forward)
+    // This must happen before trackStepViewed to capture accurate timing
     if (
       previousStepRef.current !== null &&
       currentStep > previousStepRef.current
@@ -49,6 +43,13 @@ const StepBody = () => {
         draftId,
       });
     }
+
+    // Track step viewed (this resets the step start time)
+    trackStepViewed({
+      stepIndex: currentStep,
+      stepName,
+      draftId,
+    });
 
     previousStepRef.current = currentStep;
   }, [currentStep, draftId]);
