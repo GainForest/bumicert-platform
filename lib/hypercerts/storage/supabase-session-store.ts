@@ -6,11 +6,19 @@ export class SupabaseSessionStore implements SessionStore {
   async set(did: string, session: NodeSavedSession): Promise<void> {
     const supabase = createAdminClient()
     
+    // Generate random session ID (UUID v4 = 122-bit entropy)
+    const sessionId = crypto.randomUUID()
+    
+    // Calculate session expiry (7 days from now)
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    
     const { error } = await supabase
       .from('oauth_sessions')
       .upsert({
         did,
+        session_id: sessionId,
         session_data: session,
+        expires_at: expiresAt.toISOString(),
         updated_at: new Date().toISOString(),
       })
     

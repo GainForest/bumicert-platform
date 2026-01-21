@@ -1,23 +1,16 @@
 import { hypercertsSdk } from '@/lib/hypercerts/sdk.server'
-import { cookies } from 'next/headers'
+import { setSessionCookie } from '@/lib/hypercerts/session-helpers'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams
   
   try {
-    // Complete OAuth flow
+    // Complete OAuth flow (SDK internally stores session with session ID)
     const session = await hypercertsSdk.callback(searchParams)
     
-    // Store user DID in cookie
-    const cookieStore = await cookies()
-    cookieStore.set('hypercerts-user-did', session.did, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24 * 7, // 1 week
-      path: '/',
-      sameSite: 'lax',
-    })
+    // Set session cookie with random UUID session ID
+    await setSessionCookie(session.did)
     
     // Redirect back to testing page
     const protocol = req.headers.get('x-forwarded-proto') || 

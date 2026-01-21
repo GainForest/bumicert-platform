@@ -1,6 +1,6 @@
 import 'server-only'
-import { cookies } from 'next/headers'
 import { hypercertsSdk } from './sdk.server'
+import { getSessionIdFromCookie, lookupDidBySessionId, deleteSessionCookie } from './session-helpers'
 import type { Repository } from '@hypercerts-org/sdk-core'
 
 export type RepoServer = 'pds' | 'sds'
@@ -18,16 +18,24 @@ export async function getHypercertsRepoContext(options?: {
   targetDid?: string
   serverOverride?: RepoServer
 }): Promise<RepoContext | null> {
-  const cookieStore = await cookies()
-  const userDid = cookieStore.get('hypercerts-user-did')?.value
+  // Get session ID from cookie (random UUID)
+  const sessionId = await getSessionIdFromCookie()
+  if (!sessionId) return null
   
-  if (!userDid) return null
+  // Lookup DID by session ID (validates session exists and not expired)
+  const userDid = await lookupDidBySessionId(sessionId)
+  if (!userDid) {
+    // Session expired or invalid, cleanup cookie
+    await deleteSessionCookie()
+    return null
+  }
   
-  const activeDid = cookieStore.get('hypercerts-active-did')?.value || userDid
+  const activeDid = userDid  // Could extend this later for org switching
   const targetDid = options?.targetDid || activeDid
   const server: RepoServer = options?.serverOverride ?? (targetDid === userDid ? 'pds' : 'sds')
   
   try {
+    // Restore session using DID (SDK looks it up from sessionStore)
     const session = await hypercertsSdk.restoreSession(userDid)
     if (!session) return null
     
