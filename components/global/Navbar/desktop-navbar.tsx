@@ -25,7 +25,7 @@ export type DesktopNavbarProps = {
 const DesktopNavbar = ({
   navLinks,
   footerLinks,
-  title = "Bumicertain",
+  title = "Bumicerts",
 }: DesktopNavbarProps) => {
   const { theme, setTheme } = useTheme();
   const isMounted = useIsMounted();
@@ -33,7 +33,7 @@ const DesktopNavbar = ({
   const auth = useAtprotoStore((state) => state.auth);
   const did = auth.user?.did;
 
-  const isHome = title === "Bumicertain";
+  const isHome = title === "Bumicerts";
 
   return (
     <nav className={cn("w-[240px] p-4 flex flex-col justify-between")}>

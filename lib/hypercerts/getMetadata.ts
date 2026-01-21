@@ -4,7 +4,7 @@ export const generateHypercertIPFSUrl = (cid: string) => {
   return `https://${cid}.ipfs.w3s.link`;
 };
 
-export const generateBumicertainIPFSUrl = (cid: string) => {
+export const generateBumicertsIPFSUrl = (cid: string) => {
   return `https://ipfs.io/ipfs/${cid}`;
 };
 
