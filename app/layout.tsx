@@ -54,8 +54,74 @@ const baskerville = Baskervville({
 });
 
 export const metadata: Metadata = {
-  title: "Bumicerts",
-  description: "Fund impactful regenerative projects.",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_BASE_URL ?? "https://bumicerts.com"
+  ),
+  title: {
+    default: "Bumicerts - Fund Impactful Regenerative Projects",
+    template: "%s | Bumicerts",
+  },
+  description:
+    "Fund impactful regenerative projects and support climate action. Discover verified environmental initiatives, purchase digital certificates, and contribute to a sustainable future.",
+  keywords: [
+    "bumicerts",
+    "regenerative projects",
+    "climate action",
+    "environmental impact",
+    "carbon credits",
+    "sustainability",
+    "ecological restoration",
+    "green funding",
+  ],
+  authors: [{ name: "Bumicerts" }],
+  creator: "Bumicerts",
+  publisher: "Bumicerts",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "/",
+    siteName: "Bumicerts",
+    title: "Bumicerts - Fund Impactful Regenerative Projects",
+    description:
+      "Fund impactful regenerative projects and support climate action. Discover verified environmental initiatives and contribute to a sustainable future.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Bumicerts - Fund Impactful Regenerative Projects",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Bumicerts - Fund Impactful Regenerative Projects",
+    description:
+      "Fund impactful regenerative projects and support climate action. Discover verified environmental initiatives and contribute to a sustainable future.",
+    images: ["/twitter-image.png"],
+    creator: "@bumicerts",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    // Add your verification codes here when you have them
+    // google: "your-google-verification-code",
+    // bing: "your-bing-verification-code",
+  },
 };
 
 export default function RootLayout({
