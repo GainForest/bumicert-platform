@@ -33,7 +33,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
   );
   const { popModal, stack } = useModal();
   const router = useRouter();
-  const isAuthenticated = useAtprotoStore((state) => state.auth.authenticated);
+  const isAuthenticated = useAtprotoStore(state => state.auth.authenticated);
 
   const {
     mutate: handleSignIn,
@@ -41,14 +41,11 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
     error: signInError,
   } = useMutation({
     mutationFn: async (handlePrefix: string) => {
+      addPreviousSession(handlePrefix);
       const authUrl = await getLoginUrl(handlePrefix);
-      
-      // Store the handle for after callback (to add to previous sessions)
-      localStorage.setItem('pending-login-handle', `${handlePrefix}.climateai.org`);
-      
       return authUrl;
     },
-    onSuccess: (authUrl) => {
+    onSuccess: authUrl => {
       router.push(authUrl);
     },
   });
@@ -59,10 +56,8 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
 
   const addPreviousSession = useCallback(
     (handle: string) => {
-      setPreviousSessions((prev) => {
-        const alreadyExists = prev?.find(
-          (session) => session.handle === handle
-        );
+      setPreviousSessions(prev => {
+        const alreadyExists = prev?.find(session => session.handle === handle);
         if (alreadyExists) {
           return prev;
         }
@@ -77,99 +72,106 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
   }
 
   return (
-    <ModalContent>
-      <ModalHeader
-        backAction={
-          stack.length === 1
-            ? undefined
-            : () => {
-                popModal();
-              }
-        }
-      >
-        <ModalTitle>Sign In</ModalTitle>
-        <ModalDescription>Provide your handle to continue</ModalDescription>
-      </ModalHeader>
-      <div className="flex flex-col gap-3 mt-4">
-        <div className="flex flex-col gap-1">
-          <span className="text-sm">Enter your handle</span>
-          <InputGroup>
-            <InputGroupAddon>@</InputGroupAddon>
-            <InputGroupInput
-              placeholder="john-doe"
-              value={inputHandlePrefix}
-              onChange={(e) => setInputHandlePrefix(e.target.value)}
-              disabled={isRedirecting}
-            />
-            <InputGroupAddon align="inline-end" className="text-primary">
-              .climateai.org
-            </InputGroupAddon>
-          </InputGroup>
-          <div className="w-full bg-muted rounded-md flex flex-col gap-0.5 p-1">
-            {previousSessions.length === 0 && (
-              <div className="w-full text-sm text-muted-foreground text-center p-2">
-                No previous sessions found.
-              </div>
-            )}
+    <form
+      onSubmit={e => {
+        e.preventDefault();
+        handleSignIn(inputHandlePrefix);
+      }}
+    >
+      <ModalContent>
+        <ModalHeader
+          backAction={
+            stack.length === 1
+              ? undefined
+              : () => {
+                  popModal();
+                }
+          }
+        >
+          <ModalTitle>Sign In</ModalTitle>
+          <ModalDescription>Provide your handle to continue</ModalDescription>
+        </ModalHeader>
+        <div className="flex flex-col gap-3 mt-4">
+          <div className="flex flex-col gap-1">
+            <span className="text-sm">Enter your handle</span>
+            <InputGroup>
+              <InputGroupAddon>@</InputGroupAddon>
+              <InputGroupInput
+                placeholder="john-doe"
+                value={inputHandlePrefix}
+                onChange={e => setInputHandlePrefix(e.target.value)}
+                disabled={isRedirecting}
+              />
+              <InputGroupAddon align="inline-end" className="text-primary">
+                .climateai.org
+              </InputGroupAddon>
+            </InputGroup>
+            <div className="w-full bg-muted rounded-md flex flex-col gap-0.5 p-1">
+              {previousSessions.length === 0 && (
+                <div className="w-full text-sm text-muted-foreground text-center p-2">
+                  No previous sessions found.
+                </div>
+              )}
 
-            {previousSessions.map((session) => {
-              const handleSplit = session.handle.split(".");
-              if (handleSplit.length < 2) {
-                return null;
-              }
-              const prefix = handleSplit[0];
-              const suffix = handleSplit.slice(1).join(".");
-              if (suffix !== "climateai.org") {
-                return null;
-              }
+              {previousSessions.map(session => {
+                const handleSplit = session.handle.split(".");
+                if (handleSplit.length < 2) {
+                  return null;
+                }
+                const prefix = handleSplit[0];
+                const suffix = handleSplit.slice(1).join(".");
+                if (suffix !== "climateai.org") {
+                  return null;
+                }
 
-              return (
-                <div
-                  className={cn(
-                    "w-full relative first:rounded-t-md last:rounded-b-md bg-background",
-                    inputHandlePrefix === prefix && "border border-primary/50"
-                  )}
-                  key={session.handle}
-                >
-                  <button
+                return (
+                  <div
                     className={cn(
-                      "flex items-center gap-2 justify-between h-8 rounded-md px-2 py-1 w-full cursor-pointer"
+                      "w-full relative first:rounded-t-md last:rounded-b-md bg-background",
+                      inputHandlePrefix === prefix && "border border-primary/50"
                     )}
-                    disabled={isRedirecting}
-                    onClick={() => {
-                      setInputHandlePrefix(`${prefix}`);
-                    }}
+                    key={session.handle}
                   >
-                    <span className="text-sm font-medium">
-                      <span className="opacity-50 mr-1">@</span>
-                      {session.handle}
-                    </span>
-                  </button>
-                  <div className="absolute top-0 bottom-0 right-0 flex items-center justify-center">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="hover:bg-transparent hover:text-destructive cursor-pointer"
+                    <button
+                      className={cn(
+                        "flex items-center gap-2 justify-between h-8 rounded-md px-2 py-1 w-full cursor-pointer"
+                      )}
                       disabled={isRedirecting}
                       onClick={() => {
-                        setPreviousSessions((prev) => {
-                          const newSessions =
-                            prev?.filter((s) => s.handle !== session.handle) ??
-                            [];
-                          return newSessions;
-                        });
+                        setInputHandlePrefix(`${prefix}`);
                       }}
                     >
-                      <X />
-                    </Button>
+                      <span className="text-sm font-medium">
+                        <span className="opacity-50 mr-1">@</span>
+                        {session.handle}
+                      </span>
+                    </button>
+                    <div className="absolute top-0 bottom-0 right-0 flex items-center justify-center">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="hover:bg-transparent hover:text-destructive cursor-pointer"
+                        disabled={isRedirecting}
+                        onClick={() => {
+                          setPreviousSessions(prev => {
+                            const newSessions =
+                              prev?.filter(s => s.handle !== session.handle) ??
+                              [];
+                            return newSessions;
+                          });
+                        }}
+                      >
+                        <X />
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
-        
-        {/* <div className="flex flex-col gap-1">
+
+          {/* remove password entry since using oauth. commented out incase ever needed */}
+          {/* <div className="flex flex-col gap-1">
           <span className="text-sm">Enter your password</span>
           <InputGroup>
             <InputGroupAddon>
@@ -206,32 +208,35 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
           <span>Remember me</span>
         </div> */}
 
-        
-        <p className="text-sm text-muted-foreground mt-4">
-          You'll be redirected to your ATProto provider to authenticate.
-        </p>
-      </div>
-      <ModalFooter>
-        {signInError && (
-          <span className="text-sm text-destructive">
-            {signInError instanceof Error ? signInError.message : 'Failed to initiate login'}
-          </span>
-        )}
-        <Button
-          disabled={inputHandlePrefix === "" || isRedirecting}
-          onClick={() => handleSignIn(inputHandlePrefix)}
-        >
-          {isRedirecting ? (
-            <>
-              <Loader2 className="size-4 animate-spin mr-2" />
-              Redirecting...
-            </>
-          ) : (
-            "Sign In"
+          <p className="text-sm text-muted-foreground mt-4">
+            You'll be redirected to your ATProto provider to authenticate.
+          </p>
+        </div>
+        <ModalFooter>
+          {signInError && (
+            <span className="text-sm text-destructive">
+              {signInError instanceof Error
+                ? signInError.message
+                : "Failed to initiate login"}
+            </span>
           )}
-        </Button>
-      </ModalFooter>
-    </ModalContent>
+          <Button
+            type="submit"
+            disabled={inputHandlePrefix === "" || isRedirecting}
+            onClick={() => handleSignIn(inputHandlePrefix)}
+          >
+            {isRedirecting ? (
+              <>
+                <Loader2 className="size-4 animate-spin mr-2" />
+                Redirecting...
+              </>
+            ) : (
+              "Sign In"
+            )}
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </form>
   );
 };
 
