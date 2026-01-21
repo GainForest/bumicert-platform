@@ -26,6 +26,7 @@ import {
 import CircularProgressBar from "@/components/circular-progressbar";
 import TimeText from "@/components/time-text";
 import MyBumicerts from "./_components/MyBumicerts";
+import DraftBumicerts from "./_components/DraftBumicerts";
 
 // Mock drafts data - replace with actual data fetching
 const mockDrafts: {
@@ -99,41 +100,7 @@ const CreateBumicertPage = () => {
                 </div>
               </AccordionTrigger>
               <AccordionContent>
-                {mockDrafts.length <= 0 ? (
-                  <div className="bg-muted/50 rounded-xl p-4 text-muted-foreground flex flex-col items-center justify-center text-center">
-                    <PartyPopper className="size-8 opacity-50" />
-                    <span className="text-center text-pretty mt-2">
-                      You do not have any pending applications.
-                    </span>
-                  </div>
-                ) : (
-                  <div className="w-full flex flex-col gap-1">
-                    {mockDrafts.map((draft) => (
-                      <div
-                        key={draft.id}
-                        className="w-full flex items-center p-2 rounded-lg border hover:bg-muted/50 transition-colors"
-                      >
-                        <CircularProgressBar value={draft.progress} size={34} />
-                        <div className="flex flex-col flex-1 ml-2">
-                          <h3 className="font-medium">{draft.title}</h3>
-                          <p className="text-sm text-muted-foreground flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            <TimeText date={new Date(draft.updatedAt)} />
-                          </p>
-                        </div>
-                        <Link href={links.bumicert.createWithDraftId(draft.id)}>
-                          <Button
-                            variant="outline"
-                            size="icon-sm"
-                            className="gap-2 rounded-full"
-                          >
-                            <ArrowRight className="h-3 w-3" />
-                          </Button>
-                        </Link>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <DraftBumicerts />
               </AccordionContent>
             </AccordionItem>
           </Accordion>
