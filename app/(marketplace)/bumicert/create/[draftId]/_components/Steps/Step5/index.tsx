@@ -21,8 +21,11 @@ import { useStep5Store } from "./store";
 import { toFileGenerator } from "climateai-sdk/zod";
 import { links } from "@/lib/links";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { parseAtUri } from "climateai-sdk/utilities/atproto";
 import { trpcApi } from "@/components/providers/TrpcProvider";
+import { usePathname } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { trackBumicertPublished, getFlowDurationSeconds } from "@/lib/analytics";
 
 const ProgressItem = ({
@@ -108,6 +111,8 @@ const ProgressItem = ({
 
 const Step5 = () => {
   const auth = useAtprotoStore((state) => state.auth);
+  const pathname = usePathname();
+  const queryClient = useQueryClient();
   const authStatus =
     auth.status === "RESUMING"
       ? "pending"
@@ -151,8 +156,33 @@ const Step5 = () => {
 
   const { mutate: createBumicert } =
     trpcApi.hypercerts.claim.activity.create.useMutation({
-      onSuccess: (data) => {
+      onSuccess: async (data) => {
         setCreatedBumicertResponse(data);
+
+        // Delete draft if it exists (non-zero draftId in URL)
+        const draftIdMatch = pathname.match(/\/create\/(\d+)$/);
+        const draftId = draftIdMatch ? parseInt(draftIdMatch[1], 10) : null;
+
+        if (draftId && draftId !== 0 && !isNaN(draftId)) {
+          try {
+            await fetch(links.api.drafts.bumicert.delete, {
+              method: "DELETE",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({ draftIds: [draftId] }),
+            });
+
+            // Invalidate drafts query to refresh the list
+            if (auth.user?.did) {
+              queryClient.invalidateQueries({
+                queryKey: ["drafts", auth.user.did],
+              });
+            }
+          } catch (error) {
+            // Silently fail - draft deletion is not critical
+            console.error("Failed to delete draft after publishing:", error);
+          }
+        }
 
         // Track successful bumicert publication
         const duration = getFlowDurationSeconds() ?? 0;
