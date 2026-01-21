@@ -11,7 +11,7 @@ export async function GET(request: Request) {
     client_id: `${baseUrl}/client-metadata.json`,
     client_name: 'Bumicert Platform',
     client_uri: baseUrl,
-    redirect_uris: [`${baseUrl}/api/hypercerts/auth/callback`],
+    redirect_uris: [`${baseUrl}/api/auth/callback`],
     scope: 'atproto transition:generic',
     grant_types: ['authorization_code', 'refresh_token'],
     response_types: ['code'],

@@ -1,5 +1,7 @@
 import { create } from "zustand";
-import { getAuthState, logout as logoutAction, type AuthUser } from "@/lib/hypercerts/auth-actions";
+import { type AuthUser } from "@/lib/auth/auth-actions";
+import { logout as logoutAction } from "@/lib/auth/auth-actions";
+import { getAuthState } from "@/lib/auth/auth-actions";
 
 export type User = AuthUser;
 
@@ -64,7 +66,7 @@ export const useAtprotoStore = create<AtprotoStoreState & AtprotoStoreActions>(
     },
     refreshAuth: async () => {
       const state = await getAuthState();
-      if (state.status === 'AUTHENTICATED') {
+      if (state.status === "AUTHENTICATED") {
         set({
           isReady: true,
           auth: {

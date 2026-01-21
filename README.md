@@ -1,21 +1,5 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
----
-
-## 🔥 Hypercerts SDK Integration
-
-**For developers working on Hypercerts features, start here:**
-
-📖 **[HYPERCERTS_IMPLEMENTATION_README.md](./HYPERCERTS_IMPLEMENTATION_README.md)** - Architecture & file structure guide (2-4 pages)
-
-**Additional Documentation:**
-- [IMPLEMENTATION_COMPLETE.md](./IMPLEMENTATION_COMPLETE.md) - Full implementation timeline
-- [ORGANIZATIONS_COLLABORATORS_GUIDE.md](./ORGANIZATIONS_COLLABORATORS_GUIDE.md) - Complete API reference
-- [SUPABASE_INTEGRATION.md](./SUPABASE_INTEGRATION.md) - Database setup details
-- [JWKS_FIX_SUMMARY.md](./JWKS_FIX_SUMMARY.md) - Latest OAuth fix details
-
----
-
 ## Getting Started
 
 First, run the development server:
