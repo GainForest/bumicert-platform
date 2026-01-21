@@ -120,10 +120,10 @@ const Step4 = () => {
           percentage={step2Progress}
           onEdit={() => setCurrentStepIndex(1)}
         >
-          {step2Errors.impactStory ? null : (
+          {step2Errors.description ? null : (
             <FormValue
               label="Your Impact Story"
-              value={step2FormValues.impactStory}
+              value={step2FormValues.description}
             />
           )}
         </ReviewStepCard>
