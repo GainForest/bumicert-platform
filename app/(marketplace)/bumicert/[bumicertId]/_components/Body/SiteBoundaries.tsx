@@ -10,7 +10,7 @@ import {
 import React from "react";
 import { validateMetaData, type HypercertMetadata } from "@hypercerts-org/sdk";
 import {
-  generateBumicertainIPFSUrl,
+  generateBumicertsIPFSUrl,
   getMetadata,
 } from "@/lib/hypercerts/getMetadata";
 import Link from "next/link";
@@ -66,7 +66,7 @@ import { trpcApi } from "@/components/providers/TrpcProvider";
 //     }
 
 //     const cid = match[1];
-//     const geojsonURL = generateBumicertainIPFSUrl(cid);
+//     const geojsonURL = generateBumicertsIPFSUrl(cid);
 //     const mapPreviewURL = `https://gainforest.app/geo/view?source-value=${geojsonURL}`;
 //     const metadata = validationResult.data as HypercertMetadata;
 //     return {

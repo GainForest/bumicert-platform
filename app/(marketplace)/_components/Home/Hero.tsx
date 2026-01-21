@@ -66,7 +66,7 @@ const Hero = () => {
       </div>
       <div className="w-full flex items-center justify-center p-1 text-sm text-muted-foreground text-center text-balance">
         <span>
-          🎉🎉🎉 We are thrilled to announce the newest version of Bumicertain.
+          🎉🎉🎉 We are thrilled to announce the newest version of Bumicerts.
           Read our{" "}
           <Link href={"/changelog"} className="underline">
             changelog
