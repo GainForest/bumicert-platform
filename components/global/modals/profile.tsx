@@ -1,5 +1,4 @@
 "use client";
-import { trpcApi } from "@/components/providers/TrpcProvider";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { Button } from "@/components/ui/button";
 import { useModal } from "@/components/ui/modal/context";
@@ -13,27 +12,34 @@ import {
 import { links } from "@/lib/links";
 import {
   Building,
-  GalleryVerticalEnd,
   Loader2,
   LogOut,
   UploadIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { useMutation } from "@tanstack/react-query";
 
 export const ProfileModalId = "profile";
 
 export const ProfileModal = () => {
   const { stack, popModal, hide } = useModal();
   const auth = useAtprotoStore((state) => state.auth);
-  const setAuth = useAtprotoStore((state) => state.setAuth);
+  const logout = useAtprotoStore((state) => state.logout);
 
-  const { mutate: signOut, isPending: isSigningOut } =
-    trpcApi.auth.logout.useMutation({
-      onSuccess: () => {
-        setAuth(null);
-        hide().then(() => popModal());
-      },
-    });
+  const {
+    mutate: handleSignOut,
+    isPending: isSigningOut,
+  } = useMutation({
+    mutationFn: async () => {
+      await logout();
+    },
+    onSuccess: () => {
+      hide().then(() => popModal());
+    },
+    onError: (error) => {
+      console.error('Logout failed:', error);
+    },
+  });
 
   if (!auth.authenticated) {
     return (
@@ -117,9 +123,7 @@ export const ProfileModal = () => {
       <ModalFooter>
         <Button
           variant={"destructive"}
-          onClick={() => {
-            signOut({ service: "climateai.org" });
-          }}
+          onClick={() => handleSignOut()}
           disabled={isSigningOut}
         >
           {isSigningOut ? <Loader2 className="animate-spin" /> : <LogOut />}

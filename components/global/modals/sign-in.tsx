@@ -12,14 +12,15 @@ import {
   ModalTitle,
 } from "@/components/ui/modal/modal";
 import React, { useCallback, useState } from "react";
-import { Loader2, LockIcon, X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import useLocalStorage from "use-local-storage";
-import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { useModal } from "@/components/ui/modal/context";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import AuthenticatedModalContent from "./authenticated";
-import { trpcApi } from "@/components/providers/TrpcProvider";
+import { getLoginUrl } from "@/lib/hypercerts/auth-actions";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 export const SignInModalId = "auth/sign-in";
 
@@ -30,43 +31,25 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
   const [inputHandlePrefix, setInputHandlePrefix] = useState(
     initialHandlePrefix ?? ""
   );
-  const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(true);
-  const { popModal, stack, hide } = useModal();
+  const { popModal, stack } = useModal();
+  const router = useRouter();
   const isAuthenticated = useAtprotoStore((state) => state.auth.authenticated);
-  const setAuth = useAtprotoStore((state) => state.setAuth);
+
   const {
-    mutate: signIn,
-    isPending: isSigningIn,
+    mutate: handleSignIn,
+    isPending: isRedirecting,
     error: signInError,
-  } = trpcApi.auth.login.useMutation({
-    onSuccess: (data) => {
-      addPreviousSession(data.handle);
-      setAuth(
-        {
-          did: data.did,
-          handle: data.handle,
-        },
-        data.service as string
-      );
-
-      // Pop all auth modals from the stack and hide if there
-      const stackCopy = structuredClone(stack);
-      while (stackCopy.length > 1) {
-        if (stackCopy.at(-1)?.startsWith("auth/")) {
-          stackCopy.pop();
-          popModal();
-        } else {
-          break;
-        }
-      }
-
-      // After popping all consecutive auth modals, if the last modal on stack
-      // is an auth modal, then hide the modal.
-      const shouldHideModal = stackCopy.at(-1)?.startsWith("auth/")
-        ? true
-        : false;
-      if (shouldHideModal) hide();
+  } = useMutation({
+    mutationFn: async (handlePrefix: string) => {
+      const authUrl = await getLoginUrl(handlePrefix);
+      
+      // Store the handle for after callback (to add to previous sessions)
+      localStorage.setItem('pending-login-handle', `${handlePrefix}.climateai.org`);
+      
+      return authUrl;
+    },
+    onSuccess: (authUrl) => {
+      router.push(authUrl);
     },
   });
 
@@ -116,7 +99,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
               placeholder="john-doe"
               value={inputHandlePrefix}
               onChange={(e) => setInputHandlePrefix(e.target.value)}
-              disabled={isSigningIn}
+              disabled={isRedirecting}
             />
             <InputGroupAddon align="inline-end" className="text-primary">
               .climateai.org
@@ -152,7 +135,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
                     className={cn(
                       "flex items-center gap-2 justify-between h-8 rounded-md px-2 py-1 w-full cursor-pointer"
                     )}
-                    disabled={isSigningIn}
+                    disabled={isRedirecting}
                     onClick={() => {
                       setInputHandlePrefix(`${prefix}`);
                     }}
@@ -167,7 +150,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
                       variant="ghost"
                       size="icon"
                       className="hover:bg-transparent hover:text-destructive cursor-pointer"
-                      disabled={isSigningIn}
+                      disabled={isRedirecting}
                       onClick={() => {
                         setPreviousSessions((prev) => {
                           const newSessions =
@@ -185,7 +168,8 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
             })}
           </div>
         </div>
-        <div className="flex flex-col gap-1">
+        
+        {/* <div className="flex flex-col gap-1">
           <span className="text-sm">Enter your password</span>
           <InputGroup>
             <InputGroupAddon>
@@ -220,22 +204,28 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
             }
           />
           <span>Remember me</span>
-        </div>
+        </div> */}
+
+        
+        <p className="text-sm text-muted-foreground mt-4">
+          You'll be redirected to your ATProto provider to authenticate.
+        </p>
       </div>
       <ModalFooter>
-        <span className="text-sm text-destructive">{signInError?.message}</span>
+        {signInError && (
+          <span className="text-sm text-destructive">
+            {signInError instanceof Error ? signInError.message : 'Failed to initiate login'}
+          </span>
+        )}
         <Button
-          disabled={inputHandlePrefix === "" || isSigningIn}
-          onClick={() => {
-            signIn({
-              handlePrefix: inputHandlePrefix.split(".")[0],
-              service: "climateai.org",
-              password: password,
-            });
-          }}
+          disabled={inputHandlePrefix === "" || isRedirecting}
+          onClick={() => handleSignIn(inputHandlePrefix)}
         >
-          {isSigningIn ? (
-            <Loader2 className="size-4 animate-spin" />
+          {isRedirecting ? (
+            <>
+              <Loader2 className="size-4 animate-spin mr-2" />
+              Redirecting...
+            </>
           ) : (
             "Sign In"
           )}

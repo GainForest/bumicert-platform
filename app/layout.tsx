@@ -18,6 +18,8 @@ import { PriceFeedProvider } from "@/components/providers/PriceFeedProvider";
 import { ThemeProvider } from "next-themes";
 import HypercertExchangeClientProvider from "@/components/providers/HypercertExchangeClientProvider";
 import { TrpcProvider } from "@/components/providers/TrpcProvider";
+import { AuthCallbackHandler } from "@/components/providers/AuthCallbackHandler";
+import { AuthInitializer } from "@/components/providers/AuthInitializer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -73,6 +75,8 @@ export default function RootLayout({
             {/* <PrivyProvider> */}
             <TrpcProvider>
               <ModalProvider>
+                <AuthInitializer />
+                <AuthCallbackHandler />
                 {/* <PriceFeedProvider> */}
                 {/* <ChainSwitchProvider> */}
                 {/* <HypercertExchangeClientProvider> */}

@@ -13,6 +13,7 @@ const SESSION_COOKIE_NAME = 'hypercerts-session-id'
  * Security: Cookie is httpOnly, secure in production, sameSite: lax
  */
 export async function setSessionCookie(did: string): Promise<void> {
+  console.log('[setSessionCookie] Looking up session for DID:', did)
   const supabase = createAdminClient()
   
   const { data, error } = await supabase
@@ -21,9 +22,17 @@ export async function setSessionCookie(did: string): Promise<void> {
     .eq('did', did)
     .single()
   
-  if (error || !data?.session_id) {
-    throw new Error('Session not found after OAuth callback')
+  if (error) {
+    console.error('[setSessionCookie] Error fetching session:', error)
+    throw new Error(`Session not found after OAuth callback: ${error.message}`)
   }
+  
+  if (!data?.session_id) {
+    console.error('[setSessionCookie] No session_id in data:', data)
+    throw new Error('Session not found after OAuth callback - no session_id')
+  }
+  
+  console.log('[setSessionCookie] Found session_id:', data.session_id)
   
   const cookieStore = await cookies()
   cookieStore.set(SESSION_COOKIE_NAME, data.session_id, {
@@ -33,6 +42,8 @@ export async function setSessionCookie(did: string): Promise<void> {
     path: '/',
     maxAge: 60 * 60 * 24 * 7,                       
   })
+  
+  console.log('[setSessionCookie] Cookie set successfully')
 }
 
 export async function getSessionIdFromCookie(): Promise<string | null> {
