@@ -91,11 +91,13 @@ type FormStoreState = {
     Partial<Record<keyof Step3FormValues, string>>
   ];
   formCompletionPercentages: [number, number, number];
+  draftCoverImageHash?: string;
 };
 
 type FormStoreActions = {
   hydrate: (
-    formValues: [Step1FormValues, Step2FormValues, Step3FormValues] | null
+    formValues: [Step1FormValues, Step2FormValues, Step3FormValues] | null,
+    draftCoverImageHash?: string
   ) => void;
   setFormValue: [
     (
@@ -113,6 +115,7 @@ type FormStoreActions = {
   ];
   updateErrorsAndCompletion: (formIndex?: number) => void;
   reset: (isHydrated?: boolean) => void;
+  setDraftCoverImageHash: (hash: string) => void;
 };
 
 const initialState: FormStoreState = {
@@ -191,14 +194,22 @@ export const useFormStore = create<FormStoreState & FormStoreActions>(
 
     return {
       ...initialState,
-      hydrate: (formValues) => {
+      hydrate: (formValues, draftCoverImageHash) => {
         if (!formValues) {
           set({ ...initialState, isHydrated: true });
           get().updateErrorsAndCompletion();
           return;
         }
-        set({ ...initialState, isHydrated: true, formValues });
+        set({
+          ...initialState,
+          isHydrated: true,
+          formValues,
+          draftCoverImageHash,
+        });
         get().updateErrorsAndCompletion();
+      },
+      setDraftCoverImageHash: (hash) => {
+        set({ draftCoverImageHash: hash });
       },
       setFormValue: [setForm1Value, setForm2Value, setForm3Value],
       updateErrorsAndCompletion: (formIndex) => {

@@ -22,6 +22,7 @@ import Link from "next/link";
 import { parseAtUri } from "climateai-sdk/utilities/atproto";
 import { trpcApi } from "@/components/providers/TrpcProvider";
 import { usePathname } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 const ProgressItem = ({
   iconset,
@@ -107,6 +108,7 @@ const ProgressItem = ({
 const Step5 = () => {
   const auth = useAtprotoStore((state) => state.auth);
   const pathname = usePathname();
+  const queryClient = useQueryClient();
   const authStatus =
     auth.status === "RESUMING"
       ? "pending"
@@ -165,6 +167,13 @@ const Step5 = () => {
               credentials: "include",
               body: JSON.stringify({ draftIds: [draftId] }),
             });
+            
+            // Invalidate drafts query to refresh the list
+            if (auth.user?.did) {
+              queryClient.invalidateQueries({
+                queryKey: ["drafts", auth.user.did],
+              });
+            }
           } catch (error) {
             // Silently fail - draft deletion is not critical
             console.error("Failed to delete draft after publishing:", error);

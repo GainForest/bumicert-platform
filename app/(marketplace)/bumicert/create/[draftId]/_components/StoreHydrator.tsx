@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/modal/modal";
 import { Button } from "@/components/ui/button";
 import { DraftBumicertResponse } from "@/app/api/supabase/drafts/bumicert/type";
+import { cheapHash } from "@/lib/cheapHash";
 
 const CreateBumicertHydrationErrorModalId = "create-bumicert-hydration-error";
 const CreateBumicertHydrationErrorModalContent = () => {
@@ -88,12 +89,12 @@ const StoreHydrator = ({
       try {
         const draftData = draftResponse.data;
 
-        // Fetch cover image if it exists
         let coverImageFile: File | null = null;
+        let draftCoverImageHash: string | undefined;
+
         if (draftData.coverImage) {
           coverImageFile = await urlToFile(draftData.coverImage);
           if (!coverImageFile) {
-            // If cover image fails to load, show error
             pushModal({
               id: CreateBumicertHydrationErrorModalId,
               content: <CreateBumicertHydrationErrorModalContent />,
@@ -102,8 +103,13 @@ const StoreHydrator = ({
             hydrate(null);
             return;
           }
+
+          try {
+            draftCoverImageHash = await cheapHash(coverImageFile);
+          } catch {
+            draftCoverImageHash = undefined;
+          }
         } else {
-          // If no cover image, create empty file as required by schema
           coverImageFile = new File([], "cover-image.png");
         }
 
@@ -146,7 +152,7 @@ const StoreHydrator = ({
           Step3FormValues
         ];
 
-        hydrate(formValues);
+        hydrate(formValues, draftCoverImageHash);
       } catch (error) {
         console.error("Error hydrating store:", error);
         pushModal({

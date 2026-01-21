@@ -22,6 +22,11 @@ export const links = {
   },
   api: {
     onboarding: "/api/airtable/onboarding",
+    aws: {
+      upload: {
+        image: "/api/aws/upload/image",
+      },
+    },
     drafts: {
       bumicert: {
         get: (params?: {
@@ -40,7 +45,9 @@ export const links = {
             searchParams.set("orderDirection", params.orderDirection);
           }
           const queryString = searchParams.toString();
-          return `/api/supabase/drafts/bumicert${queryString ? `?${queryString}` : ""}`;
+          return `/api/supabase/drafts/bumicert${
+            queryString ? `?${queryString}` : ""
+          }`;
         },
         post: "/api/supabase/drafts/bumicert",
         delete: "/api/supabase/drafts/bumicert",
