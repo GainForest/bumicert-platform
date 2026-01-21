@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 import { useModal } from "@/components/ui/modal/context";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import AuthenticatedModalContent from "./authenticated";
-import { getLoginUrl } from "@/lib/hypercerts/auth-actions";
+import { getLoginUrl } from "@/lib/auth/auth-actions";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 

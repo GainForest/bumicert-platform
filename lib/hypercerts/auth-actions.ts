@@ -74,19 +74,3 @@ export async function logout(): Promise<void> {
   await deleteSessionCookie()
   revalidatePath('/')
 }
-
-/**
- * Get login URL for OAuth redirect
- * Accepts handle prefix or full handle
- */
-export async function getLoginUrl(handle: string): Promise<string> {
-  const pdsUrl = process.env.NEXT_PUBLIC_PDS_URL || 'https://climateai.org'
-  const hostname = new URL(pdsUrl).hostname
-  
-  let finalHandle = handle.trim()
-  if (!finalHandle.includes('.')) {
-    finalHandle = `${finalHandle}.${hostname}`
-  }
-  
-  return await hypercertsSdk.authorize(finalHandle)
-}
