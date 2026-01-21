@@ -47,4 +47,5 @@ yarn.lock
 
 # agents
 AGENTS.local.md
+agent-docs/
 .env*.local
