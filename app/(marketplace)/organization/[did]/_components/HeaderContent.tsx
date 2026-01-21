@@ -20,10 +20,7 @@ const RightContent = ({ did }: { did: string }) => {
   return (
     <div className="flex items-center gap-1">
       <Link href={`/upload/organization/${did}`}>
-        <Button size={"sm"}>
-          <Pencil />
-          Manage Organization
-        </Button>
+        <Button size={"sm"}>Manage Organization</Button>
       </Link>
     </div>
   );
