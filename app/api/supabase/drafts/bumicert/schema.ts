@@ -29,7 +29,7 @@ export const draftBumicertDataSchemaV0 = z.object({
     .array(z.string("Work scopes must be an array of strings"))
     .optional(),
   coverImage: z.string("Cover image must be a string").optional(),
-  impactStory: z.string("Impact story must be a string").optional(),
+  description: z.string("Impact story must be a string").optional(),
   shortDescription: z.string("Short description must be a string").optional(),
   contributors: z
     .array(z.string("Contributors must be an array of strings"))

@@ -136,7 +136,7 @@ const StoreHydrator = ({
 
         const step2Data: Step2FormValues = {
           shortDescription: draftData.shortDescription || "",
-          impactStory: draftData.impactStory || "",
+          description: draftData.description || "",
         };
 
         const step3Data: Step3FormValues = {

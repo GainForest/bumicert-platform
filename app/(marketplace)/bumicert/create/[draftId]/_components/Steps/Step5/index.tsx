@@ -158,7 +158,7 @@ const Step5 = () => {
         // Delete draft if it exists (non-zero draftId in URL)
         const draftIdMatch = pathname.match(/\/create\/(\d+)$/);
         const draftId = draftIdMatch ? parseInt(draftIdMatch[1], 10) : null;
-        
+
         if (draftId && draftId !== 0 && !isNaN(draftId)) {
           try {
             await fetch(links.api.drafts.bumicert.delete, {
@@ -217,7 +217,7 @@ const Step5 = () => {
         activity: {
           title: step1FormValues.projectName,
           shortDescription: step2FormValues.shortDescription,
-          description: step2FormValues.impactStory,
+          description: step2FormValues.description,
           workScopes: step1FormValues.workType,
           startDate: step1FormValues.projectDateRange[0].toISOString(),
           endDate: step1FormValues.projectDateRange[1].toISOString(),
