@@ -33,15 +33,12 @@ export class SupabaseStateStore implements StateStore {
     
     if (error) {
       if (error.code === 'PGRST116') {
-        // No rows returned - state doesn't exist
         return undefined
       }
       throw new Error(`Failed to retrieve state: ${error.message}`)
     }
     
-    // Check if state has expired
     if (data && new Date(data.expires_at) < new Date()) {
-      // State has expired, delete it
       await this.del(state)
       return undefined
     }

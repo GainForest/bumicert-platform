@@ -12,8 +12,6 @@ export async function POST(request: Request) {
         { status: 400 }
       )
     }
-
-    // Start OAuth flow
     const authUrl = await hypercertsSdk.authorize(handle)
     
     return NextResponse.json({ authUrl })
