@@ -117,36 +117,32 @@ const SiteCard = ({ siteData, defaultSite, did }: SiteCardProps) => {
     show();
   };
   return (
-    <div
-      className="border border-border rounded-xl overflow-hidden shadow-lg"
-      style={{
-        background: getStripedBackground(
-          {
-            variable: "--muted",
-          },
-          {
-            variable: "--foreground",
-            opacity: 10,
-          },
-          2
-        ),
-      }}
-    >
+    <div className="border border-border rounded-xl overflow-hidden shadow-lg">
       <div className="bg-background rounded-xl shadow-sm">
-        <div className="p-2 relative">
-          <iframe
+        <div className="flex items-center justify-between p-2">
+          {/* <iframe
             src={shapefilePreviewUrl}
             className="w-full h-32 rounded-lg border border-border pointer-events-none"
-          />
+            /> */}
+          <Link
+            href={shapefilePreviewUrl}
+            target="_blank"
+            className={cn(
+              "ml-1 flex items-center gap-1 text-primary cursor-pointer font-medium text-xs"
+            )}
+          >
+            Preview <ArrowUpRight className="size-3" />
+          </Link>
           {isDefaultSite && (
-            <div className="absolute top-4 right-4 rounded-md px-2 py-1 flex items-center gap-1 bg-background text-primary">
-              <BadgeCheck className="size-5" />{" "}
-              <span className="mr-1">Default</span>
+            <div className="rounded-full px-1 py-0.5 flex items-center gap-1 bg-primary text-primary-foreground">
+              <BadgeCheck className="size-4" />{" "}
+              <span className="mr-1 text-sm">Default</span>
             </div>
           )}
         </div>
 
-        <div className="px-3 py-2 pt-1">
+        <hr className="opacity-50" />
+        <div className="px-3 py-2">
           <h3 className="font-medium text-lg">{site.name}</h3>
           {simplifiedMetrics ? (
             typeof simplifiedMetrics === "string" ? (
@@ -171,61 +167,63 @@ const SiteCard = ({ siteData, defaultSite, did }: SiteCardProps) => {
           )}
           <hr className="mt-3 opacity-50" />
           <div className="w-full flex items-center justify-between text-sm text-muted-foreground mt-1">
-            <span>No bumicerts use this site.</span>
+            <span>0 bumicerts</span>
 
-            {shouldEdit && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant={"ghost"}>
-                    {disableActions ? (
-                      <Loader2 className="animate-spin" />
-                    ) : (
-                      <MoreVertical />
-                    )}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem
-                    onClick={() => handleEdit()}
-                    disabled={disableActions}
-                  >
-                    <Pencil />
-                    Edit
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    disabled={isDefaultSite || disableActions}
-                    onClick={() => {
-                      console.log("setting default site", siteData.uri);
-                      setDefaultSite({
-                        siteAtUri: siteData.uri,
-                        pdsDomain: allowedPDSDomains[0],
-                      });
-                    }}
-                  >
-                    <BadgeCheck />
-                    {isDefaultSite ? "Already default" : "Make Default"}
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    disabled={isDefaultSite || disableActions}
-                    variant="destructive"
-                    onClick={() =>
-                      deleteSite({
-                        siteAtUri: siteData.uri,
-                        pdsDomain: allowedPDSDomains[0],
-                      })
-                    }
-                  >
-                    <Trash2 />
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
+            <div className="flex items-center">
+              {shouldEdit && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant={"ghost"} size={"sm"}>
+                      {disableActions ? (
+                        <Loader2 className="animate-spin" />
+                      ) : (
+                        <MoreVertical />
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      onClick={() => handleEdit()}
+                      disabled={disableActions}
+                    >
+                      <Pencil />
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      disabled={isDefaultSite || disableActions}
+                      onClick={() => {
+                        console.log("setting default site", siteData.uri);
+                        setDefaultSite({
+                          siteAtUri: siteData.uri,
+                          pdsDomain: allowedPDSDomains[0],
+                        });
+                      }}
+                    >
+                      <BadgeCheck />
+                      {isDefaultSite ? "Already default" : "Make Default"}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      disabled={isDefaultSite || disableActions}
+                      variant="destructive"
+                      onClick={() =>
+                        deleteSite({
+                          siteAtUri: siteData.uri,
+                          pdsDomain: allowedPDSDomains[0],
+                        })
+                      }
+                    >
+                      <Trash2 />
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
           </div>
         </div>
       </div>
-      <div className="px-2 py-1 flex items-center justify-center text-xs">
+      {/* <div className="px-2 py-1 flex items-center justify-center text-xs">
         <Link
           href={shapefilePreviewUrl}
           target="_blank"
@@ -235,7 +233,7 @@ const SiteCard = ({ siteData, defaultSite, did }: SiteCardProps) => {
         >
           View GeoJSON <ArrowUpRight className="size-3" />
         </Link>
-      </div>
+      </div> */}
     </div>
   );
 };

@@ -1,7 +1,7 @@
 "use client";
 import React, { useLayoutEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { ArrowUpRight, Moon, Sun } from "lucide-react";
+import { ArrowUpRight, ChevronLeft, Moon, Sun } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -33,20 +33,47 @@ const DesktopNavbar = ({
   const auth = useAtprotoStore((state) => state.auth);
   const did = auth.user?.did;
 
+  const isHome = title === "Bumicertain";
+
   return (
     <nav className={cn("w-[240px] p-4 flex flex-col justify-between")}>
       {/* Top Section */}
       <div className="flex flex-col gap-2">
         {/* Header */}
-        <div className="h-12 w-12 border border-border rounded-xl shadow-lg bg-background flex items-center justify-center">
-          <Image
-            src="/assets/media/images/logo.svg"
-            alt={title}
-            width={32}
-            height={32}
-          />
-        </div>
-        <b className="font-serif text-2xl drop-shadow-lg">{title}</b>
+        <Link
+          href="/"
+          className="group hover:scale-105 transition-all duration-300 origin-left"
+        >
+          <div
+            className={cn(
+              "h-12 w-12 border border-border rounded-xl shadow-lg bg-background flex items-center justify-center gap-1",
+              !isHome && "h-8 w-fit px-1 pr-4"
+            )}
+          >
+            {!isHome && (
+              <div className="group-hover:bg-primary text-muted-foreground group-hover:text-primary-foreground transition-all duration-300 rounded-full p-1">
+                <ChevronLeft className="size-4" />
+              </div>
+            )}
+            <div className="flex items-center gap-0">
+              <Image
+                src="/assets/media/images/logo.svg"
+                alt={title}
+                width={isHome ? 32 : 24}
+                height={isHome ? 32 : 24}
+              />
+              {!isHome && <span className="font-medium">Home</span>}
+            </div>
+          </div>
+        </Link>
+        <b
+          className={cn(
+            "font-serif text-2xl drop-shadow-lg",
+            !isHome && "mt-4"
+          )}
+        >
+          {title}
+        </b>
 
         {/* Nav Links */}
         <ul className="mt-2 flex flex-col gap-1">
