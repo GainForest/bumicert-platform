@@ -54,7 +54,7 @@ const baskerville = Baskervville({
 });
 
 export const metadata: Metadata = {
-  title: "Bumicertain",
+  title: "Bumicerts",
   description: "Fund impactful regenerative projects.",
 };
 
