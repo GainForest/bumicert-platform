@@ -11,7 +11,6 @@ import {
   ShieldCheckIcon,
   ShieldXIcon,
 } from "lucide-react";
-import Link from "next/link";
 
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
@@ -27,6 +26,7 @@ import { trpcApi } from "@/components/providers/TrpcProvider";
 import { usePathname } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { trackBumicertPublished, getFlowDurationSeconds } from "@/lib/analytics";
+import FeedbackModal from "./FeedbackModal";
 
 const ProgressItem = ({
   iconset,
@@ -146,6 +146,7 @@ const Step5 = () => {
     setIsBumicertCreationMutationInFlight,
   ] = useState(false);
   const [hasClickedPublish, setHasClickedPublish] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
   const createBumicertStatus: "pending" | "success" | "error" =
     createBumicertError
@@ -190,6 +191,9 @@ const Step5 = () => {
           draftId: data.data?.cid ?? "unknown",
           totalDurationSeconds: duration,
         });
+
+        // Show feedback modal after successful publication
+        setShowFeedbackModal(true);
       },
       onError: (error) => {
         console.error(error);
@@ -269,6 +273,10 @@ const Step5 = () => {
 
   return (
     <div>
+      <FeedbackModal
+        open={showFeedbackModal}
+        onOpenChange={setShowFeedbackModal}
+      />
       {authStatus === "success" && createBumicertStatus !== "success" && (
         <div className="mt-4 flex justify-end">
           <Button

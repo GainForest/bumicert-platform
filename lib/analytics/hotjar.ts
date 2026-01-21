@@ -297,6 +297,29 @@ export const trackFlowAbandoned = (payload: FlowAbandonedPayload): void => {
 };
 
 // ============================================
+// Draft Events
+// ============================================
+
+export type DraftSavedPayload = {
+  draftId: number;
+  stepIndex: number;
+  isUpdate: boolean;
+};
+
+export const trackDraftSaved = (payload: DraftSavedPayload): void => {
+  // Hotjar tracking
+  trackEvent("draft_saved");
+  tagRecording(["bumicert-creation", "draft-saved"]);
+
+  // Supabase tracking (async, non-blocking)
+  supabaseTracking.trackDraftSaved(
+    payload.draftId,
+    payload.stepIndex,
+    payload.isUpdate
+  );
+};
+
+// ============================================
 // Error Events
 // ============================================
 

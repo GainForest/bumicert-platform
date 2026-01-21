@@ -7,6 +7,8 @@ import {
   CheckCircle2,
   XCircle,
   RefreshCw,
+  Save,
+  RotateCcw,
 } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,6 +35,11 @@ type AnalyticsData = {
   funnelSteps: FunnelStep[];
   timeDistribution: TimeDistribution[];
   lastUpdated: string;
+  // Draft analytics
+  totalDraftsSaved: number;
+  totalDraftsResumed: number;
+  draftSaveRate: number;
+  avgDaysBeforeResume: number;
 };
 
 const formatTime = (seconds: number): string => {
@@ -110,6 +117,10 @@ const AnalyticsPage = async () => {
       funnelSteps: [],
       timeDistribution: [],
       lastUpdated: new Date().toISOString(),
+      totalDraftsSaved: 0,
+      totalDraftsResumed: 0,
+      draftSaveRate: 0,
+      avgDaysBeforeResume: 0,
     };
   }
 
@@ -344,6 +355,98 @@ const AnalyticsPage = async () => {
               <p className="text-gray-500 text-center py-8">
                 No funnel data available yet
               </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Draft Analytics */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Save className="h-5 w-5" />
+              Draft Analytics
+            </CardTitle>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Track draft save and resume behavior
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {/* Total Drafts Saved */}
+              <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <Save className="h-6 w-6 text-blue-600 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {data.totalDraftsSaved}
+                </div>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                  Drafts Saved
+                </p>
+              </div>
+
+              {/* Draft Save Rate */}
+              <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <TrendingUp className="h-6 w-6 text-green-600 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {data.draftSaveRate.toFixed(1)}%
+                </div>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                  Draft Save Rate
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  of non-completers
+                </p>
+              </div>
+
+              {/* Drafts Resumed */}
+              <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <RotateCcw className="h-6 w-6 text-purple-600 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {data.totalDraftsResumed}
+                </div>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                  Drafts Resumed
+                </p>
+              </div>
+
+              {/* Avg Days Before Resume */}
+              <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <Clock className="h-6 w-6 text-orange-600 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {data.totalDraftsResumed > 0
+                    ? data.avgDaysBeforeResume > 0
+                      ? `${data.avgDaysBeforeResume.toFixed(1)}d`
+                      : "< 1d"
+                    : "N/A"}
+                </div>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                  Avg Days to Resume
+                </p>
+              </div>
+            </div>
+
+            {/* Resume Rate Indicator */}
+            {data.totalDraftsSaved > 0 && (
+              <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Draft Resume Rate
+                  </span>
+                  <span className="text-sm font-bold text-blue-600">
+                    {Math.min((data.totalDraftsResumed / data.totalDraftsSaved) * 100, 100).toFixed(1)}%
+                  </span>
+                </div>
+                <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-blue-500 transition-all"
+                    style={{
+                      width: `${Math.min((data.totalDraftsResumed / data.totalDraftsSaved) * 100, 100)}%`,
+                    }}
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  {data.totalDraftsResumed} resume event{data.totalDraftsResumed !== 1 ? "s" : ""} for {data.totalDraftsSaved} saved draft{data.totalDraftsSaved !== 1 ? "s" : ""}
+                </p>
+              </div>
             )}
           </CardContent>
         </Card>

@@ -33,6 +33,11 @@ type AnalyticsStats = {
   medianTimeToComplete: number;
   funnelSteps: FunnelStep[];
   timeDistribution: TimeDistribution[];
+  // Draft metrics
+  totalDraftsSaved: number;
+  totalDraftsResumed: number;
+  draftSaveRate: number;
+  avgDaysBeforeResume: number;
   lastUpdated: string;
 };
 
@@ -43,27 +48,48 @@ type AnalyticsStats = {
 export async function GET(): Promise<NextResponse<AnalyticsStats>> {
   // Run all queries in parallel for better performance
   const [
-    { count: flowStartsCount },
+    { data: flowStartSessions },
     { count: completionsCount },
     { data: completedSessions },
+    { count: draftsSavedCount },
+    { count: draftsResumedCount },
+    { data: draftResumeEvents },
   ] = await Promise.all([
     supabaseAdmin
       .from("analytics_events")
-      .select("*", { count: "exact", head: true })
+      .select("session_id")
       .eq("event_type", "flow_started"),
     supabaseAdmin
       .from("analytics_events")
       .select("*", { count: "exact", head: true })
       .eq("event_type", "bumicert_published"),
     supabaseAdmin
-      .from("analytics_sessions")
-      .select("completion_duration_seconds")
-      .eq("completed", true)
-      .not("completion_duration_seconds", "is", null),
+      .from("analytics_events")
+      .select("event_data")
+      .eq("event_type", "bumicert_published"),
+    supabaseAdmin
+      .from("analytics_events")
+      .select("*", { count: "exact", head: true })
+      .eq("event_type", "draft_saved")
+      .contains("event_data", { isUpdate: false }),
+    supabaseAdmin
+      .from("analytics_events")
+      .select("*", { count: "exact", head: true })
+      .eq("event_type", "draft_resumed"),
+    supabaseAdmin
+      .from("analytics_events")
+      .select("event_data")
+      .eq("event_type", "draft_resumed"),
   ]);
 
-  const totalFlowStarts = flowStartsCount ?? 0;
+  // Count unique sessions that started the flow
+  const uniqueFlowStartSessions = new Set(
+    (flowStartSessions ?? []).map((e) => e.session_id)
+  );
+  const totalFlowStarts = uniqueFlowStartSessions.size;
   const totalCompletions = completionsCount ?? 0;
+  const totalDraftsSaved = draftsSavedCount ?? 0;
+  const totalDraftsResumed = draftsResumedCount ?? 0;
 
   // Calculate completion rate
   const completionRate =
@@ -71,9 +97,25 @@ export async function GET(): Promise<NextResponse<AnalyticsStats>> {
       ? Math.round((totalCompletions / totalFlowStarts) * 1000) / 10
       : 0;
 
+  // Calculate draft save rate
+  const draftSaveRate =
+    totalFlowStarts > 0
+      ? Math.round((totalDraftsSaved / totalFlowStarts) * 1000) / 10
+      : 0;
+
+  // Calculate average days before resume
+  const daysBeforeResume = (draftResumeEvents ?? [])
+    .map((e) => (e.event_data as { daysSinceLastUpdate?: number })?.daysSinceLastUpdate)
+    .filter((d): d is number => typeof d === "number" && d >= 0);
+
+  const avgDaysBeforeResume =
+    daysBeforeResume.length > 0
+      ? Math.round((daysBeforeResume.reduce((a, b) => a + b, 0) / daysBeforeResume.length) * 10) / 10
+      : 0;
+
   const durations = (completedSessions ?? [])
-    .map((s) => s.completion_duration_seconds as number)
-    .filter((d) => d > 0)
+    .map((s) => (s.event_data as { totalDurationSeconds?: number })?.totalDurationSeconds)
+    .filter((d): d is number => typeof d === "number" && d > 0)
     .sort((a, b) => a - b);
 
   const avgTimeToComplete =
@@ -81,9 +123,16 @@ export async function GET(): Promise<NextResponse<AnalyticsStats>> {
       ? Math.round(durations.reduce((a, b) => a + b, 0) / durations.length)
       : 0;
 
+  // Calculate median (handle even-length arrays properly)
   const medianTimeToComplete =
     durations.length > 0
-      ? durations[Math.floor(durations.length / 2)] ?? 0
+      ? durations.length % 2 === 1
+        ? durations[Math.floor(durations.length / 2)] ?? 0
+        : Math.round(
+            ((durations[durations.length / 2 - 1] ?? 0) +
+              (durations[durations.length / 2] ?? 0)) /
+              2
+          )
       : 0;
 
   // Build funnel data
@@ -100,6 +149,10 @@ export async function GET(): Promise<NextResponse<AnalyticsStats>> {
     medianTimeToComplete,
     funnelSteps,
     timeDistribution,
+    totalDraftsSaved,
+    totalDraftsResumed,
+    draftSaveRate,
+    avgDaysBeforeResume,
     lastUpdated: new Date().toISOString(),
   });
 }

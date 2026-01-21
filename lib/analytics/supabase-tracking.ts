@@ -210,3 +210,16 @@ export const trackFlowAbandoned = (
     console.error
   );
 };
+
+/**
+ * Track when user saves a draft.
+ */
+export const trackDraftSaved = (
+  draftId: number,
+  stepIndex: number,
+  isUpdate: boolean
+): void => {
+  insertEvent("draft_saved", { draftId, stepIndex, isUpdate }).catch(
+    console.error
+  );
+};

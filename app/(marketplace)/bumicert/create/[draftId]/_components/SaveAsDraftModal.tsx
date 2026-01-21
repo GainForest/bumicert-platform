@@ -11,12 +11,14 @@ import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { useFormStore } from "../form-store";
+import useNewBumicertStore from "../store";
 import { usePathname, useRouter } from "next/navigation";
 import { links } from "@/lib/links";
 import { ArrowRight, CircleCheck, Loader2, Save } from "lucide-react";
 import CircularProgressBar from "@/components/circular-progressbar";
 import { cheapHash } from "@/lib/cheapHash";
 import { DraftBumicertResponse } from "@/app/api/supabase/drafts/bumicert/type";
+import { trackDraftSaved } from "@/lib/analytics/hotjar";
 
 export const SaveAsDraftModalId = "bumicert/save-as-draft";
 
@@ -50,6 +52,7 @@ const SaveAsDraftModal = () => {
   const formCompletionPercentages = useFormStore(
     (state) => state.formCompletionPercentages
   );
+  const { currentStepIndex } = useNewBumicertStore();
   const stepPercentages =
     formCompletionPercentages.reduce((acc, curr) => acc + curr, 0) /
     formCompletionPercentages.length;
@@ -146,6 +149,15 @@ const SaveAsDraftModal = () => {
       }
 
       const savedDraftId = data.result.draft?.id;
+
+      // Track draft saved event
+      if (savedDraftId) {
+        trackDraftSaved({
+          draftId: savedDraftId,
+          stepIndex: currentStepIndex,
+          isUpdate: data.isUpdate,
+        });
+      }
 
       if (savedDraftId && data.draftId !== savedDraftId) {
         await hide();
