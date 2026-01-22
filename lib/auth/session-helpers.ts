@@ -9,11 +9,10 @@ const SESSION_COOKIE_NAME = 'hypercerts-session-id'
  * 
  * Looks up the session by DID,
  * retrieves the session ID, and stores it in a cookie.
+ * the session ID is used to retrieve a session
  * 
- * Security: Cookie is httpOnly, secure in production, sameSite: lax
  */
 export async function setSessionCookie(did: string): Promise<void> {
-  console.log('[setSessionCookie] Looking up session for DID:', did)
   const supabase = createAdminClient()
   
   const { data, error } = await supabase
@@ -23,16 +22,12 @@ export async function setSessionCookie(did: string): Promise<void> {
     .single()
   
   if (error) {
-    console.error('[setSessionCookie] Error fetching session:', error)
     throw new Error(`Session not found after OAuth callback: ${error.message}`)
   }
   
   if (!data?.session_id) {
-    console.error('[setSessionCookie] No session_id in data:', data)
     throw new Error('Session not found after OAuth callback - no session_id')
   }
-  
-  console.log('[setSessionCookie] Found session_id:', data.session_id)
   
   const cookieStore = await cookies()
   cookieStore.set(SESSION_COOKIE_NAME, data.session_id, {
@@ -42,8 +37,6 @@ export async function setSessionCookie(did: string): Promise<void> {
     path: '/',
     maxAge: 60 * 60 * 24 * 7,                       
   })
-  
-  console.log('[setSessionCookie] Cookie set successfully')
 }
 
 export async function getSessionIdFromCookie(): Promise<string | null> {
@@ -83,12 +76,6 @@ export async function lookupDidBySessionId(sessionId: string): Promise<string | 
   return data.did
 }
 
-/**
- * Delete session cookie
- * 
- * Clears the session cookie from the browser.
- * Used during logout or when session is invalid.
- */
 export async function deleteSessionCookie(): Promise<void> {
   const cookieStore = await cookies()
   cookieStore.delete(SESSION_COOKIE_NAME)

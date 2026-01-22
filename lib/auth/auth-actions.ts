@@ -6,7 +6,7 @@ import {
   getSessionIdFromCookie,
   lookupDidBySessionId,
   deleteSessionCookie,
-} from "../hypercerts/session-helpers";
+} from "./session-helpers";
 
 export type AuthUser = {
   did: string;
@@ -15,7 +15,6 @@ export type AuthUser = {
 export type AuthState =
   | { status: "AUTHENTICATED"; user: AuthUser }
   | { status: "UNAUTHENTICATED"; user: null };
-
 
 export async function getLoginUrl(handle: string) {
   const pdsUrl = process.env.NEXT_PUBLIC_PDS_URL || "https://climateai.org";
