@@ -111,6 +111,7 @@ export const useOrganizationPageStore = create<
         startDate: subHeroEditingData.startDate ?? undefined,
         country: subHeroEditingData.country,
         visibility: subHeroEditingData.visibility,
+        website: subHeroEditingData.website ?? undefined,
       },
       uploads:
         logoImageFileGenerator || coverImageFileGenerator
