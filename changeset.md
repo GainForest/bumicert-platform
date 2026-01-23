@@ -20,12 +20,12 @@ See also [AGENTS.md](./AGENTS.md) for broader project context.
     The CLI will ask you to select the packages that have changed. Since this is likely a single-package repo (Monorepo setup might vary), select `bumicertain` (or the relevant package name) by pressing `Space` to select and `Enter` to confirm.
 
 3.  **Choose Semver Bump Type**:
-    You will be asked to select the type of change for each selected package:
-    -   `major`: Breaking changes.
-    -   `minor`: New features (backward compatible).
-    -   `patch`: Bug fixes (backward compatible).
+    **IMPORTANT: We are in Alpha (0.x.x).**
+    -   **Major**: Do NOT use. (Keep as 0).
+    -   **Minor**: Represents a completed **Milestone** or **Release Cycle** (roughly monthly). Only use this when explicitly preparing a new milestone release (e.g., v0.1 -> v0.2).
+    -   **Patch**: Use this for **ALL** ongoing development (features, bug fixes, refactors) within the current milestone context.
 
-    Select the appropriate type.
+    *For almost all daily work (PRs), you will select `patch`.*
 
 4.  **Enter Summary**:
     Provide a concise summary of the changes. This summary will appear in the changelog.
