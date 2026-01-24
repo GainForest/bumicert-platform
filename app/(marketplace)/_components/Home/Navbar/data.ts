@@ -1,4 +1,5 @@
 import { NavLinkConfig } from "@/components/global/Navbar/types";
+// triggering rebuild
 import { links } from "@/lib/links";
 import { BadgePlus, BuildingIcon, Compass, Home } from "lucide-react";
 

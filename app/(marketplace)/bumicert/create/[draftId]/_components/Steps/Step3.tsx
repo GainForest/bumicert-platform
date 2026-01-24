@@ -37,6 +37,7 @@ import { OrgHypercertsDefs as Defs } from "climateai-sdk/lex-api";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { getBlobUrl, parseAtUri } from "climateai-sdk/utilities/atproto";
 import { links } from "@/lib/links";
+import { ContributorRow } from "./ContributorRow";
 import { ContributorSelector } from "./ContributorSelector";
 
 const formatCoordinate = (coordinate: string) => {
@@ -48,6 +49,8 @@ const formatCoordinate = (coordinate: string) => {
 const Step3 = () => {
   const { maxStepIndexReached, currentStepIndex } = useNewBumicertStore();
   const shouldShowValidationErrors = currentStepIndex < maxStepIndexReached;
+
+  const [newContributor, setNewContributor] = React.useState("");
 
   const formValues = useFormStore((state) => state.formValues[2]);
   const errors = useFormStore((state) => state.formErrors[2]);
@@ -126,38 +129,32 @@ const Step3 = () => {
           required
           info={`List any individuals or organizations that contributed to this work.`}
         >
-          {contributors.length === 0 && (
-            <button
-              className="border border-dashed bg-background/50 p-4 rounded-lg flex flex-col items-center justify-center gap-2"
-              onClick={() => addContributor("")}
-            >
-              <PlusCircle className="size-5 opacity-50" />
-              <span className="text-sm text-center">
-                Click to add a contributor.
-              </span>
-            </button>
-          )}
-          {contributors.length > 0 && (
-            <>
-              <div className="flex flex-col gap-2">
-                {contributors.map((c, i) => (
-                  <ContributorSelector
-                    key={i}
-                    value={c}
-                    onChange={(val) => updateContributor(i, val)}
-                    onRemove={() => removeContributor(i)}
-                    onNext={() => addContributor("")}
-                    autoFocus={i === contributors.length - 1 && contributors.length > 1}
-                  />
-                ))}
-              </div>
-              <div className="flex items-center justify-center">
-                <Button variant="outline" onClick={() => addContributor("")}>
-                  <PlusCircle /> Add another contributor
-                </Button>
-              </div>
-            </>
-          )}
+          <div className="flex flex-col gap-4">
+            <ContributorSelector
+              value={newContributor}
+              onChange={setNewContributor}
+              onRemove={() => setNewContributor("")}
+              onNext={() => {
+                if (newContributor.trim()) {
+                  addContributor(newContributor);
+                  setNewContributor("");
+                }
+              }}
+              placeholder="Search users or enter name..."
+            />
+
+            <div className="flex flex-col gap-2">
+              {contributors.map((c, i) => (
+                <ContributorRow
+                  key={i}
+                  value={c}
+                  onEdit={(val) => updateContributor(i, val)}
+                  onRemove={() => removeContributor(i)}
+                />
+              ))}
+            </div>
+          </div>
+
         </FormField>
 
         <FormField
