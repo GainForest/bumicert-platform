@@ -29,15 +29,15 @@ interface InternalTool {
 
 const tools: InternalTool[] = [
     // Analytics not yet merged to main
-    // {
-    //   title: "Platform Analytics",
-    //   description:
-    //     "View detailed metrics, conversion funnels, and usage statistics for the Bumicert creation flow.",
-    //   href: "/internal/analytics",
-    //   icon: TrendingUp,
-    //   badge: "Live",
-    //   badgeVariant: "default",
-    // },
+    {
+        title: "Platform Analytics",
+        description:
+            "View detailed metrics, conversion funnels, and usage statistics for the Bumicert creation flow.",
+        href: "/internal/analytics",
+        icon: TrendingUp,
+        badge: "Live",
+        badgeVariant: "default",
+    },
     {
         title: "Invite Codes",
         description:
