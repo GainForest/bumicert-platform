@@ -32,7 +32,7 @@ export function ContributorSelector({
     onRemove,
     placeholder = "Contributor name",
 }: ContributorSelectorProps) {
-    const [activeTab, setActiveTab] = useState<Tab>("search");
+    const [activeTab, setActiveTab] = useState<Tab>("manual");
     const [query, setQuery] = useState(value);
     const [actors, setActors] = useState<Actor[]>([]);
     const [loading, setLoading] = useState(false);
@@ -46,11 +46,12 @@ export function ContributorSelector({
     }, [value]);
 
     // Determine tab based on value content potentially?
-    // For now, default to search, but if value looks like DID/URI, maybe switch?
+    // For now, default to manual, but if value not simple string, maybe stay manual
     useEffect(() => {
-        if (value.startsWith("did:") || value.startsWith("at://")) {
-            setActiveTab("manual");
-        }
+        // If it looks like a DID or URI, manual is definitely correct.
+        // If it's a simple name, manual is also correct.
+        // Search is only for when actively searching.
+        // So distinct logic might not be needed if manual is default.
     }, []);
 
     // Search Effect
@@ -131,7 +132,7 @@ export function ContributorSelector({
                                 : "text-muted-foreground hover:text-foreground hover:bg-background/50"
                         )}
                     >
-                        Enter URI or DID
+                        Enter Name or ID
                     </button>
                 </div>
                 <Button
@@ -199,7 +200,7 @@ export function ContributorSelector({
                     <InputGroup className="bg-background">
                         <LinkIcon className="h-4 w-4 ml-2 text-muted-foreground" />
                         <InputGroupInput
-                            placeholder="did:plc:... or at://..."
+                            placeholder="Contributor name, DID, or URI..."
                             value={query}
                             onChange={handleInputChange}
                         />
