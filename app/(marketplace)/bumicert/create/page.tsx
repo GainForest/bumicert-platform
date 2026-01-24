@@ -16,6 +16,7 @@ import { getStripedBackground } from "@/lib/getStripedBackground";
 import Link from "next/link";
 import { links } from "@/lib/links";
 import HeaderContent from "./_components/HeaderContent";
+import GetStartedButton from "./_components/GetStartedButton";
 import Image from "next/image";
 import {
   Accordion,
@@ -64,12 +65,7 @@ const CreateBumicertPage = () => {
                 organization, and showcase your commitment to sustainability.
               </p>
               <div className="flex items-center justify-end mt-20">
-                <Link href={links.bumicert.createWithDraftId("0")}>
-                  <Button>
-                    Get Started
-                    <ArrowRight />
-                  </Button>
-                </Link>
+                <GetStartedButton />
               </div>
             </div>
           </section>
