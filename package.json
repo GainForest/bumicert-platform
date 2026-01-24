@@ -14,7 +14,6 @@
     "changeset": "changeset"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.971.0",
     "@ethereum-attestation-service/eas-sdk": "^2.9.1-beta.1",
     "@formkit/auto-animate": "^0.8.2",
     "@hookform/resolvers": "^5.2.1",
