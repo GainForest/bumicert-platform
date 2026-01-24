@@ -1,3 +1,19 @@
+## v0.1.2 - Jan 24, 2026
+
+### Save & Resume Drafts
+
+You can now save your Bumicert as a draft and come back to it later. No more losing your progress if you need to step away!
+
+- **Save as Draft**: Click "Save Draft" at any point during the creation flow
+- **Resume Anytime**: Your drafts are waiting for you when you return
+- **Delete Drafts**: Clean up drafts you no longer need
+
+### Share Your Feedback
+
+After publishing a Bumicert, you'll now see an option to share feedback about your experience. We'd love to hear from you!
+
+---
+
 ## v0.1.1 - Jan 24, 2026
 
 ### Changelog Page & Footer Link
