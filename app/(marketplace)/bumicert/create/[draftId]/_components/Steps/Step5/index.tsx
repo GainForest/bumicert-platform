@@ -232,7 +232,7 @@ const Step5 = () => {
         activity: {
           title: step1FormValues.projectName,
           shortDescription: step2FormValues.shortDescription,
-          description: step2FormValues.impactStory,
+          description: step2FormValues.description,
           workScopes: step1FormValues.workType,
           startDate: step1FormValues.projectDateRange[0].toISOString(),
           endDate: step1FormValues.projectDateRange[1].toISOString(),

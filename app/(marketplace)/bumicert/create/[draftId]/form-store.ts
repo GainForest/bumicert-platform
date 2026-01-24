@@ -28,7 +28,7 @@ export const step1InitialValues: Step1FormValues = {
 };
 
 export const step2Schema = z.object({
-  impactStory: z
+  description: z
     .string()
     .min(50, "At least 50 characters required")
     .max(30000, "No more than 8000 characters allowed")
@@ -41,7 +41,7 @@ export const step2Schema = z.object({
 });
 export type Step2FormValues = z.infer<typeof step2Schema>;
 export const step2InitialValues: Step2FormValues = {
-  impactStory: "",
+  description: "",
   shortDescription: "",
 };
 

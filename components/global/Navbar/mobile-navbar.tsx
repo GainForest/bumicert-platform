@@ -41,7 +41,7 @@ const MobileNavbar = ({ navLinks, footerLinks }: MobileNavbarProps) => {
             {openState.mobile ? <X /> : <Menu />}
           </Button>
           <span className="font-serif text-primary text-lg font-bold">
-            Bumicertain
+            Bumicerts
           </span>
         </div>
 

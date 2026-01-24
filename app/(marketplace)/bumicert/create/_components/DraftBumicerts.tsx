@@ -29,7 +29,7 @@ const calculateProgress = (data: DraftBumicertDataV0): number => {
     data.endDate,
     data.workScopes?.length,
     data.coverImage,
-    data.impactStory,
+    data.description,
     data.shortDescription,
     data.contributors?.length,
     data.siteBoundaries?.length,
