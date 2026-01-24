@@ -12,6 +12,7 @@ import useIsMounted from "@/hooks/use-is-mounted";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { NavLinkConfig } from "./types";
 import { links } from "@/lib/links";
+import packageJson from "@/package.json";
 
 export type DesktopNavbarProps = {
   navLinks: NavLinkConfig[];
@@ -167,7 +168,7 @@ const DesktopNavbar = ({
         <hr />
         <div className="flex items-center justify-between">
           <span className="text-muted-foreground text-xs font-semibold">
-            v0.1.0
+            v{packageJson.version}
           </span>
           <div className="flex items-center gap-1">
             <Sun className="size-3" />
