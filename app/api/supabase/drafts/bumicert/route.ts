@@ -77,7 +77,6 @@ export async function GET(req: NextRequest) {
   // Fetch drafts
   const validatedRequestBody = requestBodyValidation.data;
   let draftsFetchPromise;
-  console.log("validatedRequestBody", validatedRequestBody, userDid);
   if (validatedRequestBody.draftIds) {
     draftsFetchPromise = supabase
       .from("drafts_bumicert")
@@ -103,7 +102,6 @@ export async function GET(req: NextRequest) {
     if (draftsResponse.error) {
       throw new Error("Failed to fetch drafts");
     }
-    console.log("draftsResponse", draftsResponse);
     const typedDrafts = draftsResponse.data
       .map((draft) => {
         if (draft.version === 0) {

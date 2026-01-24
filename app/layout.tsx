@@ -18,6 +18,7 @@ import { PriceFeedProvider } from "@/components/providers/PriceFeedProvider";
 import { ThemeProvider } from "next-themes";
 import HypercertExchangeClientProvider from "@/components/providers/HypercertExchangeClientProvider";
 import { TrpcProvider } from "@/components/providers/TrpcProvider";
+import HotjarProvider from "@/components/providers/HotjarProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -135,21 +136,23 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} ${cormorantGaramond.variable} ${lisuBosa.variable} ${baskerville.variable} antialiased h-screen`}
       >
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-          <NuqsAdapter>
-            {/* <PrivyProvider> */}
-            <TrpcProvider>
-              <ModalProvider>
-                {/* <PriceFeedProvider> */}
-                {/* <ChainSwitchProvider> */}
-                {/* <HypercertExchangeClientProvider> */}
-                {children}
-                {/* </HypercertExchangeClientProvider> */}
-                {/* </ChainSwitchProvider> */}
-                {/* </PriceFeedProvider> */}
-              </ModalProvider>
-            </TrpcProvider>
-            {/* </PrivyProvider> */}
-          </NuqsAdapter>
+          <HotjarProvider>
+            <NuqsAdapter>
+              {/* <PrivyProvider> */}
+              <TrpcProvider>
+                <ModalProvider>
+                  {/* <PriceFeedProvider> */}
+                  {/* <ChainSwitchProvider> */}
+                  {/* <HypercertExchangeClientProvider> */}
+                  {children}
+                  {/* </HypercertExchangeClientProvider> */}
+                  {/* </ChainSwitchProvider> */}
+                  {/* </PriceFeedProvider> */}
+                </ModalProvider>
+              </TrpcProvider>
+              {/* </PrivyProvider> */}
+            </NuqsAdapter>
+          </HotjarProvider>
         </ThemeProvider>
       </body>
     </html>
