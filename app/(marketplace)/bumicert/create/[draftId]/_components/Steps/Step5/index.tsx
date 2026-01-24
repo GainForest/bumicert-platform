@@ -1,7 +1,7 @@
 "use client";
-import { useAtprotoStore } from "@/components/stores/atproto";
-import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
-import { cn } from "@/lib/utils";
+
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import {
   ArrowRightIcon,
   CircleAlertIcon,
@@ -11,8 +11,10 @@ import {
   ShieldCheckIcon,
   ShieldXIcon,
 } from "lucide-react";
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+
+import { useAtprotoStore } from "@/components/stores/atproto";
+import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
+import { cn } from "@/lib/utils";
 import { useFormStore } from "../../../form-store";
 import { useStep5Store } from "./store";
 import { toFileGenerator } from "climateai-sdk/zod";
@@ -23,6 +25,8 @@ import { parseAtUri } from "climateai-sdk/utilities/atproto";
 import { trpcApi } from "@/components/providers/TrpcProvider";
 import { usePathname } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
+import { trackBumicertPublished, getFlowDurationSeconds } from "@/lib/analytics";
+import FeedbackModal from "./FeedbackModal";
 
 const ProgressItem = ({
   iconset,
@@ -142,6 +146,7 @@ const Step5 = () => {
     setIsBumicertCreationMutationInFlight,
   ] = useState(false);
   const [hasClickedPublish, setHasClickedPublish] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
   const createBumicertStatus: "pending" | "success" | "error" =
     createBumicertError
@@ -167,7 +172,7 @@ const Step5 = () => {
               credentials: "include",
               body: JSON.stringify({ draftIds: [draftId] }),
             });
-            
+
             // Invalidate drafts query to refresh the list
             if (auth.user?.did) {
               queryClient.invalidateQueries({
@@ -179,6 +184,16 @@ const Step5 = () => {
             console.error("Failed to delete draft after publishing:", error);
           }
         }
+
+        // Track successful bumicert publication
+        const duration = getFlowDurationSeconds() ?? 0;
+        trackBumicertPublished({
+          draftId: data.data?.cid ?? "unknown",
+          totalDurationSeconds: duration,
+        });
+
+        // Show feedback modal after successful publication
+        setShowFeedbackModal(true);
       },
       onError: (error) => {
         console.error(error);
@@ -258,6 +273,10 @@ const Step5 = () => {
 
   return (
     <div>
+      <FeedbackModal
+        open={showFeedbackModal}
+        onOpenChange={setShowFeedbackModal}
+      />
       {authStatus === "success" && createBumicertStatus !== "success" && (
         <div className="mt-4 flex justify-end">
           <Button

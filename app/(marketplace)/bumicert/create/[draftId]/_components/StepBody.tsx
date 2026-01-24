@@ -1,7 +1,9 @@
 "use client";
-import React, { useEffect, useState } from "react";
+
+import React, { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, EyeIcon, Lightbulb } from "lucide-react";
+
 import useNewBumicertStore from "../store";
 import { BumicertArt } from "./Steps/Step4/BumicertPreviewCard";
 import { useFormStore } from "../form-store";
@@ -13,11 +15,45 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useNavbarContext } from "@/components/global/Navbar/context";
 import { STEPS } from "../_data/steps";
+import { trackStepViewed, trackStepCompleted, getStepName } from "@/lib/analytics";
+import { useParams } from "next/navigation";
 
 const StepBody = () => {
   const { viewport, openState } = useNavbarContext();
   const { currentStepIndex: currentStep } = useNewBumicertStore();
   const CurrentStepComponent = STEPS[currentStep].Component;
+  const params = useParams();
+  const draftId = (params?.draftId as string) ?? "0";
+  const previousStepRef = useRef<number | null>(null);
+
+  // Track step views when the step changes
+  useEffect(() => {
+    const stepName = getStepName(currentStep);
+
+    // Track previous step as completed FIRST (if moving forward)
+    // This must happen before trackStepViewed to capture accurate timing
+    if (
+      previousStepRef.current !== null &&
+      currentStep > previousStepRef.current
+    ) {
+      const prevStepName = getStepName(previousStepRef.current);
+      trackStepCompleted({
+        stepIndex: previousStepRef.current,
+        stepName: prevStepName,
+        draftId,
+      });
+    }
+
+    // Track step viewed (this resets the step start time)
+    trackStepViewed({
+      stepIndex: currentStep,
+      stepName,
+      draftId,
+    });
+
+    previousStepRef.current = currentStep;
+  }, [currentStep, draftId]);
+
   return (
     <div
       className={cn(

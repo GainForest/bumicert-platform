@@ -64,16 +64,20 @@ export const footerLinks: {
   href: string;
   text: string;
 }[] = [
-  {
-    href: "https://github.com/ecocertain-2",
-    text: "GitHub",
-  },
-  {
-    href: "https://twitter.com/GainForestNow",
-    text: "Twitter",
-  },
-  {
-    href: "https://www.canva.com/design/DAGNpwdK0jo/QkBOQ1gfl0gy8jDTBAo10g/view",
-    text: "Impact Report",
-  },
-];
+    {
+      href: "https://github.com/ecocertain-2",
+      text: "GitHub",
+    },
+    {
+      href: "https://twitter.com/GainForestNow",
+      text: "Twitter",
+    },
+    {
+      href: "/changelog",
+      text: "Changelog",
+    },
+    {
+      href: "https://www.canva.com/design/DAGNpwdK0jo/QkBOQ1gfl0gy8jDTBAo10g/view",
+      text: "Impact Report",
+    },
+  ];

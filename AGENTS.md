@@ -25,7 +25,10 @@ bumicert is a platform for verifying and tracking environmental claims and certi
 ## Workflows
 
 ### 1. Documenting Changes (Changesets)
-**Crucial**: Every significant change (feature, fix, refactor) must be documented using a changeset.
+**Crucial**: Every PR must have **exactly one** changeset file documenting all significant changes.
+-   **Rule**: If you modify code, you must create/update a changeset. Do not create multiple changeset files for the same PR; consolidate them if needed.
+-   **Quality**: The summary must be human-readable and descriptive (e.g., "Added a new pricing page" instead of "feat: add page").
+-   **Screenshots**: If the change involves UI and you are editing the **CHANGELOG** (not the changeset), you MUST include a Vercel Blob URL to a screenshot. **Prompt the user to provide a screenshot if you cannot capture one yourself.**
 -   See [changeset.md](./changeset.md) for detailed instructions on how to create a changeset.
 -   **Command**: `bun run changeset`
 
@@ -35,6 +38,14 @@ bumicert is a platform for verifying and tracking environmental claims and certi
 
 ### 3. Package Management
 -   Use `bun` for installing dependencies: `bun add [package]`.
+
+### 4. Media & Assets
+-   **Do not commit images/videos to the repo.** This bloats the repository size.
+-   **Use Vercel Blob**: Upload assets to Vercel Blob storage (or another external host) and link to them.
+-   If you need to upload a file, write a script using `@vercel/blob` or ask the user for a token/assistance.
+
+### 5. Git Workflow
+-   **Worktrees**: Always create a new git worktree from `main` (or `origin/main`) for new tasks. This ensures a clean environment and avoids contaminating other branches.
 
 ## Key Files for Context
 -   `package.json`: Dependencies and scripts.
