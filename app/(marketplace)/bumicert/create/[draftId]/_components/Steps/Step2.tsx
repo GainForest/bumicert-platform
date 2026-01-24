@@ -36,7 +36,18 @@ const Step2 = () => {
         description="Tell us about your impact — what changed, who was involved, and how it's helping. Take your time. Your story helps inspire others and verify your work."
         error={errors.description}
         showError={shouldShowValidationErrors}
-        inlineEndMessage={`${description.length}/8000`}
+        inlineEndMessage={
+          description.length < 50 ? (
+            <span className="flex items-center gap-1.5">
+              <span className="text-[10px] uppercase font-bold text-amber-600 bg-amber-50 px-1 rounded border border-amber-200">
+                Min 50
+              </span>
+              <span>{description.length}/8000</span>
+            </span>
+          ) : (
+            `${description.length}/8000`
+          )
+        }
         required
         info="Tell us what you did and what happened as a result"
       >
