@@ -22,6 +22,8 @@ interface ContributorSelectorProps {
     onChange: (value: string) => void;
     onRemove: () => void;
     placeholder?: string;
+    onNext?: () => void;
+    autoFocus?: boolean;
 }
 
 type Tab = "search" | "manual";
@@ -31,6 +33,8 @@ export function ContributorSelector({
     onChange,
     onRemove,
     placeholder = "Contributor name",
+    onNext,
+    autoFocus,
 }: ContributorSelectorProps) {
     const [activeTab, setActiveTab] = useState<Tab>("manual");
     const [query, setQuery] = useState(value);
@@ -106,6 +110,13 @@ export function ContributorSelector({
         if (!open && activeTab === "search") setOpen(true);
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            onNext?.();
+        }
+    };
+
     return (
         <div className="flex flex-col gap-2 w-full border rounded-md p-3 bg-muted/20">
             <div className="flex items-center justify-between mb-1">
@@ -159,6 +170,8 @@ export function ContributorSelector({
                                         onFocus={() => {
                                             if (actors.length > 0) setOpen(true);
                                         }}
+                                        onKeyDown={handleKeyDown}
+                                        autoFocus={autoFocus}
                                     />
                                     {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin text-muted-foreground" />}
                                 </InputGroup>
@@ -203,6 +216,8 @@ export function ContributorSelector({
                             placeholder="Contributor name, DID, or URI..."
                             value={query}
                             onChange={handleInputChange}
+                            onKeyDown={handleKeyDown}
+                            autoFocus={autoFocus}
                         />
                     </InputGroup>
                 )}

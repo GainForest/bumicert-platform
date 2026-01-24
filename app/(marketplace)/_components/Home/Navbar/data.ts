@@ -42,7 +42,7 @@ export const navLinks: NavLinkConfig[] = [
   // },
   {
     id: "my-organization",
-    href: links.myOrganization,
+    href: "/organization",
     text: "My Organization",
     Icon: BuildingIcon,
     pathCheck: {
@@ -71,10 +71,6 @@ export const footerLinks: {
     {
       href: "https://twitter.com/GainForestNow",
       text: "Twitter",
-    },
-    {
-      href: "/changelog",
-      text: "Changelog",
     },
     {
       href: "https://www.canva.com/design/DAGNpwdK0jo/QkBOQ1gfl0gy8jDTBAo10g/view",

@@ -146,6 +146,8 @@ const Step3 = () => {
                     value={c}
                     onChange={(val) => updateContributor(i, val)}
                     onRemove={() => removeContributor(i)}
+                    onNext={() => addContributor("")}
+                    autoFocus={i === contributors.length - 1 && contributors.length > 1}
                   />
                 ))}
               </div>
