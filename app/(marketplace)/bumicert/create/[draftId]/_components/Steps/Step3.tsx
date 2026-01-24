@@ -123,7 +123,7 @@ const Step3 = () => {
           error={errors.contributors}
           showError={shouldShowValidationErrors}
           required
-          info={`Add contributors: collaborators, teammates, individuals, or a group`}
+          info={`Who contributed to this work? It can be either an organization or a user`}
         >
           {contributors.length === 0 && (
             <button
@@ -132,7 +132,7 @@ const Step3 = () => {
             >
               <PlusCircle className="size-5 opacity-50" />
               <span className="text-sm text-center">
-                Tap anywhere to add a contributor.
+                Click to add a contributor.
               </span>
             </button>
           )}
@@ -143,7 +143,7 @@ const Step3 = () => {
                   <div key={i} className="flex items-center gap-2">
                     <InputGroup className="bg-background flex-1">
                       <InputGroupInput
-                        placeholder="Community / Organization name"
+                        placeholder="Contributor name"
                         value={c}
                         onChange={(e) => updateContributor(i, e.target.value)}
                       />
@@ -365,14 +365,14 @@ const SiteItem = ({
   const locationValidity =
     metrics.areaHectares && metrics.centroid
       ? {
-          valid: true as const,
-          area: metrics.areaHectares,
-          lat: metrics.centroid.lat,
-          lon: metrics.centroid.lon,
-        }
+        valid: true as const,
+        area: metrics.areaHectares,
+        lat: metrics.centroid.lat,
+        lon: metrics.centroid.lon,
+      }
       : {
-          valid: false as const,
-        };
+        valid: false as const,
+      };
 
   return (
     <Button
