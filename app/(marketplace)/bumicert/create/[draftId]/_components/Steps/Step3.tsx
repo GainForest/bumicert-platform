@@ -37,6 +37,7 @@ import { OrgHypercertsDefs as Defs } from "climateai-sdk/lex-api";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { getBlobUrl, parseAtUri } from "climateai-sdk/utilities/atproto";
 import { links } from "@/lib/links";
+import { ContributorSelector } from "./ContributorSelector";
 
 const formatCoordinate = (coordinate: string) => {
   const num = parseFloat(coordinate);
@@ -123,7 +124,7 @@ const Step3 = () => {
           error={errors.contributors}
           showError={shouldShowValidationErrors}
           required
-          info={`Who contributed to this work? It can be either an organization or a user`}
+          info={`List any individuals or organizations that contributed to this work.`}
         >
           {contributors.length === 0 && (
             <button
@@ -140,21 +141,12 @@ const Step3 = () => {
             <>
               <div className="flex flex-col gap-2">
                 {contributors.map((c, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <InputGroup className="bg-background flex-1">
-                      <InputGroupInput
-                        placeholder="Contributor name"
-                        value={c}
-                        onChange={(e) => updateContributor(i, e.target.value)}
-                      />
-                    </InputGroup>
-                    <Button
-                      variant="outline"
-                      onClick={() => removeContributor(i)}
-                    >
-                      <Trash2 />
-                    </Button>
-                  </div>
+                  <ContributorSelector
+                    key={i}
+                    value={c}
+                    onChange={(val) => updateContributor(i, val)}
+                    onRemove={() => removeContributor(i)}
+                  />
                 ))}
               </div>
               <div className="flex items-center justify-center">
