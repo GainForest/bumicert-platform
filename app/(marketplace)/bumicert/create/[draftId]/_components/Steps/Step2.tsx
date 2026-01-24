@@ -18,7 +18,7 @@ const Step2 = () => {
   const updateErrorsAndCompletion = useFormStore(
     (state) => state.updateErrorsAndCompletion
   );
-  const { impactStory, shortDescription } = formValues;
+  const { description, shortDescription } = formValues;
 
   useEffect(() => {
     updateErrorsAndCompletion();
@@ -34,17 +34,17 @@ const Step2 = () => {
         label="Your Impact Story"
         className="mt-8"
         description="Tell us about your impact — what changed, who was involved, and how it's helping. Take your time. Your story helps inspire others and verify your work."
-        error={errors.impactStory}
+        error={errors.description}
         showError={shouldShowValidationErrors}
-        inlineEndMessage={`${impactStory.length}/8000`}
+        inlineEndMessage={`${description.length}/8000`}
         required
         info="Tell us what you did and what happened as a result"
       >
         <Textarea
           id="your-impact-story"
           placeholder="Start your story here..."
-          value={impactStory}
-          onChange={(e) => setFormValue("impactStory", e.target.value)}
+          value={description}
+          onChange={(e) => setFormValue("description", e.target.value)}
           className="min-h-44 bg-background"
         />
       </FormField>

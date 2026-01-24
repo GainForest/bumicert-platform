@@ -12,7 +12,7 @@ import { useNavbarContext } from "@/components/global/Navbar/context";
 const Hero2 = () => {
   const [shouldDisplayLearnMoreContent, setShouldDisplayLearnMoreContent] =
     useState(false);
-  const [bumicertainBrandingDelayOffset, setBumicertBrandingDelayOffset] =
+  const [bumicertsBrandingDelayOffset, setBumicertBrandingDelayOffset] =
     useState(1.6);
 
   return (
@@ -56,9 +56,9 @@ const Hero2 = () => {
 
           <AnimatePresence mode="wait">
             {!shouldDisplayLearnMoreContent && (
-              <AnimatedBumicertainBranding
-                key={"animated-bumicertain-branding"}
-                delayOffset={bumicertainBrandingDelayOffset}
+              <AnimatedBumicertsBranding
+                key={"animated-bumicerts-branding"}
+                delayOffset={bumicertsBrandingDelayOffset}
               />
             )}
             {shouldDisplayLearnMoreContent && (
@@ -77,7 +77,7 @@ const Hero2 = () => {
                 }}
                 className="px-6 z-5 font-serif text-white text-center text-pretty max-w-xl text-xl"
               >
-                Bumicertain is a marketplace that connects nature stewards with
+                Bumicerts is a marketplace that connects nature stewards with
                 funders. It allows local communities and organizations to
                 showcase verified conservation efforts through digital
                 certificates, enabling them to receive continuous support for
@@ -112,7 +112,7 @@ const Hero2 = () => {
   );
 };
 
-const AnimatedBumicertainBranding = ({
+const AnimatedBumicertsBranding = ({
   delayOffset,
 }: {
   delayOffset: number;
@@ -151,7 +151,7 @@ const AnimatedBumicertainBranding = ({
         animate={{ opacity: 1, filter: "blur(0px)" }}
         transition={{ delay: delayOffset + 0.2 }}
       >
-        Bumicertain
+        Bumicerts
       </motion.h1>
       <motion.span
         className="font-serif text-xl text-center text-pretty italic text-white/60"

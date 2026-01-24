@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/modal/modal";
 import { countries } from "@/lib/countries";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 
 const allCountries = Object.entries(countries);
 
@@ -25,6 +25,8 @@ const CountrySelectorModal = ({
 }) => {
   const [countryCode, setCountryCode] = useState(initialCountryCode);
   const { popModal, stack, hide } = useModal();
+  const selectedCountryRef = useRef<HTMLButtonElement>(null);
+
   const handleDone = (country: string) => {
     onCountryChange(country);
     if (stack.length === 1) {
@@ -46,6 +48,16 @@ const CountrySelectorModal = ({
   useEffect(() => {
     setCountryCode(initialCountryCode);
   }, [initialCountryCode]);
+
+  // Scroll to selected country when modal opens
+  useEffect(() => {
+    if (selectedCountryRef.current && searchText === "") {
+      selectedCountryRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [searchText]);
   return (
     <ModalContent>
       <ModalHeader>
@@ -61,21 +73,12 @@ const CountrySelectorModal = ({
       />
       <div className="w-full h-full max-h-[max(45vh,500px)] overflow-y-auto mt-2">
         <div className="grid grid-cols-2 gap-2">
-          {/* Show the selected country on top if it exists */}
-          {searchText === "" && selectedCountryData && (
-            <CountryButton
-              countryCode={countryCode}
-              countryData={selectedCountryData}
-              selectedCountry={countryCode}
-              onClick={() => setCountryCode(countryCode)}
-            />
-          )}
-
-          {/* Show the filtered countries */}
           {filteredCountries.map((c) => {
+            const isSelected = c[0] === countryCode;
             return (
               <CountryButton
                 key={c[0]}
+                ref={isSelected ? selectedCountryRef : null}
                 countryCode={c[0]}
                 countryData={c[1]}
                 selectedCountry={countryCode}
@@ -93,19 +96,18 @@ const CountrySelectorModal = ({
   );
 };
 
-const CountryButton = ({
-  countryCode,
-  countryData,
-  selectedCountry,
-  onClick,
-}: {
-  countryCode: string;
-  countryData: (typeof countries)[string];
-  selectedCountry: string;
-  onClick: () => void;
-}) => {
+const CountryButton = forwardRef<
+  HTMLButtonElement,
+  {
+    countryCode: string;
+    countryData: (typeof countries)[string];
+    selectedCountry: string;
+    onClick: () => void;
+  }
+>(({ countryCode, countryData, selectedCountry, onClick }, ref) => {
   return (
     <Button
+      ref={ref}
       variant={"secondary"}
       className={cn(
         "flex flex-col h-auto items-start justify-between gap-0 px-2 py-1 text-wrap border-2 border-transparent",
@@ -122,6 +124,8 @@ const CountryButton = ({
       </span>
     </Button>
   );
-};
+});
+
+CountryButton.displayName = "CountryButton";
 
 export default CountrySelectorModal;

@@ -24,6 +24,8 @@ import { Button } from "@/components/ui/button";
 import { parseAtUri } from "climateai-sdk/utilities/atproto";
 import { trpcApi } from "@/components/providers/TrpcProvider";
 import { trackBumicertPublished, getFlowDurationSeconds } from "@/lib/analytics";
+import { usePathname } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 const ProgressItem = ({
   iconset,
@@ -108,12 +110,14 @@ const ProgressItem = ({
 
 const Step5 = () => {
   const auth = useAtprotoStore((state) => state.auth);
+  const pathname = usePathname();
+  const queryClient = useQueryClient();
   const authStatus =
     auth.status === "RESUMING"
       ? "pending"
       : auth.status === "AUTHENTICATED"
-      ? "success"
-      : "error";
+        ? "success"
+        : "error";
 
   const formValues = useFormStore((state) => state.formValues);
   const step1FormValues = formValues[0];
@@ -146,12 +150,12 @@ const Step5 = () => {
     createBumicertError
       ? "error"
       : createdBumicertResponse === null
-      ? "pending"
-      : "success";
+        ? "pending"
+        : "success";
 
   const { mutate: createBumicert } =
     trpcApi.hypercerts.claim.activity.create.useMutation({
-      onSuccess: (data) => {
+      onSuccess: async (data) => {
         setCreatedBumicertResponse(data);
 
         // Track successful bumicert publication
@@ -160,6 +164,31 @@ const Step5 = () => {
           draftId: data.data?.cid ?? "unknown",
           totalDurationSeconds: duration,
         });
+
+        // Delete draft if it exists (non-zero draftId in URL)
+        const draftIdMatch = pathname.match(/\/create\/(\d+)$/);
+        const draftId = draftIdMatch ? parseInt(draftIdMatch[1], 10) : null;
+
+        if (draftId && draftId !== 0 && !isNaN(draftId)) {
+          try {
+            await fetch(links.api.drafts.bumicert.delete, {
+              method: "DELETE",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({ draftIds: [draftId] }),
+            });
+
+            // Invalidate drafts query to refresh the list
+            if (auth.user?.did) {
+              queryClient.invalidateQueries({
+                queryKey: ["drafts", auth.user.did],
+              });
+            }
+          } catch (error) {
+            // Silently fail - draft deletion is not critical
+            console.error("Failed to delete draft after publishing:", error);
+          }
+        }
       },
       onError: (error) => {
         console.error(error);
@@ -198,7 +227,7 @@ const Step5 = () => {
         activity: {
           title: step1FormValues.projectName,
           shortDescription: step2FormValues.shortDescription,
-          description: step2FormValues.impactStory,
+          description: step2FormValues.description,
           workScopes: step1FormValues.workType,
           startDate: step1FormValues.projectDateRange[0].toISOString(),
           endDate: step1FormValues.projectDateRange[1].toISOString(),
@@ -272,15 +301,15 @@ const Step5 = () => {
             createBumicertError
               ? "Failed to publish."
               : createBumicertStatus === "success"
-              ? "Published!"
-              : "Ready to publish your bumicert"
+                ? "Published!"
+                : "Ready to publish your bumicert"
           }
           description={
             createBumicertError
               ? createBumicertError
               : isBumicertCreationMutationInFlight
-              ? "We are publishing your bumicert."
-              : "Review your details, then publish your bumicert."
+                ? "We are publishing your bumicert."
+                : "Review your details, then publish your bumicert."
           }
           status={createBumicertStatus}
           isLastStep={true}
@@ -296,8 +325,7 @@ const Step5 = () => {
             <Button className="mt-2">
               <Link
                 href={links.bumicert.view(
-                  `${parseAtUri(createdBumicertResponse.data.uri).did}-${
-                    parseAtUri(createdBumicertResponse.data.uri).rkey
+                  `${parseAtUri(createdBumicertResponse.data.uri).did}-${parseAtUri(createdBumicertResponse.data.uri).rkey
                   }`
                 )}
               >

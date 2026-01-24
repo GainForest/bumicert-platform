@@ -28,7 +28,7 @@ export const step1InitialValues: Step1FormValues = {
 };
 
 export const step2Schema = z.object({
-  impactStory: z
+  description: z
     .string()
     .min(50, "At least 50 characters required")
     .max(30000, "No more than 8000 characters allowed")
@@ -41,7 +41,7 @@ export const step2Schema = z.object({
 });
 export type Step2FormValues = z.infer<typeof step2Schema>;
 export const step2InitialValues: Step2FormValues = {
-  impactStory: "",
+  description: "",
   shortDescription: "",
 };
 
@@ -91,11 +91,13 @@ type FormStoreState = {
     Partial<Record<keyof Step3FormValues, string>>
   ];
   formCompletionPercentages: [number, number, number];
+  draftCoverImageHash?: string;
 };
 
 type FormStoreActions = {
   hydrate: (
-    formValues: [Step1FormValues, Step2FormValues, Step3FormValues] | null
+    formValues: [Step1FormValues, Step2FormValues, Step3FormValues] | null,
+    draftCoverImageHash?: string
   ) => void;
   setFormValue: [
     (
@@ -113,6 +115,7 @@ type FormStoreActions = {
   ];
   updateErrorsAndCompletion: (formIndex?: number) => void;
   reset: (isHydrated?: boolean) => void;
+  setDraftCoverImageHash: (hash: string) => void;
 };
 
 const initialState: FormStoreState = {
@@ -126,28 +129,31 @@ export const useFormStore = create<FormStoreState & FormStoreActions>(
   (set, get) => {
     const setForm1Value: FormStoreActions["setFormValue"][0] = (key, value) => {
       set((state) => ({
-        formValues: {
-          ...state.formValues,
-          0: { ...state.formValues[0], [key]: value },
-        },
+        formValues: [
+          { ...state.formValues[0], [key]: value },
+          state.formValues[1],
+          state.formValues[2],
+        ],
       }));
       get().updateErrorsAndCompletion();
     };
     const setForm2Value: FormStoreActions["setFormValue"][1] = (key, value) => {
       set((state) => ({
-        formValues: {
-          ...state.formValues,
-          1: { ...state.formValues[1], [key]: value },
-        },
+        formValues: [
+          state.formValues[0],
+          { ...state.formValues[1], [key]: value },
+          state.formValues[2],
+        ],
       }));
       get().updateErrorsAndCompletion();
     };
     const setForm3Value: FormStoreActions["setFormValue"][2] = (key, value) => {
       set((state) => ({
-        formValues: {
-          ...state.formValues,
-          2: { ...state.formValues[2], [key]: value },
-        },
+        formValues: [
+          state.formValues[0],
+          state.formValues[1],
+          { ...state.formValues[2], [key]: value },
+        ],
       }));
       get().updateErrorsAndCompletion();
     };
@@ -188,28 +194,57 @@ export const useFormStore = create<FormStoreState & FormStoreActions>(
 
     return {
       ...initialState,
-      hydrate: (formValues) => {
+      hydrate: (formValues, draftCoverImageHash) => {
         if (!formValues) {
           set({ ...initialState, isHydrated: true });
+          get().updateErrorsAndCompletion();
           return;
         }
-        set({ ...initialState, isHydrated: true, formValues });
+        set({
+          ...initialState,
+          isHydrated: true,
+          formValues,
+          draftCoverImageHash,
+        });
+        get().updateErrorsAndCompletion();
+      },
+      setDraftCoverImageHash: (hash) => {
+        set({ draftCoverImageHash: hash });
       },
       setFormValue: [setForm1Value, setForm2Value, setForm3Value],
       updateErrorsAndCompletion: (formIndex) => {
-        if (formIndex) {
+        if (formIndex !== undefined) {
           const errorsAndCompletion = getFormErrorsAndCompletion(formIndex);
           if (!errorsAndCompletion) return;
-          set((state) => ({
-            formErrors: {
-              ...state.formErrors,
-              [formIndex]: errorsAndCompletion.errors,
-            },
-            formCompletionPercentages: {
-              ...state.formCompletionPercentages,
-              [formIndex]: errorsAndCompletion.completionPercentage,
-            },
-          }));
+          set((state) => {
+            const newFormErrors: FormStoreState["formErrors"] = [
+              formIndex === 0
+                ? errorsAndCompletion.errors
+                : state.formErrors[0],
+              formIndex === 1
+                ? errorsAndCompletion.errors
+                : state.formErrors[1],
+              formIndex === 2
+                ? errorsAndCompletion.errors
+                : state.formErrors[2],
+            ];
+            const newFormCompletionPercentages: FormStoreState["formCompletionPercentages"] =
+              [
+                formIndex === 0
+                  ? errorsAndCompletion.completionPercentage
+                  : state.formCompletionPercentages[0],
+                formIndex === 1
+                  ? errorsAndCompletion.completionPercentage
+                  : state.formCompletionPercentages[1],
+                formIndex === 2
+                  ? errorsAndCompletion.completionPercentage
+                  : state.formCompletionPercentages[2],
+              ];
+            return {
+              formErrors: newFormErrors,
+              formCompletionPercentages: newFormCompletionPercentages,
+            };
+          });
         } else {
           const step1ErrorsAndCompletion = getFormErrorsAndCompletion(0);
           const step2ErrorsAndCompletion = getFormErrorsAndCompletion(1);
