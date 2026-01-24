@@ -3,11 +3,18 @@
 import React, { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Check, Trash2, Search, Link as LinkIcon, Loader2 } from "lucide-react";
+import { Trash2, Search, Link as LinkIcon, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
-import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from "@/components/ui/command";
+import { useDebounce } from "@/hooks/use-debounce";
 
 // Type for ATProto actor
 interface Actor {
@@ -40,30 +47,29 @@ export function ContributorSelector({
     const [query, setQuery] = useState(value);
     const [actors, setActors] = useState<Actor[]>([]);
     const [loading, setLoading] = useState(false);
-    const [open, setOpen] = useState(false);
+
+    // For manual input
+    const [manualQuery, setManualQuery] = useState(value);
+
+    // Debounce query for search
+    const debouncedQuery = useDebounce(query, 300);
 
     // Sync internal state with external value
     useEffect(() => {
-        if (value !== query) {
+        if (value !== query && activeTab === 'search') {
             setQuery(value);
         }
+        if (value !== manualQuery && activeTab === 'manual') {
+            setManualQuery(value);
+        }
     }, [value]);
-
-    // Determine tab based on value content potentially?
-    // For now, default to manual, but if value not simple string, maybe stay manual
-    useEffect(() => {
-        // If it looks like a DID or URI, manual is definitely correct.
-        // If it's a simple name, manual is also correct.
-        // Search is only for when actively searching.
-        // So distinct logic might not be needed if manual is default.
-    }, []);
 
     // Search Effect
     useEffect(() => {
         if (activeTab !== "search") return;
 
         const searchActors = async () => {
-            if (!query || query.length < 3) {
+            if (!debouncedQuery || debouncedQuery.length < 3) {
                 setActors([]);
                 return;
             }
@@ -77,7 +83,7 @@ export function ContributorSelector({
 
                 const promises = endpoints.map(endpoint =>
                     fetch(
-                        `${endpoint}/xrpc/app.bsky.actor.searchActors?q=${encodeURIComponent(query)}&limit=5`
+                        `${endpoint}/xrpc/app.bsky.actor.searchActors?q=${encodeURIComponent(debouncedQuery)}&limit=5`
                     ).then(res => {
                         if (!res.ok) throw new Error(`Failed to fetch from ${endpoint}`);
                         return res.json();
@@ -104,12 +110,8 @@ export function ContributorSelector({
             }
         };
 
-        const debounceTimer = setTimeout(() => {
-            searchActors();
-        }, 300);
-
-        return () => clearTimeout(debounceTimer);
-    }, [query, activeTab]);
+        searchActors();
+    }, [debouncedQuery, activeTab]);
 
     const handleSelect = (actor: Actor) => {
         const formattedName = actor.displayName
@@ -118,15 +120,14 @@ export function ContributorSelector({
 
         onChange(formattedName);
         setQuery(formattedName);
-        setOpen(false);
         onNext?.(formattedName);
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Handle manual input change
+    const handleManualInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = e.target.value;
-        setQuery(newValue);
+        setManualQuery(newValue);
         onChange(newValue);
-        if (!open && activeTab === "search") setOpen(true);
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -177,64 +178,60 @@ export function ContributorSelector({
 
             <div className="relative w-full">
                 {activeTab === "search" ? (
-                    <Popover open={open && actors.length > 0} onOpenChange={setOpen}>
-                        <PopoverTrigger asChild>
-                            <div className="w-full">
-                                <InputGroup className="bg-background">
-                                    <Search className="h-4 w-4 ml-2 text-muted-foreground" />
-                                    <InputGroupInput
-                                        placeholder="Search by handle or name..."
-                                        value={query}
-                                        onChange={handleInputChange}
-                                        onFocus={() => {
-                                            if (actors.length > 0) setOpen(true);
-                                        }}
-                                        onKeyDown={handleKeyDown}
-                                        autoFocus={autoFocus}
-                                    />
-                                    {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin text-muted-foreground" />}
-                                </InputGroup>
-                            </div>
-                        </PopoverTrigger>
-                        <PopoverContent
-                            className="p-0 w-[var(--radix-popover-trigger-width)]"
-                            align="start"
-                            onOpenAutoFocus={(e) => e.preventDefault()}
-                        >
-                            <Command shouldFilter={false}>
-                                <CommandList>
-                                    {actors.length > 0 && (
-                                        <CommandGroup heading="Suggestions">
-                                            {actors.map((actor) => (
-                                                <CommandItem
-                                                    key={actor.did}
-                                                    value={actor.handle}
-                                                    onSelect={() => handleSelect(actor)}
-                                                    className="flex items-center gap-2 cursor-pointer"
-                                                >
-                                                    <Avatar className="h-8 w-8">
-                                                        <AvatarImage src={actor.avatar} />
-                                                        <AvatarFallback>{actor.handle[0].toUpperCase()}</AvatarFallback>
-                                                    </Avatar>
-                                                    <div className="flex flex-col overflow-hidden">
-                                                        <span className="font-medium truncate">{actor.displayName || actor.handle}</span>
-                                                        <span className="text-xs text-muted-foreground truncate">@{actor.handle}</span>
-                                                    </div>
-                                                </CommandItem>
-                                            ))}
-                                        </CommandGroup>
-                                    )}
-                                </CommandList>
-                            </Command>
-                        </PopoverContent>
-                    </Popover>
+                    <Command className="border rounded-md bg-background overflow-hidden" shouldFilter={false}>
+                        <div className="flex items-center border-b px-3">
+                            <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                            <CommandInput
+                                placeholder="Search by handle or name..."
+                                value={query}
+                                onValueChange={(val) => {
+                                    setQuery(val);
+                                    // Also update parent only if we want live updates during search typing
+                                    // But typically for search-select, we might wait for selection. 
+                                    // However, the existing logic updated on change, so let's keep it sync if needed,
+                                    // though typically we only commit on select.
+                                    // For now, let's strictly commit on select for consistency with Command pattern,
+                                    // OR keep it loose. Given the reference, they select items.
+                                }}
+                                autoFocus={autoFocus}
+                                className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 border-none focus:ring-0"
+                            />
+                            {loading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground ml-2" />}
+                        </div>
+                        <CommandList>
+                            {!loading && actors.length === 0 && !!query && (
+                                <CommandEmpty className="py-6 text-center text-sm">No results found.</CommandEmpty>
+                            )}
+                            {actors.length > 0 && (
+                                <CommandGroup heading="Suggestions">
+                                    {actors.map((actor) => (
+                                        <CommandItem
+                                            key={actor.did}
+                                            value={actor.handle} // Use handle for value to avoid funky filtering if we enabled it
+                                            onSelect={() => handleSelect(actor)}
+                                            className="flex items-center gap-2 cursor-pointer"
+                                        >
+                                            <Avatar className="h-8 w-8">
+                                                <AvatarImage src={actor.avatar} />
+                                                <AvatarFallback>{actor.handle[0].toUpperCase()}</AvatarFallback>
+                                            </Avatar>
+                                            <div className="flex flex-col overflow-hidden">
+                                                <span className="font-medium truncate">{actor.displayName || actor.handle}</span>
+                                                <span className="text-xs text-muted-foreground truncate">@{actor.handle}</span>
+                                            </div>
+                                        </CommandItem>
+                                    ))}
+                                </CommandGroup>
+                            )}
+                        </CommandList>
+                    </Command>
                 ) : (
                     <InputGroup className="bg-background">
                         <LinkIcon className="h-4 w-4 ml-2 text-muted-foreground" />
                         <InputGroupInput
                             placeholder="Contributor name, DID, or URI..."
-                            value={query}
-                            onChange={handleInputChange}
+                            value={manualQuery}
+                            onChange={handleManualInputChange}
                             onKeyDown={handleKeyDown}
                             autoFocus={autoFocus}
                         />
