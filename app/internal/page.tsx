@@ -47,14 +47,6 @@ const tools: InternalTool[] = [
         badge: "Admin",
         badgeVariant: "secondary",
     },
-    {
-        title: "Migration Tool",
-        description: "Migrate legacy Hypercerts to the new schema format.",
-        href: "/bumicert/create/migrate",
-        icon: Wrench,
-        badge: "Disabled",
-        badgeVariant: "destructive",
-    },
 ];
 
 const InternalDirectoryPage = () => {
