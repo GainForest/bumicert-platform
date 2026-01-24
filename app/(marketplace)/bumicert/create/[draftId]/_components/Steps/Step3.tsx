@@ -134,9 +134,10 @@ const Step3 = () => {
               value={newContributor}
               onChange={setNewContributor}
               onRemove={() => setNewContributor("")}
-              onNext={() => {
-                if (newContributor.trim()) {
-                  addContributor(newContributor);
+              onNext={(val) => {
+                const valueToAdd = val || newContributor;
+                if (valueToAdd.trim()) {
+                  addContributor(valueToAdd);
                   setNewContributor("");
                 }
               }}

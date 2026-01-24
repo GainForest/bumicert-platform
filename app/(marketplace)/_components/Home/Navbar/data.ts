@@ -43,7 +43,7 @@ export const navLinks: NavLinkConfig[] = [
   // },
   {
     id: "my-organization",
-    href: "/organization",
+    href: "/organization/home",
     text: "My Organization",
     Icon: BuildingIcon,
     pathCheck: {

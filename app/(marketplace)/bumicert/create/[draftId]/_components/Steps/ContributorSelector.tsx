@@ -22,7 +22,7 @@ interface ContributorSelectorProps {
     onChange: (value: string) => void;
     onRemove: () => void;
     placeholder?: string;
-    onNext?: () => void;
+    onNext?: (val?: string) => void;
     autoFocus?: boolean;
 }
 
@@ -70,15 +70,33 @@ export function ContributorSelector({
 
             setLoading(true);
             try {
-                const response = await fetch(
-                    `https://public.api.bsky.app/xrpc/app.bsky.actor.searchActors?q=${encodeURIComponent(
-                        query
-                    )}&limit=5`
+                const endpoints = [
+                    "https://public.api.bsky.app",
+                    "https://climateai.org"
+                ];
+
+                const promises = endpoints.map(endpoint =>
+                    fetch(
+                        `${endpoint}/xrpc/app.bsky.actor.searchActors?q=${encodeURIComponent(query)}&limit=5`
+                    ).then(res => {
+                        if (!res.ok) throw new Error(`Failed to fetch from ${endpoint}`);
+                        return res.json();
+                    })
                 );
-                if (response.ok) {
-                    const data = await response.json();
-                    setActors(data.actors || []);
-                }
+
+                const results = await Promise.allSettled(promises);
+
+                let allActors: Actor[] = [];
+                results.forEach(result => {
+                    if (result.status === "fulfilled" && result.value.actors) {
+                        allActors = [...allActors, ...result.value.actors];
+                    }
+                });
+
+                // Deduplicate by DID
+                const uniqueActors = Array.from(new Map(allActors.map(item => [item.did, item])).values());
+
+                setActors(uniqueActors);
             } catch (error) {
                 console.error("Failed to search actors", error);
             } finally {
@@ -101,6 +119,7 @@ export function ContributorSelector({
         onChange(formattedName);
         setQuery(formattedName);
         setOpen(false);
+        onNext?.(formattedName);
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -20,21 +20,38 @@ export function ContributorRow({ value, onEdit, onRemove }: ContributorRowProps)
 
     // Parse handle to fetch avatar if possible
     useEffect(() => {
-        // Basic parsing: "Display Name (@handle)" -> handle
-        const handleMatch = value.match(/\(@([^)]+)\)/);
-        const handle = handleMatch ? handleMatch[1] : null;
+        let handle: string | null = null;
+
+        // Try matching "Name (@handle)"
+        const parensMatch = value.match(/\(@([^)]+)\)/);
+        if (parensMatch) {
+            handle = parensMatch[1];
+        }
+        // Try matching starts with "@"
+        else if (value.startsWith("@")) {
+            handle = value.slice(1);
+        }
+        // If it looks like a domain (e.g. contains dot), try using it as handle
+        else if (value.includes(".") && !value.includes(" ")) {
+            handle = value;
+        }
 
         if (handle) {
             // Fetch avatar from Bluesky public API
-            fetch(`https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=${handle}`)
-                .then((res) => res.json())
+            fetch(`https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=${encodeURIComponent(handle)}`)
+                .then((res) => {
+                    if (!res.ok) throw new Error("Failed to fetch");
+                    return res.json();
+                })
                 .then((data) => {
                     if (data.avatar) {
                         setAvatarUrl(data.avatar);
+                    } else {
+                        setAvatarUrl(undefined);
                     }
                 })
                 .catch(() => {
-                    // Ignore errors
+                    setAvatarUrl(undefined);
                 });
         } else {
             setAvatarUrl(undefined);
