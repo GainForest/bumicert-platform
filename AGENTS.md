@@ -44,6 +44,9 @@ bumicert is a platform for verifying and tracking environmental claims and certi
 -   **Use Vercel Blob**: Upload assets to Vercel Blob storage (or another external host) and link to them.
 -   If you need to upload a file, write a script using `@vercel/blob` or ask the user for a token/assistance.
 
+### 5. Git Workflow
+-   **Worktrees**: Always create a new git worktree from `main` (or `origin/main`) for new tasks. This ensures a clean environment and avoids contaminating other branches.
+
 ## Key Files for Context
 -   `package.json`: Dependencies and scripts.
 -   `README.md`: General human-facing documentation.
