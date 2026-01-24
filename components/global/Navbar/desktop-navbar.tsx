@@ -142,11 +142,12 @@ const DesktopNavbar = ({
         <div className="flex flex-col">
           <ul className="flex flex-col">
             {footerLinks.map((link) => {
+              const isInternal = link.href.startsWith("/");
               return (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    target="_blank"
+                    target={isInternal ? undefined : "_blank"}
                     className="cursor-pointer"
                   >
                     <Button
