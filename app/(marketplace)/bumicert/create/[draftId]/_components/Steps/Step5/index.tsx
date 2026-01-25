@@ -117,8 +117,8 @@ const Step5 = () => {
     auth.status === "RESUMING"
       ? "pending"
       : auth.status === "AUTHENTICATED"
-      ? "success"
-      : "error";
+        ? "success"
+        : "error";
 
   const formValues = useFormStore((state) => state.formValues);
   const step1FormValues = formValues[0];
@@ -152,8 +152,8 @@ const Step5 = () => {
     createBumicertError
       ? "error"
       : createdBumicertResponse === null
-      ? "pending"
-      : "success";
+        ? "pending"
+        : "success";
 
   const { mutate: createBumicert } =
     trpcApi.hypercerts.claim.activity.create.useMutation({
@@ -228,6 +228,10 @@ const Step5 = () => {
         step1FormValues.coverImage
       );
 
+      // TODO: When SDK is updated, use new schema format:
+      // - contributors: array of { contributorIdentity, contributionWeight, contributionDetails }
+      // - workScope: union type (string or strongRef)
+      // For now, using current SDK format
       const data = {
         activity: {
           title: step1FormValues.projectName,
@@ -310,15 +314,15 @@ const Step5 = () => {
             createBumicertError
               ? "Failed to publish."
               : createBumicertStatus === "success"
-              ? "Published!"
-              : "Ready to publish your bumicert"
+                ? "Published!"
+                : "Ready to publish your bumicert"
           }
           description={
             createBumicertError
               ? createBumicertError
               : isBumicertCreationMutationInFlight
-              ? "We are publishing your bumicert."
-              : "Review your details, then publish your bumicert."
+                ? "We are publishing your bumicert."
+                : "Review your details, then publish your bumicert."
           }
           status={createBumicertStatus}
           isLastStep={true}
@@ -334,8 +338,7 @@ const Step5 = () => {
             <Button className="mt-2">
               <Link
                 href={links.bumicert.view(
-                  `${parseAtUri(createdBumicertResponse.data.uri).did}-${
-                    parseAtUri(createdBumicertResponse.data.uri).rkey
+                  `${parseAtUri(createdBumicertResponse.data.uri).did}-${parseAtUri(createdBumicertResponse.data.uri).rkey
                   }`
                 )}
               >

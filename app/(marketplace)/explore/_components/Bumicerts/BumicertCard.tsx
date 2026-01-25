@@ -13,6 +13,7 @@ import { BumicertArt } from "@/app/(marketplace)/bumicert/create/[draftId]/_comp
 import { parseAtUri } from "climateai-sdk/utilities/atproto";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
 import { links } from "@/lib/links";
+import { getWorkScopeDisplayLabels } from "@/lib/types/activity-claim";
 
 const StripedDiv = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -49,6 +50,9 @@ const BumicertCard = ({ bumicert }: { bumicert: Bumicert }) => {
 
   const claimRkey = parseAtUri(bumicert.claimActivity.uri).rkey;
 
+  // Get work scope labels using the new helper (handles new schema format)
+  const workScopeLabels = getWorkScopeDisplayLabels(bumicert.claimActivity.value.workScope);
+
   return (
     <motion.div
       initial={{ opacity: 0, filter: "blur(10px)", scale: 0.75 }}
@@ -63,9 +67,9 @@ const BumicertCard = ({ bumicert }: { bumicert: Bumicert }) => {
           logoUrl={bumicert.organizationInfo.logoUrl}
           coverImage={imageUrl}
           title={bumicert.claimActivity.value.title}
-          objectives={bumicert.claimActivity.value.workScope?.withinAnyOf ?? []}
-          startDate={new Date(bumicert.claimActivity.value.startDate)}
-          endDate={new Date(bumicert.claimActivity.value.endDate)}
+          objectives={workScopeLabels}
+          startDate={bumicert.claimActivity.value.startDate ? new Date(bumicert.claimActivity.value.startDate) : new Date()}
+          endDate={bumicert.claimActivity.value.endDate ? new Date(bumicert.claimActivity.value.endDate) : new Date()}
         />
       </Link>
     </motion.div>

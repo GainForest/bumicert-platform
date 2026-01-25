@@ -22,6 +22,7 @@ import UserChip from "@/components/user-chip2";
 import Image from "next/image";
 import { useAdaptiveColors } from "@/hooks/use-adaptive-colors";
 import { ProgressiveBlur } from "@/components/ui/progressive-blur";
+import { getWorkScopeDisplayLabels } from "@/lib/types/activity-claim";
 
 const Hero = ({
   creatorDid,
@@ -39,10 +40,10 @@ const Hero = ({
     bumicert.image === undefined
       ? null
       : getBlobUrl(
-          creatorDid,
-          bumicert.image as $Typed<Defs.SmallImage>,
-          allowedPDSDomains[0]
-        );
+        creatorDid,
+        bumicert.image as $Typed<Defs.SmallImage>,
+        allowedPDSDomains[0]
+      );
 
   const { background, foreground, backgroundMuted, foregroundMuted } =
     useAdaptiveColors(coverImageUrl);
@@ -120,7 +121,7 @@ const Hero = ({
 
                 <div className="w-full overflow-x-auto scrollbar-hidden mask-r-from-90% mt-4">
                   <div className="w-full flex items-center justify-start gap-2">
-                    {(bumicert.workScope?.withinAnyOf ?? []).map(
+                    {getWorkScopeDisplayLabels(bumicert.workScope).map(
                       (work, index) => (
                         <span
                           key={index}
