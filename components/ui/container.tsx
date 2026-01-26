@@ -8,7 +8,7 @@ const Container = ({
   ...props
 }: { children: React.ReactNode } & React.HTMLAttributes<HTMLDivElement>) => {
   return (
-    <div className={cn("w-full max-w-6xl mx-auto p-4", className)} {...props}>
+    <div className={cn("w-full max-w-5xl mx-auto px-4 sm:px-6 py-4", className)} {...props}>
       {children}
     </div>
   );

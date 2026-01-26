@@ -6,43 +6,47 @@ import React from "react";
 
 const UserOptionCards = () => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 mt-4 gap-4">
-      <div className="flex flex-col justify-end bg-foreground/3 backdrop-blur-md rounded-3xl p-4 pt-20 relative">
-        <HandHeartIcon className="size-10 absolute top-3 left-4 text-primary opacity-50" />
-        <span className="font-serif text-primary font-bold text-3xl">
+    <div className="grid grid-cols-1 md:grid-cols-2 mt-6 gap-4">
+      <Link
+        href={links.explore}
+        className="group flex flex-col justify-end bg-secondary/50 dark:bg-secondary/20 hover:bg-secondary/70 dark:hover:bg-secondary/30 rounded-2xl p-5 pt-20 relative transition-colors"
+      >
+        <HandHeartIcon className="size-8 absolute top-4 left-5 text-primary/60 group-hover:text-primary transition-colors" />
+        <Button
+          variant="outline"
+          size="sm"
+          className="absolute top-3 right-3 rounded-lg border-border/60 text-muted-foreground group-hover:text-foreground group-hover:border-primary/30 transition-colors"
+        >
+          Explore <ArrowRight className="size-3.5" />
+        </Button>
+        <span className="font-serif text-foreground text-2xl leading-tight">
           I want to support a project.
         </span>
-        <p className="mt-2 text-muted-foreground">
+        <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
           Purchase Bumicerts to directly fund regenerative projects that restore
           nature and strengthen community resilience.
         </p>
-        <Link href={links.explore}>
-          <Button
-            variant={"outline"}
-            className="absolute top-2 right-2 rounded-xl"
-          >
-            Explore bumicerts <ArrowRight className="size-4" />
-          </Button>
-        </Link>
-      </div>
-      <div className="flex flex-col justify-end bg-foreground/3 backdrop-blur-md rounded-3xl p-4 pt-20 relative">
-        <TreesIcon className="size-10 absolute top-3 left-4 text-primary opacity-50" />
-        <span className="font-serif text-primary font-bold text-3xl">
+      </Link>
+      <Link
+        href={links.bumicert.create}
+        className="group flex flex-col justify-end bg-secondary/50 dark:bg-secondary/20 hover:bg-secondary/70 dark:hover:bg-secondary/30 rounded-2xl p-5 pt-20 relative transition-colors"
+      >
+        <TreesIcon className="size-8 absolute top-4 left-5 text-primary/60 group-hover:text-primary transition-colors" />
+        <Button
+          variant="outline"
+          size="sm"
+          className="absolute top-3 right-3 rounded-lg border-border/60 text-muted-foreground group-hover:text-foreground group-hover:border-primary/30 transition-colors"
+        >
+          Create <ArrowRight className="size-3.5" />
+        </Button>
+        <span className="font-serif text-foreground text-2xl leading-tight">
           I am an organization.
         </span>
-        <p className="mt-2 text-muted-foreground">
+        <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
           Create a bumicert to showcase your regenerative impact and attract
           donors.
         </p>
-        <Link href={links.bumicert.create}>
-          <Button
-            variant={"outline"}
-            className="absolute top-2 right-2 rounded-xl"
-          >
-            Create a bumicert <ArrowRight className="size-4" />
-          </Button>
-        </Link>
-      </div>
+      </Link>
     </div>
   );
 };

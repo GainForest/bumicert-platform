@@ -75,7 +75,7 @@ const Hero2 = () => {
                   scale: 0,
                   filter: "blur(10px)",
                 }}
-                className="px-6 z-5 font-serif text-white text-center text-pretty max-w-xl text-xl"
+                className="px-6 z-5 font-serif text-white text-center text-pretty max-w-xl text-xl leading-relaxed"
               >
                 Bumicerts is a marketplace that connects nature stewards with
                 funders. It allows local communities and organizations to
@@ -90,7 +90,7 @@ const Hero2 = () => {
             initial={{ opacity: 0, filter: "blur(10px)" }}
             animate={{ opacity: 1, filter: "blur(0px)" }}
             transition={{ delay: 2 }}
-            className="absolute bottom-2 flex items-center gap-2 px-2 py-1 bg-transparent backdrop-blur-md hover:bg-white/10 border border-white/20 rounded-full p-2"
+            className="absolute bottom-3 flex items-center gap-2 px-3 py-1.5 bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/20 rounded-full transition-colors"
             onClick={() => {
               // Set the bumicert branding delay to 0 when the user clicks Learn More for first time (or in fact, any time).
               setBumicertBrandingDelayOffset(0);
@@ -98,11 +98,11 @@ const Hero2 = () => {
             }}
           >
             {shouldDisplayLearnMoreContent ? (
-              <ChevronLeftIcon className="size-3 text-white/80" />
+              <ChevronLeftIcon className="size-3.5 text-white/90" />
             ) : (
-              <InfoIcon className="size-3 text-white/80" />
+              <InfoIcon className="size-3.5 text-white/90" />
             )}
-            <span className="text-white/80 text-sm">
+            <span className="text-white/90 text-sm font-medium">
               {shouldDisplayLearnMoreContent ? "Back" : "Learn more"}
             </span>
           </motion.button>

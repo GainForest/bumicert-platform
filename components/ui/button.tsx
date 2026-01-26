@@ -13,12 +13,18 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
         outline:
-          "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input",
+          "border border-border/60 bg-background shadow-xs hover:bg-accent hover:text-accent-foreground",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
+        // Sungai-style text action button
+        textAction:
+          "text-primary font-medium hover:text-primary/80 transition-colors bg-transparent",
+        // Sungai-style subtle text button
+        subtle:
+          "text-muted-foreground hover:text-foreground transition-colors bg-transparent",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

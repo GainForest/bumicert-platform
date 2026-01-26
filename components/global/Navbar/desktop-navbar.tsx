@@ -37,47 +37,46 @@ const DesktopNavbar = ({
   const isHome = title === "Bumicerts";
 
   return (
-    <nav className={cn("w-[240px] p-4 flex flex-col justify-between")}>
+    <nav className={cn("w-[240px] p-4 flex flex-col justify-between bg-background/50")}>
       {/* Top Section */}
       <div className="flex flex-col gap-2">
         {/* Header */}
         <Link
           href="/"
-          className="group hover:scale-105 transition-all duration-300 origin-left"
+          className="group flex items-center gap-3 hover:opacity-80 transition-opacity"
         >
           <div
             className={cn(
-              "h-12 w-12 border border-border rounded-xl shadow-lg bg-background flex items-center justify-center gap-1",
-              !isHome && "h-8 w-fit px-1 pr-4"
+              "h-10 w-10 border border-border/60 rounded-lg bg-background flex items-center justify-center shrink-0",
+              !isHome && "h-8 w-8"
             )}
           >
-            {!isHome && (
-              <div className="group-hover:bg-primary text-muted-foreground group-hover:text-primary-foreground transition-all duration-300 rounded-full p-1">
-                <ChevronLeft className="size-4" />
-              </div>
-            )}
-            <div className="flex items-center gap-0">
-              <Image
-                src="/assets/media/images/logo.svg"
-                alt={title}
-                width={isHome ? 32 : 24}
-                height={isHome ? 32 : 24}
-              />
-              {!isHome && <span className="font-medium">Home</span>}
-            </div>
+            <Image
+              src="/assets/media/images/logo.svg"
+              alt={title}
+              width={isHome ? 24 : 20}
+              height={isHome ? 24 : 20}
+              className="opacity-90"
+            />
           </div>
+          {!isHome && (
+            <div className="flex items-center gap-1 text-muted-foreground group-hover:text-foreground transition-colors">
+              <ChevronLeft className="size-4" />
+              <span className="text-sm">Home</span>
+            </div>
+          )}
         </Link>
-        <b
+        <h1
           className={cn(
-            "font-serif text-2xl drop-shadow-lg",
+            "font-serif text-xl font-medium tracking-tight text-foreground",
             !isHome && "mt-4"
           )}
         >
           {title}
-        </b>
+        </h1>
 
         {/* Nav Links */}
-        <ul className="mt-2 flex flex-col gap-1">
+        <ul className="mt-3 flex flex-col gap-0.5">
           {navLinks.map((link) => {
             let isHighlighted = false;
 
@@ -109,27 +108,22 @@ const DesktopNavbar = ({
 
             return (
               <li key={link.id} className="w-full">
-                <Link href={href} className="w-full">
-                  <Button
-                    variant={isHighlighted ? "default" : "ghost"}
-                    size="sm"
+                <Link
+                  href={href}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors",
+                    isHighlighted
+                      ? "bg-secondary text-foreground font-medium"
+                      : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                  )}
+                >
+                  <link.Icon
+                    size={16}
                     className={cn(
-                      "w-full text-left justify-start relative overflow-hidden cursor-pointer",
-                      !isHighlighted && "hover:bg-background "
+                      isHighlighted ? "text-primary" : "text-muted-foreground"
                     )}
-                  >
-                    {isHighlighted && (
-                      <div className="absolute left-0.5 top-2 bottom-2 w-0.5 bg-primary-foreground/50 rounded-full" />
-                    )}
-                    <link.Icon
-                      size={16}
-                      className={cn(
-                        "text-primary/70",
-                        isHighlighted && "text-primary-foreground/80"
-                      )}
-                    />
-                    <span>{link.text}</span>
-                  </Button>
+                  />
+                  <span>{link.text}</span>
                 </Link>
               </li>
             );
@@ -138,40 +132,32 @@ const DesktopNavbar = ({
       </div>
 
       {/* Bottom Section */}
-      <div className="flex flex-col gap-2">
-        {/* Footer */}
-        <div className="flex flex-col">
-          <ul className="flex flex-col">
-            {footerLinks.map((link) => {
-              const isInternal = link.href.startsWith("/");
-              return (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    target={isInternal ? undefined : "_blank"}
-                    className="cursor-pointer"
-                  >
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="cursor-pointer hover:bg-background hover:shadow-md w-full text-left justify-between"
-                    >
-                      <span>{link.text}</span>
-                      <ArrowUpRight size={16} className="text-primary" />
-                    </Button>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+      <div className="flex flex-col gap-3">
+        {/* Footer Links */}
+        <div className="flex flex-col gap-0.5">
+          {footerLinks.map((link) => {
+            const isInternal = link.href.startsWith("/");
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                target={isInternal ? undefined : "_blank"}
+                rel={isInternal ? undefined : "noopener noreferrer"}
+                className="flex items-center justify-between px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-secondary/50"
+              >
+                <span>{link.text}</span>
+                <ArrowUpRight size={14} className="text-primary/60" />
+              </Link>
+            );
+          })}
         </div>
-        <hr />
-        <div className="flex items-center justify-between">
-          <span className="text-muted-foreground text-xs font-semibold">
+        <div className="h-px bg-border/60" />
+        <div className="flex items-center justify-between px-1">
+          <span className="text-muted-foreground text-[11px] tracking-wide">
             v{packageJson.version}
           </span>
-          <div className="flex items-center gap-1">
-            <Sun className="size-3" />
+          <div className="flex items-center gap-1.5">
+            <Sun className="size-3 text-muted-foreground" />
             {isMounted && (
               <Switch
                 checked={theme === "dark"}
@@ -180,7 +166,7 @@ const DesktopNavbar = ({
                 }
               />
             )}
-            <Moon className="size-3" />
+            <Moon className="size-3 text-muted-foreground" />
           </div>
         </div>
       </div>
