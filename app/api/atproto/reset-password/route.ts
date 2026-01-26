@@ -68,10 +68,10 @@ export async function POST(req: NextRequest) {
       let userMessage = error.message || "Failed to reset password";
       if (error.error === "ExpiredToken") {
         userMessage =
-          "This reset link is invalid. Please request a new password reset.";
+          "This reset code is invalid. Please request a new password reset.";
       } else if (error.error === "InvalidToken") {
         userMessage =
-          "This reset link is invalid. Please request a new password reset.";
+          "This reset code is invalid. Please request a new password reset.";
       }
 
       return new Response(
