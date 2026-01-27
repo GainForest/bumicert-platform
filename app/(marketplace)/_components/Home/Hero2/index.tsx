@@ -3,12 +3,11 @@
 import { motion } from "framer-motion";
 import { BumicertArt } from "@/app/(marketplace)/bumicert/create/[draftId]/_components/Steps/Step4/BumicertPreviewCard";
 
-// Sample bumicerts to display as floating cards with Unsplash images
+// Sample bumicerts to display as floating cards
 const FLOATING_CARDS = [
   {
     id: 1,
-    // Lush rainforest canopy
-    image: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=400&q=80",
+    image: "/assets/media/images/hero-bumicert-card/image0.png",
     title: "Amazon Rainforest Conservation",
     objectives: ["Biodiversity", "Carbon Capture"],
     startDate: new Date("2024-01-01"),
@@ -24,8 +23,7 @@ const FLOATING_CARDS = [
   },
   {
     id: 2,
-    // Coral reef underwater
-    image: "https://images.unsplash.com/photo-1546026423-cc4642628d2b?w=400&q=80",
+    image: "/assets/media/images/hero-bumicert-card/image1.png",
     title: "Coral Reef Restoration",
     objectives: ["Marine Life", "Ecosystem"],
     startDate: new Date("2024-03-01"),
@@ -39,8 +37,7 @@ const FLOATING_CARDS = [
   },
   {
     id: 3,
-    // Mangrove forest
-    image: "https://images.unsplash.com/photo-1569974507005-6dc61f97fb5c?w=400&q=80",
+    image: "/assets/media/images/hero-bumicert-card/image2.png",
     title: "Mangrove Reforestation",
     objectives: ["Coastal Protection"],
     startDate: new Date("2024-06-01"),
@@ -117,7 +114,7 @@ const Hero2 = () => {
           >
             <BumicertArt
               logoUrl={null}
-              coverImage="https://images.unsplash.com/photo-1474511320723-9a56873571b7?w=400&q=80"
+              coverImage="/assets/media/images/hero-bumicert-card/image0.png"
               title="Wildlife Corridor Project"
               objectives={["Wildlife", "Connectivity"]}
               startDate={new Date("2024-02-01")}
