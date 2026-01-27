@@ -122,7 +122,7 @@ const DesktopNavbar = ({
             const href =
               typeof link.href === "function" ? link.href(did) : link.href;
 
-            // Collapsed view - icon only with tooltip
+            // Collapsed view - icon only with tooltip and hover background
             if (isCollapsed) {
               return (
                 <li key={link.id}>
@@ -133,8 +133,8 @@ const DesktopNavbar = ({
                         className={cn(
                           "flex items-center justify-center w-8 h-8 rounded-md transition-colors",
                           isHighlighted
-                            ? "text-foreground"
-                            : "text-muted-foreground/50 hover:text-foreground"
+                            ? "text-foreground bg-foreground/5"
+                            : "text-muted-foreground/50 hover:text-foreground hover:bg-foreground/5"
                         )}
                       >
                         <link.Icon size={15} strokeWidth={1.25} />
@@ -148,19 +148,20 @@ const DesktopNavbar = ({
               );
             }
 
-            // Expanded view - text only
+            // Expanded view - icon + text with hover background
             return (
               <li key={link.id} className="w-full">
                 <Link
                   href={href}
                   className={cn(
-                    "block px-1 py-1 text-sm transition-colors whitespace-nowrap",
+                    "flex items-center gap-2 px-2 py-1.5 -mx-1 rounded-md text-sm transition-colors whitespace-nowrap",
                     isHighlighted
-                      ? "text-foreground"
-                      : "text-muted-foreground/70 hover:text-foreground"
+                      ? "text-foreground bg-foreground/5"
+                      : "text-muted-foreground/70 hover:text-foreground hover:bg-foreground/5"
                   )}
                 >
-                  {link.text}
+                  <link.Icon size={15} strokeWidth={1.25} className="shrink-0" />
+                  <span>{link.text}</span>
                 </Link>
               </li>
             );
@@ -185,7 +186,7 @@ const DesktopNavbar = ({
                     href={link.href}
                     target={isInternal ? undefined : "_blank"}
                     rel={isInternal ? undefined : "noopener noreferrer"}
-                    className="flex items-center gap-1 px-1 py-1 text-sm text-muted-foreground/50 hover:text-muted-foreground transition-colors whitespace-nowrap"
+                    className="flex items-center gap-1 px-2 py-1.5 -mx-1 rounded-md text-sm text-muted-foreground/50 hover:text-muted-foreground hover:bg-foreground/5 transition-colors whitespace-nowrap"
                   >
                     <span>{link.text}</span>
                     <ArrowUpRight size={11} strokeWidth={1.5} className="shrink-0" />
@@ -210,12 +211,12 @@ const DesktopNavbar = ({
           
           {isMounted && (
             isCollapsed ? (
-              // Collapsed: icon button with tooltip
+              // Collapsed: icon button with tooltip and hover background
               <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
                   <button
                     onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                    className="flex items-center justify-center w-8 h-8 rounded-md text-muted-foreground/70 hover:text-foreground transition-colors"
+                    className="flex items-center justify-center w-8 h-8 rounded-md text-muted-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-colors"
                   >
                     {theme === "dark" ? <Moon size={15} strokeWidth={1.5} /> : <Sun size={15} strokeWidth={1.5} />}
                   </button>
@@ -225,10 +226,10 @@ const DesktopNavbar = ({
                 </TooltipContent>
               </Tooltip>
             ) : (
-              // Expanded: icon + text
+              // Expanded: icon + text with hover background
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="flex items-center gap-1.5 text-muted-foreground/70 hover:text-foreground transition-colors"
+                className="flex items-center gap-1.5 px-2 py-1.5 -mx-1 rounded-md text-muted-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-colors"
               >
                 {theme === "dark" ? <Moon size={14} strokeWidth={1.5} /> : <Sun size={14} strokeWidth={1.5} />}
                 <span className="text-xs">{theme === "dark" ? "Dark" : "Light"}</span>

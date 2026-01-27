@@ -1,21 +1,10 @@
 "use client";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
 import React, { useMemo } from "react";
 import useNewBumicertStore from "../store";
 import { STEPS as steps } from "../_data/steps";
 import { useFormStore } from "../form-store";
-import CircularProgressBar from "@/components/circular-progressbar";
-import {
-  BookImage,
-  Check,
-  ChevronRight,
-  EarthLock,
-  FlagTriangleRight,
-  PenLine,
-  ScanSearch,
-} from "lucide-react";
-import { getStripedBackground } from "@/lib/getStripedBackground";
+import { Check, FlagTriangleRight } from "lucide-react";
 import { useStep5Store } from "./Steps/Step5/store";
 
 const StepHeader = () => {
@@ -50,103 +39,84 @@ const StepHeader = () => {
       step4Enabled,
       step5Enabled,
     ];
-  }, [currentStepIndex, completionPercentages, step5OverallStatus]);
+  }, [completionPercentages, step5OverallStatus]);
 
   return (
-    <div className="flex flex-col w-full">
-      <div className="flex items-center gap-1 px-1 justify-center">
+    <div className="flex flex-col w-full gap-3">
+      {/* Step indicators */}
+      <div className="flex items-center justify-center gap-1">
         {steps.map((step, index) => {
           const progress = stepProgressesByIndex[index];
-          const Icon = progress >= 100 ? Check : step.icon;
+          const isComplete = progress >= 100;
+          const isCurrent = currentStepIndex === index;
+          const isEnabled = stepEnability[index];
+          const Icon = step.icon;
+
           return (
             <React.Fragment key={index}>
-              <motion.div className={cn("flex flex-col")} layout>
-                <motion.button
+              <button
+                className={cn(
+                  "flex items-center gap-2 px-2 py-1.5 rounded-md transition-all",
+                  "disabled:cursor-not-allowed disabled:opacity-40",
+                  isCurrent
+                    ? "bg-foreground/5"
+                    : "hover:bg-foreground/5",
+                )}
+                onClick={() => setCurrentStep(index)}
+                disabled={!isEnabled}
+              >
+                {/* Step number, check, or flag for last step */}
+                <div
                   className={cn(
-                    "cursor-pointer rounded-md overflow-hidden transition-all hover:scale-105 disabled:hover:scale-100 hover:text-primary disabled:hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50",
-                    currentStepIndex === index && "text-primary"
+                    "flex items-center justify-center size-6 rounded-full text-xs font-medium transition-all",
+                    isComplete
+                      ? "bg-primary text-primary-foreground"
+                      : index === 4
+                        ? "bg-primary/15 text-primary"
+                        : isCurrent
+                          ? "bg-foreground text-background"
+                          : "bg-foreground/10 text-foreground/60"
                   )}
-                  onClick={() => setCurrentStep(index)}
-                  disabled={!stepEnability[index]}
                 >
-                  <div className="p-1 flex items-center gap-2">
-                    <motion.div layout>
-                      <CircularProgressBar
-                        value={Math.max(5, progress)}
-                        size={28}
-                        text={
-                          <Icon
-                            className={cn(
-                              "size-6 text-primary",
-                              currentStepIndex === index &&
-                                "text-primary-foreground"
-                            )}
-                          />
-                        }
-                        textSize={0.8}
-                        backgroundColor={
-                          currentStepIndex === index
-                            ? "var(--primary)"
-                            : undefined
-                        }
-                        strokeColor={
-                          currentStepIndex === index
-                            ? "rgba(255, 255, 255, 0.6)"
-                            : undefined
-                        }
-                        strokeWidth={currentStepIndex === index ? 12 : 9}
-                      />
-                    </motion.div>
-                    {currentStepIndex === index && (
-                      <motion.div
-                        className="hidden md:flex flex-col items-start"
-                        initial={{ opacity: 0, x: -20, filter: "blur(10px)" }}
-                        animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-                      >
-                        <b className="font-medium text-nowrap">{step.title}</b>
-                      </motion.div>
-                    )}
-                  </div>
-                </motion.button>
-              </motion.div>
+                  {isComplete ? (
+                    <Check className="size-3.5" strokeWidth={2.5} />
+                  ) : index === 4 ? (
+                    <FlagTriangleRight className="size-3.5" strokeWidth={1.5} />
+                  ) : (
+                    <span>{index + 1}</span>
+                  )}
+                </div>
+                
+                {/* Step title - show on current step (desktop only) */}
+                {isCurrent && (
+                  <span className="hidden md:block text-sm font-medium text-foreground whitespace-nowrap">
+                    {step.title}
+                  </span>
+                )}
+              </button>
+
+              {/* Connector line */}
               {index < steps.length - 1 && (
-                <ChevronRight className="size-4 text-foreground/40" />
+                <div
+                  className={cn(
+                    "w-6 h-px transition-colors",
+                    stepProgressesByIndex[index] >= 100
+                      ? "bg-primary"
+                      : "bg-foreground/15"
+                  )}
+                />
               )}
             </React.Fragment>
           );
         })}
       </div>
-      <div
-        className="w-full h-1.5 overflow-hidden mt-1"
-        style={{
-          background: getStripedBackground(
-            {
-              variable: "--foreground",
-              opacity: 8,
-            },
-            {
-              variable: "--foreground",
-              opacity: 3,
-            }
-          ),
-        }}
-      >
+
+      {/* Overall progress bar */}
+      <div className="w-full h-1 bg-foreground/10 rounded-full overflow-hidden">
         <div
-          className="h-full bg-primary transition-all duration-300"
-          style={{
-            width: `${step4Progress}%`,
-            background: getStripedBackground(
-              {
-                variable: "--primary",
-                opacity: 100,
-              },
-              {
-                variable: "--primary",
-                opacity: 50,
-              }
-            ),
-          }}
-        ></div>
+          className="h-full bg-primary transition-all duration-300 ease-out rounded-full"
+          style={{ width: `${step4Progress}%` }}
+        />
       </div>
     </div>
   );

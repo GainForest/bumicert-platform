@@ -1,12 +1,11 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Lightbulb, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Lightbulb, X } from "lucide-react";
 import React, { useEffect, useEffectEvent, useMemo, useState } from "react";
 import useNewBumicertStore from "../store";
 import { STEPS, STEPS as steps } from "../_data/steps";
 import { useFormStore } from "../form-store";
 import { useStep5Store } from "./Steps/Step5/store";
-import { ProgressiveBlur } from "@/components/ui/progressive-blur";
 import { useNavbarContext } from "@/components/global/Navbar/context";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -48,73 +47,75 @@ const StepFooter = () => {
     }
     // For step 5.
     return false;
-  }, [currentStepIndex]);
+  }, [currentStepIndex, step1Progress, step2Progress, step3Progress]);
 
   return (
     <AnimatePresence>
       {showTipButton && showTips && (
         <TipsPopup onClose={() => setShowTips(false)} key={"tips-popup"} />
       )}
-      <div className="w-full sticky bottom-0 bg-linear-to-t from-black/20 to-black/0 z-7">
-        <ProgressiveBlur
-          className="w-full h-full z-7"
-          height="100%"
-        ></ProgressiveBlur>
-        <div className="relative inset-0 flex items-center justify-between p-4 z-8">
-          <div className="flex items-center flex-1 gap-1">
+      <div className="w-full sticky bottom-0 z-7">
+        {/* Subtle gradient fade */}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/95 to-transparent pointer-events-none" />
+        
+        <div className="relative flex items-center justify-between px-4 py-3 z-8">
+          <div className="flex items-center flex-1 gap-2">
             {currentStepIndex > 0 && (
               <Button
                 onClick={() => setCurrentStepIndex(currentStepIndex - 1)}
-                variant="outline"
+                variant="ghost"
+                size="sm"
                 disabled={
                   currentStepIndex === 4 && overallStatusForStep5 === "pending"
                 }
+                className="gap-1.5 text-muted-foreground hover:text-foreground"
               >
-                <ChevronLeft />
-                {showTipButton ? "" : steps[currentStepIndex - 1].title}
+                <ArrowLeft className="size-4" strokeWidth={1.5} />
+                {!showTipButton && (
+                  <span className="text-sm">{steps[currentStepIndex - 1].title}</span>
+                )}
               </Button>
             )}
             <AnimatePresence>
               {showTipButton && !showTips && (
                 <Button
-                  variant={"outline"}
+                  variant="ghost"
+                  size="sm"
                   component={motion.button}
                   componentProps={{
-                    initial: { opacity: 0, scale: 0.5, filter: "blur(10px)" },
-                    animate: { opacity: 1, scale: 1, filter: "blur(0px)" },
-                    exit: { opacity: 0, scale: 0.5, filter: "blur(10px)" },
+                    initial: { opacity: 0, scale: 0.95 },
+                    animate: { opacity: 1, scale: 1 },
+                    exit: { opacity: 0, scale: 0.95 },
                     layoutId: "tips-popup",
                     layoutRoot: true,
                   }}
                   onClick={() => setShowTips(true)}
+                  className="gap-1.5 text-muted-foreground hover:text-foreground"
                 >
                   <motion.span layoutId="tips-icon">
-                    <Lightbulb />
+                    <Lightbulb className="size-4" strokeWidth={1.5} />
                   </motion.span>
-                  <motion.span layoutId="tips-text">Tips</motion.span>
+                  <motion.span layoutId="tips-text" className="text-sm">Tips</motion.span>
                 </Button>
               )}
             </AnimatePresence>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant={"outline"} className="hidden">
-              <Lightbulb />
-            </Button>
             {currentStepIndex < 4 && (
               <Button
                 onClick={() => setCurrentStepIndex(currentStepIndex + 1)}
                 disabled={!allowUserToMoveForward}
-                className="disabled:opacity-100 disabled:saturate-40 disabled:text-primary-foreground/50"
+                size="sm"
+                className="gap-1.5 disabled:opacity-40"
               >
-                Continue <ChevronRight />
+                <span>Continue</span>
+                <ArrowRight className="size-4" strokeWidth={1.5} />
               </Button>
             )}
           </div>
         </div>
       </div>
     </AnimatePresence>
-    // <div className="flex items-center justify-between p-2 mt-6 mb-4 bg-muted rounded-2xl">
-    // </div>
   );
 };
 
@@ -122,35 +123,42 @@ const TipsPopup = ({ onClose }: { onClose: () => void }) => {
   const { currentStepIndex } = useNewBumicertStore();
   return (
     <>
-      <div className="fixed z-100 inset-0 bg-black/50"></div>
+      <div className="fixed z-100 inset-0 bg-black/40 backdrop-blur-sm" />
       <motion.div
         layoutId="tips-popup"
-        className="fixed bottom-4 left-4 right-4 z-110 bg-background border border-border rounded-lg p-4 shadow-lg"
+        className="fixed bottom-4 left-4 right-4 z-110 bg-background border border-border/50 rounded-xl p-5 shadow-xl"
       >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1 text-xl">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
             <motion.span layoutId="tips-icon">
-              <Lightbulb className="size-5" />
+              <Lightbulb className="size-4 text-foreground/70" strokeWidth={1.5} />
             </motion.span>
-            <motion.span layoutId="tips-text">Tips</motion.span>
+            <motion.span layoutId="tips-text" className="font-medium">
+              Tips
+            </motion.span>
           </div>
-          <Button
+          <button
             onClick={onClose}
-            variant={"outline"}
-            size={"icon"}
-            className="rounded-full"
+            className="p-1.5 rounded-full hover:bg-foreground/5 transition-colors"
           >
-            <X />
-          </Button>
+            <X className="size-4 text-muted-foreground" strokeWidth={1.5} />
+          </button>
         </div>
-        <div className="mt-2">
-          {STEPS[currentStepIndex].tips.pre}
-          <ul className="list-disc list-inside -indent-5 pl-5 mt-2 font-medium text-muted-foreground">
+        <div className="text-sm text-foreground/80">
+          {STEPS[currentStepIndex].tips.pre && (
+            <p className="mb-2">{STEPS[currentStepIndex].tips.pre}</p>
+          )}
+          <ul className="space-y-1.5 text-muted-foreground">
             {STEPS[currentStepIndex].tips.bullets.map((tip, index) => (
-              <li key={index}>{tip}</li>
+              <li key={index} className="flex gap-2">
+                <span className="text-foreground/30">-</span>
+                <span>{tip}</span>
+              </li>
             ))}
           </ul>
-          {STEPS[currentStepIndex].tips.post}
+          {STEPS[currentStepIndex].tips.post && (
+            <p className="mt-2 text-foreground/80">{STEPS[currentStepIndex].tips.post}</p>
+          )}
         </div>
       </motion.div>
     </>
