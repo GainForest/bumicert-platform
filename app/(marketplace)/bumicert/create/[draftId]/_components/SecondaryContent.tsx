@@ -1,73 +1,16 @@
 "use client";
-import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import BiokoNeutralImage from "@/app/(marketplace)/bumicert/create/[draftId]/_assets/bioko-neutral.png";
-import BiokoHoldingLoudspeakerImage from "@/app/(marketplace)/bumicert/create/[draftId]/_assets/bioko-holding-loudspeaker.png";
-import BiokoHoldingEarthImage from "@/app/(marketplace)/bumicert/create/[draftId]/_assets/bioko-holding-earth.png";
-import BiokoHoldingMagnifierImage from "@/app/(marketplace)/bumicert/create/[draftId]/_assets/bioko-holding-magnifier.png";
-import BiokoHoldingConfettiImage from "@/app/(marketplace)/bumicert/create/[draftId]/_assets/bioko-holding-confetti.png";
-import { getStripedBackground } from "@/lib/getStripedBackground";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, EyeIcon, Lightbulb } from "lucide-react";
 import useNewBumicertStore from "../store";
-import BumicertPreviewCard, {
-  BumicertArt,
-} from "./Steps/Step4/BumicertPreviewCard";
+import { BumicertArt } from "./Steps/Step4/BumicertPreviewCard";
 import { useFormStore } from "../form-store";
 import { trpcApi } from "@/components/providers/TrpcProvider";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { getBlobUrl } from "climateai-sdk/utilities/atproto";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-const stepImages = [
-  {
-    image: BiokoNeutralImage,
-    alt: "Bioko Neutral",
-    tips: [
-      "Use a short and descriptive name for your project.",
-      "Include a website or social link to your project for easy access.",
-    ],
-    previewBumicertByDefault: true,
-  },
-  {
-    image: BiokoHoldingLoudspeakerImage,
-    alt: "Bioko Holding Loudspeaker",
-    tips: [
-      "Tell your story in your own words. Explain what the problem was and what you did to solve it.",
-      "Share who was involved, such as your group, partners, or local community.",
-      "Describe how your work is helping and what has changed because of it.",
-      "Write freely. Longer stories are welcome.",
-    ],
-    previewBumicertByDefault: false,
-  },
-  {
-    image: BiokoHoldingEarthImage,
-    alt: "Bioko Holding Earth",
-    tips: [
-      "Add your own community or organization first, then other people or groups who joined.",
-      "Make sure everyone agrees to be included.",
-      "Upload your site boundary in GeoJSON format so it shows on the map.",
-    ],
-    previewBumicertByDefault: false,
-  },
-  {
-    image: BiokoHoldingMagnifierImage,
-    alt: "Bioko Holding Magnifier",
-    tips: [
-      "Make sure you have completed all the previous steps.",
-      "Review the look of your bumicert before submitting.",
-    ],
-    previewBumicertByDefault: false,
-  },
-  {
-    image: BiokoHoldingConfettiImage,
-    alt: "Bioko Holding Confetti",
-    tips: ["You have completed all the steps! No more tips for this section."],
-    previewBumicertByDefault: false,
-  },
-];
+import { STEPS } from "../_data/steps";
 
 const SecondaryContent = () => {
   const { currentStepIndex: currentStep } = useNewBumicertStore();
@@ -78,12 +21,13 @@ const SecondaryContent = () => {
   const step1Progress = completionPercentages[0];
   const auth = useAtprotoStore((state) => state.auth);
 
+  const currentStepData = STEPS[currentStep];
   const [isBumicertPreviewOpen, setIsBumicertPreviewOpen] = useState(
-    stepImages[currentStep].previewBumicertByDefault
+    currentStepData.previewBumicertByDefault
   );
 
   useEffect(() => {
-    setIsBumicertPreviewOpen(stepImages[currentStep].previewBumicertByDefault);
+    setIsBumicertPreviewOpen(STEPS[currentStep].previewBumicertByDefault);
   }, [currentStep]);
 
   const { data: organizationInfoResponse, isPlaceholderData: isOlderData } =
@@ -103,43 +47,34 @@ const SecondaryContent = () => {
     : null;
 
   return (
-    <div className="w-full min-h-full flex flex-col bg-muted/50 rounded-xl">
-      <div className="w-full p-2">
-        <div className="flex items-center justify-between">
-          <span className="flex items-center gap-1 text-lg font-medium text-muted-foreground">
-            <EyeIcon className="size-5" />
-            Preview Bumicert
+    <div className="w-full min-h-full flex flex-col gap-4">
+      {/* Preview Section */}
+      <div className="bg-foreground/3 rounded-lg p-4">
+        <div className="flex items-center justify-between mb-3">
+          <span className="flex items-center gap-2 text-sm font-medium text-foreground/70">
+            <EyeIcon className="size-4" strokeWidth={1.5} />
+            Preview
           </span>
-          <Button
-            size={"icon"}
-            variant={"ghost"}
+          <button
             onClick={() => setIsBumicertPreviewOpen(!isBumicertPreviewOpen)}
+            className="p-1 rounded hover:bg-foreground/5 transition-colors"
           >
             <ChevronDown
               className={cn(
-                "size-5 transition-transform duration-200",
+                "size-4 text-foreground/50 transition-transform duration-200",
                 isBumicertPreviewOpen ? "rotate-180" : ""
               )}
+              strokeWidth={1.5}
             />
-          </Button>
+          </button>
         </div>
-        <hr className="my-2" />
         <AnimatePresence mode="wait">
           {isBumicertPreviewOpen && (
             <motion.div
-              initial={{
-                opacity: 0,
-                scale: 0.3,
-                filter: "blur(10px)",
-                height: 0,
-              }}
-              animate={{
-                opacity: 1,
-                scale: 1,
-                filter: "blur(0px)",
-                height: "auto",
-              }}
-              exit={{ opacity: 0, scale: 0.3, filter: "blur(10px)", height: 0 }}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2 }}
             >
               {step1Progress === 100 ? (
                 <div className="flex items-center justify-center">
@@ -157,9 +92,9 @@ const SecondaryContent = () => {
                   />
                 </div>
               ) : (
-                <div className="w-full flex items-center justify-center p-4">
-                  <span className="font-medium text-muted-foreground text-center text-pretty">
-                    Please complete the first step to generate the preview.
+                <div className="w-full flex items-center justify-center py-6">
+                  <span className="text-sm text-foreground/50 text-center">
+                    Complete step 1 to see your preview
                   </span>
                 </div>
               )}
@@ -167,17 +102,29 @@ const SecondaryContent = () => {
           )}
         </AnimatePresence>
       </div>
-      <div className="w-full p-2">
-        <span className="flex items-center gap-1 text-lg font-medium text-muted-foreground">
-          <Lightbulb className="size-5" />
-          Tips for this section
+
+      {/* Tips Section */}
+      <div className="bg-foreground/3 rounded-lg p-4">
+        <span className="flex items-center gap-2 text-sm font-medium text-foreground/70 mb-3">
+          <Lightbulb className="size-4" strokeWidth={1.5} />
+          Tips
         </span>
-        <hr className="my-2" />
-        <ul className="list-disc list-inside -indent-5 pl-5 mt-2 font-medium text-muted-foreground">
-          {stepImages[currentStep].tips.map((tip, index) => (
-            <li key={index}>{tip}</li>
-          ))}
-        </ul>
+        <div className="space-y-3">
+          {currentStepData.tips.pre && (
+            <p className="text-sm text-foreground/60">{currentStepData.tips.pre}</p>
+          )}
+          <ul className="space-y-2">
+            {currentStepData.tips.bullets.map((tip, index) => (
+              <li key={index} className="flex gap-2 text-sm text-foreground/60">
+                <span className="text-foreground/30 shrink-0">-</span>
+                <span>{tip}</span>
+              </li>
+            ))}
+          </ul>
+          {currentStepData.tips.post && (
+            <p className="text-sm text-foreground/50 italic">{currentStepData.tips.post}</p>
+          )}
+        </div>
       </div>
     </div>
   );

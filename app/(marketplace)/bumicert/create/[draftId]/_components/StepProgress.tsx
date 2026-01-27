@@ -71,11 +71,9 @@ const StepHeader = () => {
                     "flex items-center justify-center size-6 rounded-full text-xs font-medium transition-all",
                     isComplete
                       ? "bg-primary text-primary-foreground"
-                      : index === 4
+                      : isCurrent
                         ? "bg-primary/15 text-primary"
-                        : isCurrent
-                          ? "bg-foreground text-background"
-                          : "bg-foreground/10 text-foreground/60"
+                        : "bg-foreground/10 text-foreground/60"
                   )}
                 >
                   {isComplete ? (
