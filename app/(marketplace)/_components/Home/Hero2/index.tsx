@@ -24,8 +24,8 @@ const FLOATING_CARDS = [
   {
     id: 2,
     image: "/assets/media/images/hero-bumicert-card/image1.png",
-    title: "Coral Reef Restoration",
-    objectives: ["Marine Life", "Ecosystem"],
+    title: "Parrot Conservation Program",
+    objectives: ["Wildlife Protection", "Biodiversity"],
     startDate: new Date("2024-03-01"),
     endDate: new Date("2025-03-01"),
     position: "right-[5%] top-[10%]",
@@ -38,8 +38,8 @@ const FLOATING_CARDS = [
   {
     id: 3,
     image: "/assets/media/images/hero-bumicert-card/image3.png",
-    title: "Mangrove Reforestation",
-    objectives: ["Coastal Protection"],
+    title: "Indigenous-Led Monitoring",
+    objectives: ["Community Science"],
     startDate: new Date("2024-06-01"),
     endDate: new Date("2025-06-01"),
     position: "left-[8%] bottom-[10%]",
