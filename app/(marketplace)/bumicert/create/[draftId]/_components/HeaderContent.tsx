@@ -1,7 +1,8 @@
 "use client";
 import { useHeaderContext } from "@/components/providers/HeaderProvider";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { Button } from "@/components/ui/button";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useFormStore } from "../form-store";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import StepHeader from "./StepProgress";
@@ -10,6 +11,18 @@ import SaveAsDraftModal, { SaveAsDraftModalId } from "./SaveAsDraftModal";
 import DeleteDraftModal, { DeleteDraftModalId } from "./DeleteDraftModal";
 import { usePathname } from "next/navigation";
 import { Trash2 } from "lucide-react";
+
+const LeftContent = () => {
+  return (
+    <Breadcrumbs
+      items={[
+        { label: "Home", href: "/" },
+        { label: "Create", href: "/bumicert/create" },
+        { label: "New bumicert" },
+      ]}
+    />
+  );
+};
 
 const RightContent = () => {
   const isHydrated = useFormStore((state) => state.isHydrated);
@@ -82,10 +95,10 @@ const HeaderContent = () => {
     useHeaderContext();
 
   useEffect(() => {
-    setLeftContent(null);
+    setLeftContent(<LeftContent />);
     setRightContent(<RightContent />);
     setSubHeaderContent(<SubHeaderContent />);
-  }, []);
+  }, [setLeftContent, setRightContent, setSubHeaderContent]);
 
   return null;
 };

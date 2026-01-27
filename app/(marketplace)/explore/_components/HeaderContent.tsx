@@ -1,6 +1,7 @@
 "use client";
 import { useNavbarContext } from "@/components/global/Navbar/context";
 import { useHeaderContext } from "@/components/providers/HeaderProvider";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { Combobox } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
@@ -29,12 +30,21 @@ import { links } from "@/lib/links";
 const LeftContent = () => {
   const [search, setSearch] = useQueryState("q", { defaultValue: "" });
   return (
-    <Input
-      placeholder="Search Bumicerts"
-      className="h-8 bg-background/60"
-      value={search}
-      onChange={(e) => setSearch(e.target.value)}
-    />
+    <div className="flex items-center gap-3">
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Explore" },
+        ]}
+      />
+      <div className="w-px h-4 bg-border/40" />
+      <Input
+        placeholder="Search Bumicerts"
+        className="h-8 bg-background/60 w-48"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+    </div>
   );
 };
 

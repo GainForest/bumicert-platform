@@ -1,9 +1,10 @@
 "use client";
 import { useNavbarContext } from "@/components/global/Navbar/context";
 import { useHeaderContext } from "@/components/providers/HeaderProvider";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { HandHeart, ArrowUpRight, Copy, Check } from "lucide-react";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import useCopy from "@/hooks/use-copy";
 import { useAtprotoStore } from "@/components/stores/atproto";
@@ -57,15 +58,28 @@ const SubHeaderContent = ({ bumicertId }: { bumicertId: string }) => {
   );
 };
 
+const LeftContent = ({ bumicertId }: { bumicertId: string }) => {
+  const shortId = `${bumicertId.slice(0, 8)}...`;
+  return (
+    <Breadcrumbs
+      items={[
+        { label: "Home", href: "/" },
+        { label: "Explore", href: "/explore" },
+        { label: shortId },
+      ]}
+    />
+  );
+};
+
 const HeaderContent = ({ bumicertId }: { bumicertId: string }) => {
   const { setLeftContent, setRightContent, setSubHeaderContent } =
     useHeaderContext();
 
   useEffect(() => {
-    setLeftContent(null);
+    setLeftContent(<LeftContent bumicertId={bumicertId} />);
     setRightContent(<RightContent />);
     setSubHeaderContent(<SubHeaderContent bumicertId={bumicertId} />);
-  }, []);
+  }, [bumicertId, setLeftContent, setRightContent, setSubHeaderContent]);
 
   return null;
 };
