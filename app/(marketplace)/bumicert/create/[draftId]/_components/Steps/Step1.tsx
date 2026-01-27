@@ -6,11 +6,10 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import {
-  CalendarClock,
-  Club,
-  Globe,
-  HandHeart,
-  ImagePlusIcon,
+  CalendarDays,
+  ImagePlus,
+  Sparkles,
+  Type,
 } from "lucide-react";
 import FileInput from "../../../../../../../components/ui/FileInput";
 import FormField from "../../../../../../../components/ui/FormField";
@@ -48,10 +47,10 @@ const Step1 = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-medium text-muted-foreground">
-        Share your impact at a glance.
+      <h1 className="text-xl text-foreground/70">
+        Share your impact at a glance
       </h1>
-      <div className="flex flex-col gap-2 mt-8">
+      <div className="flex flex-col gap-2 mt-6">
         <div
           className={cn(
             "grid grid-cols-1 gap-2",
@@ -61,12 +60,11 @@ const Step1 = () => {
           )}
         >
           <FormField
-            Icon={ImagePlusIcon}
-            label="Cover Image"
+            Icon={ImagePlus}
+            label="Cover image"
             error={errors.coverImage}
             showError={shouldShowValidationErrors}
-            info="Choose an image that best represents your work"
-            required
+            info="Choose an image that best represents your work, or use our default"
           >
             <FileInput
               className="h-80"
@@ -85,15 +83,16 @@ const Step1 = () => {
                 "image/webp",
               ]}
               maxSizeInMB={10}
+              defaultImageUrl="/default.webp"
             />
           </FormField>
           <div className="flex flex-col gap-2">
             <FormField
-              Icon={Club}
-              label="Project Title"
+              Icon={Type}
+              label="Project title"
               error={errors.projectName}
               showError={shouldShowValidationErrors}
-              info="You can choose more than one"
+              info="A clear, descriptive name for your project"
               required
             >
               <InputGroup className="bg-background">
@@ -105,54 +104,59 @@ const Step1 = () => {
                 />
                 <InputGroupAddon
                   align="inline-end"
-                  className={projectName.length > 50 ? "text-red-500" : ""}
+                  className={cn(
+                    "text-xs",
+                    projectName.length > 50 ? "text-amber-600 dark:text-amber-500" : "text-muted-foreground"
+                  )}
                 >
                   {projectName.length}/50
                 </InputGroupAddon>
               </InputGroup>
             </FormField>
             <FormField
-              Icon={CalendarClock}
-              label="Project Date Range"
+              Icon={CalendarDays}
+              label="Project date range"
               className="flex-1"
               error={errors.projectDateRange}
               showError={shouldShowValidationErrors}
               required
               info="Select the period when your work and impact took place"
             >
-              <div className="mt-1">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button
-                      id="project-date-range"
-                      className="group w-full flex items-center justify-center text-center bg-foreground/2 transition-all duration-300 rounded-md cursor-pointer p-2"
-                    >
-                      <span
-                        className={cn(
-                          "text-foreground/20 group-hover:text-foreground/40 text-2xl font-medium",
-                          "text-foreground group-hover:text-primary"
-                        )}
-                      >
-                        {format(projectDateRange[0], "LLL dd, y")} →{" "}
-                        {format(projectDateRange[1], "LLL dd, y")}{" "}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    id="project-date-range"
+                    className="w-full flex items-center gap-3 bg-background border border-border/50 hover:border-border transition-colors rounded-md cursor-pointer py-2 px-3"
+                  >
+                    <div className="flex-1 text-left">
+                      <span className="text-[10px] uppercase tracking-wide text-foreground/40 block">Start</span>
+                      <span className="text-sm text-foreground">
+                        {format(projectDateRange[0], "MMM d, yyyy")}
                       </span>
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto">
-                    <CalendarRange
-                      value={projectDateRange}
-                      onValueChange={(value) => {
-                        if (!value) return;
-                        setFormValue("projectDateRange", value);
-                      }}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
+                    </div>
+                    <div className="w-px h-8 bg-border/50" />
+                    <div className="flex-1 text-left">
+                      <span className="text-[10px] uppercase tracking-wide text-foreground/40 block">End</span>
+                      <span className="text-sm text-foreground">
+                        {format(projectDateRange[1], "MMM d, yyyy")}
+                      </span>
+                    </div>
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <CalendarRange
+                    value={projectDateRange}
+                    onValueChange={(value) => {
+                      if (!value) return;
+                      setFormValue("projectDateRange", value);
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
             </FormField>
             <FormField
-              Icon={HandHeart}
-              label="What kind of work are you doing?"
+              Icon={Sparkles}
+              label="Type of work"
               className="flex-1"
               error={errors.workType}
               showError={shouldShowValidationErrors}

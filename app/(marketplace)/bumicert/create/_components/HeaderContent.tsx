@@ -1,16 +1,24 @@
 "use client";
 import { useHeaderContext } from "@/components/providers/HeaderProvider";
-import React, { useEffect } from "react";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
+import { useEffect } from "react";
 
 const HeaderContent = () => {
   const { setLeftContent, setRightContent, setSubHeaderContent } =
     useHeaderContext();
 
   useEffect(() => {
-    setLeftContent(null);
+    setLeftContent(
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Create" },
+        ]}
+      />
+    );
     setRightContent(null);
     setSubHeaderContent(null);
-  }, []);
+  }, [setLeftContent, setRightContent, setSubHeaderContent]);
 
   return null;
 };

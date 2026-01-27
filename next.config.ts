@@ -10,6 +10,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "climateai.org",
       },
+      {
+        protocol: "https",
+        hostname: "cdn.bsky.app",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
     ],
   },
   // // Configure for Turbopack (default in Next.js 16)

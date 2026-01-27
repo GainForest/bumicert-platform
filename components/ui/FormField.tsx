@@ -1,4 +1,4 @@
-import { Asterisk, CircleAlert, InfoIcon, LucideIcon } from "lucide-react";
+import { CircleAlert, InfoIcon, LucideIcon } from "lucide-react";
 import React from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
@@ -34,8 +34,8 @@ const FormField = ({
       className={cn(
         "group flex flex-col gap-1.5 p-2 rounded-md transition-colors relative z-10",
         showError && error
-          ? "bg-destructive/5"
-          : "hover:bg-primary/5 focus-within:bg-primary/5",
+          ? "bg-amber-500/5"
+          : "hover:bg-foreground/3 focus-within:bg-foreground/5",
         className
       )}
     >
@@ -43,14 +43,17 @@ const FormField = ({
         <label
           htmlFor={htmlFor ?? kebabCaseLabel}
           className={cn(
-            "ml-1 flex items-center gap-1 text-sm transition-colors",
+            "ml-1 flex items-center gap-1.5 text-sm transition-colors",
             showError && error
-              ? "text-destructive"
+              ? "text-amber-700 dark:text-amber-500"
               : "text-muted-foreground group-hover:text-foreground group-focus-within:text-foreground"
           )}
         >
-          <Icon className="size-3.5" />
-          {label}
+          <Icon className="size-4" strokeWidth={1.5} />
+          <span>{label}</span>
+          {required && (
+            <span className="text-foreground/30 text-xs">*</span>
+          )}
         </label>
         <div className="flex items-center gap-1">
           <span className="text-xs text-muted-foreground">
@@ -63,7 +66,7 @@ const FormField = ({
                 size="icon-sm"
                 className="bg-transparent hover:bg-transparent h-5 w-5 hidden group-hover:flex group-focus-within:flex items-center justify-center"
               >
-                <InfoIcon className="text-muted-foreground" />
+                <InfoIcon className="size-3.5 text-muted-foreground" strokeWidth={1.5} />
               </Button>
             </QuickTooltip>
           )}
@@ -74,18 +77,7 @@ const FormField = ({
                 size="icon-sm"
                 className="bg-transparent hover:bg-transparent h-5 w-5 flex items-center justify-center"
               >
-                <CircleAlert className="text-destructive" />
-              </Button>
-            </QuickTooltip>
-          )}
-          {required && (
-            <QuickTooltip content={"This field is required"} asChild>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                className="bg-transparent hover:bg-transparent h-5 w-5 flex items-center justify-center"
-              >
-                <Asterisk className="text-muted-foreground" />
+                <CircleAlert className="size-3.5 text-amber-600 dark:text-amber-500" strokeWidth={1.5} />
               </Button>
             </QuickTooltip>
           )}

@@ -9,9 +9,7 @@ export const step1Schema = z.object({
     .describe("Project Name"),
   coverImage: z
     .instanceof(File)
-    .refine((v) => v.size > 0, {
-      message: "Required",
-    })
+    // Image is optional - will use default if not provided
     .describe("Cover Image"),
   workType: z.array(z.string()).min(1, "Required").describe("Work Type"),
   projectDateRange: z

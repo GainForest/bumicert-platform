@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import fs from "fs";
 import path from "path";
 import React from "react";
+import HeaderContent from "./_components/HeaderContent";
 
 // Simple Markdown Parser for the specific structure we created
 function parseMarkdown(content: string) {
@@ -163,6 +164,8 @@ export default async function ChangelogPage() {
     }
 
     return (
+        <>
+        <HeaderContent />
         <Container className="py-12 md:py-24 max-w-4xl mx-auto">
             <div className="mb-16">
                 <h1 className="text-4xl md:text-5xl font-serif font-medium mb-4 text-primary">
@@ -203,5 +206,6 @@ export default async function ChangelogPage() {
                 ))}
             </div>
         </Container>
+        </>
     );
 }

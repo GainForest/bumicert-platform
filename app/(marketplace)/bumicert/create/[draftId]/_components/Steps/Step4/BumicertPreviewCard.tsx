@@ -1,17 +1,18 @@
 "use client";
-import React, { useEffect, useRef } from "react";
+import React, { useRef, useState } from "react";
 import { useFormStore } from "../../../form-store";
 import Image from "next/image";
-import { ProgressiveBlur } from "@/components/ui/progressive-blur";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
 import { getBlobUrl } from "climateai-sdk/utilities/atproto";
-import { Loader2, UploadIcon } from "lucide-react";
+import { Loader2, Upload } from "lucide-react";
 import { trpcApi } from "@/components/providers/TrpcProvider";
 import { useModal } from "@/components/ui/modal/context";
 import { UploadLogoModal, UploadLogoModalId } from "./UploadLogoModal";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+
+const DEFAULT_COVER_IMAGE = "/default.webp";
 
 export const BumicertArt = ({
   logoUrl,
@@ -21,77 +22,121 @@ export const BumicertArt = ({
   startDate,
   endDate,
   className,
-  performant = true,
+  compact = false,
 }: {
   logoUrl: string | null;
-  coverImage: File | string;
+  coverImage: File | string | null;
   title: string;
   objectives: string[];
   startDate: Date;
   endDate: Date;
   className?: string;
   performant?: boolean;
+  /** Use compact mode for smaller cards (mobile hero) */
+  compact?: boolean;
 }) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [transform, setTransform] = useState("perspective(1000px) rotateX(0deg) rotateY(0deg)");
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = ((y - centerY) / centerY) * -8;
+    const rotateY = ((x - centerX) / centerX) * 8;
+    setTransform(`perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`);
+  };
+
+  const handleMouseLeave = () => {
+    setTransform("perspective(1000px) rotateX(0deg) rotateY(0deg)");
+  };
+
   return (
     <div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ transform, transition: "transform 0.15s ease-out" }}
       className={cn(
-        "group p-2 rounded-3xl shadow-2xl bg-white dark:bg-neutral-800 border border-black/10 dark:border-white/10",
+        "w-[220px] rounded-lg overflow-hidden border border-border/30 shadow-sm cursor-pointer",
         className
       )}
     >
-      <div className="w-[256px] h-[360px] relative overflow-hidden rounded-2xl">
+      <div className="w-full aspect-[3/4] relative overflow-hidden">
         <Image
           src={
-            typeof coverImage === "string"
-              ? coverImage
-              : URL.createObjectURL(coverImage)
+            !coverImage || (coverImage instanceof File && coverImage.size === 0)
+              ? DEFAULT_COVER_IMAGE
+              : typeof coverImage === "string"
+                ? coverImage
+                : URL.createObjectURL(coverImage)
           }
           alt="Bumicert"
           fill
-          className="object-cover rounded-2xl scale-105 group-hover:scale-100 transition-all duration-300"
+          className="object-cover"
         />
-        {!performant && (
-          <ProgressiveBlur
-            position="bottom"
-            height="55%"
-            className="z-0"
-            borderRadiusClassName="rounded-2xl"
-          />
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+        
+        {/* Logo */}
+        {logoUrl && (
+          <div className={cn(
+            "absolute rounded-full bg-white/90 border border-white/30 overflow-hidden shadow-sm",
+            compact ? "top-2 left-2 h-5 w-5" : "top-3 left-3 h-8 w-8"
+          )}>
+            <Image src={logoUrl} alt="Logo" fill className="object-cover" />
+          </div>
         )}
-        {/* Gradient to improve contrast */}
-        <div
-          className={cn(
-            "rounded-b-2xl absolute inset-0 top-[50%] bg-black/50 z-0 mask-t-from-50%",
-            performant ? "backdrop-blur-xl" : ""
-          )}
-        ></div>
-        <div className="absolute top-3 left-3 h-9 w-9 rounded-full bg-white border-2 border-black/10 shadow-lg">
-          {logoUrl && (
-            <Image src={logoUrl} alt="Logo" fill className="rounded-full" />
-          )}
-        </div>
-        <div className="absolute bottom-3 left-3 right-3 flex flex-col">
-          <span className="font-serif font-semibold text-white text-shadow-lg text-3xl mt-2">
+        
+        {/* Content */}
+        <div className={cn(
+          "absolute bottom-0 left-0 right-0 flex flex-col",
+          compact ? "p-2" : "p-4"
+        )}>
+          <span className={cn(
+            "font-serif font-medium text-white leading-tight line-clamp-2",
+            compact ? "text-[10px]" : "text-lg"
+          )}>
             {title}
           </span>
-          <span className="text-xs text-gray-200 text-shadow-lg mt-1">
-            {format(startDate, "LLL dd, y")} → {format(endDate, "LLL dd, y")}
+          <span className={cn(
+            "text-white/60 mt-0.5",
+            compact ? "text-[8px]" : "text-xs mt-1"
+          )}>
+            {format(startDate, "MMM yyyy")} — {format(endDate, "MMM yyyy")}
           </span>
-          <div className="flex items-center gap-1 flex-wrap mt-2">
-            {objectives.slice(0, 2).map((objective) => (
-              <span
-                key={objective}
-                className="text-xs bg-white/50 text-black backdrop-blur-lg rounded-md px-3 py-1.5 w-fit font-medium text-shadow-lg shadow-lg"
-              >
-                {objective}
-              </span>
-            ))}
-            {objectives.length > 2 && (
-              <span className="text-xs bg-white/10 text-white backdrop-blur-lg rounded-md px-2 py-1.5 w-fit font-medium text-shadow-lg shadow-lg">
-                +{objectives.length - 2}
-              </span>
-            )}
-          </div>
+          {objectives.length > 0 && !compact && (
+            <div className="flex items-center gap-1.5 flex-wrap mt-3">
+              {objectives.slice(0, 2).map((objective) => (
+                <span
+                  key={objective}
+                  className="text-[10px] bg-white/15 text-white/90 backdrop-blur-sm rounded-full px-2 py-0.5"
+                >
+                  {objective}
+                </span>
+              ))}
+              {objectives.length > 2 && (
+                <span className="text-[10px] text-white/50">
+                  +{objectives.length - 2} more
+                </span>
+              )}
+            </div>
+          )}
+          {objectives.length > 0 && compact && (
+            <div className="flex items-center gap-1 flex-wrap mt-1">
+              {objectives.slice(0, 1).map((objective) => (
+                <span
+                  key={objective}
+                  className="text-[7px] bg-white/15 text-white/90 backdrop-blur-sm rounded-full px-1.5 py-0.5 truncate max-w-full"
+                >
+                  {objective}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -129,66 +174,55 @@ const BumicertPreviewCard = () => {
 
   const isLoadingOrganizationInfo = isPendingOrganizationInfo || isOlderData;
 
+  // Cover image is optional (will use default), but title/dates/objectives are required
   const isBumicertArtReady =
-    coverImage && title && objectives && startDate && endDate;
+    title && objectives && startDate && endDate;
 
   return (
-    <div className="rounded-xl border border-primary/10 shadow-lg overflow-hidden bg-primary/10 flex flex-col">
-      {/* Header */}
-      <div className="flex items-center justify-center text-center text-primary px-2 py-1">
-        <span className="font-medium">Preview your bumicert</span>
-      </div>
+    <div className="flex flex-col gap-3">
+      {/* Logo prompt */}
+      {!logoFromData && !isLoadingOrganizationInfo && (
+        <button
+          type="button"
+          onClick={() => {
+            pushModal(
+              {
+                id: UploadLogoModalId,
+                content: <UploadLogoModal />,
+              },
+              true
+            );
+            show();
+          }}
+          className="flex items-center gap-2 px-3 py-2 rounded-lg border border-dashed border-border/50 text-muted-foreground hover:border-border hover:text-foreground transition-colors text-left group"
+        >
+          <Upload className="size-3.5 shrink-0" strokeWidth={1.5} />
+          <span className="text-xs">Add organization logo</span>
+        </button>
+      )}
 
-      <div className="bg-background p-2 rounded-xl flex-1 flex flex-col gap-2 items-center justify-center">
-        {!logoFromData && (
-          <div className="w-full flex items-start gap-2 border border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300 rounded-lg p-2 relative">
-            <button
-              type="button"
-              className="absolute h-6 w-6 -top-1 -right-1 bg-amber-500 text-white rounded-full flex items-center justify-center cursor-pointer"
-              onClick={() => {
-                pushModal(
-                  {
-                    id: UploadLogoModalId,
-                    content: <UploadLogoModal />,
-                  },
-                  true
-                );
-                show();
-              }}
-            >
-              <UploadIcon className="size-4" />
-            </button>
-            <span className="text-sm text-pretty mr-3">
-              Your organization doesn&apos;t have a logo. Do you want to add
-              one?
-            </span>
-          </div>
-        )}
-
-        {isBumicertArtReady ? (
-          <BumicertArt
-            logoUrl={logoUrl}
-            coverImage={coverImage}
-            title={title}
-            objectives={objectives}
-            startDate={startDate}
-            endDate={endDate}
-          />
-        ) : isLoadingOrganizationInfo ? (
-          <div className="flex-1 flex flex-col items-center justify-center">
-            <Loader2 className="animate-spin" />
-            <span className="text-sm text-muted-foreground text-center text-pretty">
-              Generating the preview...
-            </span>
-          </div>
-        ) : (
-          <div className="flex-1 flex flex-col items-center justify-center">
-            <span className="text-sm text-muted-foreground text-center text-pretty">
-              You need to complete the first step to preview the bumicert.
-            </span>
-          </div>
-        )}
-      </div>
+      {/* Preview */}
+      {isBumicertArtReady ? (
+        <BumicertArt
+          logoUrl={logoUrl}
+          coverImage={coverImage}
+          title={title}
+          objectives={objectives}
+          startDate={startDate}
+          endDate={endDate}
+        />
+      ) : isLoadingOrganizationInfo ? (
+        <div className="aspect-[3/4] rounded-lg border border-dashed border-border/30 flex flex-col items-center justify-center">
+          <Loader2 className="size-5 animate-spin text-foreground/20" strokeWidth={1.5} />
+          <span className="text-xs text-foreground/40 mt-2">Loading...</span>
+        </div>
+      ) : (
+        <div className="aspect-[3/4] rounded-lg border border-dashed border-border/30 flex flex-col items-center justify-center px-4">
+          <span className="text-xs text-foreground/40 text-center">
+            Complete the basics to see your bumicert preview
+          </span>
+        </div>
+      )}
     </div>
   );
 };

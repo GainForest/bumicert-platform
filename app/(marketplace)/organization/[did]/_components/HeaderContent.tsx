@@ -1,14 +1,23 @@
 "use client";
 
 import { useHeaderContext } from "@/components/providers/HeaderProvider";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { Button } from "@/components/ui/button";
-import React, { useEffect } from "react";
-import { Check, Pencil, X } from "lucide-react";
+import { useEffect } from "react";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import Link from "next/link";
 
-const LeftContent = () => {
-  return null;
+const LeftContent = ({ did }: { did: string }) => {
+  const shortDid = `${did.slice(0, 12)}...`;
+  return (
+    <Breadcrumbs
+      items={[
+        { label: "Home", href: "/" },
+        { label: "Explore", href: "/explore" },
+        { label: shortDid },
+      ]}
+    />
+  );
 };
 
 const RightContent = ({ did }: { did: string }) => {
@@ -34,10 +43,10 @@ const HeaderContent = ({ did }: { did: string }) => {
     useHeaderContext();
 
   useEffect(() => {
-    setLeftContent(<LeftContent />);
+    setLeftContent(<LeftContent did={did} />);
     setRightContent(<RightContent did={did} />);
     setSubHeaderContent(<SubHeaderContent />);
-  }, []);
+  }, [did, setLeftContent, setRightContent, setSubHeaderContent]);
 
   return null;
 };
