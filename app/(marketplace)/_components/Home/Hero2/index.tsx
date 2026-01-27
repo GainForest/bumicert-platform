@@ -12,10 +12,14 @@ const FLOATING_CARDS = [
     objectives: ["Biodiversity", "Carbon Capture"],
     startDate: new Date("2024-01-01"),
     endDate: new Date("2024-12-31"),
+    // Desktop position
     position: "left-[5%] top-[15%]",
     rotation: -12,
     delay: 0.2,
     size: "w-[140px] md:w-[180px]",
+    // Mobile card stack position
+    mobileOffset: 0,
+    mobileRotation: -8,
   },
   {
     id: 2,
@@ -28,6 +32,8 @@ const FLOATING_CARDS = [
     rotation: 8,
     delay: 0.4,
     size: "w-[130px] md:w-[160px]",
+    mobileOffset: 1,
+    mobileRotation: 0,
   },
   {
     id: 3,
@@ -40,47 +46,30 @@ const FLOATING_CARDS = [
     rotation: 6,
     delay: 0.6,
     size: "w-[120px] md:w-[150px]",
-  },
-  {
-    id: 4,
-    image: "/assets/media/images/hero-bumicert-card/image2.png",
-    title: "Wildlife Corridor Project",
-    objectives: ["Wildlife", "Connectivity"],
-    startDate: new Date("2024-02-01"),
-    endDate: new Date("2024-12-31"),
-    position: "right-[8%] bottom-[15%]",
-    rotation: -6,
-    delay: 0.8,
-    size: "w-[125px] md:w-[155px]",
+    mobileOffset: 2,
+    mobileRotation: 8,
   },
 ];
 
 const Hero2 = () => {
   return (
     <div className="w-full mt-4">
-      <div className="w-full min-h-[320px] md:min-h-[400px] rounded-2xl overflow-hidden relative bg-gradient-to-br from-primary/5 via-background to-primary/10">
+      {/* Desktop version */}
+      <div className="hidden sm:block w-full min-h-[400px] rounded-2xl overflow-hidden relative bg-gradient-to-br from-primary/5 via-background to-primary/10">
         {/* Subtle background pattern */}
         <div className="absolute inset-0 opacity-30">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(34,197,94,0.1),transparent_50%)]" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(34,197,94,0.08),transparent_50%)]" />
         </div>
 
-        {/* Floating BumicertArt cards */}
+        {/* Floating BumicertArt cards - Desktop */}
         {FLOATING_CARDS.map((card) => (
           <motion.div
             key={card.id}
-            className={`absolute ${card.position} ${card.size} z-10 hidden sm:block`}
+            className={`absolute ${card.position} ${card.size} z-10`}
             initial={{ opacity: 0, y: 30, rotate: card.rotation }}
-            animate={{ 
-              opacity: 1, 
-              y: 0, 
-              rotate: card.rotation,
-            }}
-            transition={{ 
-              delay: card.delay, 
-              duration: 0.6,
-              ease: "easeOut"
-            }}
+            animate={{ opacity: 1, y: 0, rotate: card.rotation }}
+            transition={{ delay: card.delay, duration: 0.6, ease: "easeOut" }}
             whileHover={{ 
               scale: 1.05, 
               rotate: 0,
@@ -88,11 +77,8 @@ const Hero2 = () => {
               transition: { duration: 0.2 }
             }}
           >
-            {/* Floating animation wrapper */}
             <motion.div
-              animate={{ 
-                y: [0, -8, 0],
-              }}
+              animate={{ y: [0, -8, 0] }}
               transition={{
                 duration: 3 + card.id * 0.5,
                 repeat: Infinity,
@@ -113,7 +99,32 @@ const Hero2 = () => {
           </motion.div>
         ))}
 
-        {/* Central content */}
+        {/* Additional card for desktop bottom right */}
+        <motion.div
+          className="absolute right-[8%] bottom-[15%] w-[155px] z-10"
+          initial={{ opacity: 0, y: 30, rotate: -6 }}
+          animate={{ opacity: 1, y: 0, rotate: -6 }}
+          transition={{ delay: 0.8, duration: 0.6, ease: "easeOut" }}
+          whileHover={{ scale: 1.05, rotate: 0, zIndex: 20, transition: { duration: 0.2 } }}
+        >
+          <motion.div
+            animate={{ y: [0, -8, 0] }}
+            transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+            className="drop-shadow-2xl"
+          >
+            <BumicertArt
+              logoUrl={null}
+              coverImage="/assets/media/images/hero-bumicert-card/image2.png"
+              title="Wildlife Corridor Project"
+              objectives={["Wildlife", "Connectivity"]}
+              startDate={new Date("2024-02-01")}
+              endDate={new Date("2024-12-31")}
+              className="w-full shadow-xl"
+            />
+          </motion.div>
+        </motion.div>
+
+        {/* Central content - Desktop */}
         <div className="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-none">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -125,7 +136,7 @@ const Hero2 = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.5 }}
-              className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold text-foreground tracking-tight"
+              className="font-serif text-5xl lg:text-6xl font-bold text-foreground tracking-tight"
             >
               Bumicerts
             </motion.h1>
@@ -133,35 +144,90 @@ const Hero2 = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.5 }}
-              className="text-base md:text-lg text-muted-foreground mt-3 max-w-md"
+              className="text-lg text-muted-foreground mt-3 max-w-md"
             >
               Fund impactful regenerative projects
             </motion.p>
           </motion.div>
         </div>
+      </div>
 
-        {/* Mobile: Show single card below title */}
-        <motion.div 
-          className="sm:hidden absolute bottom-4 left-1/2 -translate-x-1/2 w-[140px] z-10"
-          initial={{ opacity: 0, y: 20 }}
+      {/* Mobile version - Stacked cards with title */}
+      <div className="sm:hidden w-full rounded-2xl overflow-hidden relative bg-gradient-to-br from-primary/5 via-background to-primary/10 py-8 px-4">
+        {/* Subtle background pattern */}
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(34,197,94,0.15),transparent_60%)]" />
+        </div>
+
+        {/* Title at top */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
+          transition={{ duration: 0.5 }}
+          className="relative z-20 text-center mb-6"
         >
-          <motion.div
-            animate={{ y: [0, -5, 0] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <BumicertArt
-              logoUrl={null}
-              coverImage="/assets/media/images/hero-bumicert-card/image0.png"
-              title="Amazon Conservation"
-              objectives={["Biodiversity"]}
-              startDate={new Date("2024-01-01")}
-              endDate={new Date("2024-12-31")}
-              className="w-full shadow-xl"
-            />
-          </motion.div>
+          <h1 className="font-serif text-3xl font-bold text-foreground tracking-tight">
+            Bumicerts
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1.5">
+            Fund impactful regenerative projects
+          </p>
         </motion.div>
+
+        {/* Stacked/Fanned cards */}
+        <div className="relative z-10 flex justify-center items-center h-[200px]">
+          {FLOATING_CARDS.map((card, index) => {
+            // Calculate position for fan effect
+            const xOffset = (index - 1) * 70; // Spread cards horizontally
+            const zIndex = 10 + index;
+            
+            return (
+              <motion.div
+                key={card.id}
+                className="absolute w-[110px]"
+                style={{ zIndex }}
+                initial={{ 
+                  opacity: 0, 
+                  y: 30, 
+                  x: xOffset,
+                  rotate: card.mobileRotation 
+                }}
+                animate={{ 
+                  opacity: 1, 
+                  y: 0, 
+                  x: xOffset,
+                  rotate: card.mobileRotation 
+                }}
+                transition={{ 
+                  delay: 0.3 + index * 0.15, 
+                  duration: 0.5,
+                  ease: "easeOut"
+                }}
+              >
+                <motion.div
+                  animate={{ y: [0, -4, 0] }}
+                  transition={{
+                    duration: 2.5 + index * 0.3,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: index * 0.2,
+                  }}
+                  className="drop-shadow-xl"
+                >
+                  <BumicertArt
+                    logoUrl={null}
+                    coverImage={card.image}
+                    title={card.title}
+                    objectives={card.objectives.slice(0, 1)}
+                    startDate={card.startDate}
+                    endDate={card.endDate}
+                    className="w-full shadow-lg"
+                  />
+                </motion.div>
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
