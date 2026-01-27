@@ -20,6 +20,9 @@ import { useModal } from "@/components/ui/modal/context";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import AuthenticatedModalContent from "./authenticated";
 import { trpcApi } from "@/components/providers/TrpcProvider";
+import ForgotPasswordModal, {
+  ForgotPasswordModalId,
+} from "./forgot-password";
 
 export const SignInModalId = "auth/sign-in";
 
@@ -32,7 +35,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
   );
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(true);
-  const { popModal, stack, hide } = useModal();
+  const { popModal, pushModal, stack, hide } = useModal();
   const isAuthenticated = useAtprotoStore((state) => state.auth.authenticated);
   const setAuth = useAtprotoStore((state) => state.setAuth);
   const {
@@ -199,6 +202,19 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
               disabled={isSigningIn}
             />
           </InputGroup>
+          <button
+            type="button"
+            className="text-sm text-primary hover:underline cursor-pointer self-end"
+            onClick={() => {
+              pushModal({
+                id: ForgotPasswordModalId,
+                content: <ForgotPasswordModal />,
+              });
+            }}
+            disabled={isSigningIn}
+          >
+            Forgot Password?
+          </button>
         </div>
 
         <div className="flex items-center gap-2 text-sm mt-4">
