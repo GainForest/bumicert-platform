@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import Image from "next/image";
 import { useNavbarContext } from "./context";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import Header from "../Header";
@@ -26,25 +25,10 @@ const NavbarLayout = ({
         className={cn(
           "h-full w-full flex relative overflow-hidden",
           viewport === "mobile" && "flex-col",
-          "bg-secondary/30 dark:bg-secondary/10"
+          "bg-[rgb(242_237_227.7)] dark:bg-[rgb(30_30_30.7)]"
         )}
         ref={parent}
       >
-        {/* Decorative watercolor background - desktop only */}
-        <div
-          className="hidden lg:block fixed top-1/2 -right-44 -translate-y-1/2 w-[560px] h-[680px]
-                     pointer-events-none select-none opacity-50 dark:opacity-30"
-          aria-hidden="true"
-        >
-          <Image
-            src="/banner.png"
-            alt=""
-            fill
-            className="object-contain"
-            priority={false}
-          />
-        </div>
-
         {viewport === "desktop" && openState.desktop && (
           <DesktopNavbar {...desktopNavbarProps} />
         )}
