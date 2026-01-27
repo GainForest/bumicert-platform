@@ -2,7 +2,7 @@
 
 import React from "react";
 import { cn } from "@/lib/utils";
-import { Map, Layers, FileText, MoreHorizontal, Pencil, Trash2, ExternalLink } from "lucide-react";
+import { Map, FileText, MoreHorizontal, Pencil, Trash2, ExternalLink } from "lucide-react";
 import { format } from "date-fns";
 import {
   DropdownMenu,
@@ -16,16 +16,12 @@ import {
   SiteEditorModal,
   SiteEditorModalId,
 } from "@/components/global/modals/upload/site/editor";
-import {
-  LayerEditorModal,
-  LayerEditorModalId,
-} from "@/components/global/modals/upload/layer/editor";
 import Link from "next/link";
 import { links } from "@/lib/links";
 import { parseAtUri } from "climateai-sdk/utilities/atproto";
 
 interface AssetCardProps {
-  type: "sites" | "layers" | "bumicerts";
+  type: "sites" | "bumicerts";
   name: string;
   description?: string;
   createdAt?: string;
@@ -38,15 +34,10 @@ const typeConfig = {
     label: "Site",
     color: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
   },
-  layers: {
-    icon: Layers,
-    label: "Layer",
-    color: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
-  },
   bumicerts: {
     icon: FileText,
     label: "Bumicert",
-    color: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+    color: "bg-primary/10 text-primary",
   },
 };
 
@@ -59,12 +50,6 @@ const AssetCard = ({ type, name, description, createdAt, data }: AssetCardProps)
     if (type === "sites") {
       pushModal(
         { id: SiteEditorModalId, content: <SiteEditorModal initialData={data as never} /> },
-        true
-      );
-      show();
-    } else if (type === "layers") {
-      pushModal(
-        { id: LayerEditorModalId, content: <LayerEditorModal initialData={data as never} /> },
         true
       );
       show();
@@ -115,7 +100,7 @@ const AssetCard = ({ type, name, description, createdAt, data }: AssetCardProps)
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            {type !== "bumicerts" && (
+            {type === "sites" && (
               <DropdownMenuItem onClick={handleEdit}>
                 <Pencil className="size-4 mr-2" strokeWidth={1.5} />
                 Edit

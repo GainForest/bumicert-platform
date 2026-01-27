@@ -108,14 +108,14 @@ const MobileNavbar = ({ navLinks, footerLinks }: MobileNavbarProps) => {
                   isHighlighted = pathname.startsWith(targetPath);
                 }
 
-                // Special case for my organization link
+                // Special case for my organization/dashboard link
                 if (link.id === "my-organization") {
                   if (did) {
                     isHighlighted = pathname.startsWith(
-                      links.myOrganization(did)
+                      links.upload.organization(did)
                     );
                   } else {
-                    isHighlighted = pathname === links.myOrganization();
+                    isHighlighted = pathname.startsWith("/upload/organization");
                   }
                 }
 

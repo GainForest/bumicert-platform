@@ -10,6 +10,7 @@ import { climateAiSdk } from "@/config/climateai-sdk.server";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
 import ErrorPage from "./error";
 import OrganizationHeader from "./_components/Dashboard/OrganizationHeader";
+import AboutSection from "./_components/Dashboard/AboutSection";
 import Dashboard from "./_components/Dashboard";
 import HeaderContent from "./_components/HeaderContent";
 
@@ -89,6 +90,7 @@ const OrganizationPage = async ({
       <Container>
         <HeaderContent />
         <OrganizationHeader did={did} />
+        <AboutSection />
         <Dashboard did={did} />
       </Container>
     </OrganizationPageHydrator>

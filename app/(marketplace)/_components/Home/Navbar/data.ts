@@ -1,6 +1,6 @@
 import { NavLinkConfig } from "@/components/global/Navbar/types";
 import { links } from "@/lib/links";
-import { BadgePlus, BuildingIcon, Compass, Home } from "lucide-react";
+import { BadgePlus, Compass, Home, LayoutDashboard } from "lucide-react";
 
 export const navLinks: NavLinkConfig[] = [
   {
@@ -31,22 +31,13 @@ export const navLinks: NavLinkConfig[] = [
       startsWith: links.bumicert.create,
     },
   },
-  // {
-  //   id: "faqs",
-  //   href: "/faqs",
-  //   text: "FAQs",
-  //   Icon: MessageCircleQuestion,
-  //   pathCheck: {
-  //     startsWith: "/faqs",
-  //   },
-  // },
   {
     id: "my-organization",
-    href: links.myOrganization,
-    text: "My Organization",
-    Icon: BuildingIcon,
+    href: links.upload.organization,
+    text: "Dashboard",
+    Icon: LayoutDashboard,
     pathCheck: {
-      startsWith: links.myOrganization,
+      startsWith: "/upload/organization",
     },
   },
   // {

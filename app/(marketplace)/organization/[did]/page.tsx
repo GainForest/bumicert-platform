@@ -5,13 +5,11 @@ import { tryCatch } from "@/lib/tryCatch";
 import { TRPCError } from "@trpc/server";
 import { AppGainforestOrganizationInfo } from "climateai-sdk/lex-api";
 import { getSessionFromRequest } from "climateai-sdk/session";
-import { serialize } from "climateai-sdk/utilities/transform";
 import HeaderContent from "./_components/HeaderContent";
-import Hero from "@/app/(upload)/upload/organization/[did]/_components/Hero";
-import SubHero from "@/app/(upload)/upload/organization/[did]/_components/SubHero";
-import AboutOrganization from "@/app/(upload)/upload/organization/[did]/_components/AboutOrganization";
-import SectionForData from "@/app/(upload)/upload/organization/[did]/_components/SectionForData";
-import { OrganizationPageHydrator } from "@/app/(upload)/upload/organization/[did]/hydrator";
+import ProfileHeader from "./_components/ProfileHeader";
+import ProfileMeta from "./_components/ProfileMeta";
+import ProfileAbout from "./_components/ProfileAbout";
+import BumicertsGrid from "./_components/BumicertsGrid";
 import ErrorPage from "./error";
 
 const EMPTY_ORGANIZATION_DATA: AppGainforestOrganizationInfo.Record = {
@@ -78,26 +76,17 @@ const OrganizationPage = async ({
     );
     return <ErrorPage error={error as Error} />;
   }
-  const serializedData = serialize(data);
 
   return (
-    <OrganizationPageHydrator
-      initialSerializedData={serializedData}
-      initialDid={did}
-    >
-      <Container>
-        <HeaderContent did={did} />
-        <Hero initialData={serializedData} initialDid={did} dynamic={false} />
-        <SubHero initialData={serializedData} dynamic={false} />
-        <AboutOrganization initialData={serializedData} dynamic={false} />
-        <hr />
-        <SectionForData title="Bumicerts" userDid={did}>
-          <div className="w-full h-40 bg-muted rounded-lg mt-2 flex flex-col items-center justify-center text-center text-pretty font-serif text-xl text-muted-foreground font-bold">
-            The bumicerts of this organization will appear here.
-          </div>
-        </SectionForData>
+    <>
+      <HeaderContent did={did} />
+      <Container className="pb-12">
+        <ProfileHeader data={data} did={did} />
+        <ProfileMeta data={data} />
+        <ProfileAbout data={data} />
+        <BumicertsGrid did={did} />
       </Container>
-    </OrganizationPageHydrator>
+    </>
   );
 };
 

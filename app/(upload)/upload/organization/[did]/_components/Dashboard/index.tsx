@@ -2,28 +2,25 @@
 
 import React, { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
-import { Map, Layers, FileText, Plus, Search } from "lucide-react";
+import { Map, FileText, Plus, Search, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useModal } from "@/components/ui/modal/context";
 import {
   SiteEditorModal,
   SiteEditorModalId,
 } from "@/components/global/modals/upload/site/editor";
-import {
-  LayerEditorModal,
-  LayerEditorModalId,
-} from "@/components/global/modals/upload/layer/editor";
 import AssetCard from "./AssetCard";
 import { trpcApi } from "@/components/providers/TrpcProvider";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
 import { Loader2 } from "lucide-react";
+import Link from "next/link";
+import { links } from "@/lib/links";
 
-type AssetType = "all" | "sites" | "layers" | "bumicerts";
+type AssetType = "all" | "sites" | "bumicerts";
 
 const filters: { id: AssetType; label: string; icon: React.ElementType }[] = [
   { id: "all", label: "All", icon: FileText },
   { id: "sites", label: "Sites", icon: Map },
-  { id: "layers", label: "Layers", icon: Layers },
   { id: "bumicerts", label: "Bumicerts", icon: FileText },
 ];
 
@@ -43,13 +40,6 @@ const Dashboard = ({ did }: DashboardProps) => {
       { enabled: !!did }
     );
 
-  // Fetch layers
-  const { data: layersData, isLoading: layersLoading } =
-    trpcApi.hypercerts.monitoringLayer.getAll.useQuery(
-      { did, pdsDomain: allowedPDSDomains[0] },
-      { enabled: !!did }
-    );
-
   // Fetch bumicerts
   const { data: bumicertsData, isLoading: bumicertsLoading } =
     trpcApi.hypercerts.claim.activity.getAll.useQuery(
@@ -57,13 +47,13 @@ const Dashboard = ({ did }: DashboardProps) => {
       { enabled: !!did }
     );
 
-  const isLoading = sitesLoading || layersLoading || bumicertsLoading;
+  const isLoading = sitesLoading || bumicertsLoading;
 
   // Combine all assets into a unified list
   const allAssets = useMemo(() => {
     const assets: {
       id: string;
-      type: "sites" | "layers" | "bumicerts";
+      type: "sites" | "bumicerts";
       name: string;
       description?: string;
       createdAt?: string;
@@ -75,22 +65,10 @@ const Dashboard = ({ did }: DashboardProps) => {
       assets.push({
         id: site.uri,
         type: "sites",
-        name: site.value.name,
+        name: site.value.name ?? "Untitled Site",
         description: site.value.description,
         createdAt: site.value.createdAt,
         data: site,
-      });
-    });
-
-    // Add layers
-    layersData?.layers?.forEach((layer) => {
-      assets.push({
-        id: layer.uri,
-        type: "layers",
-        name: layer.value.name,
-        description: layer.value.description,
-        createdAt: layer.value.createdAt,
-        data: layer,
       });
     });
 
@@ -99,7 +77,7 @@ const Dashboard = ({ did }: DashboardProps) => {
       assets.push({
         id: bumicert.uri,
         type: "bumicerts",
-        name: bumicert.value.title,
+        name: bumicert.value.title ?? "Untitled Bumicert",
         description: bumicert.value.shortDescription,
         createdAt: bumicert.value.createdAt,
         data: bumicert,
@@ -107,7 +85,7 @@ const Dashboard = ({ did }: DashboardProps) => {
     });
 
     return assets;
-  }, [sitesData, layersData, bumicertsData]);
+  }, [sitesData, bumicertsData]);
 
   // Filter assets
   const filteredAssets = useMemo(() => {
@@ -141,23 +119,29 @@ const Dashboard = ({ did }: DashboardProps) => {
     show();
   };
 
-  const handleAddLayer = () => {
-    pushModal(
-      { id: LayerEditorModalId, content: <LayerEditorModal initialData={null} /> },
-      true
-    );
-    show();
-  };
-
   const counts = {
     all: allAssets.length,
     sites: sitesData?.sites?.length ?? 0,
-    layers: layersData?.layers?.length ?? 0,
     bumicerts: bumicertsData?.activities?.length ?? 0,
   };
 
   return (
-    <div className="mt-8">
+    <div className="mt-6">
+      {/* Public profile link */}
+      <div className="flex items-center justify-between mb-6 pb-6 border-b border-border/30">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <span>Share your organization:</span>
+          <Link
+            href={links.myOrganization(did)}
+            target="_blank"
+            className="inline-flex items-center gap-1 text-primary hover:underline"
+          >
+            View public page
+            <ExternalLink className="size-3" strokeWidth={1.5} />
+          </Link>
+        </div>
+      </div>
+
       {/* Filter bar */}
       <div className="flex items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-2">
@@ -197,16 +181,10 @@ const Dashboard = ({ did }: DashboardProps) => {
         </div>
 
         {/* Add button */}
-        <div className="flex items-center gap-2">
-          <Button size="sm" variant="outline" onClick={handleAddSite}>
-            <Plus className="size-4 mr-1" strokeWidth={1.5} />
-            Site
-          </Button>
-          <Button size="sm" variant="outline" onClick={handleAddLayer}>
-            <Plus className="size-4 mr-1" strokeWidth={1.5} />
-            Layer
-          </Button>
-        </div>
+        <Button size="sm" variant="outline" onClick={handleAddSite}>
+          <Plus className="size-4 mr-1" strokeWidth={1.5} />
+          Add Site
+        </Button>
       </div>
 
       {/* Content */}
@@ -219,7 +197,6 @@ const Dashboard = ({ did }: DashboardProps) => {
           activeFilter={activeFilter}
           searchQuery={searchQuery}
           onAddSite={handleAddSite}
-          onAddLayer={handleAddLayer}
         />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -243,12 +220,10 @@ const EmptyState = ({
   activeFilter,
   searchQuery,
   onAddSite,
-  onAddLayer,
 }: {
   activeFilter: AssetType;
   searchQuery: string;
   onAddSite: () => void;
-  onAddLayer: () => void;
 }) => {
   if (searchQuery) {
     return (
@@ -262,19 +237,15 @@ const EmptyState = ({
   const messages: Record<AssetType, { title: string; description: string; action?: () => void; actionLabel?: string }> = {
     all: {
       title: "No assets yet",
-      description: "Start by adding your first site or layer",
+      description: "Start by adding your first site",
+      action: onAddSite,
+      actionLabel: "Add Site",
     },
     sites: {
       title: "No sites yet",
       description: "Add a site boundary to get started",
       action: onAddSite,
       actionLabel: "Add Site",
-    },
-    layers: {
-      title: "No layers yet",
-      description: "Add a monitoring layer to track changes",
-      action: onAddLayer,
-      actionLabel: "Add Layer",
     },
     bumicerts: {
       title: "No bumicerts yet",
@@ -288,7 +259,6 @@ const EmptyState = ({
     <div className="flex flex-col items-center justify-center py-20 text-center">
       <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
         {activeFilter === "sites" && <Map className="size-7 text-muted-foreground/50" strokeWidth={1.25} />}
-        {activeFilter === "layers" && <Layers className="size-7 text-muted-foreground/50" strokeWidth={1.25} />}
         {activeFilter === "bumicerts" && <FileText className="size-7 text-muted-foreground/50" strokeWidth={1.25} />}
         {activeFilter === "all" && <Plus className="size-7 text-muted-foreground/50" strokeWidth={1.25} />}
       </div>
