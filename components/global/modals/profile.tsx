@@ -108,30 +108,30 @@ export const ProfileModal = () => {
         {/* DID with copy */}
         <button
           onClick={copyDid}
-          className="flex items-center gap-1.5 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+          className="flex items-center gap-1.5 text-muted-foreground/50 hover:text-muted-foreground transition-colors"
         >
           <span className="text-[10px] font-mono truncate max-w-[180px]">
             {auth.user.did}
           </span>
           {copied ? (
-            <Check className="size-3 text-primary shrink-0" />
+            <Check className="size-2.5 text-primary shrink-0" strokeWidth={1.5} />
           ) : (
-            <Copy className="size-3 shrink-0" />
+            <Copy className="size-2.5 shrink-0" strokeWidth={1.5} />
           )}
         </button>
       </div>
 
       {/* Quick Actions */}
-      <div className="flex flex-col gap-1 py-4 border-t border-border/30">
+      <div className="flex flex-col gap-0.5 py-4 border-t border-border/30">
         <Link
           href={links.myOrganization(auth.user.did)}
           onClick={() => {
             hide().then(() => popModal());
           }}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-secondary/50 transition-colors group"
+          className="flex items-center gap-2.5 px-2 py-2 rounded-md hover:bg-secondary/40 transition-colors group"
         >
-          <Building2 className="size-4 text-muted-foreground/70 group-hover:text-foreground transition-colors" strokeWidth={1.5} />
-          <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">My Organization</span>
+          <Building2 className="size-3.5 text-muted-foreground/50 group-hover:text-foreground transition-colors" strokeWidth={1.25} />
+          <span className="text-sm text-muted-foreground/70 group-hover:text-foreground transition-colors">My Organization</span>
         </Link>
 
         <Link
@@ -139,26 +139,26 @@ export const ProfileModal = () => {
           onClick={() => {
             hide().then(() => popModal());
           }}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-secondary/50 transition-colors group"
+          className="flex items-center gap-2.5 px-2 py-2 rounded-md hover:bg-secondary/40 transition-colors group"
         >
-          <CloudUpload className="size-4 text-muted-foreground/70 group-hover:text-foreground transition-colors" strokeWidth={1.5} />
-          <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">Upload</span>
+          <CloudUpload className="size-3.5 text-muted-foreground/50 group-hover:text-foreground transition-colors" strokeWidth={1.25} />
+          <span className="text-sm text-muted-foreground/70 group-hover:text-foreground transition-colors">Upload</span>
         </Link>
       </div>
 
       {/* Footer */}
       <ModalFooter className="border-t border-border/30 pt-3">
         <button
-          className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground/60 hover:text-muted-foreground transition-colors disabled:opacity-50"
+          className="flex items-center gap-1.5 px-2 py-1.5 text-sm text-muted-foreground/50 hover:text-muted-foreground transition-colors disabled:opacity-50"
           onClick={() => {
             signOut({ service: "climateai.org" });
           }}
           disabled={isSigningOut}
         >
           {isSigningOut ? (
-            <Loader2 className="size-3.5 animate-spin" />
+            <Loader2 className="size-3 animate-spin" />
           ) : (
-            <ArrowRightFromLine className="size-3.5" strokeWidth={1.5} />
+            <ArrowRightFromLine className="size-3" strokeWidth={1.25} />
           )}
           Sign out
         </button>

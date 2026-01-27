@@ -54,17 +54,15 @@ const DesktopNavbar = ({
         <div className="flex items-center justify-between">
           <Link
             href="/"
-            className="group flex items-center gap-2.5 hover:opacity-70 transition-opacity"
+            className="group flex items-center gap-2 hover:opacity-70 transition-opacity"
           >
-            <div className="w-6 h-6 flex items-center justify-center">
-              <Image
-                src="/assets/media/images/logo.svg"
-                alt={title}
-                width={24}
-                height={24}
-                className="shrink-0"
-              />
-            </div>
+            <Image
+              src="/assets/media/images/logo.svg"
+              alt={title}
+              width={20}
+              height={20}
+              className="shrink-0 opacity-80"
+            />
             {!isCollapsed && (
               <h1 className="font-serif text-xl font-semibold text-foreground whitespace-nowrap">
                 {title}
@@ -80,10 +78,10 @@ const DesktopNavbar = ({
                   onClick={() => setOpenState(false, "desktop")}
                   className="p-1 text-muted-foreground/40 hover:text-muted-foreground transition-colors"
                 >
-                  <ChevronLeft size={14} />
+                  <ChevronLeft size={14} strokeWidth={1.5} />
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="bottom" sideOffset={8}>
+              <TooltipContent side="right" sideOffset={8}>
                 Collapse sidebar
               </TooltipContent>
             </Tooltip>
@@ -139,7 +137,7 @@ const DesktopNavbar = ({
                             : "text-muted-foreground/50 hover:text-foreground"
                         )}
                       >
-                        <link.Icon size={16} strokeWidth={1.5} />
+                        <link.Icon size={15} strokeWidth={1.25} />
                       </Link>
                     </TooltipTrigger>
                     <TooltipContent side="right" sideOffset={12}>
@@ -190,7 +188,7 @@ const DesktopNavbar = ({
                     className="flex items-center gap-1 px-1 py-1 text-sm text-muted-foreground/50 hover:text-muted-foreground transition-colors whitespace-nowrap"
                   >
                     <span>{link.text}</span>
-                    <ArrowUpRight size={12} className="shrink-0" />
+                    <ArrowUpRight size={11} strokeWidth={1.5} className="shrink-0" />
                   </Link>
                 );
               })}
@@ -217,7 +215,7 @@ const DesktopNavbar = ({
                 <TooltipTrigger asChild>
                   <button
                     onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                    className="flex items-center justify-center w-8 h-8 rounded-md text-muted-foreground/50 hover:text-foreground transition-colors"
+                    className="flex items-center justify-center w-8 h-8 rounded-md text-muted-foreground/70 hover:text-foreground transition-colors"
                   >
                     {theme === "dark" ? <Moon size={15} strokeWidth={1.5} /> : <Sun size={15} strokeWidth={1.5} />}
                   </button>
@@ -230,7 +228,7 @@ const DesktopNavbar = ({
               // Expanded: icon + text
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="flex items-center gap-1.5 text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+                className="flex items-center gap-1.5 text-muted-foreground/70 hover:text-foreground transition-colors"
               >
                 {theme === "dark" ? <Moon size={14} strokeWidth={1.5} /> : <Sun size={14} strokeWidth={1.5} />}
                 <span className="text-xs">{theme === "dark" ? "Dark" : "Light"}</span>

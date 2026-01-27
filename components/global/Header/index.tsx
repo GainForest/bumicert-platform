@@ -18,19 +18,19 @@ const Header = () => {
   
   return (
     <div className="w-full flex flex-col sticky top-0 border-b border-border/60 backdrop-blur-sm bg-background/80 z-20">
-      <div className="flex items-center justify-between gap-2 px-4 py-2">
+      <div className="flex items-center justify-between gap-2 px-4 py-4">
         <div className="flex items-center gap-2">
           {isCollapsed && (
             <Tooltip delayDuration={0}>
               <TooltipTrigger asChild>
                 <button 
                   onClick={() => setOpenState(true, "desktop")} 
-                  className="p-1.5 rounded-md text-muted-foreground/60 hover:text-foreground transition-colors"
+                  className="p-1 text-muted-foreground/40 hover:text-muted-foreground transition-colors"
                 >
-                  <ChevronRight className="size-4" />
+                  <ChevronRight size={14} strokeWidth={1.5} />
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="bottom" sideOffset={8}>
+              <TooltipContent side="right" sideOffset={8}>
                 Expand sidebar
               </TooltipContent>
             </Tooltip>

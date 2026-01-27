@@ -42,7 +42,7 @@ const WhatIsBumicert = () => {
             </AccordionItem>
             <AccordionItem value="item-2" className="border-border/60">
               <AccordionTrigger className="font-serif font-medium text-lg text-foreground hover:text-primary transition-colors">
-                Verified Evidence of Environmental Impact
+                Verified proof of impact
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground leading-relaxed">
                 It serves as a provable record backed by photos, videos,
@@ -52,7 +52,7 @@ const WhatIsBumicert = () => {
             </AccordionItem>
             <AccordionItem value="item-3" className="border-border/60">
               <AccordionTrigger className="font-serif font-medium text-lg text-foreground hover:text-primary transition-colors">
-                A Funding Bridge Between Donors and Stewards
+                A bridge between donors and stewards
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground leading-relaxed">
                 A bumicert creates a direct pathway for supporters to fund
@@ -62,22 +62,22 @@ const WhatIsBumicert = () => {
             </AccordionItem>
             <AccordionItem value="item-4" className="border-border/60">
               <AccordionTrigger className="font-serif font-medium text-lg text-foreground hover:text-primary transition-colors">
-                A Time-Stamped Contribution to Global Restoration
+                A permanent moment in time
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground leading-relaxed">
-                Each Bumicert stores when a restoration activity
+                Each bumicert stores when a restoration activity
                 occurred—capturing the moment in time when land was protected,
                 trees were planted, or ecosystems were revived.
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-5" className="border-border/60">
               <AccordionTrigger className="font-serif font-medium text-lg text-foreground hover:text-primary transition-colors">
-                A Unique Claim to Environmental Stewardship
+                A claim to stewardship
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground leading-relaxed">
-                Buyers can claim ownership of the ecological impact represented
-                by the Bumicert, allowing them to show their personal or
-                organizational commitment to regeneration.
+                Supporters can claim ownership of the ecological impact represented
+                by a bumicert, showing their personal or organizational 
+                commitment to regeneration.
               </AccordionContent>
             </AccordionItem>
           </Accordion>
