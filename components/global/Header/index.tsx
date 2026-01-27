@@ -3,7 +3,6 @@ import React from "react";
 import { ChevronRight } from "lucide-react";
 import { useNavbarContext } from "../Navbar/context";
 import { useHeaderContext } from "../../providers/HeaderProvider";
-import AtprotoSignInButton from "./AtprotoSignInButton";
 import {
   Tooltip,
   TooltipContent,
@@ -39,12 +38,6 @@ const Header = () => {
         </div>
         <div className="flex items-center gap-2">
           {rightContent}
-          {viewport === "desktop" && (
-            <div className="flex items-center gap-2">
-              <div className="w-px h-4 bg-border/60" />
-              <AtprotoSignInButton />
-            </div>
-          )}
         </div>
       </div>
       {subHeaderContent}

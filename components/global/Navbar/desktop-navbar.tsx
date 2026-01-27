@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import { ArrowUpRight, ChevronLeft, Moon, Sun } from "lucide-react";
+import { ArrowUpRight, ChevronLeft, Loader2, Moon, Sun } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -17,6 +17,11 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useModal } from "@/components/ui/modal/context";
+import ProfileAvatar from "@/components/profile-avatar";
+import { useAtprotoProfile } from "@/hooks/use-atproto-profile";
+import AuthModal, { AuthModalId } from "@/components/global/modals/auth";
+import { ProfileModal, ProfileModalId } from "@/components/global/modals/profile";
 
 export type DesktopNavbarProps = {
   navLinks: NavLinkConfig[];
@@ -38,8 +43,24 @@ const DesktopNavbar = ({
   const auth = useAtprotoStore((state) => state.auth);
   const did = auth.user?.did;
   const { openState, setOpenState } = useNavbarContext();
+  const { pushModal, show } = useModal();
+  const { profile } = useAtprotoProfile(did);
 
   const isCollapsed = !openState.desktop;
+  const isAuthenticated = auth.status === "AUTHENTICATED";
+  const isResuming = auth.status === "RESUMING";
+  const displayName = profile?.displayName || auth.user?.handle?.split(".")[0];
+
+  const handleAccountClick = () => {
+    pushModal(
+      {
+        id: isAuthenticated ? ProfileModalId : AuthModalId,
+        content: isAuthenticated ? <ProfileModal /> : <AuthModal />,
+      },
+      true
+    );
+    show();
+  };
 
   return (
     <nav
@@ -167,6 +188,57 @@ const DesktopNavbar = ({
             );
           })}
         </ul>
+
+        {/* User Account */}
+        <div className={cn("mt-4", isCollapsed ? "-ml-2" : "")}>
+          {isResuming ? (
+            <div className={cn(
+              "flex items-center justify-center",
+              isCollapsed ? "w-8 h-8" : "px-2 py-1.5"
+            )}>
+              <Loader2 className="animate-spin text-muted-foreground size-4" />
+            </div>
+          ) : isCollapsed ? (
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={handleAccountClick}
+                  className="flex items-center justify-center w-8 h-8 rounded-md hover:bg-foreground/5 transition-colors"
+                >
+                  {isAuthenticated && did ? (
+                    <ProfileAvatar did={did} size={20} />
+                  ) : (
+                    <div className="w-5 h-5 rounded-full bg-foreground/10" />
+                  )}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="right" sideOffset={12}>
+                {isAuthenticated ? displayName : "Sign in"}
+              </TooltipContent>
+            </Tooltip>
+          ) : (
+            <button
+              onClick={handleAccountClick}
+              className="w-full flex items-center gap-2 px-2 py-1.5 -mx-1 rounded-md hover:bg-foreground/5 transition-colors"
+            >
+              {isAuthenticated && did ? (
+                <>
+                  <ProfileAvatar did={did} size={20} />
+                  <span className="text-sm text-foreground truncate">
+                    {displayName}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <div className="w-5 h-5 rounded-full bg-foreground/10" />
+                  <span className="text-sm text-muted-foreground">
+                    Sign in
+                  </span>
+                </>
+              )}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Bottom Section */}
