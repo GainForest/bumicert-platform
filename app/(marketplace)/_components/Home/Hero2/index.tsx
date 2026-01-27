@@ -5,7 +5,7 @@ import { ChevronLeft, Info } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
-const HERO_IMAGE = "/assets/media/images/hero-bumicert-card/image0.png";
+const HERO_IMAGE = "/humming.png";
 
 const Hero2 = () => {
   const [showInfo, setShowInfo] = useState(false);
