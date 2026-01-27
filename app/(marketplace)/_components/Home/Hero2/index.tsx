@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { BumicertArt } from "@/app/(marketplace)/bumicert/create/[draftId]/_components/Steps/Step4/BumicertPreviewCard";
 
-// Sample bumicerts to display as floating cards (using image0 and image1, skipping image2)
+// Sample bumicerts to display as floating cards (using image0, image1, image3, image4)
 const FLOATING_CARDS = [
   {
     id: 1,
@@ -37,7 +37,7 @@ const FLOATING_CARDS = [
   },
   {
     id: 3,
-    image: "/assets/media/images/hero-bumicert-card/image0.png",
+    image: "/assets/media/images/hero-bumicert-card/image3.png",
     title: "Mangrove Reforestation",
     objectives: ["Coastal Protection"],
     startDate: new Date("2024-06-01"),
@@ -114,7 +114,7 @@ const Hero2 = () => {
           >
             <BumicertArt
               logoUrl={null}
-              coverImage="/assets/media/images/hero-bumicert-card/image1.png"
+              coverImage="/assets/media/images/hero-bumicert-card/image4.png"
               title="Wildlife Corridor Project"
               objectives={["Wildlife", "Connectivity"]}
               startDate={new Date("2024-02-01")}
