@@ -20,6 +20,9 @@ export function ContributorRow({ value, onEdit, onRemove }: ContributorRowProps)
 
     // Parse handle to fetch avatar if possible
     useEffect(() => {
+        let cancelled = false;
+        
+        // Parse handle from value
         let handle: string | null = null;
 
         // Try matching "Name (@handle)"
@@ -44,18 +47,22 @@ export function ContributorRow({ value, onEdit, onRemove }: ContributorRowProps)
                     return res.json();
                 })
                 .then((data) => {
-                    if (data.avatar) {
-                        setAvatarUrl(data.avatar);
-                    } else {
-                        setAvatarUrl(undefined);
+                    if (!cancelled) {
+                        setAvatarUrl(data.avatar || undefined);
                     }
                 })
                 .catch(() => {
-                    setAvatarUrl(undefined);
+                    if (!cancelled) {
+                        setAvatarUrl(undefined);
+                    }
                 });
-        } else {
-            setAvatarUrl(undefined);
         }
+        
+        // Cleanup: clear avatar on dependency change and mark as cancelled
+        return () => {
+            cancelled = true;
+            setAvatarUrl(undefined);
+        };
     }, [value]);
 
     const handleSave = () => {
