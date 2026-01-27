@@ -126,16 +126,24 @@ const Step1 = () => {
                 <PopoverTrigger asChild>
                   <button
                     id="project-date-range"
-                    className="w-full flex items-center justify-center text-center bg-foreground/3 hover:bg-foreground/5 transition-colors rounded-md cursor-pointer py-2.5 px-3"
+                    className="w-full flex items-center gap-3 bg-background border border-border/50 hover:border-border transition-colors rounded-md cursor-pointer py-2 px-3"
                   >
-                    <span className="text-foreground/80 text-lg font-medium">
-                      {format(projectDateRange[0], "LLL dd, y")}
-                      <span className="text-foreground/30 mx-2">-</span>
-                      {format(projectDateRange[1], "LLL dd, y")}
-                    </span>
+                    <div className="flex-1 text-left">
+                      <span className="text-[10px] uppercase tracking-wide text-foreground/40 block">Start</span>
+                      <span className="text-sm text-foreground">
+                        {format(projectDateRange[0], "MMM d, yyyy")}
+                      </span>
+                    </div>
+                    <div className="w-px h-8 bg-border/50" />
+                    <div className="flex-1 text-left">
+                      <span className="text-[10px] uppercase tracking-wide text-foreground/40 block">End</span>
+                      <span className="text-sm text-foreground">
+                        {format(projectDateRange[1], "MMM d, yyyy")}
+                      </span>
+                    </div>
                   </button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto">
+                <PopoverContent className="w-auto p-0" align="start">
                   <CalendarRange
                     value={projectDateRange}
                     onValueChange={(value) => {
