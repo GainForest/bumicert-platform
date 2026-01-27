@@ -55,8 +55,8 @@ const MobileNavbar = ({ navLinks, footerLinks }: MobileNavbarProps) => {
   };
 
   return (
-    <div className="flex flex-col w-full">
-      <div className="w-full flex items-center justify-between p-2 relative">
+    <div className="flex flex-col w-full bg-background">
+      <div className="w-full flex items-center justify-between p-2 relative bg-background">
         <div className="flex items-center gap-2">
           <Button variant={"ghost"} size={"sm"} onClick={() => setOpenState()}>
             {openState.mobile ? <X /> : <Menu />}
@@ -97,9 +97,9 @@ const MobileNavbar = ({ navLinks, footerLinks }: MobileNavbarProps) => {
           openState.mobile && "h-20"
         )}
       ></div>
-      <div className="w-full flex flex-col" ref={parent}>
+      <div className="w-full flex flex-col bg-background" ref={parent}>
         {openState.mobile && (
-          <div className="mt-2 flex flex-col gap-2 w-full mb-2">
+          <div className="flex flex-col gap-2 w-full pb-4">
             <div className="grid grid-cols-1 min-[28rem]:grid-cols-2 px-4 py-1 gap-1 min-[28rem]:gap-2">
               {navLinks.map((link) => {
                 let isHighlighted = false;
