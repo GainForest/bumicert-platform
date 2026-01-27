@@ -3,8 +3,6 @@ import HeaderContent from "./_components/Home/HeaderContent";
 import Hero2 from "./_components/Home/Hero2";
 import WhatIsBumicert from "./_components/Home/WhatIsBumicert";
 import UserOptionCards from "./_components/Home/UserOptionCards";
-import FeaturedBumicerts from "./_components/Home/FeaturedBumicerts";
-import { Suspense } from "react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -84,13 +82,10 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
       />
       
-      <Container className="pb-16">
+      <Container className="pb-24">
         <HeaderContent />
         <Hero2 />
         <UserOptionCards />
-        <Suspense>
-          <FeaturedBumicerts />
-        </Suspense>
         <WhatIsBumicert />
       </Container>
     </>

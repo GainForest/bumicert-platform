@@ -19,7 +19,7 @@ const Hero2 = () => {
 
   return (
     <div className="w-full mt-4">
-      <div className="w-full h-72 md:h-80 rounded-2xl overflow-hidden relative">
+      <div className="w-full h-80 md:h-[420px] rounded-2xl overflow-hidden relative">
         {/* Background image */}
         <motion.img
           initial={{ filter: "brightness(0.5)", scale: 1.1 }}
@@ -37,7 +37,7 @@ const Hero2 = () => {
           transition={{ delay: 0.3, duration: 0.6 }}
           src={ApproachersImage.src}
           alt="Approachers"
-          className="absolute bottom-0 left-2 md:left-4 h-24 sm:h-32 md:h-44 lg:h-52 origin-bottom"
+          className="absolute bottom-0 left-2 md:left-8 h-28 sm:h-36 md:h-52 lg:h-64 origin-bottom"
         />
         <motion.img
           initial={{ y: 50, opacity: 0 }}
@@ -45,7 +45,7 @@ const Hero2 = () => {
           transition={{ delay: 0.4, duration: 0.6 }}
           src={PlantersImage.src}
           alt="Planters"
-          className="absolute bottom-0 right-2 md:right-4 h-24 sm:h-32 md:h-44 lg:h-52 origin-bottom"
+          className="absolute bottom-0 right-2 md:right-8 h-28 sm:h-36 md:h-52 lg:h-64 origin-bottom"
         />
 
         {/* Central content overlay */}
@@ -80,13 +80,13 @@ const Hero2 = () => {
                   transition={{ delay: hasAnimated ? 0 : 1, duration: 0.5 }}
                   src="/assets/media/images/logo.svg"
                   alt="Bumicerts Logo"
-                  className="h-16 w-16 md:h-20 md:w-20 mb-3"
+                  className="h-20 w-20 md:h-24 md:w-24 mb-4"
                 />
                 <motion.h1
                   initial={hasAnimated ? {} : { opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: hasAnimated ? 0 : 1.2, duration: 0.4 }}
-                  className="font-serif text-3xl md:text-4xl font-bold text-white"
+                  className="font-serif text-4xl md:text-5xl font-bold text-white tracking-tight"
                 >
                   Bumicerts
                 </motion.h1>
@@ -94,9 +94,9 @@ const Hero2 = () => {
                   initial={hasAnimated ? {} : { opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: hasAnimated ? 0 : 1.4, duration: 0.4 }}
-                  className="font-serif text-lg md:text-xl text-white/70 italic mt-1"
+                  className="text-lg md:text-xl text-white/80 mt-3 max-w-md"
                 >
-                  Fund impactful regenerative projects.
+                  Fund impactful regenerative projects
                 </motion.p>
               </motion.div>
             ) : (
