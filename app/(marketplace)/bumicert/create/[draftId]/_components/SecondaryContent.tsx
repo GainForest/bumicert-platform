@@ -62,10 +62,7 @@ const SecondaryContent = () => {
               <div className="flex flex-col items-center">
                 <BumicertArt
                   logoUrl={logoUrl}
-                  coverImage={
-                    step1FormValues.coverImage ??
-                    new File([], "cover-image.png")
-                  }
+                  coverImage={step1FormValues.coverImage}
                   title={step1FormValues.projectName}
                   objectives={step1FormValues.workType}
                   startDate={step1FormValues.projectDateRange[0]}

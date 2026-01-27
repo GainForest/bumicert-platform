@@ -64,8 +64,7 @@ const Step1 = () => {
             label="Cover image"
             error={errors.coverImage}
             showError={shouldShowValidationErrors}
-            info="Choose an image that best represents your work"
-            required
+            info="Choose an image that best represents your work, or use our default"
           >
             <FileInput
               className="h-80"
@@ -84,6 +83,7 @@ const Step1 = () => {
                 "image/webp",
               ]}
               maxSizeInMB={10}
+              defaultImageUrl="/default.webp"
             />
           </FormField>
           <div className="flex flex-col gap-2">

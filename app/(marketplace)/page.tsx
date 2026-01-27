@@ -3,6 +3,7 @@ import HeaderContent from "./_components/Home/HeaderContent";
 import Hero2 from "./_components/Home/Hero2";
 import WhatIsBumicert from "./_components/Home/WhatIsBumicert";
 import UserOptionCards from "./_components/Home/UserOptionCards";
+import FeaturedBumicerts from "./_components/Home/FeaturedBumicerts";
 import { Suspense } from "react";
 import type { Metadata } from "next";
 
@@ -68,12 +69,7 @@ export default function Home() {
     "description": "Platform for funding impactful regenerative projects and supporting climate action",
     "url": process.env.NEXT_PUBLIC_BASE_URL || "https://bumicerts.com",
     "logo": `${process.env.NEXT_PUBLIC_BASE_URL || "https://bumicerts.com"}/logo.png`,
-    "sameAs": [
-      // Add your social media links here when available
-      // "https://twitter.com/bumicerts",
-      // "https://linkedin.com/company/bumicerts",
-      // "https://github.com/bumicerts"
-    ]
+    "sameAs": []
   };
 
   return (
@@ -88,14 +84,14 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
       />
       
-      <Container>
+      <Container className="pb-16">
         <HeaderContent />
         <Hero2 />
         <UserOptionCards />
+        <Suspense>
+          <FeaturedBumicerts />
+        </Suspense>
         <WhatIsBumicert />
-        {/* <Suspense>
-          <Bumicerts />
-        </Suspense> */}
       </Container>
     </>
   );

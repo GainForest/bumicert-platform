@@ -128,6 +128,8 @@ interface FileInputProps {
   value?: File | null;
   maxSizeInMB?: number;
   className?: string;
+  /** URL of a default placeholder image to show when no file is selected */
+  defaultImageUrl?: string;
 }
 
 const FileInput = ({
@@ -137,6 +139,7 @@ const FileInput = ({
   value,
   maxSizeInMB = 10,
   className,
+  defaultImageUrl,
 }: FileInputProps) => {
   const normalizedValue =
     value instanceof File && value.size === 0 ? null : value;
@@ -356,31 +359,74 @@ const FileInput = ({
 
         {/* Upload Interface (when no file selected) */}
         {!normalizedValue && (
-          <div className="w-full h-full flex flex-col items-center justify-center gap-2">
-            <div className="flex items-center gap-1">
-              <QuickTooltip content="Paste from clipboard" asChild>
-                <button
-                  type="button"
-                  className="h-7 w-7 flex items-center justify-center bg-foreground/10 rounded-full text-muted-foreground hover:text-foreground cursor-pointer"
-                  onClick={handlePasteFromClipboard}
-                >
-                  <ClipboardIcon className="size-4" />
-                </button>
-              </QuickTooltip>
-              <QuickTooltip content="Upload from device" asChild>
-                <button
-                  type="button"
-                  className="h-7 w-7 flex items-center justify-center bg-foreground/10 rounded-full text-muted-foreground hover:text-foreground cursor-pointer"
-                  onClick={handleUploadClick}
-                >
-                  <FolderUpIcon className="size-4" />
-                </button>
-              </QuickTooltip>
-            </div>
+          <div className="w-full h-full relative">
+            {/* Default image background */}
+            {defaultImageUrl && (
+              <img
+                src={defaultImageUrl}
+                alt="Default placeholder"
+                className="absolute inset-0 w-full h-full object-cover opacity-60"
+              />
+            )}
+            
+            {/* Upload controls overlay */}
+            <div className={cn(
+              "absolute inset-0 flex flex-col items-center justify-center gap-2",
+              defaultImageUrl ? "bg-black/30" : ""
+            )}>
+              <div className="flex items-center gap-1">
+                <QuickTooltip content="Paste from clipboard" asChild>
+                  <button
+                    type="button"
+                    className={cn(
+                      "h-7 w-7 flex items-center justify-center rounded-full cursor-pointer",
+                      defaultImageUrl
+                        ? "bg-white/80 text-gray-700 hover:bg-white"
+                        : "bg-foreground/10 text-muted-foreground hover:text-foreground"
+                    )}
+                    onClick={handlePasteFromClipboard}
+                  >
+                    <ClipboardIcon className="size-4" />
+                  </button>
+                </QuickTooltip>
+                <QuickTooltip content="Upload from device" asChild>
+                  <button
+                    type="button"
+                    className={cn(
+                      "h-7 w-7 flex items-center justify-center rounded-full cursor-pointer",
+                      defaultImageUrl
+                        ? "bg-white/80 text-gray-700 hover:bg-white"
+                        : "bg-foreground/10 text-muted-foreground hover:text-foreground"
+                    )}
+                    onClick={handleUploadClick}
+                  >
+                    <FolderUpIcon className="size-4" />
+                  </button>
+                </QuickTooltip>
+              </div>
 
-            <span className="text-sm text-center px-2 text-muted-foreground origin-center">
-              {placeholder}
-            </span>
+              <span className={cn(
+                "text-sm text-center px-2 origin-center",
+                defaultImageUrl ? "text-white font-medium" : "text-muted-foreground"
+              )}>
+                {placeholder}
+              </span>
+              
+              {defaultImageUrl && (
+                <span className="text-xs text-white/70 mt-1">
+                  Using default image if not changed
+                </span>
+              )}
+            </div>
+            
+            {/* Drag overlay */}
+            {isDragOver && defaultImageUrl && (
+              <div className="absolute inset-0 bg-primary/40 flex items-center justify-center">
+                <div className="text-white font-medium">
+                  Drop to replace image
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

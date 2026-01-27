@@ -1,30 +1,30 @@
 "use client";
 
-import React from "react";
-import BumicertCard, { BumicertCardSkeleton } from "./BumicertCard";
+import React, { useMemo } from "react";
+import BumicertCard, { BumicertCardSkeleton, hasValidImage } from "./BumicertCard";
 import ErrorPage from "@/components/error-page";
 import useSortedBumicerts from "../../_hooks/use-sorted-bumicerts";
 import { useFilteredBumicerts } from "../../_hooks/use-filtered-bumicerts";
-import NothingPage from "@/components/nothing-page";
 import { Button } from "@/components/ui/button";
-import { Eraser } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { useQueryState } from "nuqs";
-import { AnimatePresence } from "framer-motion";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
-import { getEcocertsFromClaimActivities as getBumicertsFromClaimActivities } from "climateai-sdk/utilities/hypercerts";
-import { trpcApi } from "@/components/providers/TrpcProvider";
+import { AnimatePresence, motion } from "framer-motion";
 import { useExploreStore } from "../../store";
 
 const Bumicerts = () => {
   const { bumicerts, error } = useExploreStore();
-
   const loading = bumicerts === null;
 
   const filteredBumicerts = useFilteredBumicerts(bumicerts ?? []);
-  const sortedAndFilteredBumicerts = useSortedBumicerts(
-    filteredBumicerts ?? []
+  const sortedAndFilteredBumicerts = useSortedBumicerts(filteredBumicerts ?? []);
+  
+  // Filter out bumicerts without valid images to avoid empty grid cells
+  const validBumicerts = useMemo(
+    () => sortedAndFilteredBumicerts.filter(hasValidImage),
+    [sortedAndFilteredBumicerts]
   );
-  const [, setSearchParams] = useQueryState("q");
+  const [search, setSearchParams] = useQueryState("q");
+  const [selectedOrg, setSelectedOrg] = useQueryState("org");
 
   if (error) {
     return (
@@ -36,41 +36,72 @@ const Bumicerts = () => {
     );
   }
 
+  const clearFilters = () => {
+    setSearchParams("");
+    setSelectedOrg("");
+  };
+
   return (
-    <div className="my-4">
-      <div className="flex items-center justify-center">
-        <div className="w-full flex flex-wrap items-stretch justify-center gap-4">
-          <AnimatePresence mode="wait">
-            {loading ? (
-              Array.from({ length: 12 }).map((_, index) => (
-                <BumicertCardSkeleton key={index} />
-              ))
-            ) : sortedAndFilteredBumicerts.length > 0 ? (
-              sortedAndFilteredBumicerts.map((bumicert) => (
-                <BumicertCard
-                  key={bumicert.claimActivity.cid}
-                  bumicert={bumicert}
-                />
-              ))
-            ) : (
-              <NothingPage
-                title="No bumicerts found."
-                description="Please try changing your search."
-                cta={
-                  <Button
-                    onClick={() => {
-                      setSearchParams("");
-                    }}
-                  >
-                    <Eraser className="size-4" />
-                    Clear search
-                  </Button>
-                }
-              />
+    <div>
+      <AnimatePresence mode="wait">
+        {loading ? (
+          <motion.div
+            key="loading"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+          >
+            {Array.from({ length: 8 }).map((_, index) => (
+              <BumicertCardSkeleton key={index} />
+            ))}
+          </motion.div>
+        ) : validBumicerts.length > 0 ? (
+          <motion.div
+            key="results"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+          >
+            {validBumicerts.map((bumicert, index) => (
+              <motion.div
+                key={bumicert.claimActivity.cid}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05, duration: 0.3 }}
+                className="h-full"
+              >
+                <BumicertCard bumicert={bumicert} />
+              </motion.div>
+            ))}
+          </motion.div>
+        ) : (
+          <motion.div
+            key="empty"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="flex flex-col items-center justify-center py-20 text-center"
+          >
+            <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
+              <Search className="size-7 text-muted-foreground/50" strokeWidth={1.25} />
+            </div>
+            <h3 className="font-semibold text-foreground mb-1">No bumicerts found</h3>
+            <p className="text-sm text-muted-foreground mb-4 max-w-sm">
+              {search || selectedOrg
+                ? "Try adjusting your search or filters to find what you're looking for."
+                : "No bumicerts have been published yet."}
+            </p>
+            {(search || selectedOrg) && (
+              <Button variant="outline" size="sm" onClick={clearFilters}>
+                <X className="size-4 mr-1" strokeWidth={1.5} />
+                Clear filters
+              </Button>
             )}
-          </AnimatePresence>
-        </div>
-      </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

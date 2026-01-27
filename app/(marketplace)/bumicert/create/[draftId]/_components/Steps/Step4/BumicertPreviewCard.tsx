@@ -12,6 +12,8 @@ import { UploadLogoModal, UploadLogoModalId } from "./UploadLogoModal";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
+const DEFAULT_COVER_IMAGE = "/default.webp";
+
 export const BumicertArt = ({
   logoUrl,
   coverImage,
@@ -22,7 +24,7 @@ export const BumicertArt = ({
   className,
 }: {
   logoUrl: string | null;
-  coverImage: File | string;
+  coverImage: File | string | null;
   title: string;
   objectives: string[];
   startDate: Date;
@@ -63,9 +65,11 @@ export const BumicertArt = ({
       <div className="w-full aspect-[3/4] relative overflow-hidden">
         <Image
           src={
-            typeof coverImage === "string"
-              ? coverImage
-              : URL.createObjectURL(coverImage)
+            !coverImage || (coverImage instanceof File && coverImage.size === 0)
+              ? DEFAULT_COVER_IMAGE
+              : typeof coverImage === "string"
+                ? coverImage
+                : URL.createObjectURL(coverImage)
           }
           alt="Bumicert"
           fill
@@ -143,8 +147,9 @@ const BumicertPreviewCard = () => {
 
   const isLoadingOrganizationInfo = isPendingOrganizationInfo || isOlderData;
 
+  // Cover image is optional (will use default), but title/dates/objectives are required
   const isBumicertArtReady =
-    coverImage && title && objectives && startDate && endDate;
+    title && objectives && startDate && endDate;
 
   return (
     <div className="flex flex-col gap-3">

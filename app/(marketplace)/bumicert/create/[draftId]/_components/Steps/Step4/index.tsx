@@ -78,9 +78,10 @@ const Step4 = () => {
               let parsedValue: string;
               switch (typedKey) {
                 case "coverImage":
-                  parsedValue = step1FormValues[typedKey]
-                    ? "Uploaded"
-                    : "Not uploaded";
+                  const coverImg = step1FormValues[typedKey];
+                  parsedValue = coverImg && coverImg.size > 0
+                    ? "Custom image uploaded"
+                    : "Using default image";
                   break;
                 case "projectDateRange":
                   parsedValue = step1FormValues[typedKey]

@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { ArrowUpRight, Menu, UserX2, X } from "lucide-react";
+import { ArrowUpRight, Loader2, Menu, Moon, Sun, X } from "lucide-react";
 import React from "react";
 import { cn } from "@/lib/utils";
 import { useNavbarContext } from "./context";
@@ -9,12 +9,14 @@ import { NavLinkConfig } from "./types";
 import { usePathname } from "next/navigation";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import Link from "next/link";
-import UserAvatar from "@/components/user-avatar";
-import { AnimatePresence, motion } from "framer-motion";
+import ProfileAvatar from "@/components/profile-avatar";
 import { useModal } from "@/components/ui/modal/context";
 import { ProfileModal, ProfileModalId } from "../modals/profile";
 import AuthModal, { AuthModalId } from "../modals/auth";
 import { links } from "@/lib/links";
+import { useAtprotoProfile } from "@/hooks/use-atproto-profile";
+import { useTheme } from "next-themes";
+import useIsMounted from "@/hooks/use-is-mounted";
 
 export type MobileNavbarProps = {
   navLinks: NavLinkConfig[];
@@ -30,8 +32,27 @@ const MobileNavbar = ({ navLinks, footerLinks }: MobileNavbarProps) => {
   const pathname = usePathname();
   const auth = useAtprotoStore((state) => state.auth);
   const did = auth.user?.did;
+  const { profile } = useAtprotoProfile(did);
+  const { theme, setTheme } = useTheme();
+  const isMounted = useIsMounted();
 
-  const { show, popModal, pushModal } = useModal();
+  const { show, pushModal } = useModal();
+
+  const isAuthenticated = auth.status === "AUTHENTICATED";
+  const isResuming = auth.status === "RESUMING";
+  const displayName = profile?.displayName || auth.user?.handle?.split(".")[0];
+
+  const handleAccountClick = () => {
+    setOpenState(false);
+    pushModal(
+      {
+        id: isAuthenticated ? ProfileModalId : AuthModalId,
+        content: isAuthenticated ? <ProfileModal /> : <AuthModal />,
+      },
+      true
+    );
+    show();
+  };
 
   return (
     <div className="flex flex-col w-full">
@@ -45,41 +66,30 @@ const MobileNavbar = ({ navLinks, footerLinks }: MobileNavbarProps) => {
           </span>
         </div>
 
-        <Button
-          variant={"outline"}
-          size={"sm"}
+        <button
           className={cn(
-            "absolute right-2 top-2 h-8 w-8 rounded-full transition-all duration-300",
+            "absolute right-2 top-2 h-8 w-8 rounded-full transition-all duration-300 flex items-center justify-center border border-border/40 bg-background hover:bg-foreground/5",
             openState.mobile &&
               "h-20 w-20 translate-y-8 right-[50%] translate-x-[calc(5rem-50%)]"
           )}
-          onClick={() => {
-            setOpenState(false);
-            pushModal(
-              {
-                id: did ? ProfileModalId : AuthModalId,
-                content: did ? <ProfileModal /> : <AuthModal />,
-              },
-              true
-            );
-            show();
-          }}
+          onClick={handleAccountClick}
         >
-          {did ? (
-            <UserAvatar
-              className="transition-all duration-300"
-              did={did as `did:plc:${string}`}
-              size={openState.mobile ? "calc(5rem - 12px)" : "calc(2rem - 6px)"}
+          {isResuming ? (
+            <Loader2 className="animate-spin text-muted-foreground size-4" />
+          ) : isAuthenticated && did ? (
+            <ProfileAvatar
+              did={did}
+              size={openState.mobile ? 68 : 24}
             />
           ) : (
-            <UserX2
+            <div
               className={cn(
-                "size-4 text-muted-foreground transition-all duration-300",
-                openState.mobile && "size-8"
+                "rounded-full bg-foreground/10 transition-all duration-300",
+                openState.mobile ? "w-16 h-16" : "w-5 h-5"
               )}
             />
           )}
-        </Button>
+        </button>
       </div>
       <div
         className={cn(
@@ -123,57 +133,91 @@ const MobileNavbar = ({ navLinks, footerLinks }: MobileNavbarProps) => {
                   typeof link.href === "function" ? link.href(did) : link.href;
 
                 return (
-                  <Link href={href} key={link.id} className="w-auto">
-                    <Button
-                      variant={isHighlighted ? "default" : "outline"}
-                      size={"lg"}
-                      className={cn(
-                        "w-full flex justify-start px-1 h-10 rounded-lg text-md",
-                        !isHighlighted &&
-                          "bg-primary/10 border-none shadow-none"
-                      )}
-                    >
-                      <link.Icon
-                        className={cn(
-                          "size-5",
-                          isHighlighted
-                            ? "text-primary-foreground"
-                            : "text-primary"
-                        )}
-                      />
-                      <span>{link.text}</span>
-                    </Button>
+                  <Link
+                    href={href}
+                    key={link.id}
+                    className={cn(
+                      "flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm transition-colors",
+                      isHighlighted
+                        ? "bg-foreground/5 text-foreground font-semibold"
+                        : "text-foreground hover:bg-foreground/5"
+                    )}
+                  >
+                    <link.Icon size={18} strokeWidth={1.25} className="shrink-0" />
+                    <span>{link.text}</span>
                   </Link>
                 );
               })}
             </div>
-            <hr />
-            <div className="flex flex-col px-5">
-              <span className="text-muted-foreground text-sm font-medium">
+            {/* Divider */}
+            <div className="h-px bg-border/40 mx-4" />
+
+            {/* Footer Links */}
+            <div className="flex flex-col px-4">
+              <span className="text-muted-foreground/60 text-xs font-medium mb-2">
                 Links
               </span>
-              <div className="flex items-center flex-wrap gap-2 mt-1">
+              <div className="flex items-center flex-wrap gap-2">
                 {footerLinks.map((link) => {
+                  const isInternal = link.href.startsWith("/");
                   return (
                     <Link
                       href={link.href}
-                      target="_blank"
+                      target={isInternal ? undefined : "_blank"}
+                      rel={isInternal ? undefined : "noopener noreferrer"}
                       key={link.href}
-                      className="cursor-pointer"
+                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs text-foreground/60 bg-foreground/5 hover:bg-foreground/10 transition-colors"
                     >
-                      <Button
-                        variant={"outline"}
-                        size={"sm"}
-                        className="rounded-full text-xs h-7"
-                      >
-                        {link.text}
-                        <ArrowUpRight className="size-3" />
-                      </Button>
+                      {link.text}
+                      <ArrowUpRight size={10} strokeWidth={1.5} />
                     </Link>
                   );
                 })}
               </div>
             </div>
+
+            {/* Theme Toggle */}
+            {isMounted && (
+              <>
+                <div className="h-px bg-border/40 mx-4" />
+                <div className="px-4">
+                  <button
+                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                    className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-colors w-full"
+                  >
+                    {theme === "dark" ? (
+                      <Moon size={18} strokeWidth={1.25} />
+                    ) : (
+                      <Sun size={18} strokeWidth={1.25} />
+                    )}
+                    <span>{theme === "dark" ? "Dark mode" : "Light mode"}</span>
+                  </button>
+                </div>
+              </>
+            )}
+
+            {/* User Info (when logged in) */}
+            {isAuthenticated && displayName && (
+              <>
+                <div className="h-px bg-border/40 mx-4" />
+                <div className="px-4 pb-2">
+                  <button
+                    onClick={handleAccountClick}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-foreground/5 transition-colors w-full"
+                  >
+                    {did && <ProfileAvatar did={did} size={32} />}
+                    <div className="flex flex-col items-start">
+                      <span className="text-sm font-medium text-foreground">
+                        {displayName}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        View profile
+                      </span>
+                    </div>
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         )}
       </div>

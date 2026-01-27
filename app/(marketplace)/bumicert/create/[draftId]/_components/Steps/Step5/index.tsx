@@ -28,6 +28,15 @@ import { useQueryClient } from "@tanstack/react-query";
 import { trackBumicertPublished, getFlowDurationSeconds } from "@/lib/analytics";
 import FeedbackModal from "./FeedbackModal";
 
+const DEFAULT_COVER_IMAGE_URL = "/default.webp";
+
+// Helper to fetch the default image as a File
+async function fetchDefaultImage(): Promise<File> {
+  const response = await fetch(DEFAULT_COVER_IMAGE_URL);
+  const blob = await response.blob();
+  return new File([blob], "default-cover.webp", { type: "image/webp" });
+}
+
 const ProgressItem = ({
   iconset,
   title,
@@ -218,15 +227,16 @@ const Step5 = () => {
 
     setCreateBumicertError(null);
 
-    if (!step1FormValues.coverImage) {
-      setCreateBumicertError("Cover image is required");
-      return;
-    }
-
     try {
-      const coverImageFileGen = await toFileGenerator(
-        step1FormValues.coverImage
-      );
+      // Use provided cover image or fetch the default
+      let coverImageFile: File;
+      if (step1FormValues.coverImage && step1FormValues.coverImage.size > 0) {
+        coverImageFile = step1FormValues.coverImage;
+      } else {
+        coverImageFile = await fetchDefaultImage();
+      }
+
+      const coverImageFileGen = await toFileGenerator(coverImageFile);
 
       const data = {
         activity: {
