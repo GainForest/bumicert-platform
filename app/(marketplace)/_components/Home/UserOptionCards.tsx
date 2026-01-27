@@ -20,11 +20,10 @@ const UserOptionCards = () => {
           Explore <ArrowRight className="size-3.5" />
         </Button>
         <span className="font-serif text-foreground text-2xl leading-tight">
-          I want to support a project.
+          Support a project
         </span>
         <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-          Purchase Bumicerts to directly fund regenerative projects that restore
-          nature and strengthen community resilience.
+          Fund regenerative work directly.
         </p>
       </Link>
       <Link
@@ -40,11 +39,10 @@ const UserOptionCards = () => {
           Create <ArrowRight className="size-3.5" />
         </Button>
         <span className="font-serif text-foreground text-2xl leading-tight">
-          I am an organization.
+          Create a bumicert
         </span>
         <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-          Create a bumicert to showcase your regenerative impact and attract
-          donors.
+          Showcase your impact and attract support.
         </p>
       </Link>
     </div>
