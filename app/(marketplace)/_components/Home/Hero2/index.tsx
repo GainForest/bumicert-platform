@@ -1,12 +1,11 @@
 "use client";
 
-import BackgroundImage from "./assets/background.png";
-import PlantersImage from "./assets/planters.png";
-import ApproachersImage from "./assets/approachers.png";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, Info } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+
+const HERO_IMAGE = "/assets/media/images/hero-bumicert-card/image0.png";
 
 const Hero2 = () => {
   const [showInfo, setShowInfo] = useState(false);
@@ -19,82 +18,59 @@ const Hero2 = () => {
 
   return (
     <div className="w-full mt-4">
-      <div className="w-full h-80 md:h-[420px] rounded-2xl overflow-hidden relative">
+      <div className="w-full h-72 md:h-[380px] rounded-2xl overflow-hidden relative">
         {/* Background image */}
         <motion.img
-          initial={{ filter: "brightness(0.5)", scale: 1.1 }}
-          animate={{ filter: "brightness(1)", scale: 1 }}
+          initial={{ scale: 1.1, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 1.2 }}
-          src={BackgroundImage.src}
-          alt="Background"
-          className="absolute inset-0 object-cover object-bottom h-full w-full"
+          src={HERO_IMAGE}
+          alt="Regenerative project"
+          className="absolute inset-0 object-cover h-full w-full"
         />
 
-        {/* Character illustrations */}
-        <motion.img
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
-          src={ApproachersImage.src}
-          alt="Approachers"
-          className="absolute bottom-0 left-2 md:left-8 h-28 sm:h-36 md:h-52 lg:h-64 origin-bottom"
-        />
-        <motion.img
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.6 }}
-          src={PlantersImage.src}
-          alt="Planters"
-          className="absolute bottom-0 right-2 md:right-8 h-28 sm:h-36 md:h-52 lg:h-64 origin-bottom"
-        />
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
 
-        {/* Central content overlay */}
+        {/* Content overlay */}
         <motion.div
           className="absolute inset-0 flex flex-col items-center justify-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.8, duration: 0.5 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
         >
-          {/* Blurred background for text readability */}
-          <div
-            className={cn(
-              "absolute inset-x-0 top-1/2 -translate-y-1/2 h-48 bg-black/50 blur-3xl transition-all duration-500",
-              showInfo && "bg-black/70 h-56"
-            )}
-          />
-
           {/* Content */}
           <AnimatePresence mode="wait">
             {!showInfo ? (
               <motion.div
                 key="branding"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.3 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.4 }}
                 className="relative z-10 flex flex-col items-center text-center px-4"
               >
                 <motion.img
-                  initial={hasAnimated ? {} : { y: -30, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: hasAnimated ? 0 : 1, duration: 0.5 }}
+                  initial={hasAnimated ? {} : { scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: hasAnimated ? 0 : 0.8, duration: 0.5 }}
                   src="/assets/media/images/logo.svg"
                   alt="Bumicerts Logo"
-                  className="h-20 w-20 md:h-24 md:w-24 mb-4"
+                  className="h-16 w-16 md:h-20 md:w-20 mb-4 drop-shadow-lg"
                 />
                 <motion.h1
                   initial={hasAnimated ? {} : { opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: hasAnimated ? 0 : 1.2, duration: 0.4 }}
-                  className="font-serif text-4xl md:text-5xl font-bold text-white tracking-tight"
+                  transition={{ delay: hasAnimated ? 0 : 1, duration: 0.4 }}
+                  className="font-serif text-4xl md:text-5xl font-bold text-white tracking-tight drop-shadow-lg"
                 >
                   Bumicerts
                 </motion.h1>
                 <motion.p
                   initial={hasAnimated ? {} : { opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: hasAnimated ? 0 : 1.4, duration: 0.4 }}
-                  className="text-lg md:text-xl text-white/80 mt-3 max-w-md"
+                  transition={{ delay: hasAnimated ? 0 : 1.2, duration: 0.4 }}
+                  className="text-base md:text-lg text-white/90 mt-2 max-w-sm drop-shadow-md"
                 >
                   Fund impactful regenerative projects
                 </motion.p>
@@ -102,18 +78,17 @@ const Hero2 = () => {
             ) : (
               <motion.div
                 key="info"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.3 }}
-                className="relative z-10 px-6 max-w-xl text-center"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.4 }}
+                className="relative z-10 px-6 max-w-lg text-center"
               >
-                <p className="font-serif text-white text-lg md:text-xl leading-relaxed">
-                  Bumicerts is a marketplace that connects nature stewards with
-                  funders. It allows local communities and organizations to
-                  showcase verified conservation efforts through digital
-                  certificates, enabling them to receive continuous support for
-                  their regenerative projects.
+                <p className="text-white text-base md:text-lg leading-relaxed drop-shadow-md">
+                  Bumicerts connects nature stewards with funders. Local communities 
+                  and organizations can showcase verified conservation efforts through 
+                  digital certificates, receiving continuous support for their 
+                  regenerative projects.
                 </p>
               </motion.div>
             )}
@@ -123,16 +98,16 @@ const Hero2 = () => {
           <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.6, duration: 0.4 }}
+            transition={{ delay: 1.4, duration: 0.4 }}
             onClick={handleToggle}
-            className="absolute bottom-4 z-10 flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/20 rounded-full transition-colors"
+            className="absolute bottom-5 z-10 flex items-center gap-2 px-4 py-2 bg-white/15 backdrop-blur-md hover:bg-white/25 border border-white/20 rounded-full transition-colors"
           >
             {showInfo ? (
-              <ChevronLeft className="size-4 text-white/90" strokeWidth={1.5} />
+              <ChevronLeft className="size-4 text-white" strokeWidth={1.5} />
             ) : (
-              <Info className="size-4 text-white/90" strokeWidth={1.5} />
+              <Info className="size-4 text-white" strokeWidth={1.5} />
             )}
-            <span className="text-white/90 text-sm font-medium">
+            <span className="text-white text-sm font-medium">
               {showInfo ? "Back" : "Learn more"}
             </span>
           </motion.button>
