@@ -1,7 +1,7 @@
 "use client";
 import { trpcApi } from "@/components/providers/TrpcProvider";
 import { useAtprotoStore } from "@/components/stores/atproto";
-import { Button } from "@/components/ui/button";
+
 import { useModal } from "@/components/ui/modal/context";
 import {
   ModalContent,
@@ -12,12 +12,12 @@ import {
 } from "@/components/ui/modal/modal";
 import { links } from "@/lib/links";
 import {
-  Building,
   Copy,
   Check,
   Loader2,
-  LogOut,
-  UploadIcon,
+  ArrowRightFromLine,
+  Building2,
+  CloudUpload,
 } from "lucide-react";
 import Link from "next/link";
 import { ProfileAvatar } from "@/components/profile-avatar";
@@ -41,14 +41,10 @@ export const ProfileModal = () => {
       },
     });
 
-  // Parse handle into username and domain (must be before early return for hooks rules)
-  const { username, domain } = useMemo(() => {
+  // Parse handle into username (must be before early return for hooks rules)
+  const username = useMemo(() => {
     const fullHandle = profile?.handle || auth.user?.handle || "";
-    const parts = fullHandle.split(".");
-    return {
-      username: parts[0] || "",
-      domain: parts.slice(1).join("."),
-    };
+    return fullHandle.split(".")[0] || "";
   }, [profile?.handle, auth.user?.handle]);
 
   const copyDid = () => {
@@ -98,49 +94,44 @@ export const ProfileModal = () => {
       </ModalHeader>
 
       {/* Profile Header */}
-      <div className="flex flex-col items-center gap-4 pb-4">
+      <div className="flex flex-col items-center gap-3 pb-6">
         <ProfileAvatar
           did={auth.user.did}
-          size={72}
-          className="ring-2 ring-border/40 ring-offset-2 ring-offset-background"
+          size={64}
+          className="ring-1 ring-border/30"
         />
 
-        <div className="flex flex-col items-center text-center">
-          <h2 className="text-2xl font-serif font-medium text-foreground">
-            {username}
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            .{domain}
-          </p>
-        </div>
+        <h2 className="text-xl font-serif font-medium text-foreground">
+          {profile?.displayName || username}
+        </h2>
 
         {/* DID with copy */}
         <button
           onClick={copyDid}
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-secondary/50 hover:bg-secondary transition-colors group"
+          className="flex items-center gap-1.5 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
         >
-          <span className="text-[10px] font-mono text-muted-foreground truncate max-w-[200px]">
+          <span className="text-[10px] font-mono truncate max-w-[180px]">
             {auth.user.did}
           </span>
           {copied ? (
             <Check className="size-3 text-primary shrink-0" />
           ) : (
-            <Copy className="size-3 text-muted-foreground group-hover:text-foreground shrink-0 transition-colors" />
+            <Copy className="size-3 shrink-0" />
           )}
         </button>
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 gap-3 py-4 border-t border-border/40">
+      <div className="flex flex-col gap-1 py-4 border-t border-border/30">
         <Link
           href={links.myOrganization(auth.user.did)}
           onClick={() => {
             hide().then(() => popModal());
           }}
-          className="flex flex-col items-center gap-2 p-4 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition-colors group"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-secondary/50 transition-colors group"
         >
-          <Building className="size-6 text-muted-foreground group-hover:text-primary transition-colors" />
-          <span className="text-sm font-medium text-foreground">My Organization</span>
+          <Building2 className="size-4 text-muted-foreground/70 group-hover:text-foreground transition-colors" strokeWidth={1.5} />
+          <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">My Organization</span>
         </Link>
 
         <Link
@@ -148,31 +139,29 @@ export const ProfileModal = () => {
           onClick={() => {
             hide().then(() => popModal());
           }}
-          className="flex flex-col items-center gap-2 p-4 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition-colors group"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-secondary/50 transition-colors group"
         >
-          <UploadIcon className="size-6 text-muted-foreground group-hover:text-primary transition-colors" />
-          <span className="text-sm font-medium text-foreground">Upload</span>
+          <CloudUpload className="size-4 text-muted-foreground/70 group-hover:text-foreground transition-colors" strokeWidth={1.5} />
+          <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">Upload</span>
         </Link>
       </div>
 
       {/* Footer */}
-      <ModalFooter className="border-t border-border/40 pt-4">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+      <ModalFooter className="border-t border-border/30 pt-3">
+        <button
+          className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground/60 hover:text-muted-foreground transition-colors disabled:opacity-50"
           onClick={() => {
             signOut({ service: "climateai.org" });
           }}
           disabled={isSigningOut}
         >
           {isSigningOut ? (
-            <Loader2 className="size-4 animate-spin" />
+            <Loader2 className="size-3.5 animate-spin" />
           ) : (
-            <LogOut className="size-4" />
+            <ArrowRightFromLine className="size-3.5" strokeWidth={1.5} />
           )}
           Sign out
-        </Button>
+        </button>
       </ModalFooter>
     </ModalContent>
   );

@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { useNavbarContext } from "./context";
-import { useAutoAnimate } from "@formkit/auto-animate/react";
 import Header from "../Header";
 import { cn } from "@/lib/utils";
 import { HeaderContextProvider } from "@/components/providers/HeaderProvider";
@@ -18,7 +17,6 @@ const NavbarLayout = ({
   mobileNavbarProps: MobileNavbarProps;
 }) => {
   const { openState, viewport, setOpenState } = useNavbarContext();
-  const [parent] = useAutoAnimate<HTMLDivElement>();
   return (
     <HeaderContextProvider>
       <div
@@ -27,9 +25,8 @@ const NavbarLayout = ({
           viewport === "mobile" && "flex-col",
           "bg-[rgb(242_237_227.7)] dark:bg-[rgb(30_30_30.7)]"
         )}
-        ref={parent}
       >
-        {viewport === "desktop" && openState.desktop && (
+        {viewport === "desktop" && (
           <DesktopNavbar {...desktopNavbarProps} />
         )}
         {viewport === "mobile" && <MobileNavbar {...mobileNavbarProps} />}
@@ -42,14 +39,8 @@ const NavbarLayout = ({
             }
           }}
           className={cn(
-            "flex-1 flex flex-col bg-background border border-border/60 rounded-xl relative overflow-y-auto",
-            viewport === "desktop"
-              ? openState.desktop
-                ? "m-2 md:ml-0"
-                : "m-0 rounded-none"
-              : openState.mobile
-              ? "brightness-90 blur-[1px] overflow-hidden cursor-default"
-              : ""
+            "flex-1 flex flex-col bg-background relative overflow-y-auto",
+            viewport === "mobile" && openState.mobile && "brightness-90 blur-[1px] overflow-hidden cursor-default"
           )}
         >
           <Header />

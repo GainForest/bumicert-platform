@@ -1,29 +1,40 @@
 "use client";
 import React from "react";
-import { Button } from "../../ui/button";
-import { ChevronLeft, Sidebar } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { useNavbarContext } from "../Navbar/context";
 import { useHeaderContext } from "../../providers/HeaderProvider";
 import AtprotoSignInButton from "./AtprotoSignInButton";
-import { useRouter } from "next/navigation";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const Header = () => {
-  const router = useRouter();
-  const { setOpenState, viewport } = useNavbarContext();
+  const { viewport, openState, setOpenState } = useNavbarContext();
   const { leftContent, rightContent, subHeaderContent } = useHeaderContext();
+  
+  const isCollapsed = viewport === "desktop" && !openState.desktop;
+  
   return (
     <div className="w-full flex flex-col sticky top-0 border-b border-border/60 backdrop-blur-sm bg-background/80 z-20">
       <div className="flex items-center justify-between gap-2 px-4 py-2">
         <div className="flex items-center gap-2">
-          {viewport === "desktop" && (
-            <Button variant="ghost" size="sm" onClick={() => setOpenState()} className="text-muted-foreground hover:text-foreground">
-              <Sidebar className="size-4" />
-            </Button>
+          {isCollapsed && (
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger asChild>
+                <button 
+                  onClick={() => setOpenState(true, "desktop")} 
+                  className="p-1.5 rounded-md text-muted-foreground/60 hover:text-foreground transition-colors"
+                >
+                  <ChevronRight className="size-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" sideOffset={8}>
+                Expand sidebar
+              </TooltipContent>
+            </Tooltip>
           )}
-          <Button size="sm" variant="ghost" onClick={() => router.back()} className="text-muted-foreground hover:text-foreground">
-            <ChevronLeft className="size-4" />
-            {viewport === "desktop" && <span>Back</span>}
-          </Button>
           {leftContent}
         </div>
         <div className="flex items-center gap-2">

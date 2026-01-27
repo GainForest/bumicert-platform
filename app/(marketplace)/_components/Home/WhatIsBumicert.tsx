@@ -18,7 +18,7 @@ const WhatIsBumicert = () => {
           <BumicertArt
             logoUrl={"/assets/media/images/logo.svg"}
             coverImage={"/assets/media/images/hero-bumicert-card/image0.png"}
-            title={"An Awesome Bumicert"}
+            title={"Bioacoustics Monitoring in the Amazon"}
             objectives={[
               "Community Resilience",
               "Biodiversity Monitoring",
