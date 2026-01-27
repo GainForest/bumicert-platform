@@ -1,11 +1,10 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, Lightbulb, X } from "lucide-react";
+import { ArrowRight, Lightbulb, X } from "lucide-react";
 import React, { useEffect, useEffectEvent, useMemo, useState } from "react";
 import useNewBumicertStore from "../store";
-import { STEPS, STEPS as steps } from "../_data/steps";
+import { STEPS } from "../_data/steps";
 import { useFormStore } from "../form-store";
-import { useStep5Store } from "./Steps/Step5/store";
 import { useNavbarContext } from "@/components/global/Navbar/context";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -34,8 +33,6 @@ const StepFooter = () => {
   const step2Progress = completionPercentages[1];
   const step3Progress = completionPercentages[2];
 
-  const overallStatusForStep5 = useStep5Store((state) => state.overallStatus);
-
   const allowUserToMoveForward = useMemo(() => {
     // For steps 1, 2 and 3.
     if (currentStepIndex < 3) return true;
@@ -60,22 +57,6 @@ const StepFooter = () => {
         
         <div className="relative flex items-center justify-between px-4 py-3 z-8">
           <div className="flex items-center flex-1 gap-2">
-            {currentStepIndex > 0 && (
-              <Button
-                onClick={() => setCurrentStepIndex(currentStepIndex - 1)}
-                variant="ghost"
-                size="sm"
-                disabled={
-                  currentStepIndex === 4 && overallStatusForStep5 === "pending"
-                }
-                className="gap-1.5 text-muted-foreground hover:text-foreground"
-              >
-                <ArrowLeft className="size-4" strokeWidth={1.5} />
-                {!showTipButton && (
-                  <span className="text-sm">{steps[currentStepIndex - 1].title}</span>
-                )}
-              </Button>
-            )}
             <AnimatePresence>
               {showTipButton && !showTips && (
                 <Button

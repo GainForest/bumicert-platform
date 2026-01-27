@@ -10,7 +10,9 @@ import { useModal } from "@/components/ui/modal/context";
 import SaveAsDraftModal, { SaveAsDraftModalId } from "./SaveAsDraftModal";
 import DeleteDraftModal, { DeleteDraftModalId } from "./DeleteDraftModal";
 import { usePathname } from "next/navigation";
-import { Trash2 } from "lucide-react";
+import { ArrowLeft, Trash2 } from "lucide-react";
+import useNewBumicertStore from "../store";
+import { useStep5Store } from "./Steps/Step5/store";
 
 const LeftContent = () => {
   return (
@@ -29,6 +31,8 @@ const RightContent = () => {
   const auth = useAtprotoStore((state) => state.auth);
   const { pushModal, show } = useModal();
   const pathname = usePathname();
+  const { currentStepIndex, setCurrentStepIndex } = useNewBumicertStore();
+  const overallStatusForStep5 = useStep5Store((state) => state.overallStatus);
 
   if (!isHydrated || !auth.authenticated) return null;
 
@@ -59,14 +63,31 @@ const RightContent = () => {
     show();
   };
 
+  const handleBack = () => {
+    setCurrentStepIndex(currentStepIndex - 1);
+  };
+
+  const canGoBack = currentStepIndex > 0 && !(currentStepIndex === 4 && overallStatusForStep5 === "pending");
+
   return (
     <div className="flex items-center gap-2">
+      {canGoBack && (
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={handleBack}
+          className="text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="size-4 mr-1" strokeWidth={1.5} />
+          Back
+        </Button>
+      )}
       {showDeleteButton && (
         <Button
           size={"icon-sm"}
           variant="ghost"
           onClick={handleDeleteDraft}
-          className="text-destructive hover:text-destructive"
+          className="text-amber-600 hover:text-amber-700 dark:text-amber-500 dark:hover:text-amber-400"
         >
           <Trash2 className="h-4 w-4" />
         </Button>

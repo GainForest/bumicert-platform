@@ -1,24 +1,17 @@
 import Container from "@/components/ui/container";
 import React from "react";
-import Hero from "./_components/Hero";
-import SubHero from "./_components/SubHero";
-import AboutOrganization from "./_components/AboutOrganization";
 import { AppGainforestOrganizationInfo } from "climateai-sdk/lex-api";
-import HeaderContent from "./_components/HeaderContent";
 import { OrganizationPageHydrator } from "./hydrator";
-import Sites from "./_components/Sites";
-import Projects from "./projects/_components/Projects";
 import { tryCatch } from "@/lib/tryCatch";
 import { TRPCError } from "@trpc/server";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { getSessionFromRequest } from "climateai-sdk/session";
 import { serialize } from "climateai-sdk/utilities/transform";
 import { climateAiSdk } from "@/config/climateai-sdk.server";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
-import SectionForData from "./_components/SectionForData";
 import ErrorPage from "./error";
+import OrganizationHeader from "./_components/Dashboard/OrganizationHeader";
+import Dashboard from "./_components/Dashboard";
+import HeaderContent from "./_components/HeaderContent";
 
 const EMPTY_ORGANIZATION_DATA: AppGainforestOrganizationInfo.Record = {
   $type: "app.gainforest.organization.info",
@@ -95,20 +88,8 @@ const OrganizationPage = async ({
     >
       <Container>
         <HeaderContent />
-        <Hero initialData={serializedData} initialDid={did} />
-        <SubHero initialData={serializedData} />
-        <AboutOrganization initialData={serializedData} />
-        <hr className="my-8" />
-        <Projects did={did} />
-        <hr className="my-8" />
-        <SectionForData title="Bumicerts" userDid={did}>
-          <div className="w-full h-40 bg-muted rounded-lg mt-2 flex flex-col items-center justify-center text-center text-pretty font-serif text-xl text-muted-foreground font-bold">
-            Your bumicerts will appear here.
-          </div>
-        </SectionForData>
-
-        <hr className="my-8" />
-        <Sites did={did} />
+        <OrganizationHeader did={did} />
+        <Dashboard did={did} />
       </Container>
     </OrganizationPageHydrator>
   );

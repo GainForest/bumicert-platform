@@ -217,7 +217,7 @@ const SaveAsDraftModal = () => {
               </span>
             </div>
             {error && (
-              <div className="text-red-500 w-full text-left text-sm">
+              <div className="text-amber-700 dark:text-amber-500 w-full text-left text-sm">
                 {error.message}
               </div>
             )}

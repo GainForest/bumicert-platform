@@ -34,7 +34,7 @@ const FormField = ({
       className={cn(
         "group flex flex-col gap-1.5 p-2 rounded-md transition-colors relative z-10",
         showError && error
-          ? "bg-destructive/5"
+          ? "bg-amber-500/5"
           : "hover:bg-foreground/3 focus-within:bg-foreground/5",
         className
       )}
@@ -45,7 +45,7 @@ const FormField = ({
           className={cn(
             "ml-1 flex items-center gap-1.5 text-sm transition-colors",
             showError && error
-              ? "text-destructive"
+              ? "text-amber-700 dark:text-amber-500"
               : "text-muted-foreground group-hover:text-foreground group-focus-within:text-foreground"
           )}
         >
@@ -77,7 +77,7 @@ const FormField = ({
                 size="icon-sm"
                 className="bg-transparent hover:bg-transparent h-5 w-5 flex items-center justify-center"
               >
-                <CircleAlert className="size-3.5 text-destructive" strokeWidth={1.5} />
+                <CircleAlert className="size-3.5 text-amber-600 dark:text-amber-500" strokeWidth={1.5} />
               </Button>
             </QuickTooltip>
           )}

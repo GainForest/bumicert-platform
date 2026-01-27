@@ -106,7 +106,7 @@ const Step1 = () => {
                   align="inline-end"
                   className={cn(
                     "text-xs",
-                    projectName.length > 50 ? "text-destructive" : "text-muted-foreground"
+                    projectName.length > 50 ? "text-amber-600 dark:text-amber-500" : "text-muted-foreground"
                   )}
                 >
                   {projectName.length}/50

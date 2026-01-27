@@ -97,7 +97,7 @@ const DesktopNavbar = ({
               <TooltipTrigger asChild>
                 <button
                   onClick={() => setOpenState(false, "desktop")}
-                  className="p-1 text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+                  className="p-1 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
                 >
                   <ChevronLeft size={14} strokeWidth={1.5} />
                 </button>
@@ -155,7 +155,7 @@ const DesktopNavbar = ({
                           "flex items-center justify-center w-8 h-8 rounded-md transition-colors",
                           isHighlighted
                             ? "text-foreground bg-foreground/5"
-                            : "text-muted-foreground/50 hover:text-foreground hover:bg-foreground/5"
+                            : "text-foreground/90 hover:text-foreground hover:bg-foreground/5"
                         )}
                       >
                         <link.Icon size={15} strokeWidth={1.25} />
@@ -177,8 +177,8 @@ const DesktopNavbar = ({
                   className={cn(
                     "flex items-center gap-2 px-2 py-1.5 -mx-1 rounded-md text-sm transition-colors whitespace-nowrap",
                     isHighlighted
-                      ? "text-foreground bg-foreground/5"
-                      : "text-muted-foreground/70 hover:text-foreground hover:bg-foreground/5"
+                      ? "text-foreground font-semibold bg-foreground/5"
+                      : "text-foreground hover:bg-foreground/5"
                   )}
                 >
                   <link.Icon size={15} strokeWidth={1.25} className="shrink-0" />
@@ -258,7 +258,7 @@ const DesktopNavbar = ({
                     href={link.href}
                     target={isInternal ? undefined : "_blank"}
                     rel={isInternal ? undefined : "noopener noreferrer"}
-                    className="flex items-center gap-1 px-2 py-1.5 -mx-1 rounded-md text-sm text-muted-foreground/50 hover:text-muted-foreground hover:bg-foreground/5 transition-colors whitespace-nowrap"
+                    className="flex items-center gap-1 px-2 py-1.5 -mx-1 rounded-md text-sm text-foreground/60 hover:text-foreground hover:bg-foreground/5 transition-colors whitespace-nowrap"
                   >
                     <span>{link.text}</span>
                     <ArrowUpRight size={11} strokeWidth={1.5} className="shrink-0" />
@@ -276,7 +276,7 @@ const DesktopNavbar = ({
           isCollapsed ? "" : "justify-between px-1"
         )}>
           {!isCollapsed && (
-            <span className="text-muted-foreground/40 text-[10px]">
+            <span className="text-muted-foreground/60 text-[10px]">
               v{packageJson.version}
             </span>
           )}
@@ -288,7 +288,7 @@ const DesktopNavbar = ({
                 <TooltipTrigger asChild>
                   <button
                     onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                    className="flex items-center justify-center w-8 h-8 rounded-md text-muted-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-colors"
+                    className="flex items-center justify-center w-8 h-8 rounded-md text-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-colors"
                   >
                     {theme === "dark" ? <Moon size={15} strokeWidth={1.5} /> : <Sun size={15} strokeWidth={1.5} />}
                   </button>
@@ -301,7 +301,7 @@ const DesktopNavbar = ({
               // Expanded: icon + text with hover background
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="flex items-center gap-1.5 px-2 py-1.5 -mx-1 rounded-md text-muted-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-colors"
+                className="flex items-center gap-1.5 px-2 py-1.5 -mx-1 rounded-md text-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-colors"
               >
                 {theme === "dark" ? <Moon size={14} strokeWidth={1.5} /> : <Sun size={14} strokeWidth={1.5} />}
                 <span className="text-xs">{theme === "dark" ? "Dark" : "Light"}</span>

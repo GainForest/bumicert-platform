@@ -156,7 +156,7 @@ const DeleteDraftModal = ({
           >
             <p>
               Are you sure that you want to{" "}
-              <span className="text-destructive">delete</span> the draft,{" "}
+              <span className="text-amber-700 dark:text-amber-500 font-medium">delete</span> the draft,{" "}
               <strong className="font-medium text-foreground my-2">
                 {draftTitle}?
               </strong>
@@ -164,7 +164,7 @@ const DeleteDraftModal = ({
               This action cannot be undone.
             </p>
             {error && (
-              <div className="text-red-500 w-full text-left text-sm">
+              <div className="text-amber-700 dark:text-amber-500 w-full text-left text-sm">
                 {error.message}
               </div>
             )}
