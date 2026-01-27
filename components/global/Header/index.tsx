@@ -17,8 +17,8 @@ const Header = () => {
   
   return (
     <div className="w-full flex flex-col sticky top-0 border-b border-border/60 backdrop-blur-sm bg-background/80 z-20">
-      <div className="flex items-center justify-between gap-2 px-4 py-4">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between gap-2 px-4 py-3 min-h-[52px]">
+        <div className="flex items-center gap-2 min-h-[28px]">
           {isCollapsed && (
             <Tooltip delayDuration={0}>
               <TooltipTrigger asChild>
