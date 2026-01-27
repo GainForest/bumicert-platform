@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, EyeIcon, Lightbulb } from "lucide-react";
 import useNewBumicertStore from "../store";
 import { BumicertArt } from "./Steps/Step4/BumicertPreviewCard";
 import { useFormStore } from "../form-store";
@@ -9,7 +8,6 @@ import { trpcApi } from "@/components/providers/TrpcProvider";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { getBlobUrl } from "climateai-sdk/utilities/atproto";
-import { cn } from "@/lib/utils";
 import { STEPS } from "../_data/steps";
 
 const SecondaryContent = () => {
@@ -22,12 +20,12 @@ const SecondaryContent = () => {
   const auth = useAtprotoStore((state) => state.auth);
 
   const currentStepData = STEPS[currentStep];
-  const [isBumicertPreviewOpen, setIsBumicertPreviewOpen] = useState(
+  const [showPreview, setShowPreview] = useState(
     currentStepData.previewBumicertByDefault
   );
 
   useEffect(() => {
-    setIsBumicertPreviewOpen(STEPS[currentStep].previewBumicertByDefault);
+    setShowPreview(STEPS[currentStep].previewBumicertByDefault);
   }, [currentStep]);
 
   const { data: organizationInfoResponse, isPlaceholderData: isOlderData } =
@@ -46,83 +44,77 @@ const SecondaryContent = () => {
     ? getBlobUrl(auth.user?.did ?? "", logoFromData.image, allowedPDSDomains[0])
     : null;
 
-  return (
-    <div className="w-full min-h-full flex flex-col gap-4">
-      {/* Preview Section */}
-      <div className="bg-foreground/3 rounded-lg p-4">
-        <div className="flex items-center justify-between mb-3">
-          <span className="flex items-center gap-2 text-sm font-medium text-foreground/70">
-            <EyeIcon className="size-4" strokeWidth={1.5} />
-            Preview
-          </span>
-          <button
-            onClick={() => setIsBumicertPreviewOpen(!isBumicertPreviewOpen)}
-            className="p-1 rounded hover:bg-foreground/5 transition-colors"
-          >
-            <ChevronDown
-              className={cn(
-                "size-4 text-foreground/50 transition-transform duration-200",
-                isBumicertPreviewOpen ? "rotate-180" : ""
-              )}
-              strokeWidth={1.5}
-            />
-          </button>
-        </div>
-        <AnimatePresence mode="wait">
-          {isBumicertPreviewOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              {step1Progress === 100 ? (
-                <div className="flex items-center justify-center">
-                  <BumicertArt
-                    logoUrl={logoUrl}
-                    coverImage={
-                      step1FormValues.coverImage ??
-                      new File([], "cover-image.png")
-                    }
-                    title={step1FormValues.projectName}
-                    objectives={step1FormValues.workType}
-                    startDate={step1FormValues.projectDateRange[0]}
-                    endDate={step1FormValues.projectDateRange[1]}
-                    className="w-min"
-                  />
-                </div>
-              ) : (
-                <div className="w-full flex items-center justify-center py-6">
-                  <span className="text-sm text-foreground/50 text-center">
-                    Complete step 1 to see your preview
-                  </span>
-                </div>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+  const hasPreview = step1Progress === 100;
 
-      {/* Tips Section */}
-      <div className="bg-foreground/3 rounded-lg p-4">
-        <span className="flex items-center gap-2 text-sm font-medium text-foreground/70 mb-3">
-          <Lightbulb className="size-4" strokeWidth={1.5} />
+  return (
+    <div className="w-full flex flex-col">
+      {/* Preview */}
+      <AnimatePresence mode="wait">
+        {showPreview && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="mb-8"
+          >
+            {hasPreview ? (
+              <div className="flex flex-col items-center">
+                <BumicertArt
+                  logoUrl={logoUrl}
+                  coverImage={
+                    step1FormValues.coverImage ??
+                    new File([], "cover-image.png")
+                  }
+                  title={step1FormValues.projectName}
+                  objectives={step1FormValues.workType}
+                  startDate={step1FormValues.projectDateRange[0]}
+                  endDate={step1FormValues.projectDateRange[1]}
+                />
+              </div>
+            ) : (
+              <div className="flex flex-col items-center py-12 px-4">
+                {/* Empty state illustration */}
+                <div className="w-32 h-44 rounded-lg border-2 border-dashed border-foreground/10 flex items-center justify-center mb-4">
+                  <div className="w-16 h-16 rounded-full border-2 border-dashed border-foreground/10" />
+                </div>
+                <p className="text-sm text-foreground/40 text-center">
+                  Your bumicert preview will appear here
+                </p>
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Tips */}
+      <div className="space-y-4">
+        <p className="text-xs uppercase tracking-widest text-foreground/30 font-medium">
           Tips
-        </span>
+        </p>
+        
         <div className="space-y-3">
           {currentStepData.tips.pre && (
-            <p className="text-sm text-foreground/60">{currentStepData.tips.pre}</p>
+            <p className="text-sm text-foreground/60 leading-relaxed">
+              {currentStepData.tips.pre}
+            </p>
           )}
-          <ul className="space-y-2">
+          
+          <div className="space-y-2.5">
             {currentStepData.tips.bullets.map((tip, index) => (
-              <li key={index} className="flex gap-2 text-sm text-foreground/60">
-                <span className="text-foreground/30 shrink-0">-</span>
-                <span>{tip}</span>
-              </li>
+              <p 
+                key={index} 
+                className="text-sm text-foreground/50 leading-relaxed pl-3 border-l border-foreground/10"
+              >
+                {tip}
+              </p>
             ))}
-          </ul>
+          </div>
+          
           {currentStepData.tips.post && (
-            <p className="text-sm text-foreground/50 italic">{currentStepData.tips.post}</p>
+            <p className="text-sm text-foreground/40 italic leading-relaxed">
+              {currentStepData.tips.post}
+            </p>
           )}
         </div>
       </div>
