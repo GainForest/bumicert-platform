@@ -22,6 +22,7 @@ export const BumicertArt = ({
   startDate,
   endDate,
   className,
+  compact = false,
 }: {
   logoUrl: string | null;
   coverImage: File | string | null;
@@ -31,6 +32,8 @@ export const BumicertArt = ({
   endDate: Date;
   className?: string;
   performant?: boolean;
+  /** Use compact mode for smaller cards (mobile hero) */
+  compact?: boolean;
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [transform, setTransform] = useState("perspective(1000px) rotateX(0deg) rotateY(0deg)");
@@ -80,20 +83,32 @@ export const BumicertArt = ({
         
         {/* Logo */}
         {logoUrl && (
-          <div className="absolute top-3 left-3 h-8 w-8 rounded-full bg-white/90 border border-white/30 overflow-hidden shadow-sm">
+          <div className={cn(
+            "absolute rounded-full bg-white/90 border border-white/30 overflow-hidden shadow-sm",
+            compact ? "top-2 left-2 h-5 w-5" : "top-3 left-3 h-8 w-8"
+          )}>
             <Image src={logoUrl} alt="Logo" fill className="object-cover" />
           </div>
         )}
         
         {/* Content */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 flex flex-col">
-          <span className="font-serif font-medium text-white text-lg leading-tight">
+        <div className={cn(
+          "absolute bottom-0 left-0 right-0 flex flex-col",
+          compact ? "p-2" : "p-4"
+        )}>
+          <span className={cn(
+            "font-serif font-medium text-white leading-tight line-clamp-2",
+            compact ? "text-[10px]" : "text-lg"
+          )}>
             {title}
           </span>
-          <span className="text-xs text-white/60 mt-1">
+          <span className={cn(
+            "text-white/60 mt-0.5",
+            compact ? "text-[8px]" : "text-xs mt-1"
+          )}>
             {format(startDate, "MMM yyyy")} — {format(endDate, "MMM yyyy")}
           </span>
-          {objectives.length > 0 && (
+          {objectives.length > 0 && !compact && (
             <div className="flex items-center gap-1.5 flex-wrap mt-3">
               {objectives.slice(0, 2).map((objective) => (
                 <span
@@ -108,6 +123,18 @@ export const BumicertArt = ({
                   +{objectives.length - 2} more
                 </span>
               )}
+            </div>
+          )}
+          {objectives.length > 0 && compact && (
+            <div className="flex items-center gap-1 flex-wrap mt-1">
+              {objectives.slice(0, 1).map((objective) => (
+                <span
+                  key={objective}
+                  className="text-[7px] bg-white/15 text-white/90 backdrop-blur-sm rounded-full px-1.5 py-0.5 truncate max-w-full"
+                >
+                  {objective}
+                </span>
+              ))}
             </div>
           )}
         </div>

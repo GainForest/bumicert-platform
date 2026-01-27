@@ -222,6 +222,7 @@ const Hero2 = () => {
                     startDate={card.startDate}
                     endDate={card.endDate}
                     className="w-full shadow-lg"
+                    compact
                   />
                 </motion.div>
               </motion.div>
