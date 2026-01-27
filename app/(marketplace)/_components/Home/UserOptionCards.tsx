@@ -9,21 +9,6 @@ import { motion } from "framer-motion";
 const UserOptionCards = () => {
   return (
     <div className="mt-16">
-      {/* Section intro */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="text-center mb-10"
-      >
-        <h2 className="font-serif text-2xl md:text-3xl font-semibold text-foreground">
-          Get started
-        </h2>
-        <p className="text-muted-foreground mt-2">
-          Whether you want to fund or create impact
-        </p>
-      </motion.div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

@@ -12,10 +12,10 @@ const FLOATING_CARDS = [
     objectives: ["Biodiversity", "Carbon Capture"],
     startDate: new Date("2024-01-01"),
     endDate: new Date("2024-12-31"),
-    position: "left-[3%] top-[12%]",
+    position: "left-[3%] top-[8%]",
     rotation: -8,
     delay: 0.2,
-    size: "w-[160px] lg:w-[190px]",
+    size: "w-[140px] lg:w-[170px]",
     mobileRotation: -8,
   },
   {
@@ -25,10 +25,10 @@ const FLOATING_CARDS = [
     objectives: ["Wildlife Protection", "Biodiversity"],
     startDate: new Date("2024-03-01"),
     endDate: new Date("2025-03-01"),
-    position: "right-[3%] top-[8%]",
+    position: "right-[3%] top-[5%]",
     rotation: 6,
     delay: 0.4,
-    size: "w-[150px] lg:w-[175px]",
+    size: "w-[130px] lg:w-[155px]",
     mobileRotation: 0,
   },
   {
@@ -38,10 +38,10 @@ const FLOATING_CARDS = [
     objectives: ["Community Science"],
     startDate: new Date("2024-06-01"),
     endDate: new Date("2025-06-01"),
-    position: "left-[6%] bottom-[8%]",
+    position: "left-[6%] bottom-[5%]",
     rotation: 5,
     delay: 0.6,
-    size: "w-[140px] lg:w-[165px]",
+    size: "w-[125px] lg:w-[150px]",
     mobileRotation: 8,
   },
   {
@@ -51,10 +51,10 @@ const FLOATING_CARDS = [
     objectives: ["Wildlife", "Connectivity"],
     startDate: new Date("2024-02-01"),
     endDate: new Date("2024-12-31"),
-    position: "right-[6%] bottom-[12%]",
+    position: "right-[6%] bottom-[8%]",
     rotation: -5,
     delay: 0.8,
-    size: "w-[145px] lg:w-[170px]",
+    size: "w-[130px] lg:w-[155px]",
     mobileRotation: -6,
   },
 ];
@@ -63,7 +63,7 @@ const Hero2 = () => {
   return (
     <div className="w-full mt-4">
       {/* Desktop version */}
-      <div className="hidden sm:block w-full min-h-[420px] rounded-2xl overflow-hidden relative bg-muted/30">
+      <div className="hidden sm:block w-full min-h-[340px] rounded-2xl overflow-hidden relative bg-muted/30">
         {/* Floating BumicertArt cards */}
         {FLOATING_CARDS.map((card) => (
           <motion.div
@@ -130,13 +130,13 @@ const Hero2 = () => {
       </div>
 
       {/* Mobile version */}
-      <div className="sm:hidden w-full rounded-2xl overflow-hidden relative bg-muted/30 py-8 px-4">
+      <div className="sm:hidden w-full rounded-2xl overflow-hidden relative bg-muted/30 py-6 px-4">
         {/* Title */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="relative z-20 text-center mb-6"
+          className="relative z-20 text-center mb-4"
         >
           <h1 className="font-serif text-3xl font-semibold text-foreground">
             Bumicerts
@@ -147,7 +147,7 @@ const Hero2 = () => {
         </motion.div>
 
         {/* Fanned cards */}
-        <div className="relative z-10 flex justify-center items-center h-[200px]">
+        <div className="relative z-10 flex justify-center items-center h-[180px]">
           {FLOATING_CARDS.slice(0, 3).map((card, index) => {
             const xOffset = (index - 1) * 75;
             const zIndex = 10 + index;
