@@ -22,6 +22,7 @@ import {
   User2,
   Check,
   ArrowRight,
+  Building,
 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useModal } from "@/components/ui/modal/context";
@@ -145,10 +146,10 @@ const SignUpModal = () => {
           </InputGroup>
         </div>
         <div className="flex flex-col gap-1">
-          <span className="text-sm">Type your desired handle</span>
+          <span className="text-sm">Type your desired username</span>
           <InputGroup>
             <InputGroupAddon>
-              <User2 />
+              <Building />
             </InputGroupAddon>
             <InputGroupInput
               placeholder="john-doe"
@@ -157,7 +158,7 @@ const SignUpModal = () => {
               disabled={isSigningUp}
             />
             <InputGroupAddon align="inline-end" className="text-primary">
-              .climateai.org
+              .{allowedPDSDomains[0]}
             </InputGroupAddon>
           </InputGroup>
         </div>
@@ -188,7 +189,7 @@ const SignUpModal = () => {
           </InputGroup>
         </div>
         <div className="flex flex-col gap-1">
-          <span className="text-sm">Secure Password</span>
+          <span className="text-sm">Repeat Password</span>
           <InputGroup>
             <InputGroupAddon>
               <LockIcon />

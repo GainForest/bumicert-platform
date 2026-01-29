@@ -71,8 +71,6 @@ export async function POST(req: NextRequest) {
     const data = (await response.json()) as {
       handle: string;
       did: string;
-      accessJwt: string;
-      refreshJwt: string;
     };
     return new Response(JSON.stringify(data), { status: 200 });
   } catch (err: unknown) {
