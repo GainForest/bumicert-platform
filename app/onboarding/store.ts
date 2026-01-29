@@ -119,16 +119,16 @@ export const useOnboardingStore = create<OnboardingState & OnboardingActions>(
   })
 );
 
-// Helper function to generate a handle from org name, country, and date
+// Helper function to generate a handle from org name and country
 export function generateHandle(
   orgName: string,
-  countryCode: string,
-  startDate: string | null
+  countryCode: string
 ): string {
-  // Normalize the organization name
+  // Normalize the organization name - use only first 15 chars
   let handle = orgName
     .toLowerCase()
     .trim()
+    .substring(0, 15) // Limit to first 15 characters
     .replace(/[^a-z0-9\s-]/g, "") // Remove special characters
     .replace(/\s+/g, "-") // Replace spaces with hyphens
     .replace(/-+/g, "-") // Replace multiple hyphens with single
@@ -137,19 +137,6 @@ export function generateHandle(
   // Add country code if available
   if (countryCode) {
     handle = `${handle}-${countryCode.toLowerCase()}`;
-  }
-
-  // Add year if start date is available
-  if (startDate) {
-    const year = new Date(startDate).getFullYear();
-    if (!isNaN(year)) {
-      handle = `${handle}-${year}`;
-    }
-  }
-
-  // Ensure handle is not too long (max 30 chars before domain)
-  if (handle.length > 30) {
-    handle = handle.substring(0, 30).replace(/-$/, "");
   }
 
   return handle;

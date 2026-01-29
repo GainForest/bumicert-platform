@@ -96,8 +96,7 @@ export function StepOrgDetails() {
       // Pre-generate handle for next step
       const handle = generateHandle(
         data.organizationName,
-        data.country,
-        data.startDate
+        data.country
       );
       updateData({ handle });
       nextStep();

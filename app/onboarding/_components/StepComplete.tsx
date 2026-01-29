@@ -12,13 +12,13 @@ import {
   LogIn,
   XCircle,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { useEffect, useState, useRef } from "react";
+import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { useModal } from "@/components/ui/modal/context";
 import SignInModal, { SignInModalId } from "@/components/global/modals/sign-in";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 type CompletionState =
   | "idle"
@@ -37,6 +37,7 @@ export function StepComplete() {
 
   const isAuthenticated = auth.authenticated;
   const userDid = auth.authenticated ? auth.user?.did : null;
+  const orgSavedRef = useRef(false);
 
   // Start account creation when component mounts
   useEffect(() => {
@@ -45,6 +46,40 @@ export function StepComplete() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Save organization info when user signs in after account creation
+  useEffect(() => {
+    const saveOrganizationInfo = async () => {
+      if (!isAuthenticated || !userDid || orgSavedRef.current) return;
+      if (!data.accountCreated || data.organizationInitialized) return;
+
+      orgSavedRef.current = true;
+
+      try {
+        await trpcClient.gainforest.organization.info.createOrUpdate.mutate({
+          did: userDid,
+          info: {
+            displayName: data.organizationName,
+            shortDescription: data.shortDescription,
+            longDescription: data.longDescription,
+            country: data.country,
+            startDate: data.startDate ?? undefined,
+            website: data.website || undefined,
+            visibility: "Public",
+            objectives: [],
+          },
+          pdsDomain: allowedPDSDomains[0],
+        });
+
+        updateData({ organizationInitialized: true });
+      } catch (err) {
+        console.error("Failed to save organization info:", err);
+        // Don't block the user - they can still access their org page and edit there
+      }
+    };
+
+    saveOrganizationInfo();
+  }, [isAuthenticated, userDid, data.accountCreated, data.organizationInitialized, data.organizationName, data.shortDescription, data.longDescription, data.country, data.startDate, data.website, updateData]);
 
   const createAccount = async () => {
     setCompletionState("creating-account");
