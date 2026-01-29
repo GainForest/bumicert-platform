@@ -1,4 +1,5 @@
 import { climateAiSdk } from "@/config/climateai-sdk.server";
+import { atprotoSDK } from "@/lib/atproto";
 import React from "react";
 import ProjectsClient, {
   AllProjectsData,
@@ -10,7 +11,7 @@ import { serialize } from "climateai-sdk/utilities/transform";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
 
 const Projects = async ({ did }: { did: string }) => {
-  const apiCaller = climateAiSdk.getServerCaller();
+  const apiCaller = climateAiSdk.getServerCaller(atprotoSDK);
 
   // Placeholder API call - replace with actual endpoint when available
   // For now, gracefully handle if the endpoint doesn't exist

@@ -3,6 +3,7 @@ import SitesHeaderContent from "./HeaderContent";
 import Container from "@/components/ui/container";
 import SitesClient, { AllSitesData } from "../_components/Sites/SitesClient";
 import { climateAiSdk } from "@/config/climateai-sdk.server";
+import { atprotoSDK } from "@/lib/atproto";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
 import { serialize } from "climateai-sdk/utilities/transform";
 import { tryCatch } from "@/lib/tryCatch";
@@ -13,7 +14,7 @@ const SitesPage = async ({ params }: { params: Promise<{ did: string }> }) => {
   const { did: encodedDid } = await params;
   const did = decodeURIComponent(encodedDid);
 
-  const serverCaller = climateAiSdk.getServerCaller();
+  const serverCaller = climateAiSdk.getServerCaller(atprotoSDK);
   const [response, error] = await tryCatch(
     serverCaller.hypercerts.site.getAll({
       did: did,

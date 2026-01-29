@@ -1,36 +1,9 @@
 import { create } from "zustand";
-
-import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
-
-type ResumeSessionParams = Parameters<typeof trpcClient.auth.resume.query>[0];
-type ResumeSessionResult = Awaited<
-  ReturnType<typeof trpcClient.auth.resume.query>
->;
-const resumeSession = (params: ResumeSessionParams) => {
-  const RETRY_COUNT = 3;
-  let currentRetry = 0;
-
-  function attempt(): Promise<ResumeSessionResult | undefined> {
-    return trpcClient.auth.resume
-      .query(params)
-      .then((result) => result)
-      .catch((error) => {
-        if (currentRetry < RETRY_COUNT - 1) {
-          currentRetry++;
-          return attempt();
-        } else {
-          trpcClient.auth.logout.mutate({ service: params.service });
-          throw error;
-        }
-      });
-  }
-
-  return attempt();
-};
+import { checkSession } from "@/components/actions/oauth";
 
 export type User = {
   did: string;
-  handle: string;
+  handle?: string;
 };
 
 export type AtprotoAuthCatalog = {
@@ -42,10 +15,7 @@ export type AtprotoAuthCatalog = {
   authenticated: {
     status: "AUTHENTICATED";
     authenticated: true;
-    user: {
-      did: string;
-      handle: string;
-    };
+    user: User;
   };
   resuming: {
     status: "RESUMING";
@@ -60,18 +30,36 @@ export type AtprotoStoreState = {
 };
 
 export type AtprotoStoreActions = {
-  setAuth: (session: User | null, service?: string) => void;
+  setAuth: (user: User | null) => void;
+  refreshSession: () => Promise<void>;
 };
 
+/**
+ * Zustand store for managing ATProto authentication state.
+ *
+ * The store automatically checks for an existing session on initialization
+ * using the `checkSession` server action. This reads the encrypted app
+ * session cookie set during OAuth callback.
+ *
+ * @example
+ * ```tsx
+ * const auth = useAtprotoStore((state) => state.auth);
+ *
+ * if (auth.authenticated) {
+ *   console.log(`Logged in as ${auth.user.did}`);
+ * }
+ * ```
+ */
 export const useAtprotoStore = create<AtprotoStoreState & AtprotoStoreActions>(
-  (set) => {
-    const resumeSessionPromise = resumeSession({
-      service: allowedPDSDomains[0],
-    });
-    resumeSessionPromise
-      .then((result) => {
-        if (result) {
+  (set, get) => {
+    // Check session on store initialization
+    const initializeSession = async () => {
+      try {
+        const result = await checkSession();
+
+        if (result.authenticated) {
           set({
+            isReady: true,
             auth: {
               status: "AUTHENTICATED",
               authenticated: true,
@@ -81,18 +69,31 @@ export const useAtprotoStore = create<AtprotoStoreState & AtprotoStoreActions>(
               },
             },
           });
+        } else {
+          set({
+            isReady: true,
+            auth: {
+              status: "UNAUTHENTICATED",
+              authenticated: false,
+              user: null,
+            },
+          });
         }
-      })
-      .catch((error) => {
-        console.error("Error resuming session:", error);
+      } catch (error) {
+        console.error("Error checking session:", error);
         set({
+          isReady: true,
           auth: {
             status: "UNAUTHENTICATED",
             authenticated: false,
             user: null,
           },
         });
-      });
+      }
+    };
+
+    // Start session check immediately
+    initializeSession();
 
     return {
       isReady: false,
@@ -101,12 +102,16 @@ export const useAtprotoStore = create<AtprotoStoreState & AtprotoStoreActions>(
         authenticated: false,
         user: null,
       },
-      setAuth: async (user: User | null, service?: string) => {
+
+      /**
+       * Updates the authentication state.
+       * Call this after OAuth callback to set the authenticated user,
+       * or with null to log out.
+       */
+      setAuth: (user: User | null) => {
         if (user) {
-          if (!service) {
-            throw new Error("Service is required");
-          }
           set({
+            isReady: true,
             auth: {
               status: "AUTHENTICATED",
               authenticated: true,
@@ -115,6 +120,7 @@ export const useAtprotoStore = create<AtprotoStoreState & AtprotoStoreActions>(
           });
         } else {
           set({
+            isReady: true,
             auth: {
               status: "UNAUTHENTICATED",
               authenticated: false,
@@ -122,6 +128,21 @@ export const useAtprotoStore = create<AtprotoStoreState & AtprotoStoreActions>(
             },
           });
         }
+      },
+
+      /**
+       * Refreshes the session by re-checking with the server.
+       * Useful after OAuth callback to update the store with the new session.
+       */
+      refreshSession: async () => {
+        set({
+          auth: {
+            status: "RESUMING",
+            authenticated: false,
+            user: null,
+          },
+        });
+        await initializeSession();
       },
     };
   }

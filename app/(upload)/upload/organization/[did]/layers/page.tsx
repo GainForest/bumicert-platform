@@ -1,5 +1,6 @@
 import Container from "@/components/ui/container";
 import { climateAiSdk } from "@/config/climateai-sdk.server";
+import { atprotoSDK } from "@/lib/atproto";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
 import { tryCatch } from "@/lib/tryCatch";
 import { TRPCError } from "@trpc/server";
@@ -14,7 +15,7 @@ const LayersPage = async ({ params }: { params: Promise<{ did: string }> }) => {
   const { did: encodedDid } = await params;
   const did = decodeURIComponent(encodedDid);
 
-  const serverCaller = climateAiSdk.getServerCaller();
+  const serverCaller = climateAiSdk.getServerCaller(atprotoSDK);
   const [response, error] = await tryCatch(
     serverCaller.gainforest.organization.layer.getAll({
       did,

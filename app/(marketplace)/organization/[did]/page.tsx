@@ -1,10 +1,11 @@
 import Container from "@/components/ui/container";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
 import { climateAiSdk } from "@/config/climateai-sdk.server";
+import { atprotoSDK } from "@/lib/atproto";
 import { tryCatch } from "@/lib/tryCatch";
 import { TRPCError } from "@trpc/server";
 import { AppGainforestOrganizationInfo } from "climateai-sdk/lex-api";
-import { getSessionFromRequest } from "climateai-sdk/session";
+import { getAppSession } from "climateai-sdk/oauth";
 import { serialize } from "climateai-sdk/utilities/transform";
 import HeaderContent from "./_components/HeaderContent";
 import Hero from "@/app/(upload)/upload/organization/[did]/_components/Hero";
@@ -37,7 +38,7 @@ const OrganizationPage = async ({
   const { did: encodedDid } = await params;
   const did = decodeURIComponent(encodedDid);
 
-  const apiCaller = climateAiSdk.getServerCaller();
+  const apiCaller = climateAiSdk.getServerCaller(atprotoSDK);
   const [response, error] = await tryCatch(
     apiCaller.gainforest.organization.info.get({
       did,
@@ -63,8 +64,8 @@ const OrganizationPage = async ({
 
     if (data.visibility === "Hidden") {
       try {
-        const session = await getSessionFromRequest();
-        if (session && session.did !== did) {
+        const session = await getAppSession();
+        if (!session.isLoggedIn || session.did !== did) {
           throw new Error("This organization is hidden.");
         }
       } catch {

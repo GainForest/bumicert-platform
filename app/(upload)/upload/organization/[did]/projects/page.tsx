@@ -1,6 +1,7 @@
 import Container from "@/components/ui/container";
 import React from "react";
-import { getSessionFromRequest } from "climateai-sdk/session";
+import { getAppSession } from "climateai-sdk/oauth";
+import { atprotoSDK } from "@/lib/atproto";
 import { redirect } from "next/navigation";
 import ProjectsClient, {
   AllProjectsData,
@@ -23,20 +24,14 @@ const ProjectsPage = async ({
   const did = decodeURIComponent(encodedDid);
 
   // Check if user is authenticated and owns this organization
-  let session;
-  try {
-    session = await getSessionFromRequest();
-  } catch {
-    // Not authenticated, redirect to organization page
-    redirect(`/organization/${encodeURIComponent(did)}`);
-  }
+  const session = await getAppSession();
 
-  if (!session || session.did !== did) {
+  if (!session.isLoggedIn || session.did !== did) {
     // User doesn't own this organization, redirect to organization page
     redirect(`/organization/${encodeURIComponent(did)}`);
   }
 
-  const apiCaller = climateAiSdk.getServerCaller();
+  const apiCaller = climateAiSdk.getServerCaller(atprotoSDK);
 
   // Placeholder API call - replace with actual endpoint when available
   // For now, gracefully handle if the endpoint doesn't exist

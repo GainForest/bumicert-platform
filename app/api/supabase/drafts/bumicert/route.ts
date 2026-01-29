@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import supabase from "../../client";
-import {
-  getSessionFromRequest,
-  resumeCredentialSession,
-} from "climateai-sdk/session";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { getAppSession } from "climateai-sdk/oauth";
 import {
   draftBumicertDataSchemaV0,
   getDraftBumicertRequestSchema,
@@ -12,30 +8,28 @@ import {
   updateDraftBumicertRequestSchema,
   deleteDraftBumicertRequestSchema,
 } from "./schema";
-export async function GET(req: NextRequest) {
-  let userDid: string;
-  // Check user's authentication
+
+/**
+ * Helper function to get the authenticated user's DID from the OAuth session.
+ * Returns null if the user is not authenticated.
+ */
+async function getAuthenticatedUserDid(): Promise<string | null> {
   try {
-    const session = await getSessionFromRequest();
-    if (session && session.did) {
-      try {
-        const credentialSession = await resumeCredentialSession(
-          allowedPDSDomains[0],
-          session
-        );
-        if (!credentialSession.success) {
-          throw new Error("Failed to resume credential session");
-        }
-        userDid = session.did;
-      } catch (error) {
-        console.error("Failed to resume credential session", error);
-        throw new Error("Failed to resume credential session");
-      }
-    } else {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const session = await getAppSession();
+    if (session.isLoggedIn && session.did) {
+      return session.did;
     }
+    return null;
   } catch (error) {
-    console.error("Failed to get session", error);
+    console.error("Failed to get session:", error);
+    return null;
+  }
+}
+
+export async function GET(req: NextRequest) {
+  // Check user's authentication
+  const userDid = await getAuthenticatedUserDid();
+  if (!userDid) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -131,29 +125,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  let userDid: string;
   // Check user's authentication
-  try {
-    const session = await getSessionFromRequest();
-    if (session && session.did) {
-      try {
-        const credentialSession = await resumeCredentialSession(
-          allowedPDSDomains[0],
-          session
-        );
-        if (!credentialSession.success) {
-          throw new Error("Failed to resume credential session");
-        }
-        userDid = session.did;
-      } catch (error) {
-        console.error("Failed to resume credential session", error);
-        throw new Error("Failed to resume credential session");
-      }
-    } else {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-  } catch (error) {
-    console.error("Failed to get session", error);
+  const userDid = await getAuthenticatedUserDid();
+  if (!userDid) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -280,29 +254,9 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  let userDid: string;
   // Check user's authentication
-  try {
-    const session = await getSessionFromRequest();
-    if (session && session.did) {
-      try {
-        const credentialSession = await resumeCredentialSession(
-          allowedPDSDomains[0],
-          session
-        );
-        if (!credentialSession.success) {
-          throw new Error("Failed to resume credential session");
-        }
-        userDid = session.did;
-      } catch (error) {
-        console.error("Failed to resume credential session", error);
-        throw new Error("Failed to resume credential session");
-      }
-    } else {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-  } catch (error) {
-    console.error("Failed to get session", error);
+  const userDid = await getAuthenticatedUserDid();
+  if (!userDid) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

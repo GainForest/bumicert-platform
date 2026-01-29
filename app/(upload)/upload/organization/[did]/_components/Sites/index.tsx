@@ -1,4 +1,5 @@
 import { climateAiSdk } from "@/config/climateai-sdk.server";
+import { atprotoSDK } from "@/lib/atproto";
 import React from "react";
 import SitesClient, { AllSitesData } from "./SitesClient";
 import { tryCatch } from "@/lib/tryCatch";
@@ -7,7 +8,7 @@ import { serialize } from "climateai-sdk/utilities/transform";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
 
 const Sites = async ({ did }: { did: string }) => {
-  const apiCaller = climateAiSdk.getServerCaller();
+  const apiCaller = climateAiSdk.getServerCaller(atprotoSDK);
 
   const [response, error] = await tryCatch(
     apiCaller.hypercerts.site.getAll({

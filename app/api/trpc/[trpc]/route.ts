@@ -3,6 +3,7 @@ import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
 import { climateAiSdk } from "@/config/climateai-sdk.server";
 import { createContext } from "climateai-sdk";
+import { atprotoSDK } from "@/lib/atproto";
 
 export const runtime = "nodejs";
 
@@ -13,6 +14,7 @@ const handler = (request: Request) =>
     router: climateAiSdk.appRouter,
     createContext: ({ req }) =>
       createContext({
+        sdk: atprotoSDK,
         req,
         allowedPDSDomains,
       }),

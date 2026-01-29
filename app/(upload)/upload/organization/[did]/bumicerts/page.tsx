@@ -2,6 +2,7 @@ import React from "react";
 import BumicertsHeaderContent from "./HeaderContent";
 import Container from "@/components/ui/container";
 import { climateAiSdk } from "@/config/climateai-sdk.server";
+import { atprotoSDK } from "@/lib/atproto";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
 import { serialize } from "climateai-sdk/utilities/transform";
 import BumicertsClient from "./_components/BumicertsClient";
@@ -17,7 +18,7 @@ const BumicertsPage = async ({
 }) => {
   const { did: encodedDid } = await params;
   const did = decodeURIComponent(encodedDid);
-  const serverCaller = climateAiSdk.getServerCaller();
+  const serverCaller = climateAiSdk.getServerCaller(atprotoSDK);
 
   let activitiesResponse;
   let orgInfoResponse;
