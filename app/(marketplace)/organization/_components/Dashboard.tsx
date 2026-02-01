@@ -5,7 +5,7 @@ import {
     AppCertifiedLocation,
     AppGainforestOrganizationDefaultSite,
     AppGainforestOrganizationInfo,
-    AppHypercertsClaimActivity
+    OrgHypercertsClaimActivity
 } from "climateai-sdk/lex-api";
 import { GetRecordResponse } from "climateai-sdk/types";
 import { ArrowRight, BuildingIcon, ClipboardList, MapPin, Pencil } from "lucide-react";
