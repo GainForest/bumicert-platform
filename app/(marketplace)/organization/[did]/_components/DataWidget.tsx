@@ -52,7 +52,10 @@ const DataWidget = ({title, icon: Icon, items, viewAllHref, showManageCTA = fals
 
                         {
                             first10Items.length < items?.length && (
-                                <Button variant="ghost" size={"sm"}>View remaining {items?.length - first10Items.length} <ChevronRight /></Button>
+                                <Link href={viewAllHref}>
+
+                                    <Button variant="ghost" size={"sm"}>View remaining {items?.length - first10Items.length} <ChevronRight /></Button>
+                                </Link>
                             )
                         }
                         </div>

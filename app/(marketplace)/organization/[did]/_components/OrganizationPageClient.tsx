@@ -203,8 +203,6 @@ const OrganizationPageClient = ({
           </div>
         )}
 
-        {/* Data Widgets - Only shown in personal view */}
-
           <div className="grid grid-cols-2 gap-2 mt-4">
             <DataWidget
               title="Bumicerts"
