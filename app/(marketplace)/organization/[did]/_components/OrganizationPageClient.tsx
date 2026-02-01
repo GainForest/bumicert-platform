@@ -23,7 +23,7 @@ import {
 import { countries } from "@/lib/countries";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import DataWidget from "./DataWidget";
 import { links } from "@/lib/links";
 
@@ -48,19 +48,9 @@ const OrganizationPageClient = ({
 }: OrganizationPageClientProps) => {
   const { organizationInfo, bumicerts, projects, sites, layers } = deserialize(serializedData);
   const auth = useAtprotoStore((state) => state.auth);
-  const [viewMode, setViewMode] = useState<ViewMode>("public");
-  const [isClient, setIsClient] = useState(false);
+  const isOwner = auth.status === "AUTHENTICATED" && auth.user.did === did;
 
-  const isOwner =
-    auth.status === "AUTHENTICATED" && auth.user.did === did;
-
-  // Switch to personal view on client if user is the owner
-  useEffect(() => {
-    setIsClient(true);
-    if (isOwner) {
-      setViewMode("personal");
-    }
-  }, [isOwner]);
+  const [viewMode, setViewMode] = useState<ViewMode>(isOwner ? "personal" : "public");
 
   // Get image URLs
   const coverImageUrl = organizationInfo.coverImage
@@ -83,7 +73,7 @@ const OrganizationPageClient = ({
     <div className="w-full">
       <Container>
         {/* Management Banner - Only shown to owner in personal view */}
-        {isClient && isOwner && viewMode === "personal" && (
+        {isOwner && viewMode === "personal" && (
           <div className="border border-border rounded-xl px-4 py-3 flex items-center justify-between gap-4">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Building2 className="size-4" />
@@ -117,7 +107,7 @@ const OrganizationPageClient = ({
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
 
             {/* View Toggle - Only shown to owner on client, positioned top-right */}
-            {isClient && isOwner && (
+              {isOwner && (
               <div className="absolute top-2 right-2 z-10 flex items-center gap-2 bg-background/80 p-1 rounded-xl">
                 {/* <span className="text-sm text-foreground/70 ml-2 font-bold">View</span> */}
                 <div className="flex items-center">
