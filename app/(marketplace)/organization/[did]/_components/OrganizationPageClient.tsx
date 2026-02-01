@@ -50,6 +50,7 @@ const OrganizationPageClient = ({
   const auth = useAtprotoStore((state) => state.auth);
   const isOwner = auth.status === "AUTHENTICATED" && auth.user.did === did;
 
+  // Derive initial view mode BASED ON the very first value of isOwner at the time of rendering
   const [viewMode, setViewMode] = useState<ViewMode>(isOwner ? "personal" : "public");
 
   // Get image URLs
