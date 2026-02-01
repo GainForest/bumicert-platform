@@ -1,5 +1,5 @@
-import MyOrganizationPageClient from "../../../(marketplace)/organization/_components/MyOrganizationPageClient";
+import { redirect } from "next/navigation";
 
-export default async function MyOrganizationPage() {
-  return <MyOrganizationPageClient />;
+export default function MyOrganizationPage() {
+  redirect("/organization/home");
 }
