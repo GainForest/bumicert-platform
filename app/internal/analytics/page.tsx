@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import {
   TrendingUp,
   Clock,
@@ -9,6 +10,7 @@ import {
   RefreshCw,
   Save,
   RotateCcw,
+  Sparkles,
 } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -145,9 +147,22 @@ const AnalyticsPage = async () => {
             Track user behavior and conversion metrics for the Bumicert creation
             flow
           </p>
-          <div className="mt-4 flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-            <RefreshCw className="h-4 w-4" />
-            <span>Last updated: {formatLastUpdated(data.lastUpdated)}</span>
+          <div className="mt-4 flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+              <RefreshCw className="h-4 w-4" />
+              <span>Last updated: {formatLastUpdated(data.lastUpdated)}</span>
+            </div>
+            <Link href="/internal/analytics/interactive">
+              <button className="group relative inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-emerald-600 to-teal-600 rounded-full shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-105 transition-all duration-300 overflow-hidden">
+                <span className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-teal-400 opacity-0 group-hover:opacity-20 transition-opacity" />
+                <Sparkles className="h-4 w-4 animate-pulse" />
+                <span>Enter Interactive Mode</span>
+                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
+                </span>
+              </button>
+            </Link>
           </div>
           {fetchError && (
             <div className="mt-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">

@@ -44,3 +44,6 @@ next-env.d.ts
 bun.lock
 bun.lockb
 yarn.lock
+
+# Audio files (large assets)
+public/audio
