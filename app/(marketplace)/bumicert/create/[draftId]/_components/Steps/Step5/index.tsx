@@ -13,15 +13,15 @@ import {
 } from "lucide-react";
 
 import { useAtprotoStore } from "@/components/stores/atproto";
-import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
+import { allowedPDSDomains, trpcClient } from "@/config/gainforest-sdk";
 import { cn } from "@/lib/utils";
 import { useFormStore } from "../../../form-store";
 import { useStep5Store } from "./store";
-import { toFileGenerator } from "climateai-sdk/zod";
+import { toFileGenerator } from "gainforest-sdk/zod";
 import { links } from "@/lib/links";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { parseAtUri } from "climateai-sdk/utilities/atproto";
+import { parseAtUri } from "gainforest-sdk/utilities/atproto";
 import { trpcApi } from "@/components/providers/TrpcProvider";
 import { usePathname } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";

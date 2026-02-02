@@ -14,10 +14,10 @@ import {
   getMetadata,
 } from "@/lib/hypercerts/getMetadata";
 import Link from "next/link";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
-import { parseAtUri, getBlobUrl } from "climateai-sdk/utilities/atproto";
-import { AppGainforestCommonDefs as Defs } from "climateai-sdk/lex-api";
-import { $Typed } from "climateai-sdk/lex-api/utils";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
+import { parseAtUri, getBlobUrl } from "gainforest-sdk/utilities/atproto";
+import { AppGainforestCommonDefs as Defs } from "gainforest-sdk/lex-api";
+import { $Typed } from "gainforest-sdk/lex-api/utils";
 import { trpcApi } from "@/components/providers/TrpcProvider";
 
 // type ValidatedProperties = {

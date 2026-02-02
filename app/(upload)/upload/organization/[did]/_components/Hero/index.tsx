@@ -1,7 +1,7 @@
 "use client";
 
-import type { AppGainforestOrganizationInfo } from "climateai-sdk/lex-api";
-import { getBlobUrl } from "climateai-sdk/utilities/atproto";
+import type { AppGainforestOrganizationInfo } from "gainforest-sdk/lex-api";
+import { getBlobUrl } from "gainforest-sdk/utilities/atproto";
 import { BadgeCheck, CircleAlert, Pencil } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useMemo } from "react";
@@ -19,8 +19,8 @@ import {
   customTransformer,
   deserialize,
   SerializedSuperjson,
-} from "climateai-sdk/utilities/transform";
-import { AllowedPDSDomain, allowedPDSDomains } from "@/config/climateai-sdk";
+} from "gainforest-sdk/utilities/transform";
+import { AllowedPDSDomain, allowedPDSDomains } from "@/config/gainforest-sdk";
 import EditableText from "@/components/ui/editable-text";
 import { AnimatePresence, motion } from "framer-motion";
 import QuickTooltip from "@/components/ui/quick-tooltip";

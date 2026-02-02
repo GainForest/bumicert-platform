@@ -1,8 +1,8 @@
-import { AllowedPDSDomain, allowedPDSDomains } from "@/config/climateai-sdk";
+import { AllowedPDSDomain, allowedPDSDomains } from "@/config/gainforest-sdk";
 import { useQuery } from "@tanstack/react-query";
-import { AppGainforestCommonDefs } from "climateai-sdk/lex-api";
-import { getBlobUrl } from "climateai-sdk/utilities/atproto";
-import { BlobRef, BlobRefGenerator } from "climateai-sdk/zod";
+import { AppGainforestCommonDefs } from "gainforest-sdk/lex-api";
+import { getBlobUrl } from "gainforest-sdk/utilities/atproto";
+import { BlobRef, BlobRefGenerator } from "gainforest-sdk/zod";
 import React from "react";
 
 type SmallImage = AppGainforestCommonDefs.SmallImage;

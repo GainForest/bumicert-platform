@@ -8,16 +8,16 @@ import TimeText from "@/components/time-text";
 import {
   AppGainforestOrganizationInfo,
   OrgHypercertsClaimActivity,
-} from "climateai-sdk/lex-api";
-import { getBlobUrl } from "climateai-sdk/utilities/atproto";
+} from "gainforest-sdk/lex-api";
+import { getBlobUrl } from "gainforest-sdk/utilities/atproto";
 import { BumicertArt } from "@/app/(marketplace)/bumicert/create/[draftId]/_components/Steps/Step4/BumicertPreviewCard";
-import { $Typed } from "climateai-sdk/lex-api/utils";
-import { AppGainforestCommonDefs as Defs } from "climateai-sdk/lex-api";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { $Typed } from "gainforest-sdk/lex-api/utils";
+import { AppGainforestCommonDefs as Defs } from "gainforest-sdk/lex-api";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import {
   deserialize,
   SerializedSuperjson,
-} from "climateai-sdk/utilities/transform";
+} from "gainforest-sdk/utilities/transform";
 import UserChip from "@/components/user-chip2";
 import Image from "next/image";
 import { useAdaptiveColors } from "@/hooks/use-adaptive-colors";

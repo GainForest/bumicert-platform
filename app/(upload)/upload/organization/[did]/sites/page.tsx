@@ -2,10 +2,10 @@ import React from "react";
 import SitesHeaderContent from "./HeaderContent";
 import Container from "@/components/ui/container";
 import SitesClient, { AllSitesData } from "../_components/Sites/SitesClient";
-import { climateAiSdk } from "@/config/climateai-sdk.server";
+import { gainforestSdk } from "@/config/gainforest-sdk.server";
 import { atprotoSDK } from "@/lib/atproto";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
-import { serialize } from "climateai-sdk/utilities/transform";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
+import { serialize } from "gainforest-sdk/utilities/transform";
 import { tryCatch } from "@/lib/tryCatch";
 import { TRPCError } from "@trpc/server";
 import ErrorPage from "./error";
@@ -14,7 +14,7 @@ const SitesPage = async ({ params }: { params: Promise<{ did: string }> }) => {
   const { did: encodedDid } = await params;
   const did = decodeURIComponent(encodedDid);
 
-  const serverCaller = climateAiSdk.getServerCaller(atprotoSDK);
+  const serverCaller = gainforestSdk.getServerCaller(atprotoSDK);
   const [response, error] = await tryCatch(
     serverCaller.hypercerts.site.getAll({
       did: did,

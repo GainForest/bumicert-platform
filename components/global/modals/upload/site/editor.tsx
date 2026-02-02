@@ -7,15 +7,15 @@ import {
   ModalTitle,
 } from "@/components/ui/modal/modal";
 import { useState, type ChangeEvent } from "react";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
-import { toBlobRefGenerator, toFileGenerator } from "climateai-sdk/zod";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
+import { toBlobRefGenerator, toFileGenerator } from "gainforest-sdk/zod";
 import { Button } from "@/components/ui/button";
 import { trpcApi } from "@/components/providers/TrpcProvider";
 import {
   AppGainforestOrganizationDefaultSite,
   AppCertifiedLocation,
-} from "climateai-sdk/lex-api";
-import { getBlobUrl, parseAtUri } from "climateai-sdk/utilities/atproto";
+} from "gainforest-sdk/lex-api";
+import { getBlobUrl, parseAtUri } from "gainforest-sdk/utilities/atproto";
 import FileInput from "@/components/ui/FileInput";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, CheckIcon, Loader2, Pencil } from "lucide-react";
@@ -24,10 +24,10 @@ import { getShapefilePreviewUrl } from "../../../../../lib/shapefile";
 import DrawPolygonModal, {
   DrawPolygonModalId,
 } from "@/components/global/modals/draw-polygon";
-import { GetRecordResponse } from "climateai-sdk/types";
+import { GetRecordResponse } from "gainforest-sdk/types";
 import { useAtprotoStore } from "@/components/stores/atproto";
-import { $Typed } from "climateai-sdk/lex-api/utils";
-import { OrgHypercertsDefs as Defs } from "climateai-sdk/lex-api";
+import { $Typed } from "gainforest-sdk/lex-api/utils";
+import { OrgHypercertsDefs as Defs } from "gainforest-sdk/lex-api";
 
 export const SiteEditorModalId = "site/editor";
 

@@ -1,12 +1,12 @@
 import Container from "@/components/ui/container";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
-import { climateAiSdk } from "@/config/climateai-sdk.server";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
+import { gainforestSdk } from "@/config/gainforest-sdk.server";
 import { atprotoSDK } from "@/lib/atproto";
 import { tryCatch } from "@/lib/tryCatch";
 import { TRPCError } from "@trpc/server";
-import { AppGainforestOrganizationInfo } from "climateai-sdk/lex-api";
-import { getAppSession } from "climateai-sdk/oauth";
-import { serialize } from "climateai-sdk/utilities/transform";
+import { AppGainforestOrganizationInfo } from "gainforest-sdk/lex-api";
+import { getAppSession } from "gainforest-sdk/oauth";
+import { serialize } from "gainforest-sdk/utilities/transform";
 import HeaderContent from "./_components/HeaderContent";
 import Hero from "@/app/(upload)/upload/organization/[did]/_components/Hero";
 import SubHero from "@/app/(upload)/upload/organization/[did]/_components/SubHero";
@@ -38,7 +38,7 @@ const OrganizationPage = async ({
   const { did: encodedDid } = await params;
   const did = decodeURIComponent(encodedDid);
 
-  const apiCaller = climateAiSdk.getServerCaller(atprotoSDK);
+  const apiCaller = gainforestSdk.getServerCaller(atprotoSDK);
   const [response, error] = await tryCatch(
     apiCaller.gainforest.organization.info.get({
       did,

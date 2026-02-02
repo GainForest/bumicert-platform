@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { checkSession } from "@/components/actions/oauth";
 
 export type User = {
   did: string;
@@ -31,15 +30,15 @@ export type AtprotoStoreState = {
 
 export type AtprotoStoreActions = {
   setAuth: (user: User | null) => void;
-  refreshSession: () => Promise<void>;
+  setResuming: () => void;
 };
 
 /**
  * Zustand store for managing ATProto authentication state.
  *
- * The store automatically checks for an existing session on initialization
- * using the `checkSession` server action. This reads the encrypted app
- * session cookie set during OAuth callback.
+ * Note: Session initialization is handled by the AtprotoProvider component,
+ * which calls checkSession() in a useEffect after mount. This avoids the
+ * "Server Functions cannot be called during initial render" error.
  *
  * @example
  * ```tsx
@@ -51,36 +50,30 @@ export type AtprotoStoreActions = {
  * ```
  */
 export const useAtprotoStore = create<AtprotoStoreState & AtprotoStoreActions>(
-  (set, get) => {
-    // Check session on store initialization
-    const initializeSession = async () => {
-      try {
-        const result = await checkSession();
+  (set) => ({
+    isReady: false,
+    auth: {
+      status: "RESUMING",
+      authenticated: false,
+      user: null,
+    },
 
-        if (result.authenticated) {
-          set({
-            isReady: true,
-            auth: {
-              status: "AUTHENTICATED",
-              authenticated: true,
-              user: {
-                did: result.did,
-                handle: result.handle,
-              },
-            },
-          });
-        } else {
-          set({
-            isReady: true,
-            auth: {
-              status: "UNAUTHENTICATED",
-              authenticated: false,
-              user: null,
-            },
-          });
-        }
-      } catch (error) {
-        console.error("Error checking session:", error);
+    /**
+     * Updates the authentication state.
+     * Call this after OAuth callback to set the authenticated user,
+     * or with null to log out.
+     */
+    setAuth: (user: User | null) => {
+      if (user) {
+        set({
+          isReady: true,
+          auth: {
+            status: "AUTHENTICATED",
+            authenticated: true,
+            user,
+          },
+        });
+      } else {
         set({
           isReady: true,
           auth: {
@@ -90,60 +83,21 @@ export const useAtprotoStore = create<AtprotoStoreState & AtprotoStoreActions>(
           },
         });
       }
-    };
+    },
 
-    // Start session check immediately
-    initializeSession();
-
-    return {
-      isReady: false,
-      auth: {
-        status: "RESUMING",
-        authenticated: false,
-        user: null,
-      },
-
-      /**
-       * Updates the authentication state.
-       * Call this after OAuth callback to set the authenticated user,
-       * or with null to log out.
-       */
-      setAuth: (user: User | null) => {
-        if (user) {
-          set({
-            isReady: true,
-            auth: {
-              status: "AUTHENTICATED",
-              authenticated: true,
-              user,
-            },
-          });
-        } else {
-          set({
-            isReady: true,
-            auth: {
-              status: "UNAUTHENTICATED",
-              authenticated: false,
-              user: null,
-            },
-          });
-        }
-      },
-
-      /**
-       * Refreshes the session by re-checking with the server.
-       * Useful after OAuth callback to update the store with the new session.
-       */
-      refreshSession: async () => {
-        set({
-          auth: {
-            status: "RESUMING",
-            authenticated: false,
-            user: null,
-          },
-        });
-        await initializeSession();
-      },
-    };
-  }
+    /**
+     * Sets the auth state to resuming (checking session).
+     * Used by AtprotoProvider when refreshing session.
+     */
+    setResuming: () => {
+      set({
+        isReady: false,
+        auth: {
+          status: "RESUMING",
+          authenticated: false,
+          user: null,
+        },
+      });
+    },
+  })
 );

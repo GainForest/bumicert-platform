@@ -5,13 +5,13 @@ import CircularProgressBar from "@/components/circular-progressbar";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
-import { Ecocert as Bumicert } from "climateai-sdk/types";
-import { getBlobUrl } from "climateai-sdk/utilities/atproto";
-import { OrgHypercertsDefs as Defs } from "climateai-sdk/lex-api";
-import { $Typed } from "climateai-sdk/lex-api/utils";
+import { Ecocert as Bumicert } from "gainforest-sdk/types";
+import { getBlobUrl } from "gainforest-sdk/utilities/atproto";
+import { OrgHypercertsDefs as Defs } from "gainforest-sdk/lex-api";
+import { $Typed } from "gainforest-sdk/lex-api/utils";
 import { BumicertArt } from "@/app/(marketplace)/bumicert/create/[draftId]/_components/Steps/Step4/BumicertPreviewCard";
-import { parseAtUri } from "climateai-sdk/utilities/atproto";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { parseAtUri } from "gainforest-sdk/utilities/atproto";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { links } from "@/lib/links";
 
 const StripedDiv = ({ children }: { children: React.ReactNode }) => {

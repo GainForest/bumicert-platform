@@ -9,10 +9,10 @@ import FileInput from "../../../../../../../../components/ui/FileInput";
 import { useState } from "react";
 import { Loader2, UploadIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { useModal } from "@/components/ui/modal/context";
-import { toBlobRefGenerator, toFileGenerator } from "climateai-sdk/zod";
+import { toBlobRefGenerator, toFileGenerator } from "gainforest-sdk/zod";
 import { trpcApi } from "@/components/providers/TrpcProvider";
 
 export const UploadLogoModalId = "upload/organization/logo";

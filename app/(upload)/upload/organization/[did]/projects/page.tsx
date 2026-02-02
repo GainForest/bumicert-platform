@@ -1,6 +1,6 @@
 import Container from "@/components/ui/container";
 import React from "react";
-import { getAppSession } from "climateai-sdk/oauth";
+import { getAppSession } from "gainforest-sdk/oauth";
 import { atprotoSDK } from "@/lib/atproto";
 import { redirect } from "next/navigation";
 import ProjectsClient, {
@@ -8,9 +8,9 @@ import ProjectsClient, {
 } from "./_components/Projects/ProjectsClient";
 import { tryCatch } from "@/lib/tryCatch";
 import { TRPCError } from "@trpc/server";
-import { serialize } from "climateai-sdk/utilities/transform";
-import { climateAiSdk } from "@/config/climateai-sdk.server";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { serialize } from "gainforest-sdk/utilities/transform";
+import { gainforestSdk } from "@/config/gainforest-sdk.server";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import HeaderContent from "../_components/HeaderContent";
 import ProjectsHeaderContent from "./HeaderContent";
 import ErrorPage from "./error";
@@ -31,7 +31,7 @@ const ProjectsPage = async ({
     redirect(`/organization/${encodeURIComponent(did)}`);
   }
 
-  const apiCaller = climateAiSdk.getServerCaller(atprotoSDK);
+  const apiCaller = gainforestSdk.getServerCaller(atprotoSDK);
 
   // Placeholder API call - replace with actual endpoint when available
   // For now, gracefully handle if the endpoint doesn't exist

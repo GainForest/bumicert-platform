@@ -3,7 +3,7 @@ import {
   createATProtoSDK,
   createSupabaseSessionStore,
   createSupabaseStateStore,
-} from "climateai-sdk/oauth";
+} from "gainforest-sdk/oauth";
 
 export const OAUTH_SCOPE = "atproto repo:app.gainforest.organization.info?action=create"
 

@@ -1,13 +1,13 @@
 "use client";
 import React, { useEffect, useMemo } from "react";
-import type { AppGainforestOrganizationInfo } from "climateai-sdk/lex-api";
+import type { AppGainforestOrganizationInfo } from "gainforest-sdk/lex-api";
 import { useOrganizationPageStore } from "../../store";
 import { Textarea } from "@/components/ui/textarea";
 import useHydratedData from "@/hooks/use-hydration";
 import {
   deserialize,
   SerializedSuperjson,
-} from "climateai-sdk/utilities/transform";
+} from "gainforest-sdk/utilities/transform";
 import { cn } from "@/lib/utils";
 import { CircleAlert } from "lucide-react";
 import QuickTooltip from "@/components/ui/quick-tooltip";

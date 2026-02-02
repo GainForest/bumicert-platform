@@ -3,7 +3,7 @@ import React from "react";
 import Hero from "./_components/Hero";
 import SubHero from "./_components/SubHero";
 import AboutOrganization from "./_components/AboutOrganization";
-import { AppGainforestOrganizationInfo } from "climateai-sdk/lex-api";
+import { AppGainforestOrganizationInfo } from "gainforest-sdk/lex-api";
 import HeaderContent from "./_components/HeaderContent";
 import { OrganizationPageHydrator } from "./hydrator";
 import Sites from "./_components/Sites";
@@ -13,11 +13,11 @@ import { TRPCError } from "@trpc/server";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getAppSession } from "climateai-sdk/oauth";
+import { getAppSession } from "gainforest-sdk/oauth";
 import { atprotoSDK } from "@/lib/atproto";
-import { serialize } from "climateai-sdk/utilities/transform";
-import { climateAiSdk } from "@/config/climateai-sdk.server";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { serialize } from "gainforest-sdk/utilities/transform";
+import { gainforestSdk } from "@/config/gainforest-sdk.server";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import SectionForData from "./_components/SectionForData";
 import ErrorPage from "./error";
 
@@ -44,7 +44,7 @@ const OrganizationPage = async ({
   const { did: encodedDid } = await params;
   const did = decodeURIComponent(encodedDid);
 
-  const apiCaller = climateAiSdk.getServerCaller(atprotoSDK);
+  const apiCaller = gainforestSdk.getServerCaller(atprotoSDK);
   const [response, error] = await tryCatch(
     apiCaller.gainforest.organization.info.get({
       did,

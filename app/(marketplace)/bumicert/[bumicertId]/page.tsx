@@ -5,12 +5,12 @@ import Hero from "./_components/Hero";
 import WidgetItem from "./_components/Widgets/WidgetItem";
 import Body from "./_components/Body";
 import HeaderContent from "./_components/HeaderContent";
-import { climateAiSdk } from "@/config/climateai-sdk.server";
+import { gainforestSdk } from "@/config/gainforest-sdk.server";
 import { atprotoSDK } from "@/lib/atproto";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { tryCatch } from "@/lib/tryCatch";
 import { TRPCError } from "@trpc/server";
-import { serialize } from "climateai-sdk/utilities/transform";
+import { serialize } from "gainforest-sdk/utilities/transform";
 
 const BumicertPage = async ({
   params,
@@ -28,7 +28,7 @@ const BumicertPage = async ({
 
   const [did, rkey] = parsedBumicertId;
 
-  const caller = climateAiSdk.getServerCaller(atprotoSDK);
+  const caller = gainforestSdk.getServerCaller(atprotoSDK);
   const [bumicertResponses, bumicertFetchError] = await tryCatch(
     Promise.all([
       caller.gainforest.organization.info.get({

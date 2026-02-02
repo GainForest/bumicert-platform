@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import postgres from "postgres";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { env } from "process";
 
 if (!env.POSTGRES_URL_NON_POOLING_ATPROTO_AUTH_MAPPING) {

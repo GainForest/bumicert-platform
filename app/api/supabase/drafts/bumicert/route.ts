@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import supabase from "../../client";
-import { getAppSession } from "climateai-sdk/oauth";
+import { getAppSession } from "gainforest-sdk/oauth";
 import {
   draftBumicertDataSchemaV0,
   getDraftBumicertRequestSchema,

@@ -3,8 +3,8 @@ import React from "react";
 import { getStripedBackground } from "@/lib/getStripedBackground";
 import { cn } from "@/lib/utils";
 import { AllProjectsData } from "./ProjectsClient";
-import { PubLeafletBlocksText } from "climateai-sdk/lex-api";
-import { $Typed } from "climateai-sdk/lex-api/utils";
+import { PubLeafletBlocksText } from "gainforest-sdk/lex-api";
+import { $Typed } from "gainforest-sdk/lex-api/utils";
 
 export type ProjectData = AllProjectsData["projects"][number];
 type ProjectCardProps = {

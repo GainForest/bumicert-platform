@@ -1,13 +1,13 @@
 import { BumicertArt } from "@/app/(marketplace)/bumicert/create/[draftId]/_components/Steps/Step4/BumicertPreviewCard";
-import { Ecocert as Bumicert } from "climateai-sdk/types";
+import { Ecocert as Bumicert } from "gainforest-sdk/types";
 import {
   deserialize,
   SerializedSuperjson,
-} from "climateai-sdk/utilities/transform";
-import { OrgHypercertsDefs as Defs } from "climateai-sdk/lex-api";
+} from "gainforest-sdk/utilities/transform";
+import { OrgHypercertsDefs as Defs } from "gainforest-sdk/lex-api";
 import React from "react";
-import { getBlobUrl } from "climateai-sdk/utilities/atproto";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { getBlobUrl } from "gainforest-sdk/utilities/atproto";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 
 const BumicertsClient = ({
   did,

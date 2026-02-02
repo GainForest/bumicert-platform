@@ -6,7 +6,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import useHydratedData from "@/hooks/use-hydration";
 import SiteCard from "./SiteCard";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { useModal } from "@/components/ui/modal/context";
 import { trpcApi } from "@/components/providers/TrpcProvider";
 import {
@@ -17,12 +17,12 @@ import { useAtprotoStore } from "@/components/stores/atproto";
 import {
   SerializedSuperjson,
   deserialize,
-} from "climateai-sdk/utilities/transform";
+} from "gainforest-sdk/utilities/transform";
 import {
   AppGainforestOrganizationDefaultSite,
   AppCertifiedLocation,
-} from "climateai-sdk/lex-api";
-import { GetRecordResponse } from "climateai-sdk/types";
+} from "gainforest-sdk/lex-api";
+import { GetRecordResponse } from "gainforest-sdk/types";
 
 export type AllSitesData = {
   sites: GetRecordResponse<AppCertifiedLocation.Record>[];

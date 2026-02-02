@@ -27,14 +27,14 @@ import {
   SiteEditorModalId,
 } from "../../../../../../../components/global/modals/upload/site/editor";
 import { getShapefilePreviewUrl } from "../../../../../../../lib/shapefile";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { trpcApi } from "@/components/providers/TrpcProvider";
-import { $Typed } from "climateai-sdk/lex-api/utils";
-import { OrgHypercertsDefs as Defs } from "climateai-sdk/lex-api";
-import { getBlobUrl } from "climateai-sdk/utilities/atproto";
+import { $Typed } from "gainforest-sdk/lex-api/utils";
+import { OrgHypercertsDefs as Defs } from "gainforest-sdk/lex-api";
+import { getBlobUrl } from "gainforest-sdk/utilities/atproto";
 import { useQuery } from "@tanstack/react-query";
-import { computePolygonMetrics } from "climateai-sdk/utilities/geojson";
+import { computePolygonMetrics } from "gainforest-sdk/utilities/geojson";
 
 export type SiteData = AllSitesData["sites"][number];
 type SiteCardProps = {

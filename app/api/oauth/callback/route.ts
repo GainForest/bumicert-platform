@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { redirect } from "next/navigation";
 import { atprotoSDK } from "@/lib/atproto";
-import { saveAppSession } from "climateai-sdk/oauth";
+import { saveAppSession } from "gainforest-sdk/oauth";
 
 /**
  * OAuth 2.0 Callback endpoint.

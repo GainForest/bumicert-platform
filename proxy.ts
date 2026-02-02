@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-import { getAppSession } from "climateai-sdk/oauth";
+import { getAppSession } from "gainforest-sdk/oauth";
 
 export async function proxy(request: NextRequest) {
   try {

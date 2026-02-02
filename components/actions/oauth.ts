@@ -5,7 +5,7 @@ import {
   getAppSession,
   clearAppSession,
   AppSessionData,
-} from "climateai-sdk/oauth";
+} from "gainforest-sdk/oauth";
 
 /**
  * Initiates the OAuth authorization flow.
