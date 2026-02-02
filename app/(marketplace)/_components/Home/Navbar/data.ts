@@ -1,6 +1,6 @@
 import { NavLinkConfig } from "@/components/global/Navbar/types";
 import { links } from "@/lib/links";
-import { BadgePlus, BuildingIcon, Compass, Home } from "lucide-react";
+import { BadgePlus, Building2, BuildingIcon, Compass, Home } from "lucide-react";
 
 export const navLinks: NavLinkConfig[] = [
   {
@@ -20,6 +20,15 @@ export const navLinks: NavLinkConfig[] = [
     Icon: Compass,
     pathCheck: {
       equals: "/explore",
+    },
+  },
+  {
+    id: "organizations",
+    href: links.allOrganizations,
+    text: "Organizations",
+    Icon: Building2,
+    pathCheck: {
+      equals: links.allOrganizations,
     },
   },
   {
