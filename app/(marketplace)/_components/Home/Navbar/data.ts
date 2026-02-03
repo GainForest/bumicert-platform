@@ -1,4 +1,5 @@
 import { NavLinkConfig } from "@/components/global/Navbar/types";
+// triggering rebuild
 import { links } from "@/lib/links";
 import { BadgePlus, BuildingIcon, Compass, Home } from "lucide-react";
 
@@ -42,7 +43,7 @@ export const navLinks: NavLinkConfig[] = [
   // },
   {
     id: "my-organization",
-    href: links.myOrganization,
+    href: "/organization/home",
     text: "My Organization",
     Icon: BuildingIcon,
     pathCheck: {
@@ -71,10 +72,6 @@ export const footerLinks: {
     {
       href: "https://twitter.com/GainForestNow",
       text: "Twitter",
-    },
-    {
-      href: "/changelog",
-      text: "Changelog",
     },
     {
       href: "https://www.canva.com/design/DAGNpwdK0jo/QkBOQ1gfl0gy8jDTBAo10g/view",
