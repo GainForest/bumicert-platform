@@ -14,22 +14,28 @@ export const navLinks: NavLinkConfig[] = [
   },
   {
     id: "explore",
-    href: "/explore",
     text: "Explore",
-    showIconOnlyOnDesktop: false,
     Icon: Compass,
-    pathCheck: {
-      equals: "/explore",
-    },
-  },
-  {
-    id: "organizations",
-    href: links.allOrganizations,
-    text: "Organizations",
-    Icon: Building2,
-    pathCheck: {
-      equals: links.allOrganizations,
-    },
+    children: [
+      {
+        id: "explore-bumicerts",
+        href: "/explore",
+        text: "Bumicerts",
+        Icon: Compass,
+        pathCheck: {
+          equals: "/explore",
+        },
+      },
+      {
+        id: "explore-organizations",
+        href: links.allOrganizations,
+        text: "Organizations",
+        Icon: Building2,
+        pathCheck: {
+          equals: links.allOrganizations,
+        },
+      },
+    ],
   },
   {
     id: "submit",
