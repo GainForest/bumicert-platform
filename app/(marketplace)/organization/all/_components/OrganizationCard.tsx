@@ -30,7 +30,7 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
           </span>
         )}
         <div className="flex items-center gap-2 relative z-5">
-          <div className="flex-shrink-0 w-8 h-8 rounded-full p-0.5 bg-muted flex items-center justify-center overflow-hidden">
+          <div className="flex-shrink-0 w-8 h-8 rounded-full p-0.5 bg-muted flex items-center justify-center overflow-hidden shadow-sm">
             {organization.logoUrl ? (
               <Image
                 src={organization.logoUrl}
