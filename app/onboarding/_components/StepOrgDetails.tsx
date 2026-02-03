@@ -27,7 +27,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 export function StepOrgDetails() {
   const { data, updateData, nextStep, prevStep, setError, error } =
@@ -125,7 +125,7 @@ export function StepOrgDetails() {
     }
   };
 
-  const selectedDate = data.startDate ? new Date(data.startDate) : undefined;
+  const selectedDate = data.startDate ? parseISO(data.startDate) : undefined;
 
   return (
     <motion.div
@@ -200,7 +200,7 @@ export function StepOrgDetails() {
                     selected={selectedDate}
                     onSelect={(date) =>
                       updateData({
-                        startDate: date ? date.toISOString().split("T")[0] : null,
+                        startDate: date ? format(date, "yyyy-MM-dd") : null,
                       })
                     }
                     disabled={(date) => date > new Date()}

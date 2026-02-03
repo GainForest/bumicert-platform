@@ -132,13 +132,13 @@ export function StepComplete() {
   };
 
   const handleSignIn = () => {
-    show();
     pushModal({
       id: SignInModalId,
       content: (
         <SignInModal initialHandle={`${data.handle}.${allowedPDSDomains[0]}`} />
       ),
-    });
+    }, true);
+    show();
   };
 
   const handleRetry = () => {

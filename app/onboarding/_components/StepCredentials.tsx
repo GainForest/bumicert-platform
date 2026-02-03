@@ -83,6 +83,7 @@ export function StepCredentials() {
       .replace(/-+$/, "")
       .replace(/-+/g, "-");
     updateData({ handle: normalized });
+    if (error) setError(null);
   };
 
   return (
@@ -148,7 +149,10 @@ export function StepCredentials() {
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter a secure password"
                 value={data.password}
-                onChange={(e) => updateData({ password: e.target.value })}
+                onChange={(e) => {
+                  updateData({ password: e.target.value });
+                  if (error) setError(null);
+                }}
                 className="pr-10 h-9"
               />
               <button
@@ -213,9 +217,10 @@ export function StepCredentials() {
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="Repeat your password"
                 value={data.confirmPassword}
-                onChange={(e) =>
-                  updateData({ confirmPassword: e.target.value })
-                }
+                onChange={(e) => {
+                  updateData({ confirmPassword: e.target.value });
+                  if (error) setError(null);
+                }}
                 className={cn(
                   "pr-10 h-9",
                   passwordsMatch &&
