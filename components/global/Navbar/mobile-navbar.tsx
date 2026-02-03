@@ -179,6 +179,7 @@ const MobileNavbar = ({ navLinks, footerLinks }: MobileNavbarProps) => {
                   return (
                     <div key={link.id} className="flex flex-col gap-1 min-[28rem]:col-span-2">
                       <button
+                        type="button"
                         onClick={() => toggleGroup(link.id)}
                         className="w-full"
                       >

@@ -171,6 +171,7 @@ const DesktopNavbar = ({
               return (
                 <li key={link.id} className="w-full flex flex-col gap-0.5">
                   <button
+                    type="button"
                     onClick={() => toggleGroup(link.id)}
                     className="w-full"
                   >
