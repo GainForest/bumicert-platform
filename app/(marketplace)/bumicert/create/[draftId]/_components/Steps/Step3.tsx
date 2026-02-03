@@ -93,7 +93,7 @@ const Step3 = () => {
     isPending: isSitesPending,
     isPlaceholderData: isOlderSites,
     error: sitesFetchError,
-  } = trpcApi.hypercerts.site.getAll.useQuery(
+  } = trpcApi.hypercerts.location.getAll.useQuery(
     {
       did: auth.user?.did ?? "",
       pdsDomain: allowedPDSDomains[0],
@@ -102,7 +102,7 @@ const Step3 = () => {
       enabled: !!auth.user?.did,
     }
   );
-  const sites = sitesResponse?.sites;
+  const sites = sitesResponse?.locations;
   console.log("==============");
   console.log(JSON.stringify(sites, null, 2));
   console.log("==============");

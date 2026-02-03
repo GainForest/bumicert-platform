@@ -58,7 +58,7 @@ const ProjectsPage = async ({
       }
     } else {
       allProjectsData = {
-        projects: response,
+        projects: response as AllProjectsData["projects"],
       };
     }
   } catch (error) {

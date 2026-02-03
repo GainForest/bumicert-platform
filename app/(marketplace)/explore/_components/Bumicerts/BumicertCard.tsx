@@ -63,9 +63,9 @@ const BumicertCard = ({ bumicert }: { bumicert: Bumicert }) => {
           logoUrl={bumicert.organizationInfo.logoUrl}
           coverImage={imageUrl}
           title={bumicert.claimActivity.value.title}
-          objectives={bumicert.claimActivity.value.workScope?.withinAnyOf ?? []}
-          startDate={new Date(bumicert.claimActivity.value.startDate)}
-          endDate={new Date(bumicert.claimActivity.value.endDate)}
+          objectives={(bumicert.claimActivity.value.workScope as { withinAnyOf?: string[] } | undefined)?.withinAnyOf ?? []}
+          startDate={new Date(bumicert.claimActivity.value.startDate!)}
+          endDate={new Date(bumicert.claimActivity.value.endDate!)}
         />
       </Link>
     </motion.div>

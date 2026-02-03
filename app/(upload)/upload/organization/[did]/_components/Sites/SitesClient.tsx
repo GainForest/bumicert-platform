@@ -25,8 +25,8 @@ import {
 import { GetRecordResponse } from "gainforest-sdk/types";
 
 export type AllSitesData = {
-  sites: GetRecordResponse<AppCertifiedLocation.Record>[];
-  defaultSite: GetRecordResponse<AppGainforestOrganizationDefaultSite.Record> | null;
+  locations: GetRecordResponse<AppCertifiedLocation.Record>[];
+  defaultLocation: GetRecordResponse<AppGainforestOrganizationDefaultSite.Record> | null;
 };
 
 const SitesClient = ({
@@ -40,15 +40,15 @@ const SitesClient = ({
   const auth = useAtprotoStore((state) => state.auth);
   const shouldEdit = auth.status === "AUTHENTICATED" && auth.user.did === did;
   const { data: reactiveData, isPlaceholderData: isOlderReactiveData } =
-    trpcApi.hypercerts.site.getAll.useQuery({
+    trpcApi.hypercerts.location.getAll.useQuery({
       did,
       pdsDomain: allowedPDSDomains[0],
     });
   const isReactiveDataUpdating = isOlderReactiveData;
 
   const data = useHydratedData(initialData, reactiveData ?? null);
-  const allSites = data.sites;
-  const defaultSite = data.defaultSite;
+  const allSites = data.locations;
+  const defaultSite = data.defaultLocation;
   console.log("=============");
   console.log(allSites);
   console.log("=============");

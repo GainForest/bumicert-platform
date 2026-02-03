@@ -36,7 +36,7 @@ import { getBlobUrl } from "gainforest-sdk/utilities/atproto";
 import { useQuery } from "@tanstack/react-query";
 import { computePolygonMetrics } from "gainforest-sdk/utilities/geojson";
 
-export type SiteData = AllSitesData["sites"][number];
+export type SiteData = AllSitesData["locations"][number];
 type SiteCardProps = {
   siteData: SiteData;
   defaultSite: string | null;
@@ -80,9 +80,9 @@ const SiteCard = ({ siteData, defaultSite, did }: SiteCardProps) => {
     : null;
 
   const { mutate: setDefaultSite, isPending: isSettingDefaultSite } =
-    trpcApi.hypercerts.site.setDefault.useMutation({
+    trpcApi.hypercerts.location.setDefault.useMutation({
       onSuccess: () => {
-        utils.hypercerts.site.getAll.invalidate({
+        utils.hypercerts.location.getAll.invalidate({
           did,
           pdsDomain: allowedPDSDomains[0],
         });
@@ -90,9 +90,9 @@ const SiteCard = ({ siteData, defaultSite, did }: SiteCardProps) => {
     });
 
   const { mutate: deleteSite, isPending: isDeletingSite } =
-    trpcApi.hypercerts.site.delete.useMutation({
+    trpcApi.hypercerts.location.delete.useMutation({
       onSuccess: () => {
-        utils.hypercerts.site.getAll.invalidate({
+        utils.hypercerts.location.getAll.invalidate({
           did,
           pdsDomain: allowedPDSDomains[0],
         });
@@ -194,7 +194,8 @@ const SiteCard = ({ siteData, defaultSite, did }: SiteCardProps) => {
                       onClick={() => {
                         console.log("setting default site", siteData.uri);
                         setDefaultSite({
-                          siteAtUri: siteData.uri,
+                          did,
+                          locationAtUri: siteData.uri,
                           pdsDomain: allowedPDSDomains[0],
                         });
                       }}
@@ -208,7 +209,8 @@ const SiteCard = ({ siteData, defaultSite, did }: SiteCardProps) => {
                       variant="destructive"
                       onClick={() =>
                         deleteSite({
-                          siteAtUri: siteData.uri,
+                          did,
+                          locationAtUri: siteData.uri,
                           pdsDomain: allowedPDSDomains[0],
                         })
                       }

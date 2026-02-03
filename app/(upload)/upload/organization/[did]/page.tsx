@@ -21,8 +21,8 @@ import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import SectionForData from "./_components/SectionForData";
 import ErrorPage from "./error";
 
-const EMPTY_ORGANIZATION_DATA: AppGainforestOrganizationInfo.Record = {
-  $type: "app.gainforest.organization.info",
+const EMPTY_ORGANIZATION_DATA = {
+  $type: "app.gainforest.organization.info" as const,
   displayName: "",
   wesite: undefined,
   logo: undefined,
@@ -32,9 +32,9 @@ const EMPTY_ORGANIZATION_DATA: AppGainforestOrganizationInfo.Record = {
   objectives: [],
   startDate: "",
   country: "",
-  visibility: "Public",
+  visibility: "Public" as const,
   createdAt: new Date().toISOString(),
-};
+} as unknown as AppGainforestOrganizationInfo.Record;
 
 const OrganizationPage = async ({
   params,
@@ -66,10 +66,10 @@ const OrganizationPage = async ({
         throw new Error("An unknown error occurred.");
       }
     } else {
-      data = response.value;
+      data = (response as { value: AppGainforestOrganizationInfo.Record }).value;
     }
 
-    if (data.visibility === "Hidden") {
+    if ((data.visibility as string) === "Hidden") {
       try {
         const session = await getAppSession();
         if (!session.isLoggedIn || session.did !== did) {

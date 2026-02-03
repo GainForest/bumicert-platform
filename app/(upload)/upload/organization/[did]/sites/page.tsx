@@ -16,7 +16,7 @@ const SitesPage = async ({ params }: { params: Promise<{ did: string }> }) => {
 
   const serverCaller = gainforestSdk.getServerCaller(atprotoSDK);
   const [response, error] = await tryCatch(
-    serverCaller.hypercerts.site.getAll({
+    serverCaller.hypercerts.location.getAll({
       did: did,
       pdsDomain: allowedPDSDomains[0],
     })
@@ -29,8 +29,8 @@ const SitesPage = async ({ params }: { params: Promise<{ did: string }> }) => {
       if (error instanceof TRPCError && error.code === "NOT_FOUND") {
         // Display empty sites data
         data = {
-          sites: [],
-          defaultSite: null,
+          locations: [],
+          defaultLocation: null,
         };
       } else {
         if (error instanceof TRPCError && error.code === "BAD_REQUEST") {
@@ -39,7 +39,7 @@ const SitesPage = async ({ params }: { params: Promise<{ did: string }> }) => {
         throw new Error("An unknown error occurred.");
       }
     } else {
-      data = response;
+      data = response as AllSitesData;
     }
   } catch (error) {
     console.error(

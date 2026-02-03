@@ -57,7 +57,15 @@ export const UploadLogoModal = () => {
         logo: await toFileGenerator(logo),
       },
       info: {
-        ...organizationInfo,
+        displayName: organizationInfo.displayName,
+        shortDescription: organizationInfo.shortDescription as unknown as string,
+        longDescription: organizationInfo.longDescription as unknown as string,
+        objectives: organizationInfo.objectives,
+        country: organizationInfo.country,
+        visibility: organizationInfo.visibility,
+        website: organizationInfo.website,
+        startDate: organizationInfo.startDate,
+        createdAt: organizationInfo.createdAt,
         logo: organizationInfo.logo
           ? toBlobRefGenerator(organizationInfo.logo.image)
           : undefined,

@@ -3,6 +3,8 @@ import { create } from "zustand";
 export type User = {
   did: string;
   handle?: string;
+  displayName?: string;
+  avatar?: string;
 };
 
 export type AtprotoAuthCatalog = {

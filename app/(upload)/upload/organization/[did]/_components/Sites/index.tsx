@@ -11,15 +11,15 @@ const Sites = async ({ did }: { did: string }) => {
   const apiCaller = gainforestSdk.getServerCaller(atprotoSDK);
 
   const [response, error] = await tryCatch(
-    apiCaller.hypercerts.site.getAll({
+    apiCaller.hypercerts.location.getAll({
       did,
       pdsDomain: allowedPDSDomains[0],
     })
   );
 
   let allSitesData: AllSitesData = {
-    sites: [],
-    defaultSite: null,
+    locations: [],
+    defaultLocation: null,
   };
   if (error) {
     if (error instanceof TRPCError && error.code === "NOT_FOUND") {
@@ -28,7 +28,7 @@ const Sites = async ({ did }: { did: string }) => {
       throw new Error("An unknown error occurred.");
     }
   } else {
-    allSitesData = response;
+    allSitesData = response as AllSitesData;
   }
 
   const serializedInitialData = serialize(allSitesData);

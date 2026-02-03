@@ -32,10 +32,10 @@ import { OrgHypercertsDefs as Defs } from "gainforest-sdk/lex-api";
 export const SiteEditorModalId = "site/editor";
 
 type AllSitesData = {
-  sites: GetRecordResponse<AppCertifiedLocation.Record>[];
-  defaultSite: GetRecordResponse<AppGainforestOrganizationDefaultSite.Record> | null;
+  locations: GetRecordResponse<AppCertifiedLocation.Record>[];
+  defaultLocation: GetRecordResponse<AppGainforestOrganizationDefaultSite.Record> | null;
 };
-type SiteData = AllSitesData["sites"][number];
+type SiteData = AllSitesData["locations"][number];
 
 type SiteEditorModalProps = {
   initialData: SiteData | null;
@@ -88,9 +88,9 @@ export const SiteEditorModal = ({ initialData }: SiteEditorModalProps) => {
     mutate: handleAdd,
     isPending: isAdding,
     error: addError,
-  } = trpcApi.hypercerts.site.create.useMutation({
+  } = trpcApi.hypercerts.location.create.useMutation({
     onSuccess: () => {
-      utils.hypercerts.site.getAll.invalidate({
+      utils.hypercerts.location.getAll.invalidate({
         did,
         pdsDomain: allowedPDSDomains[0],
       });
@@ -102,9 +102,9 @@ export const SiteEditorModal = ({ initialData }: SiteEditorModalProps) => {
     mutate: handleUpdate,
     isPending: isUpdating,
     error: updateError,
-  } = trpcApi.hypercerts.site.update.useMutation({
+  } = trpcApi.hypercerts.location.update.useMutation({
     onSuccess: () => {
-      utils.hypercerts.site.getAll.invalidate({
+      utils.hypercerts.location.getAll.invalidate({
         did,
         pdsDomain: allowedPDSDomains[0],
       });
@@ -122,6 +122,7 @@ export const SiteEditorModal = ({ initialData }: SiteEditorModalProps) => {
       }
 
       await handleAdd({
+        did: did!,
         site: {
           name: name.trim(),
         },
@@ -148,20 +149,16 @@ export const SiteEditorModal = ({ initialData }: SiteEditorModalProps) => {
             : null;
         const sitePayload = {
           name: name.trim(),
-          location: initialLocationUri
-            ? {
-                $type: "org.hypercerts.defs#uri" as const,
-                uri: initialLocationUri,
-              }
-            : initialLocationBlob
+          shapefile: initialLocationBlob
             ? {
                 $type: "org.hypercerts.defs#smallBlob" as const,
-                blob: initialLocationBlob,
+                blob: toBlobRefGenerator(initialLocationBlob),
               }
             : undefined,
         };
 
         await handleUpdate({
+          did: did!,
           rkey,
           site: sitePayload,
           pdsDomain: allowedPDSDomains[0],
@@ -175,6 +172,7 @@ export const SiteEditorModal = ({ initialData }: SiteEditorModalProps) => {
         }
 
         await handleUpdate({
+          did: did!,
           rkey,
           site: {
             name: name.trim(),

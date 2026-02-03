@@ -43,7 +43,7 @@ const AboutOrganization = ({
 
   useEffect(() => {
     setEditingData({
-      longDescription: data.longDescription,
+      longDescription: data.longDescription as unknown as string,
     });
   }, [isEditing, data]);
 
@@ -86,12 +86,12 @@ const AboutOrganization = ({
         </div>
       ) : (
         <p className="text-justify mt-2">
-          {data.longDescription === "" ? (
+          {(data.longDescription as unknown as string) === "" ? (
             <span className="text-muted-foreground">
               No long description provided.
             </span>
           ) : (
-            data.longDescription
+            (data.longDescription as unknown as string)
           )}
         </p>
       )}

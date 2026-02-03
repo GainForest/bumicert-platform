@@ -14,6 +14,7 @@ import {
 import { links } from "@/lib/links";
 import { Building, Loader2, LogOut, UploadIcon } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { logout } from "@/components/actions/oauth";
 
 export const ProfileModalId = "profile";
@@ -55,10 +56,11 @@ export const ProfileModal = () => {
     );
   }
 
-  // Extract display name from handle or DID
-  const displayName = auth.user.handle
-    ? auth.user.handle.split(".")[0]
-    : auth.user.did.slice(0, 16) + "...";
+  // Prefer displayName from profile, fallback to handle prefix, fallback to truncated DID
+  const displayName = auth.user.displayName
+    ?? (auth.user.handle
+      ? auth.user.handle.split(".")[0]
+      : auth.user.did.slice(0, 16) + "...");
 
   const domain = auth.user.handle
     ? auth.user.handle.split(".").slice(1).join(".")
@@ -79,7 +81,21 @@ export const ProfileModal = () => {
         <ModalDescription></ModalDescription>
       </ModalHeader>
       <div className="flex flex-col items-center gap-2">
-        <div className="h-20 w-20 rounded-full bg-muted flex items-center justify-center"></div>
+        <div className="h-20 w-20 rounded-full bg-muted flex items-center justify-center overflow-hidden">
+          {auth.user.avatar ? (
+            <Image
+              src={auth.user.avatar}
+              alt={displayName}
+              width={80}
+              height={80}
+              className="object-cover w-full h-full"
+            />
+          ) : (
+            <span className="text-2xl font-bold text-muted-foreground">
+              {displayName.slice(0, 2).toUpperCase()}
+            </span>
+          )}
+        </div>
         <div className="flex flex-col items-center">
           <span className="text-3xl font-serif font-bold">{displayName}</span>
           <span className="text-sm text-muted-foreground">{domain}</span>

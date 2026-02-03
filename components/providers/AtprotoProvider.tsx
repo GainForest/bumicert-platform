@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useAtprotoStore } from "@/components/stores/atproto";
-import { checkSession } from "@/components/actions/oauth";
+import { checkSession, getProfile } from "@/components/actions/oauth";
 
 /**
  * Provider component that initializes ATProto session state.
@@ -35,7 +35,15 @@ export function AtprotoProvider({ children }: { children: React.ReactNode }) {
       try {
         const result = await checkSession();
         if (result.authenticated) {
-          setAuth({ did: result.did, handle: result.handle });
+          // Fetch profile to get handle, displayName, avatar
+          const profile = await getProfile(result.did);
+
+          setAuth({
+            did: result.did,
+            handle: profile?.handle,
+            displayName: profile?.displayName,
+            avatar: profile?.avatar,
+          });
         } else {
           setAuth(null);
         }

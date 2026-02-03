@@ -6,6 +6,8 @@ import {
   clearAppSession,
   AppSessionData,
 } from "gainforest-sdk/oauth";
+import { getBlobUrl } from "gainforest-sdk/utilities/atproto";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 
 /**
  * Initiates the OAuth authorization flow.
@@ -92,4 +94,69 @@ export async function checkSession(): Promise<
     did: session.did,
     handle: session.handle,
   };
+}
+
+/**
+ * Profile data returned from ATProto
+ */
+export type ProfileData = {
+  handle: string;
+  displayName?: string;
+  description?: string;
+  avatar?: string;
+};
+
+/**
+ * Fetches the user's ATProto profile using the hypercerts SDK.
+ *
+ * This server action restores the OAuth session and uses the repository
+ * pattern to fetch the user's profile data including handle, display name,
+ * and avatar.
+ *
+ * @param did - The user's DID
+ * @returns Profile data or null if profile doesn't exist or session is invalid
+ *
+ * @example
+ * ```tsx
+ * const profile = await getProfile("did:plc:abc123");
+ * if (profile) {
+ *   console.log(`Hello, ${profile.displayName ?? profile.handle}!`);
+ * }
+ * ```
+ */
+export async function getProfile(did: string): Promise<ProfileData | null> {
+  try {
+    // Restore OAuth session from Supabase
+    const session = await atprotoSDK.restoreSession(did);
+    if (!session) {
+      console.error("Could not restore session for profile fetch");
+      return null;
+    }
+
+    // Get repository and fetch profile
+    const repo = atprotoSDK.repository(session);
+    const profile = await repo.profile.get();
+
+    // Handle avatar - could be URL string or blob reference object
+    let avatarUrl: string | undefined = undefined;
+    if (profile.avatar) {
+      if (typeof profile.avatar === "string") {
+        // Already a URL
+        avatarUrl = profile.avatar;
+      } else if (typeof profile.avatar === "object") {
+        // It's a blob reference, convert to URL
+        avatarUrl = getBlobUrl(did, profile.avatar, allowedPDSDomains[0]);
+      }
+    }
+
+    return {
+      handle: profile.handle,
+      displayName: profile.displayName,
+      description: profile.description,
+      avatar: avatarUrl,
+    };
+  } catch (error) {
+    console.error("Error fetching profile:", error);
+    return null;
+  }
 }

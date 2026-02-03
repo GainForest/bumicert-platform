@@ -45,10 +45,10 @@ const BumicertsClient = ({
               coverImage={coverImageUrl}
               title={bumicert.claimActivity.value.title}
               objectives={
-                bumicert.claimActivity.value.workScope?.withinAnyOf ?? []
+                (bumicert.claimActivity.value.workScope as { withinAnyOf?: string[] } | undefined)?.withinAnyOf ?? []
               }
-              startDate={new Date(bumicert.claimActivity.value.startDate)}
-              endDate={new Date(bumicert.claimActivity.value.endDate)}
+              startDate={new Date(bumicert.claimActivity.value.startDate!)}
+              endDate={new Date(bumicert.claimActivity.value.endDate!)}
             />
           </div>
         );

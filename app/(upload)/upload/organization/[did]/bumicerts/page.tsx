@@ -20,8 +20,10 @@ const BumicertsPage = async ({
   const did = decodeURIComponent(encodedDid);
   const serverCaller = gainforestSdk.getServerCaller(atprotoSDK);
 
-  let activitiesResponse;
-  let orgInfoResponse;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let activitiesResponse: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let orgInfoResponse: any;
 
   try {
     const [activitiesData, activitiesError] = await tryCatch(

@@ -1,14 +1,14 @@
 import { AllowedPDSDomain, allowedPDSDomains } from "@/config/gainforest-sdk";
 import { useQuery } from "@tanstack/react-query";
-import { AppGainforestCommonDefs } from "gainforest-sdk/lex-api";
+import { OrgHypercertsDefs } from "gainforest-sdk/lex-api";
 import { getBlobUrl } from "gainforest-sdk/utilities/atproto";
 import { BlobRef, BlobRefGenerator } from "gainforest-sdk/zod";
 import React from "react";
 
-type SmallImage = AppGainforestCommonDefs.SmallImage;
-type LargeImage = AppGainforestCommonDefs.LargeImage;
-type SmallBlob = AppGainforestCommonDefs.SmallBlob;
-type LargeBlob = AppGainforestCommonDefs.LargeBlob;
+type SmallImage = OrgHypercertsDefs.SmallImage;
+type LargeImage = OrgHypercertsDefs.LargeImage;
+type SmallBlob = OrgHypercertsDefs.SmallBlob;
+type LargeBlob = OrgHypercertsDefs.LargeBlob;
 type BlobUrl =
   `https://${AllowedPDSDomain}/xrpc/com.atproto.sync.getBlob?did=${string}&cid=${string}`;
 

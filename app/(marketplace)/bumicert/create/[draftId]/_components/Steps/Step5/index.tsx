@@ -188,7 +188,7 @@ const Step5 = () => {
         // Track successful bumicert publication
         const duration = getFlowDurationSeconds() ?? 0;
         trackBumicertPublished({
-          draftId: data.data?.cid ?? "unknown",
+          draftId: data.cid ?? "unknown",
           totalDurationSeconds: duration,
         });
 
@@ -229,6 +229,7 @@ const Step5 = () => {
       );
 
       const data = {
+        did: auth.user?.did ?? "",
         activity: {
           title: step1FormValues.projectName,
           shortDescription: step2FormValues.shortDescription,
@@ -236,7 +237,7 @@ const Step5 = () => {
           workScopes: step1FormValues.workType,
           startDate: step1FormValues.projectDateRange[0].toISOString(),
           endDate: step1FormValues.projectDateRange[1].toISOString(),
-          contributors: step3FormValues.contributors,
+          contributors: step3FormValues.contributors.map((c) => ({ identity: c })),
           locations: step3FormValues.siteBoundaries.map((sb) => ({
             $type: "com.atproto.repo.strongRef" as const,
             cid: sb.cid,
@@ -325,7 +326,7 @@ const Step5 = () => {
         />
       )}
       {createBumicertStatus === "success" &&
-        createdBumicertResponse?.data.cid && (
+        createdBumicertResponse?.cid && (
           <div className="mt-4 flex flex-col items-center border border-border rounded-lg">
             <CircleCheckIcon className="size-6" />
             <span className="mt-1">
@@ -334,8 +335,8 @@ const Step5 = () => {
             <Button className="mt-2">
               <Link
                 href={links.bumicert.view(
-                  `${parseAtUri(createdBumicertResponse.data.uri).did}-${
-                    parseAtUri(createdBumicertResponse.data.uri).rkey
+                  `${parseAtUri(createdBumicertResponse.uri).did}-${
+                    parseAtUri(createdBumicertResponse.uri).rkey
                   }`
                 )}
               >

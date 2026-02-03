@@ -16,7 +16,7 @@ import {
 import Link from "next/link";
 import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { parseAtUri, getBlobUrl } from "gainforest-sdk/utilities/atproto";
-import { AppGainforestCommonDefs as Defs } from "gainforest-sdk/lex-api";
+import { OrgHypercertsDefs as Defs } from "gainforest-sdk/lex-api";
 import { $Typed } from "gainforest-sdk/lex-api/utils";
 import { trpcApi } from "@/components/providers/TrpcProvider";
 

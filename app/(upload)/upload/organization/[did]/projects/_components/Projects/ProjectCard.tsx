@@ -15,7 +15,7 @@ type ProjectCardProps = {
 const ProjectCard = ({ projectData, did }: ProjectCardProps) => {
   const project = projectData.value;
 
-  const bumicertsCount = project.activities?.length ?? 0;
+  const bumicertsCount = project.items?.length ?? 0;
   const measuredTreesClustersCount = 0;
   const sitesCount = 0;
   const layersCount = 0;

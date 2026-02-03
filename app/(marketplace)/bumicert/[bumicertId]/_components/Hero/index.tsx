@@ -12,7 +12,7 @@ import {
 import { getBlobUrl } from "gainforest-sdk/utilities/atproto";
 import { BumicertArt } from "@/app/(marketplace)/bumicert/create/[draftId]/_components/Steps/Step4/BumicertPreviewCard";
 import { $Typed } from "gainforest-sdk/lex-api/utils";
-import { AppGainforestCommonDefs as Defs } from "gainforest-sdk/lex-api";
+import { OrgHypercertsDefs as Defs } from "gainforest-sdk/lex-api";
 import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import {
   deserialize,
@@ -109,19 +109,19 @@ const Hero = ({
                   <Calendar className="size-4 mr-1 opacity-50" />
                   <TimeText
                     format="absolute-date"
-                    date={new Date(bumicert.startDate)}
+                    date={new Date(bumicert.startDate!)}
                   />{" "}
                   <ArrowRight className="size-3" />{" "}
                   <TimeText
                     format="absolute-date"
-                    date={new Date(bumicert.endDate)}
+                    date={new Date(bumicert.endDate!)}
                   />
                 </span>
 
                 <div className="w-full overflow-x-auto scrollbar-hidden mask-r-from-90% mt-4">
                   <div className="w-full flex items-center justify-start gap-2">
-                    {(bumicert.workScope?.withinAnyOf ?? []).map(
-                      (work, index) => (
+                    {((bumicert.workScope as { withinAnyOf?: string[] } | undefined)?.withinAnyOf ?? []).map(
+                      (work: string, index: number) => (
                         <span
                           key={index}
                           className="rounded-lg px-3 py-1.5 text-sm font-medium shrink-0"

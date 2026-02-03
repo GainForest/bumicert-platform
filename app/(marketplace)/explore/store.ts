@@ -36,8 +36,6 @@ export type ExploreStoreState =
 type ClaimsWithOrgInfo = {
   repo: {
     did: string;
-    head: string;
-    rev: string;
   };
   activities: Array<GetRecordResponse<OrgHypercertsClaimActivity.Record>>;
   organizationInfo: AppGainforestOrganizationInfo.Record;
