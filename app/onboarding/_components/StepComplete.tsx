@@ -9,14 +9,11 @@ import {
   CheckCircle2,
   FileText,
   Loader2,
-  LogIn,
   XCircle,
 } from "lucide-react";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
 import { useAtprotoStore } from "@/components/stores/atproto";
-import { useModal } from "@/components/ui/modal/context";
-import SignInModal, { SignInModalId } from "@/components/global/modals/sign-in";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
@@ -32,12 +29,8 @@ export function StepComplete() {
   const [completionState, setCompletionState] = useState<CompletionState>(
     data.accountCreated ? "success" : "idle"
   );
-  const auth = useAtprotoStore((state) => state.auth);
-  const { show, pushModal } = useModal();
-
-  const isAuthenticated = auth.authenticated;
-  const userDid = auth.authenticated ? auth.user?.did : null;
-  const orgSavedRef = useRef(false);
+  const setAuth = useAtprotoStore((state) => state.setAuth);
+  const userDid = data.did;
 
   // Start account creation when component mounts
   useEffect(() => {
@@ -47,17 +40,52 @@ export function StepComplete() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Save organization info when user signs in after account creation
-  useEffect(() => {
-    const saveOrganizationInfo = async () => {
-      if (!isAuthenticated || !userDid || orgSavedRef.current) return;
-      if (!data.accountCreated || data.organizationInitialized) return;
+  const createAccount = async () => {
+    setCompletionState("creating-account");
+    setError(null);
 
-      orgSavedRef.current = true;
+    try {
+      // Step 1: Create the account and sign in via cookie
+      const accountResponse = await fetch("/api/atproto/create-account", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: data.email.trim().toLowerCase(),
+          password: data.password,
+          handle: `${data.handle}.${allowedPDSDomains[0]}`,
+          inviteCode: data.inviteCode,
+          updateCookies: true,
+        }),
+      });
+
+      if (!accountResponse.ok) {
+        const errorData = await accountResponse.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || errorData.error || "Failed to create account"
+        );
+      }
+
+      const accountResult = await accountResponse.json();
+      const did = accountResult.did;
+      const handle = accountResult.handle;
+
+      if (!did) {
+        throw new Error("Account created but no DID returned");
+      }
+
+      updateData({ did, accountCreated: true });
+
+      // Step 2: Update client-side auth state if server signed us in
+      if (accountResult.signedIn) {
+        setAuth({ did, handle }, allowedPDSDomains[0]);
+      }
+
+      // Step 3: Initialize organization data on PDS
+      setCompletionState("initializing-org");
 
       try {
         await trpcClient.gainforest.organization.info.createOrUpdate.mutate({
-          did: userDid,
+          did,
           info: {
             displayName: data.organizationName,
             shortDescription: data.shortDescription,
@@ -72,55 +100,11 @@ export function StepComplete() {
         });
 
         updateData({ organizationInitialized: true });
-      } catch (err) {
-        console.error("Failed to save organization info:", err);
-        // Don't block the user - they can still access their org page and edit there
-      }
-    };
-
-    saveOrganizationInfo();
-  }, [isAuthenticated, userDid, data.accountCreated, data.organizationInitialized, data.organizationName, data.shortDescription, data.longDescription, data.country, data.startDate, data.website, updateData]);
-
-  const createAccount = async () => {
-    setCompletionState("creating-account");
-    setError(null);
-
-    try {
-      // Step 1: Create the account
-      const accountResponse = await fetch("/api/atproto/create-account", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: data.email.trim().toLowerCase(),
-          password: data.password,
-          handle: `${data.handle}.${allowedPDSDomains[0]}`,
-          inviteCode: data.inviteCode,
-        }),
-      });
-
-      if (!accountResponse.ok) {
-        const errorData = await accountResponse.json().catch(() => ({}));
-        throw new Error(
-          errorData.message || errorData.error || "Failed to create account"
-        );
+      } catch (orgErr) {
+        console.error("Failed to save organization info:", orgErr);
+        // Don't block the user — they can edit org info from their org page
       }
 
-      const accountResult = await accountResponse.json();
-      const did = accountResult.did;
-
-      if (!did) {
-        throw new Error("Account created but no DID returned");
-      }
-
-      updateData({ did, accountCreated: true });
-
-      // Step 2: Initialize organization data on PDS
-      setCompletionState("initializing-org");
-
-      // We need to sign in first to initialize the organization
-      // For now, we'll just mark this step as complete and let the user
-      // initialize their organization after signing in
-      updateData({ organizationInitialized: true });
       setCompletionState("success");
     } catch (err) {
       console.error("Account creation error:", err);
@@ -129,16 +113,6 @@ export function StepComplete() {
       );
       setCompletionState("error");
     }
-  };
-
-  const handleSignIn = () => {
-    pushModal({
-      id: SignInModalId,
-      content: (
-        <SignInModal initialHandle={`${data.handle}.${allowedPDSDomains[0]}`} />
-      ),
-    }, true);
-    show();
   };
 
   const handleRetry = () => {
@@ -250,76 +224,7 @@ export function StepComplete() {
     );
   }
 
-  // Success state - check if user is authenticated
-  if (isAuthenticated && userDid) {
-    return (
-      <motion.div
-        className="w-full max-w-md mx-auto text-center"
-        initial={{ opacity: 0, filter: "blur(10px)", scale: 0.95 }}
-        animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
-        transition={{ duration: 0.3 }}
-      >
-        <div className="flex flex-col items-center gap-4">
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="h-16 w-16 bg-green-500 blur-2xl rounded-full animate-pulse" />
-            </div>
-            <CheckCircle2 className="w-16 h-16 text-green-500" />
-          </div>
-          <div className="space-y-1">
-            <h1 className="text-2xl font-serif font-bold">
-              Welcome to GainForest!
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Your account is ready. What would you like to do?
-            </p>
-          </div>
-
-          <div className="w-full grid gap-3 mt-2">
-            <Link href={`/upload/organization/${userDid}`} className="block">
-              <Button variant="outline" className="w-full h-auto py-3">
-                <div className="flex items-center gap-3 w-full">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                    <Building2 className="w-5 h-5 text-primary" />
-                  </div>
-                  <div className="text-left flex-1">
-                    <div className="font-semibold text-sm">
-                      View My Organization
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      Complete your profile
-                    </div>
-                  </div>
-                  <ArrowRight className="w-4 h-4 text-muted-foreground" />
-                </div>
-              </Button>
-            </Link>
-
-            <Link href="/upload/bumicert" className="block">
-              <Button className="w-full h-auto py-3">
-                <div className="flex items-center gap-3 w-full">
-                  <div className="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center shrink-0">
-                    <FileText className="w-5 h-5" />
-                  </div>
-                  <div className="text-left flex-1">
-                    <div className="font-semibold text-sm">
-                      Create New Bumicert
-                    </div>
-                    <div className="text-xs opacity-80">
-                      Issue project certificates
-                    </div>
-                  </div>
-                  <ArrowRight className="w-4 h-4 opacity-80" />
-                </div>
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </motion.div>
-    );
-  }
-
-  // Success state - user needs to sign in
+  // Success state
   return (
     <motion.div
       className="w-full max-w-md mx-auto text-center"
@@ -335,27 +240,53 @@ export function StepComplete() {
           <CheckCircle2 className="w-16 h-16 text-green-500" />
         </div>
         <div className="space-y-1">
-          <h1 className="text-2xl font-serif font-bold">Account Created!</h1>
+          <h1 className="text-2xl font-serif font-bold">
+            Welcome to GainForest!
+          </h1>
           <p className="text-sm text-muted-foreground">
-            Sign in to access your organization.
+            Your account is ready. What would you like to do?
           </p>
         </div>
 
-        <div className="p-3 bg-muted/50 rounded-lg w-full">
-          <p className="text-xs text-muted-foreground mb-1">Your handle:</p>
-          <p className="text-base font-mono font-bold text-primary">
-            @{data.handle}.{allowedPDSDomains[0]}
-          </p>
+        <div className="w-full grid gap-3 mt-2">
+          <Link href={`/upload/organization/${userDid}`} className="block">
+            <Button variant="outline" className="w-full h-auto py-3">
+              <div className="flex items-center gap-3 w-full">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                  <Building2 className="w-5 h-5 text-primary" />
+                </div>
+                <div className="text-left flex-1">
+                  <div className="font-semibold text-sm">
+                    View My Organization
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Complete your profile
+                  </div>
+                </div>
+                <ArrowRight className="w-4 h-4 text-muted-foreground" />
+              </div>
+            </Button>
+          </Link>
+
+          <Link href="/upload/bumicert" className="block">
+            <Button className="w-full h-auto py-3">
+              <div className="flex items-center gap-3 w-full">
+                <div className="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center shrink-0">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div className="text-left flex-1">
+                  <div className="font-semibold text-sm">
+                    Create New Bumicert
+                  </div>
+                  <div className="text-xs opacity-80">
+                    Issue project certificates
+                  </div>
+                </div>
+                <ArrowRight className="w-4 h-4 opacity-80" />
+              </div>
+            </Button>
+          </Link>
         </div>
-
-        <Button onClick={handleSignIn} className="w-full">
-          <LogIn className="w-4 h-4 mr-2" />
-          Sign In to Continue
-        </Button>
-
-        <p className="text-xs text-muted-foreground">
-          Use the password you just created.
-        </p>
       </div>
     </motion.div>
   );

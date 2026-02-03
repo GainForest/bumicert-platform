@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import postgres from "postgres";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { climateAiSdk } from "@/config/climateai-sdk.server";
 import { env } from "process";
 
 if (!env.POSTGRES_URL_NON_POOLING_ATPROTO_AUTH_MAPPING) {
@@ -19,8 +20,10 @@ export async function POST(req: NextRequest) {
       password: string;
       handle: string;
       inviteCode: string;
+      updateCookies?: boolean;
     };
     let { email, password, handle, inviteCode } = body;
+    const { updateCookies } = body;
     email = (email ?? "").trim().toLowerCase();
     password = (password ?? "").trim();
     handle = (handle ?? "").trim();
@@ -72,7 +75,29 @@ export async function POST(req: NextRequest) {
       handle: string;
       did: string;
     };
-    return new Response(JSON.stringify(data), { status: 200 });
+
+    // Optionally sign in the user by setting auth cookies
+    let signedIn = false;
+    if (updateCookies) {
+      try {
+        const handlePrefix = handle.split(".")[0];
+        const serverCaller = climateAiSdk.getServerCaller();
+        await serverCaller.auth.login({
+          handlePrefix,
+          service: service,
+          password,
+        });
+        signedIn = true;
+      } catch (loginErr) {
+        console.error("Auto sign-in after account creation failed:", loginErr);
+        // Don't fail the request — account was already created successfully
+      }
+    }
+
+    return new Response(
+      JSON.stringify({ ...data, signedIn }),
+      { status: 200 }
+    );
   } catch (err: unknown) {
     console.error("Unexpected error:", err);
     return new Response(
