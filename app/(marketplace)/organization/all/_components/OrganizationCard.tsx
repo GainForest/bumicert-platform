@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, Globe, Leaf } from "lucide-react";
+import { Building2, BuildingIcon, Globe, Leaf } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { countries } from "@/lib/countries";
@@ -22,15 +22,15 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
         {organization.coverImageUrl && (
           <Image src={organization.coverImageUrl} alt={organization.displayName} fill className="z-0 object-cover" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-transparent"></div>
         {countryData && (
           <span className="flex items-center text-sm gap-1 absolute top-2 right-2 bg-background/50 backdrop-blur-sm rounded-full px-2 py-1">
             <span>{countryData.emoji}</span>
             {countryData.name}
           </span>
         )}
-        <div className="flex flex-col gap-2 relative z-5">
-          <div className="flex-shrink-0 w-10 h-10 rounded-full p-0.5 bg-muted flex items-center justify-center overflow-hidden">
+        <div className="flex items-center gap-2 relative z-5">
+          <div className="flex-shrink-0 w-8 h-8 rounded-full p-0.5 bg-muted flex items-center justify-center overflow-hidden">
             {organization.logoUrl ? (
               <Image
                 src={organization.logoUrl}
@@ -40,17 +40,17 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
                 className="w-full h-full object-cover rounded-full"
               />
             ) : (
-              <Building2 className="w-6 h-6 text-muted-foreground" />
+              <BuildingIcon className="w-6 h-6 text-muted-foreground" />
             )}
           </div>
-          <h3 className="font-serif font-bold text-lg text-foreground group-hover:text-primary transition-colors line-clamp-1">
+          <h3 className="font-serif font-bold text-lg text-foreground transition-colors line-clamp-1">
             {organization.displayName}
           </h3>
         </div>
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+        <p className="text-sm text-muted-foreground line-clamp-4 p-1">
           {organization.shortDescription}
         </p>
       </div>
