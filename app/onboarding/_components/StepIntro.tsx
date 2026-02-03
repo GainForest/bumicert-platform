@@ -114,7 +114,7 @@ export function StepIntro() {
               <p id="coc-description" className="text-xs text-muted-foreground">
                 Please review our{" "}
                 <Link
-                  href="/code-of-conduct"
+                  href="https://gainforest.notion.site/GainForest-Community-Code-of-Conduct-23094a2f76b380118bc0dfe560df4a2e"
                   className="text-primary hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
