@@ -6,6 +6,7 @@ const didCatcher = (callback: (did: string) => string): DidDynamicLink => {
 export const links = {
   myOrganization: (did?: string) =>
     did ? `/organization/${did}` : "/organization",
+  allOrganizations: "/organization/all",
   upload: {
     organization: didCatcher((did) => `/upload/organization/${did}`),
     projects: didCatcher((did) => `/upload/organization/${did}/projects`),
