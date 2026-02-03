@@ -14,8 +14,8 @@ import {
 } from "lucide-react";
 import SignInModal, { SignInModalId } from "./sign-in";
 import { useModal } from "@/components/ui/modal/context";
-import SignUpModal, { SignUpModalId } from "./sign-up";
 import { useAtprotoStore } from "@/components/stores/atproto";
+import { useRouter } from "next/navigation";
 
 export const AuthModalId = "auth/main";
 
@@ -52,8 +52,10 @@ const Action = ({
 };
 
 const AuthModal = () => {
-  const { pushModal } = useModal();
+  const { pushModal, hide } = useModal();
   const auth = useAtprotoStore((state) => state.auth);
+  const router = useRouter();
+
   if (auth.authenticated) {
     return (
       <ModalContent>
@@ -64,6 +66,11 @@ const AuthModal = () => {
       </ModalContent>
     );
   }
+
+  const handleSignUp = () => {
+    hide();
+    router.push("/onboarding");
+  };
 
   return (
     <ModalContent>
@@ -86,13 +93,8 @@ const AuthModal = () => {
         <Action
           Icon={UserPlusIcon}
           title="I don't have an account."
-          description="Continue to register with invite code."
-          onClick={() => {
-            pushModal({
-              id: SignUpModalId,
-              content: <SignUpModal />,
-            });
-          }}
+          description="Create a new organization account."
+          onClick={handleSignUp}
         />
       </div>
     </ModalContent>
