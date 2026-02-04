@@ -33,7 +33,7 @@ const Projects = async ({ did }: { did: string }) => {
     }
   } else {
     allProjectsData = {
-      projects: response as AllProjectsData["projects"],
+      projects: response || [],
     };
   }
 

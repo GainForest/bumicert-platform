@@ -22,6 +22,11 @@ const ProjectsPage = async ({
   const { did: encodedDid } = await params;
   const did = decodeURIComponent(encodedDid);
 
+  const pdsDomain = allowedPDSDomains[0];
+  if (!pdsDomain) {
+    return <ErrorPage error={new Error("No PDS domain configured.")} />;
+  }
+
   // Check if user is authenticated and owns this organization
   const session = await getAppSession();
 
@@ -43,7 +48,7 @@ const ProjectsPage = async ({
     const [response, error] = await tryCatch(
       apiCaller.hypercerts.claim.project.getAll({
         did,
-        pdsDomain: allowedPDSDomains[0],
+        pdsDomain,
       })
     );
     if (error) {
@@ -57,7 +62,7 @@ const ProjectsPage = async ({
       }
     } else {
       allProjectsData = {
-        projects: response as AllProjectsData["projects"],
+        projects: response,
       };
     }
   } catch (error) {

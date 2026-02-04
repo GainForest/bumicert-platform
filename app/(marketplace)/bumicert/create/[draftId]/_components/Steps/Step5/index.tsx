@@ -223,13 +223,18 @@ const Step5 = () => {
       return;
     }
 
+    if (!auth.user?.did) {
+      setCreateBumicertError("You must be signed in to publish.");
+      return;
+    }
+
     try {
       const coverImageFileGen = await toFileGenerator(
         step1FormValues.coverImage
       );
 
       const data = {
-        did: auth.user?.did ?? "",
+        did: auth.user.did,
         activity: {
           title: step1FormValues.projectName,
           shortDescription: step2FormValues.shortDescription,
@@ -237,7 +242,7 @@ const Step5 = () => {
           workScopes: step1FormValues.workType,
           startDate: step1FormValues.projectDateRange[0].toISOString(),
           endDate: step1FormValues.projectDateRange[1].toISOString(),
-          contributors: step3FormValues.contributors.map((c) => ({ identity: c })),
+          contributors: step3FormValues.contributors.map((contributor) => ({ identity: contributor })),
           locations: step3FormValues.siteBoundaries.map((sb) => ({
             $type: "com.atproto.repo.strongRef" as const,
             cid: sb.cid,

@@ -14,6 +14,8 @@ import { useAtprotoStore } from "@/components/stores/atproto";
 import { useModal } from "@/components/ui/modal/context";
 import { toBlobRefGenerator, toFileGenerator } from "gainforest-sdk/zod";
 import { trpcApi } from "@/components/providers/TrpcProvider";
+import { $Typed } from "gainforest-sdk/lex-api/utils";
+import { PubLeafletBlocksText } from "gainforest-sdk/lex-api";
 
 export const UploadLogoModalId = "upload/organization/logo";
 
@@ -51,6 +53,15 @@ export const UploadLogoModal = () => {
     if (!logo) throw new Error("Logo is required");
     if (!organizationInfo)
       throw new Error("Organization information is required");
+    
+    // temp fixes until parser is ready
+    const firstBlock = organizationInfo.longDescription?.blocks?.[0]?.block;
+    const longDescription = firstBlock?.$type === "pub.leaflet.blocks.text" 
+      ? (firstBlock as $Typed<PubLeafletBlocksText.Main>).plaintext 
+      : "";
+    
+    const shortDescription = organizationInfo.shortDescription.text 
+    
     await uploadLogo({
       did: auth.user?.did ?? "",
       uploads: {
@@ -58,8 +69,8 @@ export const UploadLogoModal = () => {
       },
       info: {
         displayName: organizationInfo.displayName,
-        shortDescription: organizationInfo.shortDescription as unknown as string,
-        longDescription: organizationInfo.longDescription as unknown as string,
+        shortDescription,
+        longDescription,
         objectives: organizationInfo.objectives,
         country: organizationInfo.country,
         visibility: organizationInfo.visibility,

@@ -34,7 +34,7 @@ const LayersPage = async ({ params }: { params: Promise<{ did: string }> }) => {
         throw new Error("An unknown error occurred.");
       }
     } else {
-      data = (response as AllLayersData) ?? [];
+      data = response || [];
     }
   } catch (error) {
     console.error(

@@ -17,17 +17,17 @@ import ErrorPage from "./error";
 const EMPTY_ORGANIZATION_DATA = {
   $type: "app.gainforest.organization.info" as const,
   displayName: "",
-  wesite: undefined,
+  website: undefined,
   logo: undefined,
   coverImage: undefined,
-  shortDescription: "",
-  longDescription: "",
+  shortDescription: { text: "", facets: [] },
+  longDescription: { blocks: []},
   objectives: [],
   startDate: "",
   country: "",
   visibility: "Public" as const,
   createdAt: new Date().toISOString(),
-} as unknown as AppGainforestOrganizationInfo.Record;
+} as  AppGainforestOrganizationInfo.Record;
 
 const OrganizationPage = async ({
   params,
@@ -61,14 +61,15 @@ const OrganizationPage = async ({
       data = (response as { value: AppGainforestOrganizationInfo.Record }).value;
     }
 
-    if ((data.visibility as string) === "Hidden") {
+    const visibility = data.visibility as string;
+    if (visibility === "Unlisted") {
       try {
         const session = await getAppSession();
         if (!session.isLoggedIn || session.did !== did) {
-          throw new Error("This organization is hidden.");
+          throw new Error("This organization is not publicly visible.");
         }
       } catch {
-        throw new Error("This organization is hidden.");
+        throw new Error("This organization is not publicly visible.");
       }
     }
   } catch (error) {

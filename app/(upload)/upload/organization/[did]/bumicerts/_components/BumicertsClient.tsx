@@ -47,8 +47,8 @@ const BumicertsClient = ({
               objectives={
                 (bumicert.claimActivity.value.workScope as { withinAnyOf?: string[] } | undefined)?.withinAnyOf ?? []
               }
-              startDate={new Date(bumicert.claimActivity.value.startDate!)}
-              endDate={new Date(bumicert.claimActivity.value.endDate!)}
+              startDate={bumicert.claimActivity.value.startDate ? new Date(bumicert.claimActivity.value.startDate) : undefined}
+              endDate={bumicert.claimActivity.value.endDate ? new Date(bumicert.claimActivity.value.endDate) : undefined}
             />
           </div>
         );

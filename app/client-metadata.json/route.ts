@@ -23,7 +23,7 @@ export async function GET() {
     redirect_uris: [`${PUBLIC_URL}/api/oauth/callback`],
     grant_types: ["authorization_code", "refresh_token"],
     response_types: ["code"],
-    scope: "atproto transition:generic",
+    scope: OAUTH_SCOPE,
     token_endpoint_auth_method: "private_key_jwt",
     token_endpoint_auth_signing_alg: "ES256",
     application_type: "web",

@@ -19,6 +19,8 @@ import { saveAppSession, Agent } from "gainforest-sdk/oauth";
  * 6. User redirected to home page
  */
 export async function GET(request: NextRequest) {
+  let success = false;
+
   try {
     const searchParams = request.nextUrl.searchParams;
 
@@ -41,12 +43,16 @@ export async function GET(request: NextRequest) {
       isLoggedIn: true,
     });
 
-    // Redirect to home page after successful authentication
-    redirect("/");
+    success = true;
   } catch (error) {
     console.error("OAuth callback error:", error);
-    // Redirect to home with error indicator
-    // TODO: Add proper error handling UI
+  }
+
+  // Redirects are outside try/catch because Next.js redirect() throws
+  // a control-flow exception that must not be caught
+  if (success) {
+    redirect("/");
+  } else {
     redirect("/?error=auth_failed");
   }
 }

@@ -38,7 +38,7 @@ const SitesPage = async ({ params }: { params: Promise<{ did: string }> }) => {
         throw new Error("An unknown error occurred.");
       }
     } else {
-      data = response as AllSitesData;
+      data = response;
     }
   } catch (error) {
     console.error(

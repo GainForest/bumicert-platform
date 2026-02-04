@@ -9,6 +9,13 @@ import { allowedPDSDomains } from "@/config/gainforest-sdk";
 const Sites = async ({ did }: { did: string }) => {
   const apiCaller = gainforestSdk.getServerCaller();
 
+  // Guard: Ensure allowedPDSDomains is configured
+  if (!allowedPDSDomains || allowedPDSDomains.length === 0) {
+    throw new Error(
+      `allowedPDSDomains is not configured. Cannot call apiCaller.hypercerts.location.getAll for did: ${did}`
+    );
+  }
+
   const [response, error] = await tryCatch(
     apiCaller.hypercerts.location.getAll({
       did,
@@ -27,7 +34,7 @@ const Sites = async ({ did }: { did: string }) => {
       throw new Error("An unknown error occurred.");
     }
   } else {
-    allSitesData = response as AllSitesData;
+    allSitesData = response;
   }
 
   const serializedInitialData = serialize(allSitesData);

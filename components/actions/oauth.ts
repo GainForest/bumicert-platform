@@ -28,7 +28,7 @@ export async function authorize(handle: string): Promise<{ authorizationUrl: str
   // Normalize the handle - add domain if not present
   const normalizedHandle = handle.includes(".")
     ? handle
-    : `${handle}.climateai.org`;
+    : `${handle}.${allowedPDSDomains[0]}`;
 
   const authUrl = await atprotoSDK.authorize(normalizedHandle);
 
@@ -52,10 +52,15 @@ export async function authorize(handle: string): Promise<{ authorizationUrl: str
  */
 export async function logout(): Promise<{ success: boolean }> {
   const session: AppSessionData = await getAppSession();
-  if (session.did) {
-    await atprotoSDK.revokeSession(session.did);
+  try {
+    if (session.did) {
+      await atprotoSDK.revokeSession(session.did);
+    }
+  } catch (error) {
+    console.error("Failed to revoke session:", error);
+  } finally {
+    await clearAppSession();
   }
-  await clearAppSession();
   return { success: true };
 }
 

@@ -5,7 +5,7 @@ import {
   createSupabaseStateStore,
 } from "gainforest-sdk/oauth";
 
-export const OAUTH_SCOPE = "atproto repo:app.gainforest.organization.info?action=create"
+export const OAUTH_SCOPE = "atproto transition:generic"
 
 // Create Supabase client with service role key (server-side only!)
 // Cast to work around version mismatch between SDK's bundled supabase and ours
@@ -20,23 +20,23 @@ const APP_ID = "bumicerts";
 /**
  * Resolves the public URL of the app from available environment variables.
  * 
- * We need to set the production url to NEXT_PUBLIC_APP_URL and for the previews we just use VERCEL_BRANCH_URL
+ * We need to set the production url to NEXT_PUBLIC_BASE_URL and for the previews we just use VERCEL_BRANCH_URL
  *
  * Priority:
- * 1. NEXT_PUBLIC_APP_URL — explicit override (local dev with ngrok, or custom config)
+ * 1. NEXT_PUBLIC_BASE_URL — explicit override (local dev with ngrok, or custom config)
  * 2. VERCEL_BRANCH_URL — stable per-branch URL for preview deploys (auto-set by Vercel)
  * 
  * Disclaimer when testing previews only works with the branch name preview and not with the commit name preview
  */
 export const resolvePublicUrl = (): string => {
-  if (process.env.NEXT_PUBLIC_APP_URL) {
-    return process.env.NEXT_PUBLIC_APP_URL;
+  if (process.env.NEXT_PUBLIC_BASE_URL) {
+    return process.env.NEXT_PUBLIC_BASE_URL;
   }
   if (process.env.VERCEL_BRANCH_URL) {
     return `https://${process.env.VERCEL_BRANCH_URL}`;
   }
   throw new Error(
-    "Set NEXT_PUBLIC_APP_URL, or deploy to Vercel (provides VERCEL_PROJECT_PRODUCTION_URL / VERCEL_BRANCH_URL automatically)"
+    "Set NEXT_PUBLIC_BASE_URL, or deploy to Vercel (provides VERCEL_PROJECT_PRODUCTION_URL / VERCEL_BRANCH_URL automatically)"
   );
 };
 
@@ -59,7 +59,7 @@ export const atprotoSDK = createATProtoSDK({
     redirectUri: `${PUBLIC_URL}/api/oauth/callback`,
     jwksUri: `${PUBLIC_URL}/.well-known/jwks.json`,
     jwkPrivate: process.env.ATPROTO_JWK_PRIVATE!,
-    scope: "atproto transition:generic",
+    scope: OAUTH_SCOPE,
   },
   servers: {
     pds: "https://climateai.org",

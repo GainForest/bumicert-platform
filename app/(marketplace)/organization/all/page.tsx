@@ -60,7 +60,7 @@ const AllOrganizationsPage = async () => {
     .map((org) => ({
       did: org.repo.did,
       displayName: org.organizationInfo.displayName,
-      shortDescription: org.organizationInfo.shortDescription as unknown as string,
+      shortDescription: org.organizationInfo.shortDescription.text,
       logoUrl: getSmallImageUrl(org.repo.did, org.organizationInfo.logo),
       coverImageUrl: getSmallImageUrl(org.repo.did, org.organizationInfo.coverImage),
       country: org.organizationInfo.country,

@@ -13,6 +13,7 @@ import { BumicertArt } from "@/app/(marketplace)/bumicert/create/[draftId]/_comp
 import { parseAtUri } from "gainforest-sdk/utilities/atproto";
 import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { links } from "@/lib/links";
+import { getWorkScopeItems } from "@/lib/bumicert";
 
 const StripedDiv = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -63,9 +64,9 @@ const BumicertCard = ({ bumicert }: { bumicert: Bumicert }) => {
           logoUrl={bumicert.organizationInfo.logoUrl}
           coverImage={imageUrl}
           title={bumicert.claimActivity.value.title}
-          objectives={(bumicert.claimActivity.value.workScope as { withinAnyOf?: string[] } | undefined)?.withinAnyOf ?? []}
-          startDate={new Date(bumicert.claimActivity.value.startDate!)}
-          endDate={new Date(bumicert.claimActivity.value.endDate!)}
+          objectives={getWorkScopeItems(bumicert.claimActivity.value.workScope)}
+          startDate={bumicert.claimActivity.value.startDate ? new Date(bumicert.claimActivity.value.startDate) : undefined}
+          endDate={bumicert.claimActivity.value.endDate ? new Date(bumicert.claimActivity.value.endDate) : undefined}
         />
       </Link>
     </motion.div>
