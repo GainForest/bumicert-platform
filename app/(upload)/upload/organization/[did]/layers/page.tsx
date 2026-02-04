@@ -1,6 +1,5 @@
 import Container from "@/components/ui/container";
 import { gainforestSdk } from "@/config/gainforest-sdk.server";
-import { atprotoSDK } from "@/lib/atproto";
 import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { tryCatch } from "@/lib/tryCatch";
 import { TRPCError } from "@trpc/server";
@@ -15,7 +14,7 @@ const LayersPage = async ({ params }: { params: Promise<{ did: string }> }) => {
   const { did: encodedDid } = await params;
   const did = decodeURIComponent(encodedDid);
 
-  const serverCaller = gainforestSdk.getServerCaller(atprotoSDK);
+  const serverCaller = gainforestSdk.getServerCaller();
   const [response, error] = await tryCatch(
     serverCaller.gainforest.organization.layer.getAll({
       did,

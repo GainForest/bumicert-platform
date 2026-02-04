@@ -51,6 +51,10 @@ export async function authorize(handle: string): Promise<{ authorizationUrl: str
  * ```
  */
 export async function logout(): Promise<{ success: boolean }> {
+  const session: AppSessionData = await getAppSession();
+  if (session.did) {
+    await atprotoSDK.revokeSession(session.did);
+  }
   await clearAppSession();
   return { success: true };
 }

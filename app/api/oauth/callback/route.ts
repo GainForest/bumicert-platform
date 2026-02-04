@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { redirect } from "next/navigation";
 import { atprotoSDK } from "@/lib/atproto";
-import { saveAppSession } from "gainforest-sdk/oauth";
+import { saveAppSession, Agent } from "gainforest-sdk/oauth";
 
 /**
  * OAuth 2.0 Callback endpoint.
@@ -14,8 +14,9 @@ import { saveAppSession } from "gainforest-sdk/oauth";
  * 1. ATProto auth server redirects here with ?code=...&state=...
  * 2. SDK exchanges code for tokens (with PKCE verification)
  * 3. OAuth session (tokens, DPoP keys) stored in Supabase
- * 4. App session (DID, handle) saved to encrypted cookie
- * 5. User redirected to home page
+ * 4. Handle resolved from DID via identity resolution
+ * 5. App session (DID, handle) saved to encrypted cookie
+ * 6. User redirected to home page
  */
 export async function GET(request: NextRequest) {
   try {
@@ -25,14 +26,18 @@ export async function GET(request: NextRequest) {
     // This validates the state, verifies PKCE, and stores tokens in Supabase
     const session = await atprotoSDK.callback(searchParams);
 
-    // The session has `did` property (DID of the authenticated user)
-    // Handle is resolved from the DID when needed
-    const did = session.did;
+    // Resolve handle from DID -- OAuthSession only has sub/did, NOT handle
+    // Using describeRepo since climateai.org PDS doesn't support resolveIdentity
+    const agent = new Agent(session);
+    const { data: repo } = await agent.com.atproto.repo.describeRepo({
+      repo: session.did,
+    });
 
-    // Save user identity to encrypted cookie for subsequent requests
-    // Handle will be resolved later when displaying user info
+    // Save user identity (DID + handle) to encrypted cookie so no async
+    // resolution is needed on subsequent page loads
     await saveAppSession({
-      did,
+      did: session.did,
+      handle: repo.handle,
       isLoggedIn: true,
     });
 

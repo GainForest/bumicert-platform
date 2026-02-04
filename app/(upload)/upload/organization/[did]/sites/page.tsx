@@ -3,7 +3,6 @@ import SitesHeaderContent from "./HeaderContent";
 import Container from "@/components/ui/container";
 import SitesClient, { AllSitesData } from "../_components/Sites/SitesClient";
 import { gainforestSdk } from "@/config/gainforest-sdk.server";
-import { atprotoSDK } from "@/lib/atproto";
 import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { serialize } from "gainforest-sdk/utilities/transform";
 import { tryCatch } from "@/lib/tryCatch";
@@ -14,7 +13,7 @@ const SitesPage = async ({ params }: { params: Promise<{ did: string }> }) => {
   const { did: encodedDid } = await params;
   const did = decodeURIComponent(encodedDid);
 
-  const serverCaller = gainforestSdk.getServerCaller(atprotoSDK);
+  const serverCaller = gainforestSdk.getServerCaller();
   const [response, error] = await tryCatch(
     serverCaller.hypercerts.location.getAll({
       did: did,

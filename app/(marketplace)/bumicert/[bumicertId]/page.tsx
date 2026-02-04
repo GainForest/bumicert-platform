@@ -6,7 +6,6 @@ import WidgetItem from "./_components/Widgets/WidgetItem";
 import Body from "./_components/Body";
 import HeaderContent from "./_components/HeaderContent";
 import { gainforestSdk } from "@/config/gainforest-sdk.server";
-import { atprotoSDK } from "@/lib/atproto";
 import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { tryCatch } from "@/lib/tryCatch";
 import { TRPCError } from "@trpc/server";
@@ -28,7 +27,7 @@ const BumicertPage = async ({
 
   const [did, rkey] = parsedBumicertId;
 
-  const caller = gainforestSdk.getServerCaller(atprotoSDK);
+  const caller = gainforestSdk.getServerCaller();
   const [bumicertResponses, bumicertFetchError] = await tryCatch(
     Promise.all([
       caller.gainforest.organization.info.get({

@@ -14,7 +14,6 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getAppSession } from "gainforest-sdk/oauth";
-import { atprotoSDK } from "@/lib/atproto";
 import { serialize } from "gainforest-sdk/utilities/transform";
 import { gainforestSdk } from "@/config/gainforest-sdk.server";
 import { allowedPDSDomains } from "@/config/gainforest-sdk";
@@ -44,7 +43,7 @@ const OrganizationPage = async ({
   const { did: encodedDid } = await params;
   const did = decodeURIComponent(encodedDid);
 
-  const apiCaller = gainforestSdk.getServerCaller(atprotoSDK);
+  const apiCaller = gainforestSdk.getServerCaller();
   const [response, error] = await tryCatch(
     apiCaller.gainforest.organization.info.get({
       did,

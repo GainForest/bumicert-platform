@@ -1,7 +1,6 @@
 import Container from "@/components/ui/container";
 import React from "react";
 import { getAppSession } from "gainforest-sdk/oauth";
-import { atprotoSDK } from "@/lib/atproto";
 import { redirect } from "next/navigation";
 import ProjectsClient, {
   AllProjectsData,
@@ -31,7 +30,7 @@ const ProjectsPage = async ({
     redirect(`/organization/${encodeURIComponent(did)}`);
   }
 
-  const apiCaller = gainforestSdk.getServerCaller(atprotoSDK);
+  const apiCaller = gainforestSdk.getServerCaller();
 
   // Placeholder API call - replace with actual endpoint when available
   // For now, gracefully handle if the endpoint doesn't exist

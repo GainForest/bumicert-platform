@@ -5,7 +5,7 @@ import Image from "next/image";
 import { ProgressiveBlur } from "@/components/ui/progressive-blur";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { allowedPDSDomains } from "@/config/gainforest-sdk";
-import { getBlobUrl } from "gainforest-sdk/utilities/atproto";
+import { getBlobUrl } from "gainforest-sdk/utilities";
 import { Loader2, UploadIcon } from "lucide-react";
 import { trpcApi } from "@/components/providers/TrpcProvider";
 import { useModal } from "@/components/ui/modal/context";

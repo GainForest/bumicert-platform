@@ -2,7 +2,6 @@ import React from "react";
 import BumicertsHeaderContent from "./HeaderContent";
 import Container from "@/components/ui/container";
 import { gainforestSdk } from "@/config/gainforest-sdk.server";
-import { atprotoSDK } from "@/lib/atproto";
 import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { serialize } from "gainforest-sdk/utilities/transform";
 import BumicertsClient from "./_components/BumicertsClient";
@@ -18,7 +17,7 @@ const BumicertsPage = async ({
 }) => {
   const { did: encodedDid } = await params;
   const did = decodeURIComponent(encodedDid);
-  const serverCaller = gainforestSdk.getServerCaller(atprotoSDK);
+  const serverCaller = gainforestSdk.getServerCaller();
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let activitiesResponse: any;

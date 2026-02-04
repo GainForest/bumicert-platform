@@ -46,7 +46,7 @@
     "bignumber.js": "^9.3.1",
     "blo": "^2.0.0",
     "class-variance-authority": "^0.7.1",
-    "gainforest-sdk": "file:./gainforest-sdk-nextjs-0.1.0.tgz",
+    "gainforest-sdk": "file:./vendor/gainforest-sdk-nextjs-0.1.0.tgz",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",

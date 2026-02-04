@@ -1,15 +1,15 @@
 import Container from "@/components/ui/container";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
-import { climateAiSdk } from "@/config/climateai-sdk.server";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
+import { gainforestSdk } from "@/config/gainforest-sdk.server";
 import { tryCatch } from "@/lib/tryCatch";
-import { serialize } from "climateai-sdk/utilities/transform";
-import { getBlobUrl } from "climateai-sdk/utilities/atproto";
+import { serialize } from "gainforest-sdk/utilities/transform";
+import { getBlobUrl } from "gainforest-sdk/utilities/atproto";
 import AllOrganizationsClient from "./_components/AllOrganizationsClient";
 import HeaderContent from "./_components/HeaderContent";
 import { Suspense } from "react";
-import { AppGainforestCommonDefs } from "climateai-sdk/lex-api";
+import { OrgHypercertsDefs } from "gainforest-sdk/lex-api";
 
-type SmallImage = AppGainforestCommonDefs.SmallImage;
+type SmallImage = OrgHypercertsDefs.SmallImage;
 
 export type OrganizationWithBumicertCount = {
   did: string;
@@ -28,7 +28,7 @@ export type AllOrganizationsPageData = {
 };
 
 const AllOrganizationsPage = async () => {
-  const apiCaller = climateAiSdk.getServerCaller();
+  const apiCaller = gainforestSdk.getServerCaller();
   const [response, error] = await tryCatch(
     apiCaller.hypercerts.claim.activity.getAllAcrossOrgs({
       pdsDomain: allowedPDSDomains[0],
@@ -60,7 +60,7 @@ const AllOrganizationsPage = async () => {
     .map((org) => ({
       did: org.repo.did,
       displayName: org.organizationInfo.displayName,
-      shortDescription: org.organizationInfo.shortDescription,
+      shortDescription: org.organizationInfo.shortDescription as unknown as string,
       logoUrl: getSmallImageUrl(org.repo.did, org.organizationInfo.logo),
       coverImageUrl: getSmallImageUrl(org.repo.did, org.organizationInfo.coverImage),
       country: org.organizationInfo.country,

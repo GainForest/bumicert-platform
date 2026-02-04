@@ -1,5 +1,4 @@
 import { gainforestSdk } from "@/config/gainforest-sdk.server";
-import { atprotoSDK } from "@/lib/atproto";
 import React from "react";
 import ProjectsClient, {
   AllProjectsData,
@@ -11,7 +10,7 @@ import { serialize } from "gainforest-sdk/utilities/transform";
 import { allowedPDSDomains } from "@/config/gainforest-sdk";
 
 const Projects = async ({ did }: { did: string }) => {
-  const apiCaller = gainforestSdk.getServerCaller(atprotoSDK);
+  const apiCaller = gainforestSdk.getServerCaller();
 
   // Placeholder API call - replace with actual endpoint when available
   // For now, gracefully handle if the endpoint doesn't exist

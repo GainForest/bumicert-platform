@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import {
   deserialize,
   SerializedSuperjson,
-} from "climateai-sdk/utilities/transform";
+} from "gainforest-sdk/utilities/transform";
 import { Input } from "@/components/ui/input";
 import {
   Select,

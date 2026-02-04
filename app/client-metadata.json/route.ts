@@ -1,7 +1,5 @@
-import { OAUTH_SCOPE } from "@/lib/atproto";
+import { OAUTH_SCOPE, resolvePublicUrl } from "@/lib/atproto";
 import { NextResponse } from "next/server";
-
-const PUBLIC_URL = process.env.NEXT_PUBLIC_APP_URL!;
 
 /**
  * OAuth 2.0 Client Metadata endpoint.
@@ -14,6 +12,7 @@ const PUBLIC_URL = process.env.NEXT_PUBLIC_APP_URL!;
  * @see https://atproto.com/specs/oauth
  */
 export async function GET() {
+  const PUBLIC_URL = resolvePublicUrl();
   const metadata = {
     client_id: `${PUBLIC_URL}/client-metadata.json`,
     client_name: "Bumicerts",

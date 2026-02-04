@@ -1,7 +1,6 @@
 import Container from "@/components/ui/container";
 import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { gainforestSdk } from "@/config/gainforest-sdk.server";
-import { atprotoSDK } from "@/lib/atproto";
 import { tryCatch } from "@/lib/tryCatch";
 import { TRPCError } from "@trpc/server";
 import { AppGainforestOrganizationInfo } from "gainforest-sdk/lex-api";
@@ -38,7 +37,7 @@ const OrganizationPage = async ({
   const { did: encodedDid } = await params;
   const did = decodeURIComponent(encodedDid);
 
-  const apiCaller = gainforestSdk.getServerCaller(atprotoSDK);
+  const apiCaller = gainforestSdk.getServerCaller();
   const [response, error] = await tryCatch(
     apiCaller.gainforest.organization.info.get({
       did,

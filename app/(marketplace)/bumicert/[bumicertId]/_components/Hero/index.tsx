@@ -107,15 +107,28 @@ const Hero = ({
               <div className="w-full">
                 <span className="rounded-full px-2 py-0.5 text-sm font-medium shrink-0 inline-flex items-center gap-1">
                   <Calendar className="size-4 mr-1 opacity-50" />
-                  <TimeText
-                    format="absolute-date"
-                    date={new Date(bumicert.startDate!)}
-                  />{" "}
-                  <ArrowRight className="size-3" />{" "}
-                  <TimeText
-                    format="absolute-date"
-                    date={new Date(bumicert.endDate!)}
-                  />
+                  {bumicert.startDate ? (
+                    <TimeText
+                      format="absolute-date"
+                      date={new Date(bumicert.startDate)}
+                    />
+                  ) : (
+                    <span>—</span>
+                  )}
+                  {bumicert.startDate && bumicert.endDate && (
+                    <>
+                      {" "}
+                      <ArrowRight className="size-3" />{" "}
+                    </>
+                  )}
+                  {bumicert.endDate ? (
+                    <TimeText
+                      format="absolute-date"
+                      date={new Date(bumicert.endDate)}
+                    />
+                  ) : (
+                    <span>—</span>
+                  )}
                 </span>
 
                 <div className="w-full overflow-x-auto scrollbar-hidden mask-r-from-90% mt-4">
