@@ -101,18 +101,21 @@ export async function POST(req: NextRequest) {
     );
 
     if (!response.ok) {
-      const error = await response.json();
+      const error = await response.json().catch(() => null);
       console.error("Password reset failed:", error);
 
-      // Return generic error message for all token-related errors
-      // This prevents enumeration of valid tokens
+      const isServerError = response.status >= 500;
       return new Response(
         JSON.stringify({
-          error: "InvalidToken",
-          message:
-            "Invalid or expired reset code. Please request a new password reset.",
+          error: isServerError ? "ResetUnavailable" : "InvalidToken",
+          message: isServerError
+            ? "Password reset service is temporarily unavailable. Please try again later."
+            : "Invalid or expired reset code. Please request a new password reset.",
         }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
+        {
+          status: isServerError ? 502 : 400,
+          headers: { "Content-Type": "application/json" },
+        }
       );
     }
 

@@ -94,6 +94,7 @@ export const LayerEditorModal = ({ initialData }: LayerEditorModalProps) => {
 
   const isCompleted = false; // Will be state when feature is enabled
   const isPending = false;
+  // TODO: When the mutation is restored, use `error.message` instead of `String(error)` below
   const error = null;
   const isFeatureDisabled = true; // Remove this when SDK supports layer.createOrUpdate
 

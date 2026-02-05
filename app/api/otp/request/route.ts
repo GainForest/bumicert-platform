@@ -70,6 +70,9 @@ export async function POST(req: NextRequest) {
 
     const { email, purpose, metadata } = parseResult.data;
 
+    // Record IP attempt early to count all requests (even invalid emails)
+    await recordRateLimitAttempt(`ip:${clientIp}`, "otp-request");
+
     // 3. Check email-based rate limit
     const emailLimit = await checkRateLimit(
       `email:${email}`,
@@ -85,8 +88,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // 4. Record rate limit attempts
-    await recordRateLimitAttempt(`ip:${clientIp}`, "otp-request");
+    // 4. Record email attempt only for valid, non-limited emails
     await recordRateLimitAttempt(`email:${email}`, "otp-request");
 
     const supabase = getSupabaseAdmin();
@@ -102,12 +104,19 @@ export async function POST(req: NextRequest) {
     }
 
     // 5. Invalidate previous pending OTPs for this email+purpose
-    await supabase
+    const { error: invalidateError } = await supabase
       .from("email_otps")
       .update({ verified_at: new Date().toISOString() })
       .eq("email", email)
       .eq("purpose", purpose)
       .is("verified_at", null);
+
+    if (invalidateError) {
+      console.warn(
+        "[OTP Request] Failed to invalidate previous OTPs:",
+        invalidateError
+      );
+    }
 
     // 6. Generate and store new OTP
     const code = generateOtp();

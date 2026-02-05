@@ -76,6 +76,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Record IP attempt early to count all requests (even invalid emails)
+    await recordRateLimitAttempt(`ip:${clientIp}`, "request-password-reset");
+
     // 2. Check email-based rate limit
     const emailLimit = await checkRateLimit(
       `email:${email}`,
@@ -96,8 +99,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 3. Record the attempt BEFORE calling PDS
-    await recordRateLimitAttempt(`ip:${clientIp}`, "request-password-reset");
+    // 3. Record email attempt only for valid, non-limited emails
     await recordRateLimitAttempt(`email:${email}`, "request-password-reset");
 
     const service = allowedPDSDomains[0];
