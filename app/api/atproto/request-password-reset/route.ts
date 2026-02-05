@@ -1,5 +1,11 @@
 import { NextRequest } from "next/server";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
+import {
+  checkRateLimit,
+  recordRateLimitAttempt,
+  getClientIp,
+  RATE_LIMITS,
+} from "@/lib/rate-limit";
 
 /**
  * POST /api/atproto/request-password-reset
@@ -7,11 +13,43 @@ import { allowedPDSDomains } from "@/config/climateai-sdk";
  * Initiates a password reset by sending an email with a reset token to the user.
  * Proxies to: com.atproto.server.requestPasswordReset
  *
+ * Security measures:
+ * - Rate limited by IP (10 requests per hour)
+ * - Rate limited by email (3 requests per 15 minutes)
+ * - Always returns generic success message to prevent user enumeration
+ *
  * Request body: { email: string }
- * Response: 200 OK (empty body on success)
+ * Response: 200 OK with generic success message
  */
 export async function POST(req: NextRequest) {
   try {
+    const clientIp = getClientIp(req.headers);
+
+    // 1. Check IP-based rate limit first (fail fast)
+    const ipLimit = await checkRateLimit(
+      `ip:${clientIp}`,
+      "request-password-reset",
+      RATE_LIMITS.passwordResetRequest.byIp
+    );
+
+    if (!ipLimit.allowed) {
+      return new Response(
+        JSON.stringify({
+          error: "TooManyRequests",
+          message: "Too many requests. Please try again later.",
+        }),
+        {
+          status: 429,
+          headers: {
+            "Content-Type": "application/json",
+            "Retry-After": Math.ceil(
+              (ipLimit.resetAt.getTime() - Date.now()) / 1000
+            ).toString(),
+          },
+        }
+      );
+    }
+
     const body = (await req.json()) as { email?: string };
     let { email } = body;
     email = (email ?? "").trim().toLowerCase();
@@ -38,6 +76,30 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // 2. Check email-based rate limit
+    const emailLimit = await checkRateLimit(
+      `email:${email}`,
+      "request-password-reset",
+      RATE_LIMITS.passwordResetRequest.byEmail
+    );
+
+    if (!emailLimit.allowed) {
+      // Still return generic message to avoid enumeration
+      // but don't actually call the PDS
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message:
+            "If an account exists with this email, a password reset code has been sent.",
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // 3. Record the attempt BEFORE calling PDS
+    await recordRateLimitAttempt(`ip:${clientIp}`, "request-password-reset");
+    await recordRateLimitAttempt(`email:${email}`, "request-password-reset");
+
     const service = allowedPDSDomains[0];
 
     const response = await fetch(
@@ -52,25 +114,25 @@ export async function POST(req: NextRequest) {
     if (!response.ok) {
       const error = await response.json();
       console.error("Password reset request failed:", error);
-      return new Response(JSON.stringify(error), {
-        status: response.status,
-        headers: { "Content-Type": "application/json" },
-      });
+      // DON'T expose the error - always return generic success
+      // This prevents user enumeration attacks
     }
 
-    // Return success (PDS will send the email)
-    return new Response(JSON.stringify({ success: true }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    // 4. Always return generic success (prevents user enumeration)
+    return new Response(
+      JSON.stringify({
+        success: true,
+        message:
+          "If an account exists with this email, a password reset code has been sent.",
+      }),
+      { status: 200, headers: { "Content-Type": "application/json" } }
+    );
   } catch (err: unknown) {
     console.error("Unexpected error in request-password-reset:", err);
     return new Response(
       JSON.stringify({
         error: "InternalServerError",
-        message:
-          (err as Record<string, string>)?.message ||
-          "Unexpected error occurred",
+        message: "An unexpected error occurred. Please try again later.",
       }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );

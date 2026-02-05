@@ -49,6 +49,7 @@ const SaveAsDraftModal = () => {
   const setDraftCoverImageHash = useFormStore(
     (state) => state.setDraftCoverImageHash
   );
+  const markAsSaved = useFormStore((state) => state.markAsSaved);
   const formCompletionPercentages = useFormStore(
     (state) => state.formCompletionPercentages
   );
@@ -144,6 +145,9 @@ const SaveAsDraftModal = () => {
       return { result, isUpdate, draftId: draftId ?? 0, newCoverImageHash };
     },
     onSuccess: async (data) => {
+      // Mark form as saved (clears dirty state for beforeunload warning)
+      markAsSaved();
+      
       if (data.newCoverImageHash) {
         setDraftCoverImageHash(data.newCoverImageHash);
       }
@@ -159,7 +163,10 @@ const SaveAsDraftModal = () => {
         });
       }
 
+      // For new drafts, show success message briefly before redirecting
       if (savedDraftId && data.draftId !== savedDraftId) {
+        // Wait 1.5 seconds so user can see the success message
+        await new Promise((resolve) => setTimeout(resolve, 1500));
         await hide();
         popModal();
         router.push(links.bumicert.createWithDraftId(savedDraftId.toString()));

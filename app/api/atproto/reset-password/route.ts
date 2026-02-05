@@ -1,5 +1,11 @@
 import { NextRequest } from "next/server";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
+import {
+  checkRateLimit,
+  recordRateLimitAttempt,
+  getClientIp,
+  RATE_LIMITS,
+} from "@/lib/rate-limit";
 
 /**
  * POST /api/atproto/reset-password
@@ -7,12 +13,46 @@ import { allowedPDSDomains } from "@/config/climateai-sdk";
  * Resets a user's password using the token received via email.
  * Proxies to: com.atproto.server.resetPassword
  *
+ * Security measures:
+ * - Rate limited by IP (10 attempts per 15 minutes)
+ * - Returns generic error message for all token-related errors
+ *
  * Request body: { token: string, password: string }
  * Response: 200 OK on success
- * Errors: 400 (InvalidRequest | ExpiredToken | InvalidToken)
+ * Errors: 400 (generic), 429 (rate limited)
  */
 export async function POST(req: NextRequest) {
   try {
+    const clientIp = getClientIp(req.headers);
+
+    // 1. Check IP-based rate limit
+    const ipLimit = await checkRateLimit(
+      `ip:${clientIp}`,
+      "reset-password",
+      RATE_LIMITS.passwordReset.byIp
+    );
+
+    if (!ipLimit.allowed) {
+      return new Response(
+        JSON.stringify({
+          error: "TooManyRequests",
+          message: "Too many attempts. Please try again later.",
+        }),
+        {
+          status: 429,
+          headers: {
+            "Content-Type": "application/json",
+            "Retry-After": Math.ceil(
+              (ipLimit.resetAt.getTime() - Date.now()) / 1000
+            ).toString(),
+          },
+        }
+      );
+    }
+
+    // 2. Record the attempt
+    await recordRateLimitAttempt(`ip:${clientIp}`, "reset-password");
+
     const body = (await req.json()) as { token?: string; password?: string };
     let { token, password } = body;
     token = (token ?? "").trim();
@@ -64,25 +104,15 @@ export async function POST(req: NextRequest) {
       const error = await response.json();
       console.error("Password reset failed:", error);
 
-      // Map PDS error codes to user-friendly messages
-      let userMessage = error.message || "Failed to reset password";
-      if (error.error === "ExpiredToken") {
-        userMessage =
-          "This reset code is invalid. Please request a new password reset.";
-      } else if (error.error === "InvalidToken") {
-        userMessage =
-          "This reset code is invalid. Please request a new password reset.";
-      }
-
+      // Return generic error message for all token-related errors
+      // This prevents enumeration of valid tokens
       return new Response(
         JSON.stringify({
-          ...error,
-          message: userMessage,
+          error: "InvalidToken",
+          message:
+            "Invalid or expired reset code. Please request a new password reset.",
         }),
-        {
-          status: response.status,
-          headers: { "Content-Type": "application/json" },
-        }
+        { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
@@ -96,9 +126,7 @@ export async function POST(req: NextRequest) {
     return new Response(
       JSON.stringify({
         error: "InternalServerError",
-        message:
-          (err as Record<string, string>)?.message ||
-          "Unexpected error occurred",
+        message: "An unexpected error occurred. Please try again later.",
       }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
