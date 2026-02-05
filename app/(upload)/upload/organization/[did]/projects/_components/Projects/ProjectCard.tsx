@@ -43,7 +43,7 @@ const ProjectCard = ({ projectData, did }: ProjectCardProps) => {
             <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
               {project.description.blocks.map((doc) => {
                 const block = doc.block;
-                if (block.$type === "pub.leaflet.blocks#text") {
+                if (block.$type === "pub.leaflet.blocks.text") {
                   const typedBlock = block as $Typed<PubLeafletBlocksText.Main>;
                   return typedBlock.plaintext;
                 }

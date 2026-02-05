@@ -91,12 +91,16 @@ const AboutOrganization = ({
         </div>
       ) : (
         <p className="text-justify mt-2">
-          {(data.longDescription as unknown as string) === "" ? (
+          {data.longDescription.blocks.length === 0 ? (
             <span className="text-muted-foreground">
               No long description provided.
             </span>
           ) : (
-            (data.longDescription as unknown as string)
+            // temp solution for now until parser is ready
+            data.longDescription.blocks.map((block) => {
+              const typedBlock = block.block as $Typed<PubLeafletBlocksText.Main>;
+              return typedBlock?.plaintext || "";
+            }).join("\n\n")
           )}
         </p>
       )}

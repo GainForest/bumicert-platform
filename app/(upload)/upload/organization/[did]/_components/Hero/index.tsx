@@ -71,7 +71,7 @@ const Hero = ({
   useEffect(() => {
     setEditingData({
       displayName: data.displayName,
-      shortDescription: data.shortDescription as unknown as string,
+      shortDescription: data?.shortDescription?.text || "",
       coverImage: data.coverImage ? data.coverImage.image : undefined,
       logoImage: data.logo ? data.logo.image : undefined,
     });
@@ -256,7 +256,7 @@ const Hero = ({
               editable={isEditing}
               multiline={true}
               value={
-                isEditing ? editingData.shortDescription : (data.shortDescription as unknown as string)
+                isEditing ? editingData.shortDescription : (data?.shortDescription?.text || "")
               }
               onChange={(value: string) => {
                 console.log(value);
