@@ -131,7 +131,7 @@ const BumicertPreviewCard = () => {
   const isLoadingOrganizationInfo = isPendingOrganizationInfo || isOlderData;
 
   const isBumicertArtReady =
-    coverImage && title && objectives;
+    coverImage && title && objectives.length;
 
   return (
     <div className="rounded-xl border border-primary/10 shadow-lg overflow-hidden bg-primary/10 flex flex-col">

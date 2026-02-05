@@ -60,7 +60,7 @@ export const UploadLogoModal = () => {
       ? (firstBlock as $Typed<PubLeafletBlocksText.Main>).plaintext 
       : "";
     
-    const shortDescription = organizationInfo.shortDescription.text 
+    const shortDescription = organizationInfo?.shortDescription?.text || ""; 
     
     await uploadLogo({
       did: auth.user?.did ?? "",

@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useMemo } from "react";
-import type { AppGainforestOrganizationInfo } from "gainforest-sdk/lex-api";
+import type { AppGainforestOrganizationInfo, PubLeafletBlocksText } from "gainforest-sdk/lex-api";
 import { useOrganizationPageStore } from "../../store";
 import { Textarea } from "@/components/ui/textarea";
 import useHydratedData from "@/hooks/use-hydration";
@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { CircleAlert } from "lucide-react";
 import QuickTooltip from "@/components/ui/quick-tooltip";
 import { Button } from "@/components/ui/button";
+import { $Typed } from "gainforest-sdk/lex-api/utils";
 
 const AboutOrganization = ({
   initialData,
@@ -42,8 +43,12 @@ const AboutOrganization = ({
   }, [editingData.longDescription, isEditing]);
 
   useEffect(() => {
+    const firstBlock = data.longDescription?.blocks?.[0]?.block;
+    const longDescription = firstBlock?.$type === "pub.leaflet.blocks.text" 
+      ? (firstBlock as $Typed<PubLeafletBlocksText.Main>).plaintext 
+      : "";
     setEditingData({
-      longDescription: data.longDescription as unknown as string,
+      longDescription,
     });
   }, [isEditing, data]);
 

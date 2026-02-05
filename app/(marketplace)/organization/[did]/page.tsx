@@ -1,3 +1,8 @@
+import AboutOrganization from "@/app/(upload)/upload/organization/[did]/_components/AboutOrganization";
+import Hero from "@/app/(upload)/upload/organization/[did]/_components/Hero";
+import SectionForData from "@/app/(upload)/upload/organization/[did]/_components/SectionForData";
+import SubHero from "@/app/(upload)/upload/organization/[did]/_components/SubHero";
+import { OrganizationPageHydrator } from "@/app/(upload)/upload/organization/[did]/hydrator";
 import Container from "@/components/ui/container";
 import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { gainforestSdk } from "@/config/gainforest-sdk.server";
@@ -7,11 +12,6 @@ import { AppGainforestOrganizationInfo } from "gainforest-sdk/lex-api";
 import { getAppSession } from "gainforest-sdk/oauth";
 import { serialize } from "gainforest-sdk/utilities/transform";
 import HeaderContent from "./_components/HeaderContent";
-import Hero from "@/app/(upload)/upload/organization/[did]/_components/Hero";
-import SubHero from "@/app/(upload)/upload/organization/[did]/_components/SubHero";
-import AboutOrganization from "@/app/(upload)/upload/organization/[did]/_components/AboutOrganization";
-import SectionForData from "@/app/(upload)/upload/organization/[did]/_components/SectionForData";
-import { OrganizationPageHydrator } from "@/app/(upload)/upload/organization/[did]/hydrator";
 import ErrorPage from "./error";
 
 const EMPTY_ORGANIZATION_DATA = {
@@ -58,7 +58,7 @@ const OrganizationPage = async ({
         throw new Error("An unknown error occurred.");
       }
     } else {
-      data = (response as { value: AppGainforestOrganizationInfo.Record }).value;
+      data = response.value;
     }
 
     const visibility = data.visibility as string;

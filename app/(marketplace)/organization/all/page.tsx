@@ -2,12 +2,12 @@ import Container from "@/components/ui/container";
 import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { gainforestSdk } from "@/config/gainforest-sdk.server";
 import { tryCatch } from "@/lib/tryCatch";
-import { serialize } from "gainforest-sdk/utilities/transform";
+import { OrgHypercertsDefs } from "gainforest-sdk/lex-api";
 import { getBlobUrl } from "gainforest-sdk/utilities/atproto";
+import { serialize } from "gainforest-sdk/utilities/transform";
+import { Suspense } from "react";
 import AllOrganizationsClient from "./_components/AllOrganizationsClient";
 import HeaderContent from "./_components/HeaderContent";
-import { Suspense } from "react";
-import { OrgHypercertsDefs } from "gainforest-sdk/lex-api";
 
 type SmallImage = OrgHypercertsDefs.SmallImage;
 

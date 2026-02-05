@@ -1,24 +1,20 @@
 import Container from "@/components/ui/container";
-import React from "react";
-import Hero from "./_components/Hero";
-import SubHero from "./_components/SubHero";
-import AboutOrganization from "./_components/AboutOrganization";
-import { AppGainforestOrganizationInfo } from "gainforest-sdk/lex-api";
-import HeaderContent from "./_components/HeaderContent";
-import { OrganizationPageHydrator } from "./hydrator";
-import Sites from "./_components/Sites";
-import Projects from "./projects/_components/Projects";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
+import { gainforestSdk } from "@/config/gainforest-sdk.server";
 import { tryCatch } from "@/lib/tryCatch";
 import { TRPCError } from "@trpc/server";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { AppGainforestOrganizationInfo } from "gainforest-sdk/lex-api";
 import { getAppSession } from "gainforest-sdk/oauth";
 import { serialize } from "gainforest-sdk/utilities/transform";
-import { gainforestSdk } from "@/config/gainforest-sdk.server";
-import { allowedPDSDomains } from "@/config/gainforest-sdk";
+import AboutOrganization from "./_components/AboutOrganization";
+import HeaderContent from "./_components/HeaderContent";
+import Hero from "./_components/Hero";
 import SectionForData from "./_components/SectionForData";
+import Sites from "./_components/Sites";
+import SubHero from "./_components/SubHero";
 import ErrorPage from "./error";
+import { OrganizationPageHydrator } from "./hydrator";
+import Projects from "./projects/_components/Projects";
 
 const EMPTY_ORGANIZATION_DATA = {
   $type: "app.gainforest.organization.info" as const,
@@ -26,14 +22,14 @@ const EMPTY_ORGANIZATION_DATA = {
   website: undefined,
   logo: undefined,
   coverImage: undefined,
-  shortDescription: "",
-  longDescription: "",
+  shortDescription: { text: "", facets: [] },
+  longDescription: { blocks: [] },
   objectives: [],
   startDate: "",
   country: "",
   visibility: "Public" as const,
   createdAt: new Date().toISOString(),
-} as unknown as AppGainforestOrganizationInfo.Record;
+} as AppGainforestOrganizationInfo.Record;
 
 const OrganizationPage = async ({
   params,
