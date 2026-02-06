@@ -2,7 +2,7 @@
 "bumicerts": patch
 ---
 
-Add rate limiting security to password reset endpoints
+Add rate-limiting security to password reset endpoints
 
 ## Security Enhancements
 - Add IP-based rate limiting to password reset request (10 requests per hour)
@@ -16,4 +16,4 @@ Add rate limiting security to password reset endpoints
 - `POST /api/atproto/reset-password` - Now rate limited by IP
 
 ## Dependencies
-- Requires `lib/rate-limit.ts` from OTP endpoints PR
+- Requires shared rate-limiting utility `lib/rate-limit.ts` (introduced in this PR)

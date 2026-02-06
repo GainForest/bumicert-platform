@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
       return Response.json(
         {
           error: "BadRequest",
-          message: parseResult.error.message || "Invalid request",
+          message: "Invalid request",
         },
         { status: 400 }
       );

@@ -54,6 +54,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Record IP attempt immediately to count all requests (even malformed payloads)
+    await recordRateLimitAttempt(`ip:${clientIp}`, "otp-request");
+
     // 2. Parse and validate request body
     const body = await req.json();
     const parseResult = requestOtpSchema.safeParse(body);
@@ -62,7 +65,7 @@ export async function POST(req: NextRequest) {
       return Response.json(
         {
           error: "BadRequest",
-          message: parseResult.error.message || "Invalid request",
+          message: "Invalid request",
         },
         { status: 400 }
       );
@@ -70,9 +73,6 @@ export async function POST(req: NextRequest) {
 
     // email is already normalized (lowercased + trimmed) by the Zod schema transform
     const { email, purpose, metadata } = parseResult.data;
-
-    // Record IP attempt early to count all requests (even invalid emails)
-    await recordRateLimitAttempt(`ip:${clientIp}`, "otp-request");
 
     // 3. Check email-based rate limit
     const emailLimit = await checkRateLimit(
