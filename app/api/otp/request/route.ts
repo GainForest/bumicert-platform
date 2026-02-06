@@ -58,7 +58,18 @@ export async function POST(req: NextRequest) {
     await recordRateLimitAttempt(`ip:${clientIp}`, "otp-request");
 
     // 2. Parse and validate request body
-    const body = await req.json();
+    let body: unknown;
+    try {
+      body = await req.json();
+    } catch {
+      return Response.json(
+        {
+          error: "BadRequest",
+          message: "Invalid request",
+        },
+        { status: 400 }
+      );
+    }
     const parseResult = requestOtpSchema.safeParse(body);
 
     if (!parseResult.success) {
