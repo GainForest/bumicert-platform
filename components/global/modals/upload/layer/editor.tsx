@@ -94,7 +94,8 @@ export const LayerEditorModal = ({ initialData }: LayerEditorModalProps) => {
 
   const isCompleted = false; // Will be state when feature is enabled
   const isPending = false;
-  const error = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const error: any = null;
   const isFeatureDisabled = true; // Remove this when SDK supports layer.createOrUpdate
 
   const disableSubmit = !name.trim() || !type || !uri.trim() || isFeatureDisabled;
@@ -219,7 +220,7 @@ export const LayerEditorModal = ({ initialData }: LayerEditorModalProps) => {
 
             {error && (
               <div className="text-sm text-destructive">
-                {String(error)}
+                {error instanceof Error ? error.message : String(error)}
               </div>
             )}
 

@@ -54,6 +54,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Record IP attempt immediately to count all requests (even malformed payloads)
+    await recordRateLimitAttempt(`ip:${clientIp}`, "otp-request");
+
     // 2. Parse and validate request body
     const body = await req.json();
     const parseResult = requestOtpSchema.safeParse(body);
@@ -62,12 +65,13 @@ export async function POST(req: NextRequest) {
       return Response.json(
         {
           error: "BadRequest",
-          message: parseResult.error.message || "Invalid request",
+          message: "Invalid request",
         },
         { status: 400 }
       );
     }
 
+    // email is already normalized (lowercased + trimmed) by the Zod schema transform
     const { email, purpose, metadata } = parseResult.data;
 
     // 3. Check email-based rate limit
@@ -77,6 +81,10 @@ export async function POST(req: NextRequest) {
       RATE_LIMITS.otpRequest.byEmail
     );
 
+    // 4. Record email attempt for every request (even blocked ones)
+    // so the cooldown window keeps sliding and IP limits still apply
+    await recordRateLimitAttempt(`email:${email}`, "otp-request");
+
     if (!emailLimit.allowed) {
       // Return generic success to prevent enumeration
       return Response.json({
@@ -84,10 +92,6 @@ export async function POST(req: NextRequest) {
         message: "If this email is valid, a verification code has been sent.",
       });
     }
-
-    // 4. Record rate limit attempts
-    await recordRateLimitAttempt(`ip:${clientIp}`, "otp-request");
-    await recordRateLimitAttempt(`email:${email}`, "otp-request");
 
     const supabase = getSupabaseAdmin();
     if (!supabase) {
@@ -102,12 +106,26 @@ export async function POST(req: NextRequest) {
     }
 
     // 5. Invalidate previous pending OTPs for this email+purpose
-    await supabase
+    const { error: invalidateError } = await supabase
       .from("email_otps")
       .update({ verified_at: new Date().toISOString() })
       .eq("email", email)
       .eq("purpose", purpose)
       .is("verified_at", null);
+
+    if (invalidateError) {
+      console.error(
+        "[OTP Request] Failed to invalidate previous OTPs:",
+        invalidateError
+      );
+      return Response.json(
+        {
+          error: "InternalServerError",
+          message: "Failed to generate verification code",
+        },
+        { status: 500 }
+      );
+    }
 
     // 6. Generate and store new OTP
     const code = generateOtp();

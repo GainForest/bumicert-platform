@@ -1,5 +1,5 @@
 ---
-"bumicertain": patch
+"bumicerts": patch
 ---
 
 Add OTP verification endpoints with rate limiting
@@ -17,8 +17,8 @@ Add OTP verification endpoints with rate limiting
 - Previous pending OTPs are invalidated when new one is requested
 - Generic success messages to prevent email enumeration
 
-## Rate Limiting Library
-- Add reusable rate limiting utility at `lib/rate-limit.ts`
+## Rate-Limiting Library
+- Add reusable rate-limiting utility at `lib/rate-limit.ts`
 - Uses Supabase to track attempts in a sliding window
 - Fails open if Supabase is not configured (for local dev)
 

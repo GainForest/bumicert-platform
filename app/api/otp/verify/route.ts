@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
       return Response.json(
         {
           error: "BadRequest",
-          message: parseResult.error.message || "Invalid request",
+          message: "Invalid request",
         },
         { status: 400 }
       );
@@ -89,9 +89,20 @@ export async function POST(req: NextRequest) {
       .gt("expires_at", new Date().toISOString())
       .order("created_at", { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
-    if (fetchError || !otpRecord) {
+    if (fetchError) {
+      console.error("[OTP Verify] Database error:", fetchError);
+      return Response.json(
+        {
+          error: "InternalServerError",
+          message: "Service temporarily unavailable",
+        },
+        { status: 500 }
+      );
+    }
+
+    if (!otpRecord) {
       // No valid OTP found - return generic error
       return Response.json(
         {
@@ -118,10 +129,17 @@ export async function POST(req: NextRequest) {
 
     if (!isValid) {
       // Increment attempt counter
-      await supabase
+      const { error: updateError } = await supabase
         .from("email_otps")
         .update({ attempts: otpRecord.attempts + 1 })
         .eq("id", otpRecord.id);
+
+      if (updateError) {
+        console.error(
+          "[OTP Verify] Failed to increment attempts:",
+          updateError
+        );
+      }
 
       return Response.json(
         {
@@ -133,10 +151,24 @@ export async function POST(req: NextRequest) {
     }
 
     // 7. Mark OTP as verified (single-use)
-    await supabase
+    const { error: verifyError } = await supabase
       .from("email_otps")
       .update({ verified_at: new Date().toISOString() })
       .eq("id", otpRecord.id);
+
+    if (verifyError) {
+      console.error(
+        "[OTP Verify] Failed to mark OTP as verified:",
+        verifyError
+      );
+      return Response.json(
+        {
+          error: "InternalServerError",
+          message: "Verification failed. Please try again.",
+        },
+        { status: 500 }
+      );
+    }
 
     // 8. Return success
     return Response.json({

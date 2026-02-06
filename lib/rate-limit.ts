@@ -1,4 +1,17 @@
+import { createHmac } from "crypto";
 import { getSupabaseAdmin } from "@/lib/supabase/server";
+
+const RATE_LIMIT_HMAC_KEY = process.env.RATE_LIMIT_HMAC_KEY ?? "";
+
+/**
+ * Hash an identifier (email/IP) with HMAC-SHA256 to avoid storing PII in the rate_limits table.
+ * Lookups remain deterministic because the same key + identifier always produce the same hash.
+ */
+function hashIdentifier(identifier: string): string {
+  return createHmac("sha256", RATE_LIMIT_HMAC_KEY)
+    .update(identifier)
+    .digest("hex");
+}
 
 interface RateLimitConfig {
   windowMs: number; // Time window in milliseconds
@@ -14,6 +27,9 @@ interface RateLimitResult {
 /**
  * Check if a request is within rate limits
  * Uses Supabase to track attempts in a sliding window
+ *
+ * In production, fails closed (blocks requests) when Supabase is unavailable.
+ * In development or when RATE_LIMIT_FAIL_OPEN=true, fails open (allows requests).
  */
 export async function checkRateLimit(
   identifier: string,
@@ -21,9 +37,18 @@ export async function checkRateLimit(
   config: RateLimitConfig
 ): Promise<RateLimitResult> {
   const supabase = getSupabaseAdmin();
+  const failOpen =
+    process.env.RATE_LIMIT_FAIL_OPEN === "true" ||
+    process.env.NODE_ENV !== "production";
 
   if (!supabase) {
-    // If Supabase isn't configured, allow the request (fail open)
+    if (!failOpen) {
+      return {
+        allowed: false,
+        remaining: 0,
+        resetAt: new Date(Date.now() + config.windowMs),
+      };
+    }
     console.warn(
       "[RateLimit] Supabase not configured, skipping rate limit check"
     );
@@ -35,18 +60,25 @@ export async function checkRateLimit(
   }
 
   const windowStart = new Date(Date.now() - config.windowMs);
+  const hashedIdentifier = hashIdentifier(identifier);
 
   // Count attempts within the window
   const { count, error } = await supabase
     .from("rate_limits")
     .select("*", { count: "exact", head: true })
-    .eq("identifier", identifier)
+    .eq("identifier", hashedIdentifier)
     .eq("endpoint", endpoint)
     .gte("created_at", windowStart.toISOString());
 
   if (error) {
     console.error("[RateLimit] Error checking rate limit:", error);
-    // Fail open on error
+    if (!failOpen) {
+      return {
+        allowed: false,
+        remaining: 0,
+        resetAt: new Date(Date.now() + config.windowMs),
+      };
+    }
     return {
       allowed: true,
       remaining: config.maxAttempts,
@@ -76,9 +108,10 @@ export async function recordRateLimitAttempt(
 
   if (!supabase) return;
 
+  const hashedIdentifier = hashIdentifier(identifier);
   const { error } = await supabase
     .from("rate_limits")
-    .insert({ identifier, endpoint });
+    .insert({ identifier: hashedIdentifier, endpoint });
 
   if (error) {
     console.error("[RateLimit] Error recording attempt:", error);

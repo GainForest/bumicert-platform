@@ -1,19 +1,25 @@
-import { createHash, randomInt } from "crypto";
+import { createHash, randomInt, timingSafeEqual } from "crypto";
 
-export const OTP_EXPIRY_MINUTES = parseInt(
-  process.env.OTP_EXPIRY_MINUTES || "10",
+const parsedExpiry = Number.parseInt(
+  process.env.OTP_EXPIRY_MINUTES ?? "10",
   10
 );
-export const OTP_MAX_ATTEMPTS = parseInt(
-  process.env.OTP_MAX_ATTEMPTS || "5",
+export const OTP_EXPIRY_MINUTES =
+  Number.isFinite(parsedExpiry) && parsedExpiry > 0 ? parsedExpiry : 10;
+
+const parsedAttempts = Number.parseInt(
+  process.env.OTP_MAX_ATTEMPTS ?? "5",
   10
 );
+export const OTP_MAX_ATTEMPTS =
+  Number.isFinite(parsedAttempts) && parsedAttempts > 0 ? parsedAttempts : 5;
 
 /**
  * Generate a cryptographically secure 6-digit OTP
+ * Covers the full 000000–999999 range.
  */
 export function generateOtp(): string {
-  return randomInt(100000, 999999).toString();
+  return randomInt(0, 1_000_000).toString().padStart(6, "0");
 }
 
 /**
@@ -30,11 +36,10 @@ export function verifyOtpHash(code: string, hash: string): boolean {
   const codeHash = hashOtp(code);
   if (codeHash.length !== hash.length) return false;
 
-  let result = 0;
-  for (let i = 0; i < codeHash.length; i++) {
-    result |= codeHash.charCodeAt(i) ^ hash.charCodeAt(i);
-  }
-  return result === 0;
+  return timingSafeEqual(
+    Buffer.from(codeHash, "hex"),
+    Buffer.from(hash, "hex")
+  );
 }
 
 /**
