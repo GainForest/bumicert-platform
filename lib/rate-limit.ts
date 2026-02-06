@@ -157,5 +157,6 @@ export const RATE_LIMITS = {
   },
   otpVerify: {
     byIp: { windowMs: 15 * 60 * 1000, maxAttempts: 10 }, // 10 per 15 min per IP
+    byEmail: { windowMs: 15 * 60 * 1000, maxAttempts: 5 }, // 5 per 15 min per email
   },
 } as const;

@@ -78,6 +78,33 @@ export async function POST(req: NextRequest) {
 
     const { email, code, purpose } = parseResult.data;
 
+    // 4. Check email-based rate limit to prevent distributed brute-force
+    const emailLimit = await checkRateLimit(
+      `email:${email}`,
+      "otp-verify",
+      RATE_LIMITS.otpVerify.byEmail
+    );
+
+    // Record email attempt for every parsed request (even blocked ones)
+    await recordRateLimitAttempt(`email:${email}`, "otp-verify");
+
+    if (!emailLimit.allowed) {
+      return Response.json(
+        {
+          error: "TooManyRequests",
+          message: "Too many attempts. Please try again later.",
+        },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": Math.ceil(
+              (emailLimit.resetAt.getTime() - Date.now()) / 1000
+            ).toString(),
+          },
+        }
+      );
+    }
+
     const supabase = getSupabaseAdmin();
     if (!supabase) {
       console.error("[OTP Verify] Supabase not configured");
@@ -90,7 +117,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 4. Find the most recent unverified OTP for this email+purpose
+    // 5. Find the most recent unverified OTP for this email+purpose
     const { data: otpRecord, error: fetchError } = await supabase
       .from("email_otps")
       .select("*")
@@ -124,7 +151,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 5. Check if max attempts exceeded
+    // 6. Check if max attempts exceeded
     if (otpRecord.attempts >= OTP_MAX_ATTEMPTS) {
       return Response.json(
         {
@@ -135,7 +162,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 6. Verify the code using constant-time comparison
+    // 7. Verify the code using constant-time comparison
     const isValid = verifyOtpHash(code, otpRecord.code);
 
     if (!isValid) {
@@ -182,7 +209,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 7. Mark OTP as verified (single-use)
+    // 8. Mark OTP as verified (single-use)
     const { error: verifyError } = await supabase
       .from("email_otps")
       .update({ verified_at: new Date().toISOString() })
@@ -202,7 +229,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 8. Return success
+    // 9. Return success
     return Response.json({
       success: true,
       verified: true,
