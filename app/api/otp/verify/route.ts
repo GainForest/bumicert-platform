@@ -139,16 +139,37 @@ export async function POST(req: NextRequest) {
     const isValid = verifyOtpHash(code, otpRecord.code);
 
     if (!isValid) {
-      // Increment attempt counter
-      const { error: updateError } = await supabase
+      // Increment attempt counter with optimistic locking to avoid lost updates
+      const { data: updatedAttempt, error: updateError } = await supabase
         .from("email_otps")
         .update({ attempts: otpRecord.attempts + 1 })
-        .eq("id", otpRecord.id);
+        .eq("id", otpRecord.id)
+        .eq("attempts", otpRecord.attempts)
+        .select("attempts")
+        .maybeSingle();
 
       if (updateError) {
         console.error(
           "[OTP Verify] Failed to increment attempts:",
           updateError
+        );
+        return Response.json(
+          {
+            error: "InternalServerError",
+            message: "Service temporarily unavailable",
+          },
+          { status: 500 }
+        );
+      }
+
+      if (!updatedAttempt) {
+        // Another request updated attempts first; treat as invalid attempt without leaking state
+        return Response.json(
+          {
+            error: "InvalidOTP",
+            message: "Invalid or expired code. Please request a new one.",
+          },
+          { status: 400 }
         );
       }
 
