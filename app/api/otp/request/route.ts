@@ -68,6 +68,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // email is already normalized (lowercased + trimmed) by the Zod schema transform
     const { email, purpose, metadata } = parseResult.data;
 
     // Record IP attempt early to count all requests (even invalid emails)
@@ -80,6 +81,10 @@ export async function POST(req: NextRequest) {
       RATE_LIMITS.otpRequest.byEmail
     );
 
+    // 4. Record email attempt for every request (even blocked ones)
+    // so the cooldown window keeps sliding and IP limits still apply
+    await recordRateLimitAttempt(`email:${email}`, "otp-request");
+
     if (!emailLimit.allowed) {
       // Return generic success to prevent enumeration
       return Response.json({
@@ -87,9 +92,6 @@ export async function POST(req: NextRequest) {
         message: "If this email is valid, a verification code has been sent.",
       });
     }
-
-    // 4. Record email attempt only for valid, non-limited emails
-    await recordRateLimitAttempt(`email:${email}`, "otp-request");
 
     const supabase = getSupabaseAdmin();
     if (!supabase) {
@@ -112,9 +114,16 @@ export async function POST(req: NextRequest) {
       .is("verified_at", null);
 
     if (invalidateError) {
-      console.warn(
+      console.error(
         "[OTP Request] Failed to invalidate previous OTPs:",
         invalidateError
+      );
+      return Response.json(
+        {
+          error: "InternalServerError",
+          message: "Failed to generate verification code",
+        },
+        { status: 500 }
       );
     }
 

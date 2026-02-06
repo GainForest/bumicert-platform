@@ -1,5 +1,5 @@
 ---
-"bumicertain": patch
+"bumicerts": patch
 ---
 
 Add rate limiting security to password reset endpoints

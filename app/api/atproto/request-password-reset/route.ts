@@ -86,6 +86,10 @@ export async function POST(req: NextRequest) {
       RATE_LIMITS.passwordResetRequest.byEmail
     );
 
+    // 3. Record email attempt for every request (even blocked ones)
+    // so the cooldown window keeps sliding and IP limits still apply
+    await recordRateLimitAttempt(`email:${email}`, "request-password-reset");
+
     if (!emailLimit.allowed) {
       // Still return generic message to avoid enumeration
       // but don't actually call the PDS
@@ -98,9 +102,6 @@ export async function POST(req: NextRequest) {
         { status: 200, headers: { "Content-Type": "application/json" } }
       );
     }
-
-    // 3. Record email attempt only for valid, non-limited emails
-    await recordRateLimitAttempt(`email:${email}`, "request-password-reset");
 
     const service = allowedPDSDomains[0];
 
