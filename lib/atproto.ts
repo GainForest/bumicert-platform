@@ -53,12 +53,16 @@ const PUBLIC_URL = resolvePublicUrl();
  * Sessions are stored in Supabase (atproto_oauth_session table).
  * Auth flow state is stored temporarily in Supabase (atproto_oauth_state table).
  */
+const atprotoJwkPrivate = process.env.ATPROTO_JWK_PRIVATE;
+if (!atprotoJwkPrivate) {
+  throw new Error("ATPROTO_JWK_PRIVATE is not set");
+}
 export const atprotoSDK = createATProtoSDK({
   oauth: {
     clientId: `${PUBLIC_URL}/client-metadata.json`,
     redirectUri: `${PUBLIC_URL}/api/oauth/callback`,
     jwksUri: `${PUBLIC_URL}/.well-known/jwks.json`,
-    jwkPrivate: process.env.ATPROTO_JWK_PRIVATE!,
+    jwkPrivate: atprotoJwkPrivate,
     scope: OAUTH_SCOPE,
   },
   servers: {

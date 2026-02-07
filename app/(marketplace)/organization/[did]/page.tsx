@@ -21,13 +21,13 @@ const EMPTY_ORGANIZATION_DATA = {
   logo: undefined,
   coverImage: undefined,
   shortDescription: { text: "", facets: [] },
-  longDescription: { blocks: []},
+  longDescription: { blocks: [] },
   objectives: [],
   startDate: "",
   country: "",
   visibility: "Public" as const,
   createdAt: new Date().toISOString(),
-} as  AppGainforestOrganizationInfo.Record;
+} as AppGainforestOrganizationInfo.Record;
 
 const OrganizationPage = async ({
   params,
@@ -47,37 +47,29 @@ const OrganizationPage = async ({
 
   let data = EMPTY_ORGANIZATION_DATA;
 
-  try {
-    if (error) {
-      if (error instanceof TRPCError && error.code === "NOT_FOUND") {
-        // Display empty organization data
-      } else {
-        if (error instanceof TRPCError && error.code === "BAD_REQUEST") {
-          throw new Error("This organization does not exist.");
-        }
-        throw new Error("An unknown error occurred.");
-      }
+  if (error) {
+    if (error instanceof TRPCError && error.code === "NOT_FOUND") {
+      // Display empty organization data
     } else {
-      data = response.value;
-    }
-
-    const visibility = data.visibility as string;
-    if (visibility === "Unlisted") {
-      try {
-        const session = await getAppSession();
-        if (!session.isLoggedIn || session.did !== did) {
-          throw new Error("This organization is not publicly visible.");
-        }
-      } catch {
-        throw new Error("This organization is not publicly visible.");
+      if (error instanceof TRPCError && error.code === "BAD_REQUEST") {
+        throw new Error("This organization does not exist.", { cause: "This organization does not exist." });
       }
+      throw new Error("An unknown error occurred.", { cause: "An unknown error occurred." });
     }
-  } catch (error) {
-    console.error(
-      "Redirecting to error page due to the following error:",
-      error
-    );
-    return <ErrorPage error={error as Error} />;
+  } else {
+    data = response.value;
+  }
+
+  const visibility = data.visibility as string;
+  if (visibility === "Unlisted") {
+    try {
+      const session = await getAppSession();
+      if (!session.isLoggedIn || session.did !== did) {
+        throw new Error("This organization is not publicly visible.", { cause: "This organization is not publicly visible." });
+      }
+    } catch {
+      throw new Error("This organization is not publicly visible.", { cause: "This organization is not publicly visible." });
+    }
   }
   const serializedData = serialize(data);
 
