@@ -8,6 +8,7 @@ import { OrgHypercertsDefs as Defs } from "climateai-sdk/lex-api";
 import React from "react";
 import { getBlobUrl } from "climateai-sdk/utilities/atproto";
 import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { getWorkScopeDisplayLabels } from "@/lib/types/activity-claim";
 
 const BumicertsClient = ({
   did,
@@ -44,11 +45,9 @@ const BumicertsClient = ({
               logoUrl={bumicert.organizationInfo.logoUrl}
               coverImage={coverImageUrl}
               title={bumicert.claimActivity.value.title}
-              objectives={
-                bumicert.claimActivity.value.workScope?.withinAnyOf ?? []
-              }
-              startDate={new Date(bumicert.claimActivity.value.startDate)}
-              endDate={new Date(bumicert.claimActivity.value.endDate)}
+              objectives={getWorkScopeDisplayLabels(bumicert.claimActivity.value.workScope)}
+              startDate={bumicert.claimActivity.value.startDate ? new Date(bumicert.claimActivity.value.startDate) : new Date()}
+              endDate={bumicert.claimActivity.value.endDate ? new Date(bumicert.claimActivity.value.endDate) : new Date()}
             />
           </div>
         );
