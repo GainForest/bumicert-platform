@@ -7,7 +7,7 @@ import React, { useEffect } from "react";
 import Link from "next/link";
 import useCopy from "@/hooks/use-copy";
 import { useAtprotoStore } from "@/components/stores/atproto";
-import { OrgHypercertsClaimActivity } from "climateai-sdk/lex-api";
+import { OrgHypercertsClaimActivity } from "gainforest-sdk/lex-api";
 
 const RightContent = () => {
   const { viewport } = useNavbarContext();

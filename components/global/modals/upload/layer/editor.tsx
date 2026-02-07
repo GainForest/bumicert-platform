@@ -9,15 +9,15 @@ import {
   ModalTitle,
 } from "@/components/ui/modal/modal";
 import { ChangeEvent, useMemo, useState } from "react";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { trpcApi } from "@/components/providers/TrpcProvider";
-import { GetRecordResponse } from "climateai-sdk/types";
-import { AppGainforestOrganizationLayer } from "climateai-sdk/lex-api";
+import { GetRecordResponse } from "gainforest-sdk/types";
+import { AppGainforestOrganizationLayer } from "gainforest-sdk/lex-api";
 import { useAtprotoStore } from "@/components/stores/atproto";
-import { parseAtUri } from "climateai-sdk/utilities/atproto";
+import { parseAtUri } from "gainforest-sdk/utilities/atproto";
 import {
   Select,
   SelectContent,

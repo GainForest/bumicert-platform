@@ -9,11 +9,11 @@ import { FullHypercert } from "@/graphql/hypercerts/queries/fullHypercertById";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ChevronDownIcon } from "lucide-react";
-import { OrgHypercertsClaimActivity } from "climateai-sdk/lex-api";
+import { OrgHypercertsClaimActivity } from "gainforest-sdk/lex-api";
 import {
   deserialize,
   SerializedSuperjson,
-} from "climateai-sdk/utilities/transform";
+} from "gainforest-sdk/utilities/transform";
 
 // Custom hook to handle collapsible content
 const useCollapsible = (maxHeight: number = 320) => {

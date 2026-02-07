@@ -1,9 +1,8 @@
-import { SupportedPDSDomain } from "climateai-sdk";
-import { createTRPCClient } from "climateai-sdk/client";
+import { SupportedPDSDomain } from "gainforest-sdk";
+import { createTRPCClient } from "gainforest-sdk/client";
 
 export const allowedPDSDomains = [
   "climateai.org",
-  // add domains here to allow them
 ] satisfies SupportedPDSDomain[];
 export type AllowedPDSDomain = (typeof allowedPDSDomains)[number];
 

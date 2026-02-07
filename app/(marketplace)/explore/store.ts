@@ -1,10 +1,10 @@
-import { allowedPDSDomains } from "@/config/climateai-sdk";
-import { getEcocertsFromClaimActivities as getBumicertsFromClaimActivities } from "climateai-sdk/utilities/hypercerts";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
+import { getEcocertsFromClaimActivities as getBumicertsFromClaimActivities } from "gainforest-sdk/utilities/hypercerts";
 import {
   AppGainforestOrganizationInfo,
   OrgHypercertsClaimActivity,
-} from "climateai-sdk/lex-api";
-import { GetRecordResponse, Ecocert as Bumicert } from "climateai-sdk/types";
+} from "gainforest-sdk/lex-api";
+import { GetRecordResponse, Ecocert as Bumicert } from "gainforest-sdk/types";
 import { create } from "zustand";
 import { Nullable } from "nuqs";
 
@@ -36,8 +36,6 @@ export type ExploreStoreState =
 type ClaimsWithOrgInfo = {
   repo: {
     did: string;
-    head: string;
-    rev: string;
   };
   activities: Array<GetRecordResponse<OrgHypercertsClaimActivity.Record>>;
   organizationInfo: AppGainforestOrganizationInfo.Record;

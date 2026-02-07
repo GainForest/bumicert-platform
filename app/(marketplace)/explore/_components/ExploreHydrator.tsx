@@ -1,6 +1,6 @@
 "use client";
 import { trpcApi } from "@/components/providers/TrpcProvider";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import React, { useEffect } from "react";
 import { useExploreStore } from "../store";
 

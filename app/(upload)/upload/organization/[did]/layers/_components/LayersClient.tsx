@@ -5,16 +5,16 @@ import { CirclePlusIcon } from "lucide-react";
 import React from "react";
 import { cn } from "@/lib/utils";
 import useHydratedData from "@/hooks/use-hydration";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { useModal } from "@/components/ui/modal/context";
 import { trpcApi } from "@/components/providers/TrpcProvider";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import {
   SerializedSuperjson,
   deserialize,
-} from "climateai-sdk/utilities/transform";
-import { AppGainforestOrganizationLayer } from "climateai-sdk/lex-api";
-import { GetRecordResponse } from "climateai-sdk/types";
+} from "gainforest-sdk/utilities/transform";
+import { AppGainforestOrganizationLayer } from "gainforest-sdk/lex-api";
+import { GetRecordResponse } from "gainforest-sdk/types";
 import {
   LayerEditorModal,
   LayerEditorModalId,

@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 
 /**
  * POST /api/atproto/request-password-reset

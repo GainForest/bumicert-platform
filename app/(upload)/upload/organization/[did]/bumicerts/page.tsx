@@ -1,11 +1,11 @@
 import React from "react";
 import BumicertsHeaderContent from "./HeaderContent";
 import Container from "@/components/ui/container";
-import { climateAiSdk } from "@/config/climateai-sdk.server";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
-import { serialize } from "climateai-sdk/utilities/transform";
+import { gainforestSdk } from "@/config/gainforest-sdk.server";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
+import { serialize } from "gainforest-sdk/utilities/transform";
 import BumicertsClient from "./_components/BumicertsClient";
-import { getEcocertsFromClaimActivities } from "climateai-sdk/utilities/hypercerts";
+import { getEcocertsFromClaimActivities } from "gainforest-sdk/utilities/hypercerts";
 import { tryCatch } from "@/lib/tryCatch";
 import { TRPCError } from "@trpc/server";
 import ErrorPage from "./error";
@@ -17,10 +17,12 @@ const BumicertsPage = async ({
 }) => {
   const { did: encodedDid } = await params;
   const did = decodeURIComponent(encodedDid);
-  const serverCaller = climateAiSdk.getServerCaller();
+  const serverCaller = gainforestSdk.getServerCaller();
 
-  let activitiesResponse;
-  let orgInfoResponse;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let activitiesResponse: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let orgInfoResponse: any;
 
   try {
     const [activitiesData, activitiesError] = await tryCatch(

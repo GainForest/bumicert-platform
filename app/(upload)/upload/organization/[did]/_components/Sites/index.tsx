@@ -1,24 +1,31 @@
-import { climateAiSdk } from "@/config/climateai-sdk.server";
+import { gainforestSdk } from "@/config/gainforest-sdk.server";
 import React from "react";
 import SitesClient, { AllSitesData } from "./SitesClient";
 import { tryCatch } from "@/lib/tryCatch";
 import { TRPCError } from "@trpc/server";
-import { serialize } from "climateai-sdk/utilities/transform";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { serialize } from "gainforest-sdk/utilities/transform";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 
 const Sites = async ({ did }: { did: string }) => {
-  const apiCaller = climateAiSdk.getServerCaller();
+  const apiCaller = gainforestSdk.getServerCaller();
+
+  // Guard: Ensure allowedPDSDomains is configured
+  if (!allowedPDSDomains || allowedPDSDomains.length === 0) {
+    throw new Error(
+      `allowedPDSDomains is not configured. Cannot call apiCaller.hypercerts.location.getAll for did: ${did}`
+    );
+  }
 
   const [response, error] = await tryCatch(
-    apiCaller.hypercerts.site.getAll({
+    apiCaller.hypercerts.location.getAll({
       did,
       pdsDomain: allowedPDSDomains[0],
     })
   );
 
   let allSitesData: AllSitesData = {
-    sites: [],
-    defaultSite: null,
+    locations: [],
+    defaultLocation: null,
   };
   if (error) {
     if (error instanceof TRPCError && error.code === "NOT_FOUND") {

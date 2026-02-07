@@ -6,21 +6,21 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import useHydratedData from "@/hooks/use-hydration";
 import ProjectCard from "./ProjectCard";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { trpcApi } from "@/components/providers/TrpcProvider";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import {
   SerializedSuperjson,
   deserialize,
-} from "climateai-sdk/utilities/transform";
-import { GetRecordResponse } from "climateai-sdk/types";
+} from "gainforest-sdk/utilities/transform";
+import { GetRecordResponse } from "gainforest-sdk/types";
 import Link from "next/link";
-import { OrgHypercertsClaimProject } from "climateai-sdk/lex-api";
+import { OrgHypercertsClaimCollection } from "gainforest-sdk/lex-api";
 import SectionForData from "../../../_components/SectionForData";
 import { links } from "@/lib/links";
 
 export type AllProjectsData = {
-  projects: GetRecordResponse<OrgHypercertsClaimProject.Record>[];
+  projects: GetRecordResponse<OrgHypercertsClaimCollection.Record>[];
 };
 
 type ProjectSectionClientProps = {

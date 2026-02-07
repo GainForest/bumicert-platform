@@ -1,6 +1,6 @@
-import { getBlobUrl } from "climateai-sdk/utilities/atproto";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
-import { BlobRefGenerator, BlobRef } from "climateai-sdk/zod";
+import { getBlobUrl } from "gainforest-sdk/utilities/atproto";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
+import { BlobRefGenerator, BlobRef } from "gainforest-sdk/zod";
 
 export const getShapefilePreviewUrl = (
   shapefile:

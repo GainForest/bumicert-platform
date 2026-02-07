@@ -1,39 +1,35 @@
 import Container from "@/components/ui/container";
-import React from "react";
-import Hero from "./_components/Hero";
-import SubHero from "./_components/SubHero";
-import AboutOrganization from "./_components/AboutOrganization";
-import { AppGainforestOrganizationInfo } from "climateai-sdk/lex-api";
-import HeaderContent from "./_components/HeaderContent";
-import { OrganizationPageHydrator } from "./hydrator";
-import Sites from "./_components/Sites";
-import Projects from "./projects/_components/Projects";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
+import { gainforestSdk } from "@/config/gainforest-sdk.server";
 import { tryCatch } from "@/lib/tryCatch";
 import { TRPCError } from "@trpc/server";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { getSessionFromRequest } from "climateai-sdk/session";
-import { serialize } from "climateai-sdk/utilities/transform";
-import { climateAiSdk } from "@/config/climateai-sdk.server";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { AppGainforestOrganizationInfo } from "gainforest-sdk/lex-api";
+import { getAppSession } from "gainforest-sdk/oauth";
+import { serialize } from "gainforest-sdk/utilities/transform";
+import AboutOrganization from "./_components/AboutOrganization";
+import HeaderContent from "./_components/HeaderContent";
+import Hero from "./_components/Hero";
 import SectionForData from "./_components/SectionForData";
+import Sites from "./_components/Sites";
+import SubHero from "./_components/SubHero";
 import ErrorPage from "./error";
+import { OrganizationPageHydrator } from "./hydrator";
+import Projects from "./projects/_components/Projects";
 
-const EMPTY_ORGANIZATION_DATA: AppGainforestOrganizationInfo.Record = {
-  $type: "app.gainforest.organization.info",
+const EMPTY_ORGANIZATION_DATA = {
+  $type: "app.gainforest.organization.info" as const,
   displayName: "",
-  wesite: undefined,
+  website: undefined,
   logo: undefined,
   coverImage: undefined,
-  shortDescription: "",
-  longDescription: "",
+  shortDescription: { text: "", facets: [] },
+  longDescription: { blocks: [] },
   objectives: [],
   startDate: "",
   country: "",
-  visibility: "Public",
+  visibility: "Public" as const,
   createdAt: new Date().toISOString(),
-};
+} as AppGainforestOrganizationInfo.Record;
 
 const OrganizationPage = async ({
   params,
@@ -43,7 +39,7 @@ const OrganizationPage = async ({
   const { did: encodedDid } = await params;
   const did = decodeURIComponent(encodedDid);
 
-  const apiCaller = climateAiSdk.getServerCaller();
+  const apiCaller = gainforestSdk.getServerCaller();
   const [response, error] = await tryCatch(
     apiCaller.gainforest.organization.info.get({
       did,
@@ -65,17 +61,18 @@ const OrganizationPage = async ({
         throw new Error("An unknown error occurred.");
       }
     } else {
-      data = response.value;
+      data = (response as { value: AppGainforestOrganizationInfo.Record }).value;
     }
 
-    if (data.visibility === "Hidden") {
+    const visibility = data.visibility as string;
+    if (visibility === "Unlisted") {
       try {
-        const session = await getSessionFromRequest();
-        if (session && session.did !== did) {
-          throw new Error("This organization is hidden.");
+        const session = await getAppSession();
+        if (!session.isLoggedIn || session.did !== did) {
+          throw new Error("This organization is not publicly visible.");
         }
       } catch {
-        throw new Error("This organization is hidden.");
+        throw new Error("This organization is not publicly visible.");
       }
     }
   } catch (error) {

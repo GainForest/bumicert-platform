@@ -27,7 +27,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useModal } from "@/components/ui/modal/context";
 import { GetAnInviteModal, GetAnInviteModalId } from "./get-an-invite";
 import SignInModal, { SignInModalId } from "./sign-in";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { useAtprotoStore } from "@/components/stores/atproto";
 
 export const SignUpModalId = "auth/sign-up";

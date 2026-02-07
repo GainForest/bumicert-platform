@@ -1,27 +1,24 @@
 "use client";
-import { getStripedBackground } from "@/lib/getStripedBackground";
-import { BadgeCheck, Calendar, ShieldCheck } from "lucide-react";
-import { ArrowRight } from "lucide-react";
-import React from "react";
-import ProgressView from "./ProgressView";
 import TimeText from "@/components/time-text";
+import UserChip from "@/components/user-chip2";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
+import { useAdaptiveColors } from "@/hooks/use-adaptive-colors";
+import { getStripedBackground } from "@/lib/getStripedBackground";
 import {
   AppGainforestOrganizationInfo,
+  OrgHypercertsDefs as Defs,
   OrgHypercertsClaimActivity,
-} from "climateai-sdk/lex-api";
-import { getBlobUrl } from "climateai-sdk/utilities/atproto";
-import { BumicertArt } from "@/app/(marketplace)/bumicert/create/[draftId]/_components/Steps/Step4/BumicertPreviewCard";
-import { $Typed } from "climateai-sdk/lex-api/utils";
-import { AppGainforestCommonDefs as Defs } from "climateai-sdk/lex-api";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+} from "gainforest-sdk/lex-api";
+import { $Typed } from "gainforest-sdk/lex-api/utils";
+import { getBlobUrl } from "gainforest-sdk/utilities/atproto";
 import {
   deserialize,
   SerializedSuperjson,
-} from "climateai-sdk/utilities/transform";
-import UserChip from "@/components/user-chip2";
+} from "gainforest-sdk/utilities/transform";
+import { ArrowRight, BadgeCheck, Calendar, ShieldCheck } from "lucide-react";
 import Image from "next/image";
-import { useAdaptiveColors } from "@/hooks/use-adaptive-colors";
-import { ProgressiveBlur } from "@/components/ui/progressive-blur";
+import ProgressView from "./ProgressView";
+import { getWorkScopeItems } from "@/lib/bumicert";
 
 const Hero = ({
   creatorDid,
@@ -107,33 +104,43 @@ const Hero = ({
               <div className="w-full">
                 <span className="rounded-full px-2 py-0.5 text-sm font-medium shrink-0 inline-flex items-center gap-1">
                   <Calendar className="size-4 mr-1 opacity-50" />
-                  <TimeText
-                    format="absolute-date"
-                    date={new Date(bumicert.startDate)}
-                  />{" "}
-                  <ArrowRight className="size-3" />{" "}
-                  <TimeText
-                    format="absolute-date"
-                    date={new Date(bumicert.endDate)}
-                  />
+                  {bumicert.startDate ? (
+                    <TimeText
+                      format="absolute-date"
+                      date={new Date(bumicert.startDate)}
+                    />
+                  ) : (
+                    <span>—</span>
+                  )}
+                  {bumicert.startDate && bumicert.endDate && (
+                    <>
+                      {" "}<ArrowRight className="size-3" />{" "}
+                    </>
+                  )}
+                  {bumicert.endDate ? (
+                    <TimeText
+                      format="absolute-date"
+                      date={new Date(bumicert.endDate)}
+                    />
+                  ) : (
+                    <span>—</span>
+                  )}
                 </span>
 
                 <div className="w-full overflow-x-auto scrollbar-hidden mask-r-from-90% mt-4">
                   <div className="w-full flex items-center justify-start gap-2">
-                    {(bumicert.workScope?.withinAnyOf ?? []).map(
-                      (work, index) => (
-                        <span
-                          key={index}
-                          className="rounded-lg px-3 py-1.5 text-sm font-medium shrink-0"
-                          style={{
-                            background: `${backgroundMuted}`,
-                            color: `${foreground}96`,
-                          }}
-                        >
-                          {work}
-                        </span>
-                      )
-                    )}
+                    {getWorkScopeItems(bumicert.workScope).map((work: string, index: number) => (
+                      <span
+                        key={index}
+                        className="rounded-lg px-3 py-1.5 text-sm font-medium shrink-0"
+                        style={{
+                          background: `${backgroundMuted}`,
+                          color: `${foreground}96`,
+                        }}
+                      >
+                        {work}
+                      </span>
+                    ))}
                   </div>
                 </div>
               </div>

@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import type { AppGainforestOrganizationInfo } from "climateai-sdk/lex-api";
+import type { AppGainforestOrganizationInfo } from "gainforest-sdk/lex-api";
 import {
   ArrowUpRightFromSquare,
   Calendar,
@@ -32,7 +32,7 @@ import useHydratedData from "@/hooks/use-hydration";
 import {
   deserialize,
   SerializedSuperjson,
-} from "climateai-sdk/utilities/transform";
+} from "gainforest-sdk/utilities/transform";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
