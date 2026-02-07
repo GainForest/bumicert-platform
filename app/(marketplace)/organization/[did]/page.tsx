@@ -48,13 +48,18 @@ const OrganizationPage = async ({
   let data = EMPTY_ORGANIZATION_DATA;
 
   if (error) {
-    if (error instanceof TRPCError && error.code === "NOT_FOUND") {
-      // Display empty organization data
-    } else {
-      if (error instanceof TRPCError && error.code === "BAD_REQUEST") {
-        throw new Error("This organization does not exist.", { cause: "This organization does not exist." });
-      }
-      throw new Error("An unknown error occurred.", { cause: "An unknown error occurred." });
+    if (!(error instanceof TRPCError)) {
+      return <ErrorPage error={error} />;
+    }
+    switch (error.code) {
+      case "BAD_REQUEST":
+        return <ErrorPage error="This organization does not exist." />;
+      case "NOT_FOUND":
+        // "NOT_FOUND" is expected when the info record is not found. So, we display empty data.
+        data = EMPTY_ORGANIZATION_DATA;
+        break;
+      default:
+        return <ErrorPage error="An unknown error occurred." />;
     }
   } else {
     data = response.value;
@@ -62,13 +67,10 @@ const OrganizationPage = async ({
 
   const visibility = data.visibility as string;
   if (visibility === "Unlisted") {
-    try {
-      const session = await getAppSession();
-      if (!session.isLoggedIn || session.did !== did) {
-        throw new Error("This organization is not publicly visible.", { cause: "This organization is not publicly visible." });
-      }
-    } catch {
-      throw new Error("This organization is not publicly visible.", { cause: "This organization is not publicly visible." });
+    const [sessionResponse, sessionError] = await tryCatch(getAppSession());
+    const notPubliclyVisible = sessionError ? true : !sessionResponse.isLoggedIn || sessionResponse.did !== did;
+    if (notPubliclyVisible) {
+      return <ErrorPage error={"This organization is not publicly visible."} />;
     }
   }
   const serializedData = serialize(data);
