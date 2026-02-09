@@ -1,10 +1,18 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Trash2, Pencil, Check, X } from "lucide-react";
 import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
+import { useQuery } from "@tanstack/react-query";
+
+interface ActorProfile {
+    did: string;
+    handle: string;
+    displayName?: string;
+    avatar?: string;
+}
 
 interface ContributorRowProps {
     value: string;
@@ -12,44 +20,33 @@ interface ContributorRowProps {
     onRemove: () => void;
 }
 
+function isDidOrHandle(value: string): boolean {
+    // DID format: did:plc:... or did:web:...
+    if (value.startsWith("did:")) return true;
+    // Handle format: contains dot, no spaces (e.g., user.bsky.social)
+    if (value.includes(".") && !value.includes(" ")) return true;
+    return false;
+}
+
 export function ContributorRow({ value, onEdit, onRemove }: ContributorRowProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [editValue, setEditValue] = useState(value);
-    const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined);
 
-    const handle = useMemo(() => {
-        // Try matching "Name (@handle)"
-        const parensMatch = value.match(/\(@([^)]+)\)/);
-        if (parensMatch) return parensMatch[1];
-        // Try matching starts with "@"
-        if (value.startsWith("@")) return value.slice(1);
-        // If it looks like a domain (e.g. contains dot), try using it as handle
-        if (value.includes(".") && !value.includes(" ")) return value;
-        return null;
-    }, [value]);
+    const shouldFetch = isDidOrHandle(value);
 
-    useEffect(() => {
-        if (!handle) return;
-
-        const controller = new AbortController();
-
-        fetch(
-            `https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=${encodeURIComponent(handle)}`,
-            { signal: controller.signal }
-        )
-            .then((res) => {
-                if (!res.ok) throw new Error("Failed to fetch");
-                return res.json();
-            })
-            .then((data) => {
-                if (data.avatar) setAvatarUrl(data.avatar);
-            })
-            .catch((err) => {
-                if (err.name !== "AbortError") setAvatarUrl(undefined);
-            });
-
-        return () => controller.abort();
-    }, [handle]);
+    const { data: profile, isPending } = useQuery<ActorProfile>({
+        queryKey: ["actor-profile", value],
+        queryFn: async () => {
+            const res = await fetch(
+                `https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=${encodeURIComponent(value)}`
+            );
+            if (!res.ok) throw new Error("Failed to fetch profile");
+            return res.json();
+        },
+        enabled: shouldFetch,
+        staleTime: 1000 * 60 * 5, // 5 minutes
+        retry: false,
+    });
 
     const handleSave = () => {
         onEdit(editValue);
@@ -91,14 +88,26 @@ export function ContributorRow({ value, onEdit, onRemove }: ContributorRowProps)
         );
     }
 
+    // Determine what to display
+    const hasProfile = shouldFetch && profile && !isPending;
+    const displayName = hasProfile ? (profile.displayName || profile.handle) : value;
+    const handle = hasProfile ? `@${profile.handle}` : null;
+    const avatarUrl = hasProfile ? profile.avatar : undefined;
+    const fallbackChar = (hasProfile ? profile.handle[0] : value[0])?.toUpperCase() || "?";
+
     return (
         <div className="flex items-center justify-between p-3 border rounded-md bg-background">
             <div className="flex items-center gap-3 overflow-hidden">
                 <Avatar className="h-8 w-8 shrink-0">
                     <AvatarImage src={avatarUrl} />
-                    <AvatarFallback>{value[0]?.toUpperCase() || "?"}</AvatarFallback>
+                    <AvatarFallback>{fallbackChar}</AvatarFallback>
                 </Avatar>
-                <span className="font-medium truncate">{value}</span>
+                <div className="flex flex-col overflow-hidden">
+                    <span className="font-medium truncate">{displayName}</span>
+                    {handle && (
+                        <span className="text-xs text-muted-foreground truncate">{handle}</span>
+                    )}
+                </div>
             </div>
             <div className="flex items-center gap-1 shrink-0">
                 <Button

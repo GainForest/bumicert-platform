@@ -54,13 +54,12 @@ export function ContributorSelector({
 
     // Sync internal state with external value and on tab switch
     useEffect(() => {
-        if (value !== query && activeTab === 'search') {
+        if (activeTab === 'search') {
             setQuery(value);
-        }
-        if (value !== manualQuery && activeTab === 'manual') {
+        } else {
             setManualQuery(value);
         }
-    }, [value, activeTab, query, manualQuery]);
+    }, [value, activeTab]);
 
     // Search Effect
     useEffect(() => {
@@ -111,13 +110,9 @@ export function ContributorSelector({
     }, [debouncedQuery, activeTab]);
 
     const handleSelect = (actor: Actor) => {
-        const formattedName = actor.displayName
-            ? `${actor.displayName} (@${actor.handle})`
-            : `@${actor.handle}`;
-
-        onChange(formattedName);
-        setQuery(formattedName);
-        onNext?.(formattedName);
+        onChange(actor.did);
+        setQuery("");
+        onNext?.(actor.did);
     };
 
     // Handle manual input change
@@ -137,7 +132,7 @@ export function ContributorSelector({
     const showClearButton = activeTab === "search" ? query.length > 0 : manualQuery.length > 0;
 
     return (
-        <div className="flex flex-col gap-2 w-full border rounded-md p-3 bg-muted/20">
+        <div className="flex flex-col gap-2 w-full rounded-md">
             <div className="flex bg-muted rounded-lg p-1 gap-1 w-fit">
                 <button
                     type="button"
