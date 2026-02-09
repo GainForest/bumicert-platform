@@ -54,7 +54,7 @@ export function ContributorSelector({
     // Debounce query for search
     const debouncedQuery = useDebounce(query, 300);
 
-    // Sync internal state with external value
+    // Sync internal state with external value and on tab switch
     useEffect(() => {
         if (value !== query && activeTab === 'search') {
             setQuery(value);
@@ -62,7 +62,7 @@ export function ContributorSelector({
         if (value !== manualQuery && activeTab === 'manual') {
             setManualQuery(value);
         }
-    }, [value]);
+    }, [value, activeTab, query, manualQuery]);
 
     // Search Effect
     useEffect(() => {
