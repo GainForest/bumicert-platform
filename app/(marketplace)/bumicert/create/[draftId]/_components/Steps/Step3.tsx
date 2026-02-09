@@ -127,7 +127,7 @@ const Step3 = () => {
           required
           info={`List any individuals or organizations that contributed to this work.`}
         >
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1">
             <ContributorSelector
               value={newContributor}
               onChange={setNewContributor}
@@ -141,7 +141,7 @@ const Step3 = () => {
               }}
             />
 
-            <div className="flex flex-col gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
               {contributors.map((c) => (
                 <ContributorRow
                   key={c.id}
