@@ -49,7 +49,8 @@ const OrganizationPage = async ({
 
   if (error) {
     if (!(error instanceof TRPCError)) {
-      return <ErrorPage error={error} />;
+      console.error("An uncaught error occurred:", error);
+      return <ErrorPage error={"An unknown error occurred."} />;
     }
     switch (error.code) {
       case "BAD_REQUEST":
@@ -59,6 +60,7 @@ const OrganizationPage = async ({
         data = EMPTY_ORGANIZATION_DATA;
         break;
       default:
+        console.error("An uncaught TRPCError occurred:", error);
         return <ErrorPage error="An unknown error occurred." />;
     }
   } else {
