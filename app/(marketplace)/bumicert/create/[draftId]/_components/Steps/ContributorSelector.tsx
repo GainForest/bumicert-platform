@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Trash2, Search, Link as LinkIcon, Loader2 } from "lucide-react";
+import { X, Link as LinkIcon, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
 import {
@@ -27,8 +26,7 @@ interface Actor {
 interface ContributorSelectorProps {
     value: string;
     onChange: (value: string) => void;
-    onRemove: () => void;
-    placeholder?: string;
+    onClear: () => void;
     onNext?: (val?: string) => void;
     autoFocus?: boolean;
 }
@@ -38,8 +36,7 @@ type Tab = "search" | "manual";
 export function ContributorSelector({
     value,
     onChange,
-    onRemove,
-    placeholder = "Contributor name",
+    onClear,
     onNext,
     autoFocus,
 }: ContributorSelectorProps) {
@@ -136,67 +133,59 @@ export function ContributorSelector({
         }
     };
 
+    const showClearButton = activeTab === "search" ? query.length > 0 : manualQuery.length > 0;
+
     return (
         <div className="flex flex-col gap-2 w-full border rounded-md p-3 bg-muted/20">
-            <div className="flex items-center justify-between mb-1">
-                <div className="flex bg-muted rounded-lg p-1 gap-1">
-                    <button
-                        type="button"
-                        onClick={() => setActiveTab("search")}
-                        className={cn(
-                            "px-3 py-1.5 text-sm font-medium rounded-md transition-all",
-                            activeTab === "search"
-                                ? "bg-background text-foreground shadow-sm"
-                                : "text-muted-foreground hover:text-foreground hover:bg-background/50"
-                        )}
-                    >
-                        Search Users
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => setActiveTab("manual")}
-                        className={cn(
-                            "px-3 py-1.5 text-sm font-medium rounded-md transition-all",
-                            activeTab === "manual"
-                                ? "bg-background text-foreground shadow-sm"
-                                : "text-muted-foreground hover:text-foreground hover:bg-background/50"
-                        )}
-                    >
-                        Enter Name or ID
-                    </button>
-                </div>
-                <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    onClick={onRemove}
-                    className="text-muted-foreground hover:text-destructive"
+            <div className="flex bg-muted rounded-lg p-1 gap-1 w-fit">
+                <button
+                    type="button"
+                    onClick={() => setActiveTab("search")}
+                    className={cn(
+                        "px-3 py-1.5 text-sm font-medium rounded-md transition-all",
+                        activeTab === "search"
+                            ? "bg-background text-foreground shadow-sm"
+                            : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                    )}
                 >
-                    <Trash2 className="size-4" />
-                </Button>
+                    Search Users
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setActiveTab("manual")}
+                    className={cn(
+                        "px-3 py-1.5 text-sm font-medium rounded-md transition-all",
+                        activeTab === "manual"
+                            ? "bg-background text-foreground shadow-sm"
+                            : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                    )}
+                >
+                    Enter Name or ID
+                </button>
             </div>
 
             <div className="relative w-full">
                 {activeTab === "search" ? (
                     <Command className="border rounded-md bg-background overflow-hidden" shouldFilter={false}>
-                        <div className="flex items-center border-b px-3">
-                            <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                        <div className="flex items-center gap-2 pr-2 [&>[data-slot=command-input-wrapper]]:flex-1 [&>[data-slot=command-input-wrapper]]:border-b-0">
                             <CommandInput
                                 placeholder="Search by handle or name..."
                                 value={query}
-                                onValueChange={(val) => {
-                                    setQuery(val);
-                                    // Also update parent only if we want live updates during search typing
-                                    // But typically for search-select, we might wait for selection. 
-                                    // However, the existing logic updated on change, so let's keep it sync if needed,
-                                    // though typically we only commit on select.
-                                    // For now, let's strictly commit on select for consistency with Command pattern,
-                                    // OR keep it loose. Given the reference, they select items.
-                                }}
+                                onValueChange={setQuery}
                                 autoFocus={autoFocus}
-                                className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 border-none focus:ring-0"
                             />
-                            {loading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground ml-2" />}
+                            {loading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground shrink-0" />}
+                            {showClearButton && !loading && (
+                                <button
+                                    type="button"
+                                    onClick={onClear}
+                                    className="h-4 w-4 shrink-0 text-muted-foreground hover:text-foreground transition-colors"
+                                >
+                                    <X className="h-4 w-4" />
+                                </button>
+                            )}
                         </div>
+                        <div className="border-t"></div>
                         <CommandList>
                             {!loading && actors.length === 0 && !!query && (
                                 <CommandEmpty className="py-6 text-center text-sm">No results found.</CommandEmpty>
@@ -234,6 +223,15 @@ export function ContributorSelector({
                             onKeyDown={handleKeyDown}
                             autoFocus={autoFocus}
                         />
+                        {showClearButton && (
+                            <button
+                                type="button"
+                                onClick={onClear}
+                                className="h-4 w-4 mr-3 shrink-0 text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                                <X className="h-4 w-4" />
+                            </button>
+                        )}
                     </InputGroup>
                 )}
             </div>

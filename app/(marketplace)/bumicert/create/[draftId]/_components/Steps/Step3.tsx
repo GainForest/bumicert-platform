@@ -1,7 +1,6 @@
 "use client";
-import React, { Suspense, useEffect } from "react";
+import React, { useEffect } from "react";
 import FormField from "../../../../../../../components/ui/FormField";
-import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
 import { Button } from "@/components/ui/button";
 import {
   Users,
@@ -132,7 +131,7 @@ const Step3 = () => {
             <ContributorSelector
               value={newContributor}
               onChange={setNewContributor}
-              onRemove={() => setNewContributor("")}
+              onClear={() => setNewContributor("")}
               onNext={(val) => {
                 const trimmed = (val || newContributor).trim();
                 if (trimmed) {
@@ -140,7 +139,6 @@ const Step3 = () => {
                   setNewContributor("");
                 }
               }}
-              placeholder="Search users or enter name..."
             />
 
             <div className="flex flex-col gap-2">
