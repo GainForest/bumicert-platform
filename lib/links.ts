@@ -28,6 +28,9 @@ export const links = {
         image: "/api/aws/upload/image",
       },
     },
+    proxy: {
+      searchActors: "/api/proxy/search-actors",
+    },
     drafts: {
       bumicert: {
         get: (params?: {

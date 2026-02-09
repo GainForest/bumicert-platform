@@ -142,7 +142,9 @@ const Step4 = () => {
             let parsedValue: string;
             switch (typedKey) {
               case "contributors":
-                parsedValue = step3FormValues[typedKey].join(", ");
+                parsedValue = step3FormValues[typedKey]
+                  .map((c) => c.name)
+                  .join(", ");
                 break;
               case "siteBoundaries":
                 parsedValue = `${step3FormValues[typedKey].length} site${
