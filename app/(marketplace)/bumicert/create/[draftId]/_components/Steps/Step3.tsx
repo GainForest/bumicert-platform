@@ -39,6 +39,7 @@ import { getBlobUrl, parseAtUri } from "climateai-sdk/utilities/atproto";
 import { links } from "@/lib/links";
 import { ContributorRow } from "./ContributorRow";
 import { ContributorSelector } from "./ContributorSelector";
+import QuerySuspense from "@/components/query-suspense";
 
 const formatCoordinate = (coordinate: string) => {
   const num = parseFloat(coordinate);
@@ -62,17 +63,18 @@ const Step3 = () => {
     formValues;
 
   const addContributor = (name: string) => {
-    setFormValue("contributors", [...contributors, name]);
+    setFormValue("contributors", [...contributors, { id: crypto.randomUUID(), name }]);
   };
-  const updateContributor = (index: number, name: string) => {
-    const newContributors = [...contributors];
-    newContributors[index] = name;
-    setFormValue("contributors", newContributors);
-  };
-  const removeContributor = (index: number) => {
+  const updateContributor = (id: string, name: string) => {
     setFormValue(
       "contributors",
-      contributors.filter((_, i) => i !== index)
+      contributors.map((c) => (c.id === id ? { ...c, name } : c))
+    );
+  };
+  const removeContributor = (id: string) => {
+    setFormValue(
+      "contributors",
+      contributors.filter((c) => c.id !== id)
     );
   };
 
@@ -107,9 +109,6 @@ const Step3 = () => {
     }
   );
   const sites = sitesResponse?.sites;
-  console.log("==============");
-  console.log(JSON.stringify(sites, null, 2));
-  console.log("==============");
   const isSitesLoading = isSitesPending || isOlderSites;
 
   const selectedSitesSet = new Set(siteBoundaries.map((sb) => sb.uri));
@@ -135,9 +134,9 @@ const Step3 = () => {
               onChange={setNewContributor}
               onRemove={() => setNewContributor("")}
               onNext={(val) => {
-                const valueToAdd = val || newContributor;
-                if (valueToAdd.trim()) {
-                  addContributor(valueToAdd);
+                const trimmed = (val || newContributor).trim();
+                if (trimmed) {
+                  addContributor(trimmed);
                   setNewContributor("");
                 }
               }}
@@ -145,12 +144,12 @@ const Step3 = () => {
             />
 
             <div className="flex flex-col gap-2">
-              {contributors.map((c, i) => (
+              {contributors.map((c) => (
                 <ContributorRow
-                  key={i}
-                  value={c}
-                  onEdit={(val) => updateContributor(i, val)}
-                  onRemove={() => removeContributor(i)}
+                  key={c.id}
+                  value={c.name}
+                  onEdit={(val) => updateContributor(c.id, val)}
+                  onRemove={() => removeContributor(c.id)}
                 />
               ))}
             </div>
@@ -217,9 +216,9 @@ const Step3 = () => {
                       const cid = site.cid;
                       const uri = site.uri;
                       return (
-                        <Suspense
+                        <QuerySuspense
                           key={site.cid}
-                          fallback={
+                          loadingFallback={
                             <div className="h-12 rounded-md bg-muted animate-pulse"></div>
                           }
                         >
@@ -245,7 +244,7 @@ const Step3 = () => {
                               }
                             }}
                           />
-                        </Suspense>
+                        </QuerySuspense>
                       );
                     })}
                     <Button
@@ -343,6 +342,7 @@ const SiteItem = ({
     queryKey: ["location", urlToFetch],
     queryFn: async () => {
       if (!urlToFetch) {
+        console.error("Invalid urlToFetch while fetching Location. Location for debugging:", locationRef)
         throw new Error("A valid location could not be found.");
       }
       const response = await fetch(urlToFetch);
