@@ -62,14 +62,14 @@ const formatLastUpdated = (isoString: string): string => {
 
 const fetchAnalyticsData = async (): Promise<AnalyticsData> => {
   // Construct the full URL for the API endpoint
-  // Priority: VERCEL_URL (preview deploys) > NEXT_PUBLIC_APP_URL > localhost
+  // Priority: VERCEL_URL (preview deploys) > NEXT_PUBLIC_BASE_URL > localhost
   let baseUrl: string;
   
   if (process.env.VERCEL_URL) {
     // Vercel preview/production deployment
     baseUrl = `https://${process.env.VERCEL_URL}`;
-  } else if (process.env.NEXT_PUBLIC_APP_URL) {
-    baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+  } else if (process.env.NEXT_PUBLIC_BASE_URL) {
+    baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   } else {
     baseUrl = "http://localhost:3000";
   }

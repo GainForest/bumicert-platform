@@ -5,9 +5,9 @@ import { ReactNode, useMemo } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink, loggerLink } from "@trpc/client";
 import { createTRPCReact } from "@trpc/react-query";
-import { AppRouter } from "climateai-sdk";
-import { customTransformer } from "climateai-sdk/utilities/transform";
-import { AllowedPDSDomain } from "@/config/climateai-sdk";
+import { AppRouter } from "gainforest-sdk";
+import { customTransformer } from "gainforest-sdk/utilities/transform";
+import { AllowedPDSDomain } from "@/config/gainforest-sdk";
 
 export const trpcApi = createTRPCReact<AppRouter<AllowedPDSDomain>>();
 

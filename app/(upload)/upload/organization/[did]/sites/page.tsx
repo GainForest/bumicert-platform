@@ -2,9 +2,9 @@ import React from "react";
 import SitesHeaderContent from "./HeaderContent";
 import Container from "@/components/ui/container";
 import SitesClient, { AllSitesData } from "../_components/Sites/SitesClient";
-import { climateAiSdk } from "@/config/climateai-sdk.server";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
-import { serialize } from "climateai-sdk/utilities/transform";
+import { gainforestSdk } from "@/config/gainforest-sdk.server";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
+import { serialize } from "gainforest-sdk/utilities/transform";
 import { tryCatch } from "@/lib/tryCatch";
 import { TRPCError } from "@trpc/server";
 import ErrorPage from "./error";
@@ -13,9 +13,9 @@ const SitesPage = async ({ params }: { params: Promise<{ did: string }> }) => {
   const { did: encodedDid } = await params;
   const did = decodeURIComponent(encodedDid);
 
-  const serverCaller = climateAiSdk.getServerCaller();
+  const serverCaller = gainforestSdk.getServerCaller();
   const [response, error] = await tryCatch(
-    serverCaller.hypercerts.site.getAll({
+    serverCaller.hypercerts.location.getAll({
       did: did,
       pdsDomain: allowedPDSDomains[0],
     })
@@ -28,8 +28,8 @@ const SitesPage = async ({ params }: { params: Promise<{ did: string }> }) => {
       if (error instanceof TRPCError && error.code === "NOT_FOUND") {
         // Display empty sites data
         data = {
-          sites: [],
-          defaultSite: null,
+          locations: [],
+          defaultLocation: null,
         };
       } else {
         if (error instanceof TRPCError && error.code === "BAD_REQUEST") {

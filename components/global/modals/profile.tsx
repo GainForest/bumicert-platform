@@ -1,5 +1,6 @@
 "use client";
-import { trpcApi } from "@/components/providers/TrpcProvider";
+
+import { useState } from "react";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { Button } from "@/components/ui/button";
 import { useModal } from "@/components/ui/modal/context";
@@ -11,14 +12,10 @@ import {
   ModalTitle,
 } from "@/components/ui/modal/modal";
 import { links } from "@/lib/links";
-import {
-  Building,
-  GalleryVerticalEnd,
-  Loader2,
-  LogOut,
-  UploadIcon,
-} from "lucide-react";
+import { Building, Loader2, LogOut, UploadIcon } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
+import { logout } from "@/components/actions/oauth";
 
 export const ProfileModalId = "profile";
 
@@ -26,14 +23,20 @@ export const ProfileModal = () => {
   const { stack, popModal, hide } = useModal();
   const auth = useAtprotoStore((state) => state.auth);
   const setAuth = useAtprotoStore((state) => state.setAuth);
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
-  const { mutate: signOut, isPending: isSigningOut } =
-    trpcApi.auth.logout.useMutation({
-      onSuccess: () => {
-        setAuth(null);
-        hide().then(() => popModal());
-      },
-    });
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    try {
+      await logout();
+      setAuth(null);
+      await hide();
+      popModal();
+    } catch (error) {
+      console.error("Logout error:", error);
+      setIsSigningOut(false);
+    }
+  };
 
   if (!auth.authenticated) {
     return (
@@ -53,6 +56,16 @@ export const ProfileModal = () => {
     );
   }
 
+  // Prefer displayName from profile, fallback to handle prefix, fallback to truncated DID
+  const displayName = auth.user.displayName
+    ?? (auth.user.handle
+      ? auth.user.handle.split(".")[0]
+      : auth.user.did.slice(0, 16) + "...");
+
+  const domain = auth.user.handle
+    ? auth.user.handle.split(".").slice(1).join(".")
+    : "DID";
+
   return (
     <ModalContent>
       <ModalHeader
@@ -68,14 +81,24 @@ export const ProfileModal = () => {
         <ModalDescription></ModalDescription>
       </ModalHeader>
       <div className="flex flex-col items-center gap-2">
-        <div className="h-20 w-20 rounded-full bg-muted flex items-center justify-center"></div>
+        <div className="h-20 w-20 rounded-full bg-muted flex items-center justify-center overflow-hidden">
+          {auth.user.avatar ? (
+            <Image
+              src={auth.user.avatar}
+              alt={displayName}
+              width={80}
+              height={80}
+              className="object-cover w-full h-full"
+            />
+          ) : (
+            <span className="text-2xl font-bold text-muted-foreground">
+              {displayName.slice(0, 2).toUpperCase()}
+            </span>
+          )}
+        </div>
         <div className="flex flex-col items-center">
-          <span className="text-3xl font-serif font-bold">
-            {auth.user.handle.split(".")[0]}
-          </span>
-          <span className="text-sm text-muted-foreground">
-            {auth.user.handle.split(".").slice(1).join(".")}
-          </span>
+          <span className="text-3xl font-serif font-bold">{displayName}</span>
+          <span className="text-sm text-muted-foreground">{domain}</span>
         </div>
         <div className="flex items-center gap-2 w-full my-4">
           <Link
@@ -117,9 +140,7 @@ export const ProfileModal = () => {
       <ModalFooter>
         <Button
           variant={"destructive"}
-          onClick={() => {
-            signOut({ service: "climateai.org" });
-          }}
+          onClick={handleSignOut}
           disabled={isSigningOut}
         >
           {isSigningOut ? <Loader2 className="animate-spin" /> : <LogOut />}

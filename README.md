@@ -20,6 +20,28 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## ATProto OAuth Setup
+
+This application uses ATProto OAuth for authentication. You'll need to generate a JWK (JSON Web Key) for signing OAuth tokens.
+
+### Generating a JWK
+
+Run the following command to generate a new ES256 keypair:
+
+```bash
+bun run generate-jwk
+```
+
+The script will output a JWKS (JSON Web Key Set) in the correct format. Copy the entire JSON output and set it as the `ATPROTO_JWK_PRIVATE` environment variable.
+
+**For local development:**
+1. Create a `.env.local` file if it doesn't exist
+2. Add: `ATPROTO_JWK_PRIVATE='{"keys":[...]}'` (paste the full output)
+
+**For production (Vercel):**
+1. Go to your project settings → Environment Variables
+2. Add `ATPROTO_JWK_PRIVATE` with the full JSON output
+3. Redeploy your application
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

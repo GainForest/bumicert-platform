@@ -1,17 +1,18 @@
 "use client";
 import React, { useEffect, useMemo } from "react";
-import type { AppGainforestOrganizationInfo } from "climateai-sdk/lex-api";
+import type { AppGainforestOrganizationInfo, PubLeafletBlocksText } from "gainforest-sdk/lex-api";
 import { useOrganizationPageStore } from "../../store";
 import { Textarea } from "@/components/ui/textarea";
 import useHydratedData from "@/hooks/use-hydration";
 import {
   deserialize,
   SerializedSuperjson,
-} from "climateai-sdk/utilities/transform";
+} from "gainforest-sdk/utilities/transform";
 import { cn } from "@/lib/utils";
 import { CircleAlert } from "lucide-react";
 import QuickTooltip from "@/components/ui/quick-tooltip";
 import { Button } from "@/components/ui/button";
+import { $Typed } from "gainforest-sdk/lex-api/utils";
 
 const AboutOrganization = ({
   initialData,
@@ -42,8 +43,12 @@ const AboutOrganization = ({
   }, [editingData.longDescription, isEditing]);
 
   useEffect(() => {
+    const firstBlock = data.longDescription?.blocks?.[0]?.block;
+    const longDescription = firstBlock?.$type === "pub.leaflet.blocks.text" 
+      ? (firstBlock as $Typed<PubLeafletBlocksText.Main>).plaintext 
+      : "";
     setEditingData({
-      longDescription: data.longDescription,
+      longDescription,
     });
   }, [isEditing, data]);
 
@@ -86,12 +91,16 @@ const AboutOrganization = ({
         </div>
       ) : (
         <p className="text-justify mt-2">
-          {data.longDescription === "" ? (
+          {data.longDescription.blocks.length === 0 ? (
             <span className="text-muted-foreground">
               No long description provided.
             </span>
           ) : (
-            data.longDescription
+            // temp solution for now until parser is ready
+            data.longDescription.blocks.map((block) => {
+              const typedBlock = block.block as $Typed<PubLeafletBlocksText.Main>;
+              return typedBlock?.plaintext || "";
+            }).join("\n\n")
           )}
         </p>
       )}

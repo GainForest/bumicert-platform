@@ -3,10 +3,10 @@
 import { trpcApi } from "@/components/providers/TrpcProvider";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { Button } from "@/components/ui/button";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { links } from "@/lib/links";
-import { parseAtUri } from "climateai-sdk/utilities/atproto";
-import { getEcocertsFromClaimActivities as getBumicertsFromClaimActivities } from "climateai-sdk/utilities/hypercerts";
+import { parseAtUri } from "gainforest-sdk/utilities/atproto";
+import { getEcocertsFromClaimActivities as getBumicertsFromClaimActivities } from "gainforest-sdk/utilities/hypercerts";
 import { ArrowUpRight, Inbox, Loader2 } from "lucide-react";
 import Link from "next/link";
 import React, { useMemo } from "react";

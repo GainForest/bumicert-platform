@@ -28,9 +28,10 @@ export const links = {
         image: "/api/aws/upload/image",
       },
     },
-    proxy: {
-      searchActors: "/api/proxy/search-actors",
-    },
+    searchActors: (q: string, limit: number = 5) =>
+      `https://public.api.bsky.app/xrpc/app.bsky.actor.searchActors?q=${encodeURIComponent(q)}&limit=${limit}`,
+    getProfile: (actor: string) =>
+      `https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=${encodeURIComponent(actor)}`,
     drafts: {
       bumicert: {
         get: (params?: {

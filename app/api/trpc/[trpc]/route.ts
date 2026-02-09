@@ -1,8 +1,6 @@
 // app/api/trpc/[trpc]/route.ts
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
-import { climateAiSdk } from "@/config/climateai-sdk.server";
-import { createContext } from "climateai-sdk";
+import { gainforestSdk } from "@/config/gainforest-sdk.server";
 
 export const runtime = "nodejs";
 
@@ -10,12 +8,8 @@ const handler = (request: Request) =>
   fetchRequestHandler({
     endpoint: "/api/trpc",
     req: request,
-    router: climateAiSdk.appRouter,
-    createContext: ({ req }) =>
-      createContext({
-        req,
-        allowedPDSDomains,
-      }),
+    router: gainforestSdk.appRouter,
+    createContext: ({ req }) => gainforestSdk.createContext({ req }),
   });
 
 export { handler as GET, handler as POST };

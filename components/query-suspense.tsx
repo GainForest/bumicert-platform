@@ -10,7 +10,7 @@ const QuerySuspense = ({ children, loadingFallback, errorFallback }: { children:
             console.error("Error in QuerySuspense:", error);
             reset();
         }} fallbackRender={({ error }) => (
-            errorFallback ? errorFallback(error) : null
+            errorFallback ? <>{errorFallback(error)}</> : null
         )}>
             <Suspense fallback={loadingFallback}>
                 {children}

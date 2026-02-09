@@ -17,7 +17,7 @@ import {
 import { useFormStore } from "../../form-store";
 import { Checkbox } from "@/components/ui/checkbox";
 import useNewBumicertStore from "../../store";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { trpcApi } from "@/components/providers/TrpcProvider";
 import { useModal } from "@/components/ui/modal/context";
@@ -27,14 +27,14 @@ import {
   SiteEditorModal,
   SiteEditorModalId,
 } from "@/components/global/modals/upload/site/editor";
-import { computePolygonMetrics } from "climateai-sdk/utilities/geojson";
-import { GetRecordResponse } from "climateai-sdk/types";
-import { AppCertifiedLocation } from "climateai-sdk/lex-api";
+import { computePolygonMetrics } from "gainforest-sdk/utilities/geojson";
+import { GetRecordResponse } from "gainforest-sdk/types";
+import { AppCertifiedLocation } from "gainforest-sdk/lex-api";
 import useBlob from "@/hooks/use-blob";
-import { $Typed } from "climateai-sdk/lex-api/utils";
-import { OrgHypercertsDefs as Defs } from "climateai-sdk/lex-api";
+import { $Typed } from "gainforest-sdk/lex-api/utils";
+import { OrgHypercertsDefs as Defs } from "gainforest-sdk/lex-api";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { getBlobUrl, parseAtUri } from "climateai-sdk/utilities/atproto";
+import { getBlobUrl, parseAtUri } from "gainforest-sdk/utilities/atproto";
 import { links } from "@/lib/links";
 import { ContributorRow } from "./ContributorRow";
 import { ContributorSelector } from "./ContributorSelector";
@@ -98,7 +98,7 @@ const Step3 = () => {
     isPending: isSitesPending,
     isPlaceholderData: isOlderSites,
     error: sitesFetchError,
-  } = trpcApi.hypercerts.site.getAll.useQuery(
+  } = trpcApi.hypercerts.location.getAll.useQuery(
     {
       did: auth.user?.did ?? "",
       pdsDomain: allowedPDSDomains[0],
@@ -107,7 +107,7 @@ const Step3 = () => {
       enabled: !!auth.user?.did,
     }
   );
-  const sites = sitesResponse?.sites;
+  const sites = sitesResponse?.locations;
   const isSitesLoading = isSitesPending || isOlderSites;
 
   const selectedSitesSet = new Set(siteBoundaries.map((sb) => sb.uri));

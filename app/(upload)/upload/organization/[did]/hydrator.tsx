@@ -1,11 +1,11 @@
 "use client";
-import { AppGainforestOrganizationInfo } from "climateai-sdk/lex-api";
+import { AppGainforestOrganizationInfo } from "gainforest-sdk/lex-api";
 import { useOrganizationPageStore } from "./store";
 import { useEffect } from "react";
 import {
   deserialize,
   SerializedSuperjson,
-} from "climateai-sdk/utilities/transform";
+} from "gainforest-sdk/utilities/transform";
 
 export const OrganizationPageHydrator = ({
   initialSerializedData,

@@ -18,12 +18,12 @@ const VisibilitySelectorModal = ({
   initialVisibility,
   onVisibilityChange,
 }: {
-  initialVisibility: "Public" | "Hidden";
-  onVisibilityChange: (visibility: "Public" | "Hidden") => void;
+  initialVisibility: "Public" | "Unlisted";
+  onVisibilityChange: (visibility: "Public" | "Unlisted") => void;
 }) => {
   const [visibility, setVisibility] = useState(initialVisibility);
   const { popModal, stack, hide } = useModal();
-  const handleDone = (visibility: "Public" | "Hidden") => {
+  const handleDone = (visibility: "Public" | "Unlisted") => {
     onVisibilityChange(visibility);
     if (stack.length === 1) {
       hide().then(() => {
@@ -68,14 +68,14 @@ const VisibilitySelectorModal = ({
           variant={"outline"}
           className={cn(
             "w-full h-auto flex items-start justify-start text-wrap",
-            visibility === "Hidden" &&
+            visibility === "Unlisted" &&
               "border-primary text-primary bg-accent/50"
           )}
-          onClick={() => setVisibility("Hidden")}
+          onClick={() => setVisibility("Unlisted")}
         >
           <LockIcon className="size-6 opacity-40 mt-2" />
           <div className="flex flex-col items-start">
-            <span className="text-lg font-medium">Hidden</span>
+            <span className="text-lg font-medium">Unlisted</span>
             <span className="text-sm text-muted-foreground text-wrap text-left">
               Only you can view your organization and its details on the
               platform. Your organization&apos;s information will be hidden from

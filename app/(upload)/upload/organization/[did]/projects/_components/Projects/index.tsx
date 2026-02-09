@@ -1,4 +1,4 @@
-import { climateAiSdk } from "@/config/climateai-sdk.server";
+import { gainforestSdk } from "@/config/gainforest-sdk.server";
 import React from "react";
 import ProjectsClient, {
   AllProjectsData,
@@ -6,11 +6,11 @@ import ProjectsClient, {
 } from "./ProjectsClient";
 import { tryCatch } from "@/lib/tryCatch";
 import { TRPCError } from "@trpc/server";
-import { serialize } from "climateai-sdk/utilities/transform";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { serialize } from "gainforest-sdk/utilities/transform";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 
 const Projects = async ({ did }: { did: string }) => {
-  const apiCaller = climateAiSdk.getServerCaller();
+  const apiCaller = gainforestSdk.getServerCaller();
 
   // Placeholder API call - replace with actual endpoint when available
   // For now, gracefully handle if the endpoint doesn't exist
@@ -33,7 +33,7 @@ const Projects = async ({ did }: { did: string }) => {
     }
   } else {
     allProjectsData = {
-      projects: response,
+      projects: response || [],
     };
   }
 
