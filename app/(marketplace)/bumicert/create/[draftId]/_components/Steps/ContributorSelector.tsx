@@ -76,16 +76,15 @@ export function ContributorSelector({
 
             setLoading(true);
             try {
-                const endpoints = [
-                    "/api/proxy/climateai-search",
-                    "https://public.api.bsky.app"
+                const queryParams = `q=${encodeURIComponent(debouncedQuery)}&limit=5`;
+                const urls = [
+                    `/api/proxy/climateai-search?${queryParams}`,
+                    `https://public.api.bsky.app/xrpc/app.bsky.actor.searchActors?${queryParams}`
                 ];
 
-                const promises = endpoints.map(endpoint =>
-                    fetch(
-                        `${endpoint}/xrpc/app.bsky.actor.searchActors?q=${encodeURIComponent(debouncedQuery)}&limit=5`
-                    ).then(res => {
-                        if (!res.ok) throw new Error(`Failed to fetch from ${endpoint}`);
+                const promises = urls.map(url =>
+                    fetch(url).then(res => {
+                        if (!res.ok) throw new Error(`Failed to fetch from ${url}`);
                         return res.json();
                     })
                 );
