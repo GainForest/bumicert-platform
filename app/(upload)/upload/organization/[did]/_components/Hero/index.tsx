@@ -1,29 +1,27 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import EditableText from "@/components/ui/editable-text";
+import { useModal } from "@/components/ui/modal/context";
+import QuickTooltip from "@/components/ui/quick-tooltip";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
+import useHydratedData from "@/hooks/use-hydration";
+import { cn } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer-motion";
 import type { AppGainforestOrganizationInfo } from "gainforest-sdk/lex-api";
 import { getBlobUrl } from "gainforest-sdk/utilities/atproto";
+import {
+  deserialize,
+  SerializedSuperjson
+} from "gainforest-sdk/utilities/transform";
 import { BadgeCheck, CircleAlert, Pencil } from "lucide-react";
 import Image from "next/image";
-import React, { useEffect, useMemo } from "react";
-import { useOrganizationPageStore } from "../../store";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { useModal } from "@/components/ui/modal/context";
+import { useEffect, useMemo } from "react";
 import {
   ImageEditorModal,
   ImageEditorModalId,
 } from "../../_modals/image-editor";
-import useHydratedData from "@/hooks/use-hydration";
-import {
-  customTransformer,
-  deserialize,
-  SerializedSuperjson,
-} from "gainforest-sdk/utilities/transform";
-import { AllowedPDSDomain, allowedPDSDomains } from "@/config/gainforest-sdk";
-import EditableText from "@/components/ui/editable-text";
-import { AnimatePresence, motion } from "framer-motion";
-import QuickTooltip from "@/components/ui/quick-tooltip";
+import { useOrganizationPageStore } from "../../store";
 
 const Hero = ({
   initialData,
