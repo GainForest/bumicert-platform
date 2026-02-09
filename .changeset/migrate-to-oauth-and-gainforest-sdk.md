@@ -13,6 +13,9 @@ Migrate authentication to ATProto OAuth 2.0 and replace climateai-sdk with gainf
 - Added AtprotoProvider for client-side session initialization
 - Added server actions for authorize, logout, session checking, and profile fetching
 - Removed forgot-password modal and all credential-based login logic
+- Added loopback OAuth configuration for local development (RFC 8252 compliant)
+- Local development now works without ngrok using 127.0.0.1:3000
+- OAuth automatically switches between loopback (dev) and web client (production) modes
 
 ## SDK Migration
 

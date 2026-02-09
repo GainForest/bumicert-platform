@@ -17,14 +17,18 @@ const supabase = createClient(
 // Unique identifier for this app in the shared Supabase tables
 const APP_ID = "bumicerts";
 
+// Environment detection
+const isDev = process.env.NODE_ENV === "development";
+
 /**
  * Resolves the public URL of the app from available environment variables.
  * 
  * We need to set the production url to NEXT_PUBLIC_BASE_URL and for the previews we just use VERCEL_BRANCH_URL
  *
  * Priority:
- * 1. NEXT_PUBLIC_BASE_URL — explicit override (local dev with ngrok, or custom config)
+ * 1. NEXT_PUBLIC_BASE_URL — explicit override (local dev with loopback, ngrok, or custom config)
  * 2. VERCEL_BRANCH_URL — stable per-branch URL for preview deploys (auto-set by Vercel)
+ * 3. Default to http://127.0.0.1:3000 in development mode (loopback OAuth)
  * 
  * Disclaimer when testing previews only works with the branch name preview and not with the commit name preview
  */
@@ -34,6 +38,9 @@ export const resolvePublicUrl = (): string => {
   }
   if (process.env.VERCEL_BRANCH_URL) {
     return `https://${process.env.VERCEL_BRANCH_URL}`;
+  }
+  if (isDev) {
+    return "http://127.0.0.1:3000";
   }
   throw new Error(
     "Set NEXT_PUBLIC_BASE_URL, or deploy to Vercel (provides VERCEL_PROJECT_PRODUCTION_URL / VERCEL_BRANCH_URL automatically)"
@@ -57,16 +64,44 @@ const atprotoJwkPrivate = process.env.ATPROTO_JWK_PRIVATE;
 if (!atprotoJwkPrivate) {
   throw new Error("ATPROTO_JWK_PRIVATE is not set");
 }
+
+/**
+ * Development OAuth Configuration (Loopback Client)
+ * 
+ * RFC 8252 compliant loopback client for local development.
+ * - Uses http://localhost (no port) in client ID per RFC 8252
+ * - Actual redirect URI uses 127.0.0.1:3000
+ * - No client authentication required (token_endpoint_auth_method: "none")
+ * - Application type: "native"
+ */
+export const DEV_OAUTH_CONFIG = {
+  clientId: `http://localhost?scope=${encodeURIComponent(OAUTH_SCOPE)}&redirect_uri=${encodeURIComponent(`${PUBLIC_URL}/api/oauth/callback`)}`,
+  redirectUri: `${PUBLIC_URL}/api/oauth/callback`,
+  jwksUri: `${PUBLIC_URL}/.well-known/jwks.json`,
+  jwkPrivate: atprotoJwkPrivate,
+  scope: OAUTH_SCOPE,
+};
+
+/**
+ * Production OAuth Configuration (Web Client)
+ * 
+ * Standard web client using client metadata endpoint.
+ * - Client ID points to metadata endpoint
+ * - Uses private_key_jwt authentication
+ * - Application type: "web"
+ */
+export const PROD_OAUTH_CONFIG = {
+  clientId: `${PUBLIC_URL}/client-metadata.json`,
+  redirectUri: `${PUBLIC_URL}/api/oauth/callback`,
+  jwksUri: `${PUBLIC_URL}/.well-known/jwks.json`,
+  jwkPrivate: atprotoJwkPrivate,
+  scope: OAUTH_SCOPE,
+};
+
 export const atprotoSDK = createATProtoSDK({
-  oauth: {
-    clientId: `${PUBLIC_URL}/client-metadata.json`,
-    redirectUri: `${PUBLIC_URL}/api/oauth/callback`,
-    jwksUri: `${PUBLIC_URL}/.well-known/jwks.json`,
-    jwkPrivate: atprotoJwkPrivate,
-    scope: OAUTH_SCOPE,
-  },
+  oauth: isDev ? DEV_OAUTH_CONFIG : PROD_OAUTH_CONFIG,
   servers: {
-    pds: "https://climateai.org",
+    pds: process.env.NEXT_PUBLIC_PDS_URL,
   },
   storage: {
     sessionStore: createSupabaseSessionStore(supabase, APP_ID),
