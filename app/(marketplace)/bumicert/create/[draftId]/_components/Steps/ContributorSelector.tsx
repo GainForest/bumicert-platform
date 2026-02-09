@@ -14,6 +14,7 @@ import {
     CommandList,
 } from "@/components/ui/command";
 import { useDebounce } from "@/hooks/use-debounce";
+import { links } from "@/lib/links";
 
 // Type for ATProto actor
 interface Actor {
@@ -75,7 +76,7 @@ export function ContributorSelector({
             try {
                 const queryParams = `q=${encodeURIComponent(debouncedQuery)}&limit=5`;
                 const urls = [
-                    `/api/proxy/climateai-search?${queryParams}`,
+                    `${links.api.proxy.searchActors}?${queryParams}`,
                     `https://public.api.bsky.app/xrpc/app.bsky.actor.searchActors?${queryParams}`
                 ];
 
