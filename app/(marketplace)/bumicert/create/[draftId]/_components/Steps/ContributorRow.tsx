@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Trash2, Pencil, Check, X } from "lucide-react";
 import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
-import { cn } from "@/lib/utils";
 
 interface ContributorRowProps {
     value: string;
@@ -18,45 +17,39 @@ export function ContributorRow({ value, onEdit, onRemove }: ContributorRowProps)
     const [editValue, setEditValue] = useState(value);
     const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined);
 
-    // Parse handle to fetch avatar if possible
-    useEffect(() => {
-        let handle: string | null = null;
-
+    const handle = useMemo(() => {
         // Try matching "Name (@handle)"
         const parensMatch = value.match(/\(@([^)]+)\)/);
-        if (parensMatch) {
-            handle = parensMatch[1];
-        }
+        if (parensMatch) return parensMatch[1];
         // Try matching starts with "@"
-        else if (value.startsWith("@")) {
-            handle = value.slice(1);
-        }
+        if (value.startsWith("@")) return value.slice(1);
         // If it looks like a domain (e.g. contains dot), try using it as handle
-        else if (value.includes(".") && !value.includes(" ")) {
-            handle = value;
-        }
-
-        if (handle) {
-            // Fetch avatar from Bluesky public API
-            fetch(`https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=${encodeURIComponent(handle)}`)
-                .then((res) => {
-                    if (!res.ok) throw new Error("Failed to fetch");
-                    return res.json();
-                })
-                .then((data) => {
-                    if (data.avatar) {
-                        setAvatarUrl(data.avatar);
-                    } else {
-                        setAvatarUrl(undefined);
-                    }
-                })
-                .catch(() => {
-                    setAvatarUrl(undefined);
-                });
-        } else {
-            setAvatarUrl(undefined);
-        }
+        if (value.includes(".") && !value.includes(" ")) return value;
+        return null;
     }, [value]);
+
+    useEffect(() => {
+        if (!handle) return;
+
+        const controller = new AbortController();
+
+        fetch(
+            `https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=${encodeURIComponent(handle)}`,
+            { signal: controller.signal }
+        )
+            .then((res) => {
+                if (!res.ok) throw new Error("Failed to fetch");
+                return res.json();
+            })
+            .then((data) => {
+                if (data.avatar) setAvatarUrl(data.avatar);
+            })
+            .catch((err) => {
+                if (err.name !== "AbortError") setAvatarUrl(undefined);
+            });
+
+        return () => controller.abort();
+    }, [handle]);
 
     const handleSave = () => {
         onEdit(editValue);
