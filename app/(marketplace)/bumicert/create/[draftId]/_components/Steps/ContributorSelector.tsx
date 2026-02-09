@@ -73,32 +73,14 @@ export function ContributorSelector({
 
             setLoading(true);
             try {
-                const queryParams = `q=${encodeURIComponent(debouncedQuery)}&limit=5`;
-                const urls = [
-                    `${links.api.proxy.searchActors}?${queryParams}`,
-                    `https://public.api.bsky.app/xrpc/app.bsky.actor.searchActors?${queryParams}`
-                ];
+                const res = await fetch(links.api.searchActors(debouncedQuery, 5));
 
-                const promises = urls.map(url =>
-                    fetch(url).then(res => {
-                        if (!res.ok) throw new Error(`Failed to fetch from ${url}`);
-                        return res.json();
-                    })
-                );
+                if (!res.ok) {
+                    throw new Error("Failed to fetch");
+                }
 
-                const results = await Promise.allSettled(promises);
-
-                let allActors: Actor[] = [];
-                results.forEach(result => {
-                    if (result.status === "fulfilled" && result.value.actors) {
-                        allActors = [...allActors, ...result.value.actors];
-                    }
-                });
-
-                // Deduplicate by DID
-                const uniqueActors = Array.from(new Map(allActors.map(item => [item.did, item])).values());
-
-                setActors(uniqueActors);
+                const data = await res.json();
+                setActors(data.actors || []);
             } catch (error) {
                 console.error("Failed to search actors", error);
             } finally {
