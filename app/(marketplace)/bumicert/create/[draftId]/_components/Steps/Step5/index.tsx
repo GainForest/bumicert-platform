@@ -242,7 +242,7 @@ const Step5 = () => {
           workScopes: step1FormValues.workType,
           startDate: step1FormValues.projectDateRange[0].toISOString(),
           endDate: step1FormValues.projectDateRange[1].toISOString(),
-          contributors: step3FormValues.contributors.map((contributor) => ({ identity: contributor })),
+          contributors: step3FormValues.contributors.map((contributor) => ({ identity: contributor.name })),
           locations: step3FormValues.siteBoundaries.map((sb) => ({
             $type: "com.atproto.repo.strongRef" as const,
             cid: sb.cid,

@@ -140,7 +140,10 @@ const StoreHydrator = ({
         };
 
         const step3Data: Step3FormValues = {
-          contributors: draftData.contributors || [],
+          contributors: (draftData.contributors || []).map((name) => ({
+            id: crypto.randomUUID(),
+            name,
+          })),
           siteBoundaries: draftData.siteBoundaries || [],
           confirmPermissions: false,
           agreeTnc: false,

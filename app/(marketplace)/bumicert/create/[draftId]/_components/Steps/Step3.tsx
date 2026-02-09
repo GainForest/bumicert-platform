@@ -1,7 +1,6 @@
 "use client";
-import React, { Suspense, useEffect } from "react";
+import React, { useEffect } from "react";
 import FormField from "../../../../../../../components/ui/FormField";
-import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
 import { Button } from "@/components/ui/button";
 import {
   Users,
@@ -37,6 +36,9 @@ import { OrgHypercertsDefs as Defs } from "gainforest-sdk/lex-api";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { getBlobUrl, parseAtUri } from "gainforest-sdk/utilities/atproto";
 import { links } from "@/lib/links";
+import { ContributorRow } from "./ContributorRow";
+import { ContributorSelector } from "./ContributorSelector";
+import QuerySuspense from "@/components/query-suspense";
 
 const formatCoordinate = (coordinate: string) => {
   const num = parseFloat(coordinate);
@@ -48,6 +50,8 @@ const Step3 = () => {
   const { maxStepIndexReached, currentStepIndex } = useNewBumicertStore();
   const shouldShowValidationErrors = currentStepIndex < maxStepIndexReached;
 
+  const [newContributor, setNewContributor] = React.useState("");
+
   const formValues = useFormStore((state) => state.formValues[2]);
   const errors = useFormStore((state) => state.formErrors[2]);
   const setFormValue = useFormStore((state) => state.setFormValue[2]);
@@ -58,17 +62,18 @@ const Step3 = () => {
     formValues;
 
   const addContributor = (name: string) => {
-    setFormValue("contributors", [...contributors, name]);
+    setFormValue("contributors", [...contributors, { id: crypto.randomUUID(), name }]);
   };
-  const updateContributor = (index: number, name: string) => {
-    const newContributors = [...contributors];
-    newContributors[index] = name;
-    setFormValue("contributors", newContributors);
-  };
-  const removeContributor = (index: number) => {
+  const updateContributor = (id: string, name: string) => {
     setFormValue(
       "contributors",
-      contributors.filter((_, i) => i !== index)
+      contributors.map((c) => (c.id === id ? { ...c, name } : c))
+    );
+  };
+  const removeContributor = (id: string) => {
+    setFormValue(
+      "contributors",
+      contributors.filter((c) => c.id !== id)
     );
   };
 
@@ -103,9 +108,6 @@ const Step3 = () => {
     }
   );
   const sites = sitesResponse?.locations;
-  console.log("==============");
-  console.log(JSON.stringify(sites, null, 2));
-  console.log("==============");
   const isSitesLoading = isSitesPending || isOlderSites;
 
   const selectedSitesSet = new Set(siteBoundaries.map((sb) => sb.uri));
@@ -123,47 +125,34 @@ const Step3 = () => {
           error={errors.contributors}
           showError={shouldShowValidationErrors}
           required
-          info={`Add contributors: collaborators, teammates, individuals, or a group`}
+          info={`List any individuals or organizations that contributed to this work.`}
         >
-          {contributors.length === 0 && (
-            <button
-              className="border border-dashed bg-background/50 p-4 rounded-lg flex flex-col items-center justify-center gap-2"
-              onClick={() => addContributor("")}
-            >
-              <PlusCircle className="size-5 opacity-50" />
-              <span className="text-sm text-center">
-                Tap anywhere to add a contributor.
-              </span>
-            </button>
-          )}
-          {contributors.length > 0 && (
-            <>
-              <div className="flex flex-col gap-2">
-                {contributors.map((c, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <InputGroup className="bg-background flex-1">
-                      <InputGroupInput
-                        placeholder="Community / Organization name"
-                        value={c}
-                        onChange={(e) => updateContributor(i, e.target.value)}
-                      />
-                    </InputGroup>
-                    <Button
-                      variant="outline"
-                      onClick={() => removeContributor(i)}
-                    >
-                      <Trash2 />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-              <div className="flex items-center justify-center">
-                <Button variant="outline" onClick={() => addContributor("")}>
-                  <PlusCircle /> Add another contributor
-                </Button>
-              </div>
-            </>
-          )}
+          <div className="flex flex-col gap-1">
+            <ContributorSelector
+              value={newContributor}
+              onChange={setNewContributor}
+              onClear={() => setNewContributor("")}
+              onNext={(val) => {
+                const trimmed = (val || newContributor).trim();
+                if (trimmed) {
+                  addContributor(trimmed);
+                  setNewContributor("");
+                }
+              }}
+            />
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+              {contributors.map((c) => (
+                <ContributorRow
+                  key={c.id}
+                  value={c.name}
+                  onEdit={(val) => updateContributor(c.id, val)}
+                  onRemove={() => removeContributor(c.id)}
+                />
+              ))}
+            </div>
+          </div>
+
         </FormField>
 
         <FormField
@@ -225,9 +214,9 @@ const Step3 = () => {
                       const cid = site.cid;
                       const uri = site.uri;
                       return (
-                        <Suspense
+                        <QuerySuspense
                           key={site.cid}
-                          fallback={
+                          loadingFallback={
                             <div className="h-12 rounded-md bg-muted animate-pulse"></div>
                           }
                         >
@@ -253,7 +242,7 @@ const Step3 = () => {
                               }
                             }}
                           />
-                        </Suspense>
+                        </QuerySuspense>
                       );
                     })}
                     <Button
@@ -264,7 +253,8 @@ const Step3 = () => {
                       <PlusCircle /> Add a site
                     </Button>
                   </div>
-                )}
+                )
+                }
               </>
             )}
           </div>
@@ -350,6 +340,7 @@ const SiteItem = ({
     queryKey: ["location", urlToFetch],
     queryFn: async () => {
       if (!urlToFetch) {
+        console.error("Invalid urlToFetch while fetching Location. Location for debugging:", locationRef)
         throw new Error("A valid location could not be found.");
       }
       const response = await fetch(urlToFetch);
@@ -365,14 +356,14 @@ const SiteItem = ({
   const locationValidity =
     metrics.areaHectares && metrics.centroid
       ? {
-          valid: true as const,
-          area: metrics.areaHectares,
-          lat: metrics.centroid.lat,
-          lon: metrics.centroid.lon,
-        }
+        valid: true as const,
+        area: metrics.areaHectares,
+        lat: metrics.centroid.lat,
+        lon: metrics.centroid.lon,
+      }
       : {
-          valid: false as const,
-        };
+        valid: false as const,
+      };
 
   return (
     <Button
