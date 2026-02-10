@@ -10,6 +10,7 @@ import {
   Folder,
   Home,
   Map,
+  Mic,
   Satellite,
 } from "lucide-react";
 
@@ -48,6 +49,15 @@ export const navLinks: NavLinkConfig[] = [
     Icon: Satellite,
     pathCheck: {
       equals: links.upload.layers,
+    },
+  },
+  {
+    id: "upload/organization/a/audio",
+    href: links.upload.audio,
+    text: "Audio",
+    Icon: Mic,
+    pathCheck: {
+      equals: links.upload.audio,
     },
   },
   {
