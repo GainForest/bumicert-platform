@@ -225,3 +225,28 @@ time=2026-02-11T22:46:01.160+06:00 level=INFO msg="Import triggered by file chan
 time=2026-02-11T22:46:01.161+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
 time=2026-02-11T22:46:01.161+06:00 level=INFO msg="Skipping %s: JSONL content unchanged" !BADKEY=auto-import
 time=2026-02-11T22:46:01.331+06:00 level=INFO msg="Pull failed: %v (backoff: %v)" !BADKEY="git pull failed: exit status 1\nfatal: couldn't find remote ref eco-277-send-an-invite-code-to-the-user-email\n" !BADKEY=10m0s
+time=2026-02-11T22:46:16.613+06:00 level=INFO msg="Git ref change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.git/refs/heads/eco-277-send-an-invite-code-to-the-user-email.lock
+time=2026-02-11T22:46:17.615+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-11T22:46:17.615+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-11T22:50:16.458+06:00 level=INFO msg="Git ref change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.git/refs/heads/eco-277-send-an-invite-code-to-the-user-email.lock
+time=2026-02-11T22:50:17.459+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-11T22:50:17.460+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-11T22:50:20.758+06:00 level=INFO msg="Mutation detected: %s %s" status=bumicert-platform-e5f.6
+time=2026-02-11T22:50:20.843+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-11T22:50:20.843+06:00 level=INFO msg="File change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-11T22:50:21.259+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-11T22:50:21.260+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-11T22:50:21.260+06:00 level=INFO msg="Pre-export validation failed: %v" !BADKEY="refusing to export: JSONL content has changed since last import (import first to avoid data loss)"
+time=2026-02-11T22:50:21.844+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-11T22:50:21.845+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-11T22:50:38.775+06:00 level=INFO msg="Git ref change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.git/refs/heads/eco-277-send-an-invite-code-to-the-user-email.lock
+time=2026-02-11T22:50:39.776+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-11T22:50:39.777+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-12T10:10:52.424+06:00 level=INFO msg="Git ref change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.git/refs/heads/eco-277-send-an-invite-code-to-the-user-email.lock
+time=2026-02-12T10:10:53.425+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-12T10:10:53.426+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-12T10:10:53.426+06:00 level=INFO msg="JSONL content changed, proceeding with %s..." !BADKEY=auto-import
+time=2026-02-12T10:10:57.293+06:00 level=INFO msg="Pull failed: %v (backoff: %v)" !BADKEY="git pull failed: exit status 1\nfatal: couldn't find remote ref eco-277-send-an-invite-code-to-the-user-email\n" !BADKEY=30m0s
+time=2026-02-12T10:11:38.751+06:00 level=INFO msg="Git ref change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.git/refs/heads/eco-277-send-an-invite-code-to-the-user-email.lock
+time=2026-02-12T10:11:39.753+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-12T10:11:39.753+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import

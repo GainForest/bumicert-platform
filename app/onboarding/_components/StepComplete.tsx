@@ -12,7 +12,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
+import { allowedPDSDomains, trpcClient } from "@/config/gainforest-sdk";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -77,7 +77,7 @@ export function StepComplete() {
 
       // Step 2: Update client-side auth state if server signed us in
       if (accountResult.signedIn) {
-        setAuth({ did, handle }, allowedPDSDomains[0]);
+        setAuth({ did, handle });
       }
 
       // Step 3: Initialize organization data on PDS
