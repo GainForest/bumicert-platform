@@ -1,28 +1,24 @@
 "use server";
 
 import { NextRequest } from "next/server";
-import postgres from "postgres";
 import {
   allowedPDSDomains,
   defaultPdsDomain,
   type AllowedPDSDomain,
 } from "@/config/gainforest-sdk";
+import {
+  fetchExistingInvites,
+  isInviteCodeError,
+  mintInviteCodes,
+} from "@/lib/atproto/invites";
+import { getSupabaseAdmin } from "@/lib/supabase/server";
 
-if (!process.env.POSTGRES_URL_NON_POOLING_ATPROTO_AUTH_MAPPING) {
-  throw new Error("Missing POSTGRES_URL_NON_POOLING_ATPROTO_AUTH_MAPPING env var");
-}
 if (!process.env.INVITE_CODES_PASSWORD) {
   throw new Error("Missing INVITE_CODES_PASSWORD env var");
 }
 if (!process.env.PDS_ADMIN_IDENTIFIER || !process.env.PDS_ADMIN_PASSWORD) {
   throw new Error("Missing PDS_ADMIN_IDENTIFIER / PDS_ADMIN_PASSWORD env vars");
 }
-
-const sql = postgres(process.env.POSTGRES_URL_NON_POOLING_ATPROTO_AUTH_MAPPING, { ssl: "require" });
-
-type XrpcInviteResponse = {
-  codes: Array<{ account: string; codes: string[] }>;
-};
 
 export async function POST(req: NextRequest) {
   try {
@@ -44,7 +40,7 @@ export async function POST(req: NextRequest) {
       .trim()
       .toLowerCase();
 
-    const emails = emailsInput
+    let emails = emailsInput
       .map((e) => (e ?? "").trim().toLowerCase())
       .filter(Boolean);
 
@@ -92,135 +88,97 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const supabase = getSupabaseAdmin();
+    if (!supabase) {
+      return Response.json(
+        {
+          error: "ServerMisconfigured",
+          message: "Supabase admin client not configured",
+        },
+        { status: 500 }
+      );
+    }
+
+    let existingInvites: { email: string; inviteCode: string }[] = [];
+
     // When using "insecure" mode, check if invite codes already exist in the database
     if (isInsecureMode) {
       try {
-        const existingInvites: { email: string; inviteCode: string }[] = [];
-        const emailsNeedingNewCodes: string[] = [];
+        existingInvites = await fetchExistingInvites(
+          supabase,
+          emails,
+          pdsDomain as AllowedPDSDomain
+        );
 
-        for (const email of emails) {
-          const existing = await sql`
-            SELECT invite_token FROM invites WHERE email = ${email} AND pds_domain = ${pdsDomain} LIMIT 1
-          `;
-
-          if (existing.length > 0 && existing[0].invite_token) {
-            existingInvites.push({ email, inviteCode: existing[0].invite_token });
-          } else {
-            emailsNeedingNewCodes.push(email);
-          }
-        }
+        const existingEmails = new Set(
+          existingInvites.map((invite) => invite.email)
+        );
+        const emailsNeedingNewCodes = emails.filter(
+          (email) => !existingEmails.has(email)
+        );
 
         // If all emails have existing invite codes, return them
         if (emailsNeedingNewCodes.length === 0) {
-          return new Response(JSON.stringify({ invites: existingInvites }), {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-          });
+          return Response.json({ invites: existingInvites });
         }
 
-        // Otherwise, continue with creating new codes only for emails that don't have one
-        // We'll merge the results at the end
-        if (existingInvites.length > 0) {
-          // Some emails have existing codes, only create for the rest
-          // Update emails array to only include those needing new codes
-          emails.length = 0;
-          emails.push(...emailsNeedingNewCodes);
-          // Store existing invites to merge later
-          (req as unknown as { existingInvites: typeof existingInvites }).existingInvites = existingInvites;
-        }
+        // Only create new codes for emails that don't have one
+        emails = emailsNeedingNewCodes;
       } catch (dbErr) {
         console.error("Failed to check existing invites:", dbErr);
         // Continue with normal flow if DB check fails
       }
     }
 
-    const service =
-      process.env.NEXT_PUBLIC_ATPROTO_SERVICE_URL || `https://${pdsDomain}`;
-    const adminUsername = process.env.PDS_ADMIN_IDENTIFIER!;
-    const adminPassword = process.env.PDS_ADMIN_PASSWORD!;
-    const adminBasic = Buffer.from(`${adminUsername}:${adminPassword}`).toString("base64");
-
     // so N codes for N emails  with use count being 1
     const codeCount = emails.length;
 
     // If all emails already had codes (codeCount is 0), we would have returned earlier
     if (codeCount === 0) {
-      const existingInvites = (req as unknown as { existingInvites: { email: string; inviteCode: string }[] }).existingInvites || [];
-      return new Response(JSON.stringify({ invites: existingInvites }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      });
+      return Response.json({ invites: existingInvites });
     }
 
-    const response = await fetch(`${service}/xrpc/com.atproto.server.createInviteCodes`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Basic ${adminBasic}`,
-      },
-      body: JSON.stringify({ codeCount, useCount }),
-      // If your PDS is strict about JSON ints, the cast above ensures numbers.
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      return new Response(
-        error,
-        { status: response.status, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    const data = (await response.json()) as XrpcInviteResponse;
-    const minted = data?.codes?.[0]?.codes ?? [];
-
-    if (!Array.isArray(minted) || minted.length < emails.length) {
-      return new Response(
-        JSON.stringify({
-          error: "UpstreamError",
-          message: `PDS returned ${minted.length || 0} code(s) for ${emails.length} email(s)`,
-        }),
-        { status: 502, headers: { "Content-Type": "application/json" } }
-      );
-    }
+    const minted = await mintInviteCodes(
+      pdsDomain as AllowedPDSDomain,
+      codeCount
+    );
 
     // Pair first N codes to N emails; insert each mapping
     const results: { email: string; inviteCode: string }[] = [];
-    try {
-      for (let i = 0; i < emails.length; i++) {
-        const email = emails[i];
-        const inviteCode = minted[i];
+    const insertRows = emails.map((email, index) => ({
+      email,
+      invite_token: minted[index],
+      pds_domain: pdsDomain,
+    }));
 
-        await sql`
-          INSERT INTO invites (email, invite_token, pds_domain)
-          VALUES (${email}, ${inviteCode}, ${pdsDomain})
-        `;
-
-        results.push({ email, inviteCode });
-      }
-    } catch (dbErr) {
-      console.error("Failed to insert invite(s):", dbErr);
-      return new Response(
-        JSON.stringify({ error: "DatabaseError", message: "Failed to persist invite(s)" }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
+    const insertResult = await supabase.from("invites").insert(insertRows);
+    if (insertResult.error) {
+      console.error("Failed to insert invite(s):", insertResult.error);
+      return Response.json(
+        { error: "DatabaseError", message: "Failed to persist invite(s)" },
+        { status: 500 }
       );
     }
 
-    // Merge with any existing invites (from insecure mode check)
-    const existingInvites = (req as unknown as { existingInvites?: { email: string; inviteCode: string }[] }).existingInvites || [];
-    const allInvites = [...existingInvites, ...results];
+    for (let i = 0; i < emails.length; i++) {
+      results.push({ email: emails[i], inviteCode: minted[i] });
+    }
 
-    return new Response(JSON.stringify({ invites: allInvites }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    const allInvites = [...existingInvites, ...results];
+    return Response.json({ invites: allInvites });
   } catch (err) {
+    if (isInviteCodeError(err)) {
+      return Response.json(err.payload, { status: err.status });
+    }
+
     console.error("Unexpected error:", err);
-    return new Response(
-      JSON.stringify({
+    return Response.json(
+      {
         error: "InternalServerError",
-        message: (err as Record<string, string>)?.message || "Unexpected error occurred",
-      }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
+        message: (err as Record<string, string>)?.message ||
+          "Unexpected error occurred",
+      },
+      { status: 500 }
     );
   }
 }
