@@ -6,6 +6,7 @@ const didCatcher = (callback: (did: string) => string): DidDynamicLink => {
 export const links = {
   myOrganization: (did?: string) =>
     did ? `/organization/${did}` : "/organization",
+  allOrganizations: "/organization/all",
   upload: {
     organization: didCatcher((did) => `/upload/organization/${did}`),
     projects: didCatcher((did) => `/upload/organization/${did}/projects`),
@@ -27,6 +28,10 @@ export const links = {
         image: "/api/aws/upload/image",
       },
     },
+    searchActors: (q: string, limit: number = 5) =>
+      `https://public.api.bsky.app/xrpc/app.bsky.actor.searchActors?q=${encodeURIComponent(q)}&limit=${limit}`,
+    getProfile: (actor: string) =>
+      `https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=${encodeURIComponent(actor)}`,
     drafts: {
       bumicert: {
         get: (params?: {

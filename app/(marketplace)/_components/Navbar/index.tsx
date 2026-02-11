@@ -2,7 +2,7 @@
 import { NavbarContextProvider } from "@/components/global/Navbar/context";
 import NavbarLayout from "@/components/global/Navbar/NavbarLayout";
 import React from "react";
-import { navLinks, footerLinks } from "../Navbar/data";
+import { navLinks, footerLinks } from "./data";
 
 const Navbar = ({ children }: { children: React.ReactNode }) => {
   return (

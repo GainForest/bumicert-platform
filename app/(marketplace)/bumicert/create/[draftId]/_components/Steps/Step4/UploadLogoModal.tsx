@@ -9,11 +9,13 @@ import FileInput from "../../../../../../../../components/ui/FileInput";
 import { useState } from "react";
 import { Loader2, UploadIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { useModal } from "@/components/ui/modal/context";
-import { toBlobRefGenerator, toFileGenerator } from "climateai-sdk/zod";
+import { toBlobRefGenerator, toFileGenerator } from "gainforest-sdk/zod";
 import { trpcApi } from "@/components/providers/TrpcProvider";
+import { $Typed } from "gainforest-sdk/lex-api/utils";
+import { PubLeafletBlocksText } from "gainforest-sdk/lex-api";
 
 export const UploadLogoModalId = "upload/organization/logo";
 
@@ -51,13 +53,30 @@ export const UploadLogoModal = () => {
     if (!logo) throw new Error("Logo is required");
     if (!organizationInfo)
       throw new Error("Organization information is required");
+    
+    // temp fixes until parser is ready
+    const firstBlock = organizationInfo.longDescription?.blocks?.[0]?.block;
+    const longDescription = firstBlock?.$type === "pub.leaflet.blocks.text" 
+      ? (firstBlock as $Typed<PubLeafletBlocksText.Main>).plaintext 
+      : "";
+    
+    const shortDescription = organizationInfo?.shortDescription?.text || ""; 
+    
     await uploadLogo({
       did: auth.user?.did ?? "",
       uploads: {
         logo: await toFileGenerator(logo),
       },
       info: {
-        ...organizationInfo,
+        displayName: organizationInfo.displayName,
+        shortDescription,
+        longDescription,
+        objectives: organizationInfo.objectives,
+        country: organizationInfo.country,
+        visibility: organizationInfo.visibility,
+        website: organizationInfo.website,
+        startDate: organizationInfo.startDate,
+        createdAt: organizationInfo.createdAt,
         logo: organizationInfo.logo
           ? toBlobRefGenerator(organizationInfo.logo.image)
           : undefined,

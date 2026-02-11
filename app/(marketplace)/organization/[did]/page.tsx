@@ -1,33 +1,33 @@
+import AboutOrganization from "@/app/(upload)/upload/organization/[did]/_components/AboutOrganization";
+import Hero from "@/app/(upload)/upload/organization/[did]/_components/Hero";
+import SectionForData from "@/app/(upload)/upload/organization/[did]/_components/SectionForData";
+import SubHero from "@/app/(upload)/upload/organization/[did]/_components/SubHero";
+import { OrganizationPageHydrator } from "@/app/(upload)/upload/organization/[did]/hydrator";
 import Container from "@/components/ui/container";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
-import { climateAiSdk } from "@/config/climateai-sdk.server";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
+import { gainforestSdk } from "@/config/gainforest-sdk.server";
 import { tryCatch } from "@/lib/tryCatch";
 import { TRPCError } from "@trpc/server";
-import { AppGainforestOrganizationInfo } from "climateai-sdk/lex-api";
-import { getSessionFromRequest } from "climateai-sdk/session";
-import { serialize } from "climateai-sdk/utilities/transform";
+import { AppGainforestOrganizationInfo } from "gainforest-sdk/lex-api";
+import { getAppSession } from "gainforest-sdk/oauth";
+import { serialize } from "gainforest-sdk/utilities/transform";
 import HeaderContent from "./_components/HeaderContent";
-import Hero from "@/app/(upload)/upload/organization/[did]/_components/Hero";
-import SubHero from "@/app/(upload)/upload/organization/[did]/_components/SubHero";
-import AboutOrganization from "@/app/(upload)/upload/organization/[did]/_components/AboutOrganization";
-import SectionForData from "@/app/(upload)/upload/organization/[did]/_components/SectionForData";
-import { OrganizationPageHydrator } from "@/app/(upload)/upload/organization/[did]/hydrator";
 import ErrorPage from "./error";
 
-const EMPTY_ORGANIZATION_DATA: AppGainforestOrganizationInfo.Record = {
-  $type: "app.gainforest.organization.info",
+const EMPTY_ORGANIZATION_DATA = {
+  $type: "app.gainforest.organization.info" as const,
   displayName: "",
-  wesite: undefined,
+  website: undefined,
   logo: undefined,
   coverImage: undefined,
-  shortDescription: "",
-  longDescription: "",
+  shortDescription: { text: "", facets: [] },
+  longDescription: { blocks: [] },
   objectives: [],
   startDate: "",
   country: "",
-  visibility: "Public",
+  visibility: "Public" as const,
   createdAt: new Date().toISOString(),
-};
+} as AppGainforestOrganizationInfo.Record;
 
 const OrganizationPage = async ({
   params,
@@ -37,7 +37,7 @@ const OrganizationPage = async ({
   const { did: encodedDid } = await params;
   const did = decodeURIComponent(encodedDid);
 
-  const apiCaller = climateAiSdk.getServerCaller();
+  const apiCaller = gainforestSdk.getServerCaller();
   const [response, error] = await tryCatch(
     apiCaller.gainforest.organization.info.get({
       did,
@@ -47,36 +47,33 @@ const OrganizationPage = async ({
 
   let data = EMPTY_ORGANIZATION_DATA;
 
-  try {
-    if (error) {
-      if (error instanceof TRPCError && error.code === "NOT_FOUND") {
-        // Display empty organization data
-      } else {
-        if (error instanceof TRPCError && error.code === "BAD_REQUEST") {
-          throw new Error("This organization does not exist.");
-        }
-        throw new Error("An unknown error occurred.");
-      }
-    } else {
-      data = response.value;
+  if (error) {
+    if (!(error instanceof TRPCError)) {
+      console.error("An uncaught error occurred:", error);
+      return <ErrorPage error={"An unknown error occurred."} />;
     }
+    switch (error.code) {
+      case "BAD_REQUEST":
+        return <ErrorPage error="This organization does not exist." />;
+      case "NOT_FOUND":
+        // "NOT_FOUND" is expected when the info record is not found. So, we display empty data.
+        data = EMPTY_ORGANIZATION_DATA;
+        break;
+      default:
+        console.error("An uncaught TRPCError occurred:", error);
+        return <ErrorPage error="An unknown error occurred." />;
+    }
+  } else {
+    data = response.value;
+  }
 
-    if (data.visibility === "Hidden") {
-      try {
-        const session = await getSessionFromRequest();
-        if (session && session.did !== did) {
-          throw new Error("This organization is hidden.");
-        }
-      } catch {
-        throw new Error("This organization is hidden.");
-      }
+  const visibility = data.visibility as string;
+  if (visibility === "Unlisted") {
+    const [sessionResponse, sessionError] = await tryCatch(getAppSession());
+    const notPubliclyVisible = sessionError ? true : !sessionResponse.isLoggedIn || sessionResponse.did !== did;
+    if (notPubliclyVisible) {
+      return <ErrorPage error={"This organization is not publicly visible."} />;
     }
-  } catch (error) {
-    console.error(
-      "Redirecting to error page due to the following error:",
-      error
-    );
-    return <ErrorPage error={error as Error} />;
   }
   const serializedData = serialize(data);
 

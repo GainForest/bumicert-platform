@@ -1,8 +1,8 @@
 import { NextRequest } from "next/server";
 import postgres from "postgres";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
-import { climateAiSdk } from "@/config/climateai-sdk.server";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { env } from "process";
+import { gainforestSdk } from "@/config/gainforest-sdk.server";
 
 if (!env.POSTGRES_URL_NON_POOLING_ATPROTO_AUTH_MAPPING) {
   throw new Error(
@@ -77,22 +77,22 @@ export async function POST(req: NextRequest) {
     };
 
     // Optionally sign in the user by setting auth cookies
-    let signedIn = false;
-    if (updateCookies) {
-      try {
-        const handlePrefix = handle.split(".")[0];
-        const serverCaller = climateAiSdk.getServerCaller();
-        await serverCaller.auth.login({
-          handlePrefix,
-          service: service,
-          password,
-        });
-        signedIn = true;
-      } catch (loginErr) {
-        console.error("Auto sign-in after account creation failed:", loginErr);
-        // Don't fail the request — account was already created successfully
-      }
-    }
+    const signedIn = false;
+    // if (updateCookies) {
+    //   try {
+    //     const handlePrefix = handle.split(".")[0];
+    //     const serverCaller = gainforestSdk.getServerCaller();
+    //     await serverCaller.login({
+    //       handlePrefix,
+    //       service: service,
+    //       password,
+    //     });
+    //     signedIn = true;
+    //   } catch (loginErr) {
+    //     console.error("Auto sign-in after account creation failed:", loginErr);
+    //     // Don't fail the request — account was already created successfully
+    //   }
+    // }
 
     return new Response(
       JSON.stringify({ ...data, signedIn }),

@@ -1,16 +1,15 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { ArrowUpRight, Menu, UserX2, X } from "lucide-react";
-import React from "react";
+import { ArrowUpRight, ChevronDown, ChevronUp, Menu, UserX2, X } from "lucide-react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useNavbarContext } from "./context";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { NavLinkConfig } from "./types";
+import { NavLinkConfig, NavLinkLeaf } from "./types";
 import { usePathname } from "next/navigation";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import Link from "next/link";
 import UserAvatar from "@/components/user-avatar";
-import { AnimatePresence, motion } from "framer-motion";
 import { useModal } from "@/components/ui/modal/context";
 import { ProfileModal, ProfileModalId } from "../modals/profile";
 import AuthModal, { AuthModalId } from "../modals/auth";
@@ -24,6 +23,33 @@ export type MobileNavbarProps = {
   }[];
 };
 
+function isLeafActive(
+  leaf: NavLinkLeaf,
+  pathname: string,
+  did?: string
+): boolean {
+  if (leaf.id === "my-organization") {
+    if (did) {
+      return pathname.startsWith(links.myOrganization(did));
+    }
+    return pathname === links.myOrganization();
+  }
+
+  if ("equals" in leaf.pathCheck) {
+    const targetPath =
+      typeof leaf.pathCheck.equals === "function"
+        ? leaf.pathCheck.equals(did)
+        : leaf.pathCheck.equals;
+    return pathname === targetPath;
+  }
+
+  const targetPath =
+    typeof leaf.pathCheck.startsWith === "function"
+      ? leaf.pathCheck.startsWith(did)
+      : leaf.pathCheck.startsWith;
+  return pathname.startsWith(targetPath);
+}
+
 const MobileNavbar = ({ navLinks, footerLinks }: MobileNavbarProps) => {
   const { openState, setOpenState } = useNavbarContext();
   const [parent] = useAutoAnimate();
@@ -32,6 +58,58 @@ const MobileNavbar = ({ navLinks, footerLinks }: MobileNavbarProps) => {
   const did = auth.user?.did;
 
   const { show, popModal, pushModal } = useModal();
+
+  const [expandedGroups, setExpandedGroups] = useState<string[]>([]);
+  const expandedOrderRef = useRef<string[]>([]);
+
+  const isChildActive = useCallback(
+    (group: NavLinkConfig) => {
+      if (!group.children) return false;
+      return group.children.some((child) => isLeafActive(child, pathname, did));
+    },
+    [pathname, did]
+  );
+
+  // Auto-expand groups with active children on pathname change
+  useEffect(() => {
+    const activeGroupIds = navLinks
+      .filter((link) => link.children && isChildActive(link))
+      .map((link) => link.id);
+
+    setExpandedGroups((prev) => {
+      const merged = new Set([...prev, ...activeGroupIds]);
+      const result = Array.from(merged);
+      expandedOrderRef.current = result;
+      return result;
+    });
+  }, [pathname, did, navLinks, isChildActive]);
+
+  const toggleGroup = (groupId: string) => {
+    setExpandedGroups((prev) => {
+      if (prev.includes(groupId)) {
+        const next = prev.filter((id) => id !== groupId);
+        expandedOrderRef.current = next;
+        return next;
+      }
+
+      let next = [...prev, groupId];
+
+      if (next.length > 2) {
+        const toCollapse = expandedOrderRef.current.find((id) => {
+          const group = navLinks.find((l) => l.id === id);
+          return group && !isChildActive(group);
+        });
+        if (toCollapse) {
+          next = next.filter((id) => id !== toCollapse);
+        } else {
+          next = next.slice(1);
+        }
+      }
+
+      expandedOrderRef.current = next;
+      return next;
+    });
+  };
 
   return (
     <div className="flex flex-col w-full">
@@ -92,33 +170,92 @@ const MobileNavbar = ({ navLinks, footerLinks }: MobileNavbarProps) => {
           <div className="mt-2 flex flex-col gap-2 w-full mb-2">
             <div className="grid grid-cols-1 min-[28rem]:grid-cols-2 px-4 py-1 gap-1 min-[28rem]:gap-2">
               {navLinks.map((link) => {
-                let isHighlighted = false;
+                // Group item
+                if (link.children) {
+                  const isExpanded = expandedGroups.includes(link.id);
+                  const hasActiveChild = isChildActive(link);
+                  const parentHighlighted = !isExpanded && hasActiveChild;
 
-                if ("equals" in link.pathCheck) {
-                  const targetPath =
-                    typeof link.pathCheck.equals === "function"
-                      ? link.pathCheck.equals(did)
-                      : link.pathCheck.equals;
-                  isHighlighted = pathname === targetPath;
-                } else {
-                  const targetPath =
-                    typeof link.pathCheck.startsWith === "function"
-                      ? link.pathCheck.startsWith(did)
-                      : link.pathCheck.startsWith;
-                  isHighlighted = pathname.startsWith(targetPath);
+                  return (
+                    <div key={link.id} className="flex flex-col gap-1 min-[28rem]:col-span-2">
+                      <button
+                        type="button"
+                        onClick={() => toggleGroup(link.id)}
+                        className="w-full"
+                      >
+                        <Button
+                          variant={parentHighlighted ? "default" : "outline"}
+                          size={"lg"}
+                          className={cn(
+                            "w-full flex justify-between px-1 h-10 rounded-lg text-md",
+                            !parentHighlighted &&
+                              "bg-primary/10 border-none shadow-none",
+                            !parentHighlighted && hasActiveChild && "bg-foreground/10"
+                          )}
+                          asChild
+                        >
+                          <span className="relative">
+                            <span className="flex items-center gap-2">
+                              <link.Icon
+                                className={cn(
+                                  "size-5",
+                                  parentHighlighted
+                                    ? "text-primary-foreground"
+                                    : "text-primary"
+                                )}
+                              />
+                              <span>{link.text}</span>
+                            </span>
+                            {isExpanded ? (
+                              <ChevronUp className={cn("size-4", parentHighlighted ? "text-primary-foreground/60" : "text-muted-foreground")} />
+                            ) : (
+                              <ChevronDown className={cn("size-4", parentHighlighted ? "text-primary-foreground/60" : "text-muted-foreground")} />
+                            )}
+                          </span>
+                        </Button>
+                      </button>
+
+                      {isExpanded && (
+                        <div className="grid grid-cols-1 min-[28rem]:grid-cols-2 gap-1 min-[28rem]:gap-2 ml-5">
+                          {link.children.map((child) => {
+                            const isHighlighted = isLeafActive(child, pathname, did);
+                            const href =
+                              typeof child.href === "function"
+                                ? child.href(did)
+                                : child.href;
+
+                            return (
+                              <Link href={href} key={child.id} className="w-auto">
+                                <Button
+                                  variant={isHighlighted ? "default" : "outline"}
+                                  size={"lg"}
+                                  className={cn(
+                                    "w-full flex justify-start px-1 h-10 rounded-lg text-md",
+                                    !isHighlighted &&
+                                      "bg-primary/10 border-none shadow-none"
+                                  )}
+                                >
+                                  <child.Icon
+                                    className={cn(
+                                      "size-5",
+                                      isHighlighted
+                                        ? "text-primary-foreground"
+                                        : "text-primary"
+                                    )}
+                                  />
+                                  <span>{child.text}</span>
+                                </Button>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
                 }
 
-                // Special case for my organization link
-                if (link.id === "my-organization") {
-                  if (did) {
-                    isHighlighted = pathname.startsWith(
-                      links.myOrganization(did)
-                    );
-                  } else {
-                    isHighlighted = pathname === links.myOrganization();
-                  }
-                }
-
+                // Leaf item
+                const isHighlighted = isLeafActive(link, pathname, did);
                 const href =
                   typeof link.href === "function" ? link.href(did) : link.href;
 

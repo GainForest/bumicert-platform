@@ -1,7 +1,7 @@
 "use client";
 import usePriceFeed from "@/components/providers/PriceFeedProvider";
 import { Button } from "@/components/ui/button";
-import { OrgHypercertsClaimActivity } from "climateai-sdk/lex-api";
+import { OrgHypercertsClaimActivity } from "gainforest-sdk/lex-api";
 import { getStripedBackground } from "@/lib/getStripedBackground";
 import { getLastValidOrder } from "@/lib/hypercerts/getLastValidOrder";
 import { motion } from "framer-motion";

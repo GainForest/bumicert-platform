@@ -11,18 +11,14 @@ import {
   ModalHeader,
   ModalTitle,
 } from "@/components/ui/modal/modal";
-import React, { useCallback, useState } from "react";
-import { Loader2, LockIcon, X } from "lucide-react";
+import React, { useState } from "react";
+import { Loader2, X } from "lucide-react";
 import useLocalStorage from "use-local-storage";
-import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { useModal } from "@/components/ui/modal/context";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import AuthenticatedModalContent from "./authenticated";
-import { trpcApi } from "@/components/providers/TrpcProvider";
-import ForgotPasswordModal, {
-  ForgotPasswordModalId,
-} from "./forgot-password";
+import { authorize } from "@/components/actions/oauth";
 
 export const SignInModalId = "auth/sign-in";
 
@@ -33,64 +29,43 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
   const [inputHandlePrefix, setInputHandlePrefix] = useState(
     initialHandlePrefix ?? ""
   );
-  const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(true);
-  const { popModal, pushModal, stack, hide } = useModal();
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { popModal, stack } = useModal();
   const isAuthenticated = useAtprotoStore((state) => state.auth.authenticated);
-  const setAuth = useAtprotoStore((state) => state.setAuth);
-  const {
-    mutate: signIn,
-    isPending: isSigningIn,
-    error: signInError,
-  } = trpcApi.auth.login.useMutation({
-    onSuccess: (data) => {
-      addPreviousSession(data.handle);
-      setAuth(
-        {
-          did: data.did,
-          handle: data.handle,
-        },
-        data.service as string
-      );
-
-      // Pop all auth modals from the stack and hide if there
-      const stackCopy = structuredClone(stack);
-      while (stackCopy.length > 1) {
-        if (stackCopy.at(-1)?.startsWith("auth/")) {
-          stackCopy.pop();
-          popModal();
-        } else {
-          break;
-        }
-      }
-
-      // After popping all consecutive auth modals, if the last modal on stack
-      // is an auth modal, then hide the modal.
-      const shouldHideModal = stackCopy.at(-1)?.startsWith("auth/")
-        ? true
-        : false;
-      if (shouldHideModal) hide();
-    },
-  });
 
   const [previousSessions, setPreviousSessions] = useLocalStorage<
     { handle: string }[]
   >("previous-sessions", []);
 
-  const addPreviousSession = useCallback(
-    (handle: string) => {
-      setPreviousSessions((prev) => {
-        const alreadyExists = prev?.find(
-          (session) => session.handle === handle
+  const handleSignIn = async () => {
+    if (!inputHandlePrefix) return;
+
+    setIsRedirecting(true);
+    setError(null);
+
+    try {
+      // Call the server action to get the authorization URL
+      const { authorizationUrl } = await authorize(inputHandlePrefix);
+
+      // Store the handle prefix for later (to add to previous sessions after callback)
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem(
+          "pending_oauth_handle",
+          `${inputHandlePrefix}.climateai.org`
         );
-        if (alreadyExists) {
-          return prev;
-        }
-        return [...(prev ?? []), { handle }];
-      });
-    },
-    [setPreviousSessions]
-  );
+      }
+
+      // Redirect to the authorization URL
+      window.location.href = authorizationUrl;
+    } catch (err) {
+      console.error("OAuth authorization error:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to initiate sign in"
+      );
+      setIsRedirecting(false);
+    }
+  };
 
   if (isAuthenticated) {
     return <AuthenticatedModalContent message="You are already signed in." />;
@@ -108,7 +83,9 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
         }
       >
         <ModalTitle>Sign In</ModalTitle>
-        <ModalDescription>Provide your handle to continue</ModalDescription>
+        <ModalDescription>
+          Sign in with your ClimateAI account
+        </ModalDescription>
       </ModalHeader>
       <div className="flex flex-col gap-3 mt-4">
         <div className="flex flex-col gap-1">
@@ -119,7 +96,12 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
               placeholder="john-doe"
               value={inputHandlePrefix}
               onChange={(e) => setInputHandlePrefix(e.target.value)}
-              disabled={isSigningIn}
+              disabled={isRedirecting}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && inputHandlePrefix) {
+                  handleSignIn();
+                }
+              }}
             />
             <InputGroupAddon align="inline-end" className="text-primary">
               .climateai.org
@@ -155,7 +137,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
                     className={cn(
                       "flex items-center gap-2 justify-between h-8 rounded-md px-2 py-1 w-full cursor-pointer"
                     )}
-                    disabled={isSigningIn}
+                    disabled={isRedirecting}
                     onClick={() => {
                       setInputHandlePrefix(`${prefix}`);
                     }}
@@ -170,7 +152,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
                       variant="ghost"
                       size="icon"
                       className="hover:bg-transparent hover:text-destructive cursor-pointer"
-                      disabled={isSigningIn}
+                      disabled={isRedirecting}
                       onClick={() => {
                         setPreviousSessions((prev) => {
                           const newSessions =
@@ -188,72 +170,24 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
             })}
           </div>
         </div>
-        <div className="flex flex-col gap-1">
-          <span className="text-sm">Enter your password</span>
-          <InputGroup>
-            <InputGroupAddon>
-              <LockIcon />
-            </InputGroupAddon>
-            <InputGroupInput
-              placeholder="Enter your password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={isSigningIn}
-            />
-          </InputGroup>
-          <button
-            type="button"
-            className="text-sm text-primary hover:underline cursor-pointer self-end"
-            onClick={() => {
-              pushModal({
-                id: ForgotPasswordModalId,
-                content: <ForgotPasswordModal />,
-              });
-            }}
-            disabled={isSigningIn}
-          >
-            Forgot Password?
-          </button>
-        </div>
 
-        <div className="flex items-center gap-2 text-sm mt-4">
-          <Switch
-            checked={
-              // If the handle is in the previous sessions, then the switch should be checked
-              previousSessions.find(
-                (session) => session.handle === inputHandlePrefix
-              )
-                ? true
-                : rememberMe
-            }
-            onCheckedChange={setRememberMe}
-            disabled={
-              isSigningIn ||
-              previousSessions.find(
-                (session) => session.handle === inputHandlePrefix
-              ) !== undefined
-            }
-          />
-          <span>Remember me</span>
-        </div>
+        <p className="text-xs text-muted-foreground">
+          You will be redirected to ClimateAI to authenticate.
+        </p>
       </div>
       <ModalFooter>
-        <span className="text-sm text-destructive">{signInError?.message}</span>
+        {error && <span className="text-sm text-destructive">{error}</span>}
         <Button
-          disabled={inputHandlePrefix === "" || isSigningIn}
-          onClick={() => {
-            signIn({
-              handlePrefix: inputHandlePrefix.split(".")[0],
-              service: "climateai.org",
-              password: password,
-            });
-          }}
+          disabled={inputHandlePrefix === "" || isRedirecting}
+          onClick={handleSignIn}
         >
-          {isSigningIn ? (
-            <Loader2 className="size-4 animate-spin" />
+          {isRedirecting ? (
+            <>
+              <Loader2 className="size-4 animate-spin mr-2" />
+              Redirecting...
+            </>
           ) : (
-            "Sign In"
+            "Sign in with ClimateAI"
           )}
         </Button>
       </ModalFooter>

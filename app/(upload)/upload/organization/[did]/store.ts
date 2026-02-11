@@ -1,13 +1,13 @@
 import { create } from "zustand";
-import { AppGainforestOrganizationInfo } from "climateai-sdk/lex-api";
-import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
+import { AppGainforestOrganizationInfo } from "gainforest-sdk/lex-api";
+import { allowedPDSDomains, trpcClient } from "@/config/gainforest-sdk";
 import {
   BlobRefGenerator,
   toBlobRefGenerator,
   toFileGenerator,
-} from "climateai-sdk/zod";
-import { BlobRef } from "climateai-sdk/zod";
-import { PutRecordResponse } from "climateai-sdk/types";
+} from "gainforest-sdk/zod";
+import { BlobRef } from "gainforest-sdk/zod";
+import { PutRecordResponse } from "gainforest-sdk/types";
 
 export type HeroEditingData = {
   displayName: string;

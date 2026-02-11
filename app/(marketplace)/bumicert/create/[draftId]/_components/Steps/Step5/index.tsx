@@ -13,15 +13,15 @@ import {
 } from "lucide-react";
 
 import { useAtprotoStore } from "@/components/stores/atproto";
-import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
+import { allowedPDSDomains, trpcClient } from "@/config/gainforest-sdk";
 import { cn } from "@/lib/utils";
 import { useFormStore } from "../../../form-store";
 import { useStep5Store } from "./store";
-import { toFileGenerator } from "climateai-sdk/zod";
+import { toFileGenerator } from "gainforest-sdk/zod";
 import { links } from "@/lib/links";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { parseAtUri } from "climateai-sdk/utilities/atproto";
+import { parseAtUri } from "gainforest-sdk/utilities/atproto";
 import { trpcApi } from "@/components/providers/TrpcProvider";
 import { usePathname } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
@@ -188,7 +188,7 @@ const Step5 = () => {
         // Track successful bumicert publication
         const duration = getFlowDurationSeconds() ?? 0;
         trackBumicertPublished({
-          draftId: data.data?.cid ?? "unknown",
+          draftId: data.cid ?? "unknown",
           totalDurationSeconds: duration,
         });
 
@@ -223,12 +223,18 @@ const Step5 = () => {
       return;
     }
 
+    if (!auth.user?.did) {
+      setCreateBumicertError("You must be signed in to publish.");
+      return;
+    }
+
     try {
       const coverImageFileGen = await toFileGenerator(
         step1FormValues.coverImage
       );
 
       const data = {
+        did: auth.user.did,
         activity: {
           title: step1FormValues.projectName,
           shortDescription: step2FormValues.shortDescription,
@@ -236,7 +242,7 @@ const Step5 = () => {
           workScopes: step1FormValues.workType,
           startDate: step1FormValues.projectDateRange[0].toISOString(),
           endDate: step1FormValues.projectDateRange[1].toISOString(),
-          contributors: step3FormValues.contributors,
+          contributors: step3FormValues.contributors.map((contributor) => ({ identity: contributor.name })),
           locations: step3FormValues.siteBoundaries.map((sb) => ({
             $type: "com.atproto.repo.strongRef" as const,
             cid: sb.cid,
@@ -325,7 +331,7 @@ const Step5 = () => {
         />
       )}
       {createBumicertStatus === "success" &&
-        createdBumicertResponse?.data.cid && (
+        createdBumicertResponse?.cid && (
           <div className="mt-4 flex flex-col items-center border border-border rounded-lg">
             <CircleCheckIcon className="size-6" />
             <span className="mt-1">
@@ -334,8 +340,8 @@ const Step5 = () => {
             <Button className="mt-2">
               <Link
                 href={links.bumicert.view(
-                  `${parseAtUri(createdBumicertResponse.data.uri).did}-${
-                    parseAtUri(createdBumicertResponse.data.uri).rkey
+                  `${parseAtUri(createdBumicertResponse.uri).did}-${
+                    parseAtUri(createdBumicertResponse.uri).rkey
                   }`
                 )}
               >
