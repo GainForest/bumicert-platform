@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import postgres from "postgres";
-import { allowedPDSDomains } from "@/config/gainforest-sdk";
+import { defaultPdsDomain } from "@/config/gainforest-sdk";
 import { env } from "process";
 import { gainforestSdk } from "@/config/gainforest-sdk.server";
 
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const service = allowedPDSDomains[0];
+    const service = defaultPdsDomain;
 
     const response = await fetch(
       `https://${service}/xrpc/com.atproto.server.createAccount`,
