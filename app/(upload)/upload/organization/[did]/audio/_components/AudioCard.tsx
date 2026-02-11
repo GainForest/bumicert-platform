@@ -8,7 +8,7 @@ import {
   MapPin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { AllAudioData } from "./AudioClient";
+import { AudioData } from "./AudioClient";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -26,7 +26,6 @@ import { useAtprotoStore } from "@/components/stores/atproto";
 import { trpcApi } from "@/components/providers/TrpcProvider";
 import { getBlobUrl } from "gainforest-sdk/utilities/atproto";
 
-export type AudioData = AllAudioData[number];
 type AudioCardProps = {
   audioData: AudioData;
   did: string;
