@@ -33,9 +33,10 @@ export const AudioEditorModal = ({ initialData }: AudioEditorModalProps) => {
   const initialAudio = initialData?.value;
   const initialName = initialAudio?.name;
   const initialDescription = initialAudio?.description?.text;
+  const initialCoordinates = initialAudio?.metadata?.coordinates;
 
   const auth = useAtprotoStore((state) => state.auth);
-  const did = auth.user?.did;
+  const did = auth.status === "AUTHENTICATED" ? auth.user.did : null;
 
   const { rkey } = initialData?.uri
     ? parseAtUri(initialData.uri)
@@ -44,15 +45,18 @@ export const AudioEditorModal = ({ initialData }: AudioEditorModalProps) => {
 
   const [name, setName] = useState(initialName ?? "");
   const [description, setDescription] = useState(initialDescription ?? "");
+  const [coordinates, setCoordinates] = useState(initialCoordinates ?? "");
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [recordedAt, setRecordedAt] = useState(
     initialAudio?.metadata?.recordedAt
       ? new Date(initialAudio.metadata.recordedAt).toISOString().slice(0, 16)
       : new Date().toISOString().slice(0, 16)
   );
+  const [localError, setLocalError] = useState<string | null>(null);
 
   const hasAudioInput = audioFile !== null;
-  const disableSubmission = mode === "add" && !hasAudioInput;
+  const isAuthenticated = did !== null;
+  const disableSubmission = !isAuthenticated || (mode === "add" && !hasAudioInput);
 
   const [isCompleted, setIsCompleted] = useState(false);
 
@@ -66,7 +70,7 @@ export const AudioEditorModal = ({ initialData }: AudioEditorModalProps) => {
   } = trpcApi.gainforest.organization.recordings.audio.create.useMutation({
     onSuccess: () => {
       utils.gainforest.organization.recordings.audio.getAll.invalidate({
-        did,
+        did: did ?? undefined,
         pdsDomain: allowedPDSDomains[0],
       });
       setIsCompleted(true);
@@ -80,7 +84,7 @@ export const AudioEditorModal = ({ initialData }: AudioEditorModalProps) => {
   } = trpcApi.gainforest.organization.recordings.audio.update.useMutation({
     onSuccess: () => {
       utils.gainforest.organization.recordings.audio.getAll.invalidate({
-        did,
+        did: did ?? undefined,
         pdsDomain: allowedPDSDomains[0],
       });
       setIsCompleted(true);
@@ -88,45 +92,31 @@ export const AudioEditorModal = ({ initialData }: AudioEditorModalProps) => {
   });
 
   const executeAddOrEdit = async () => {
-    if (mode === "add") {
-      const audioFileInput =
-        audioFile === null ? null : await toFileGenerator(audioFile);
+    if (!did) {
+      setLocalError("You must be authenticated to perform this action.");
+      return;
+    }
 
-      if (!audioFileInput) {
-        throw new Error("Audio file is required");
-      }
+    setLocalError(null);
 
-      await handleAdd({
-        did: did!,
-        recording: {
-          name: name.trim() || undefined,
-          description: description.trim()
-            ? { text: description.trim() }
-            : undefined,
-          recordedAt: new Date(recordedAt).toISOString(),
-        },
-        uploads: {
-          audioFile: audioFileInput,
-        },
-        pdsDomain: allowedPDSDomains[0],
-      });
-    } else {
-      if (!rkey) {
-        throw new Error("Record key is required for editing");
-      }
+    try {
+      if (mode === "add") {
+        if (!audioFile) {
+          setLocalError("Audio file is required.");
+          return;
+        }
 
-      if (hasAudioInput) {
-        const audioFileInput = await toFileGenerator(audioFile!);
+        const audioFileInput = await toFileGenerator(audioFile);
 
-        await handleUpdate({
-          did: did!,
-          rkey,
+        handleAdd({
+          did,
           recording: {
             name: name.trim() || undefined,
             description: description.trim()
               ? { text: description.trim() }
               : undefined,
             recordedAt: new Date(recordedAt).toISOString(),
+            coordinates: coordinates.trim() || undefined,
           },
           uploads: {
             audioFile: audioFileInput,
@@ -134,24 +124,54 @@ export const AudioEditorModal = ({ initialData }: AudioEditorModalProps) => {
           pdsDomain: allowedPDSDomains[0],
         });
       } else {
-        await handleUpdate({
-          did: did!,
-          rkey,
-          recording: {
-            name: name.trim() || undefined,
-            description: description.trim()
-              ? { text: description.trim() }
-              : undefined,
-            recordedAt: new Date(recordedAt).toISOString(),
-          },
-          pdsDomain: allowedPDSDomains[0],
-        });
+        if (!rkey) {
+          setLocalError("Record key is required for editing.");
+          return;
+        }
+
+        if (hasAudioInput) {
+          const audioFileInput = await toFileGenerator(audioFile);
+
+          handleUpdate({
+            did,
+            rkey,
+            recording: {
+              name: name.trim() || undefined,
+              description: description.trim()
+                ? { text: description.trim() }
+                : undefined,
+              recordedAt: new Date(recordedAt).toISOString(),
+              coordinates: coordinates.trim() || undefined,
+            },
+            uploads: {
+              audioFile: audioFileInput,
+            },
+            pdsDomain: allowedPDSDomains[0],
+          });
+        } else {
+          handleUpdate({
+            did,
+            rkey,
+            recording: {
+              name: name.trim() || undefined,
+              description: description.trim()
+                ? { text: description.trim() }
+                : undefined,
+              recordedAt: new Date(recordedAt).toISOString(),
+              coordinates: coordinates.trim() || undefined,
+            },
+            pdsDomain: allowedPDSDomains[0],
+          });
+        }
       }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred.";
+      setLocalError(errorMessage);
     }
   };
 
   const isPending = isAdding || isUpdating;
-  const error = addError || updateError;
+  const error = localError || addError?.message || updateError?.message;
 
   return (
     <ModalContent>
@@ -231,6 +251,26 @@ export const AudioEditorModal = ({ initialData }: AudioEditorModalProps) => {
                 />
               </div>
 
+              <div className="flex flex-col gap-0.5">
+                <label
+                  htmlFor="coordinates-for-audio"
+                  className="text-sm text-muted-foreground"
+                >
+                  Coordinates (optional)
+                </label>
+                <Input
+                  placeholder="e.g., -3.4653, 142.0723 or -3.4653, 142.0723, 450"
+                  id="coordinates-for-audio"
+                  value={coordinates}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    setCoordinates(e.target.value)
+                  }
+                />
+                <span className="text-xs text-muted-foreground mt-1">
+                  Format: latitude, longitude (and optionally altitude)
+                </span>
+              </div>
+
               <hr className="opacity-50" />
 
               <div className="flex flex-col gap-0.5">
@@ -262,7 +302,7 @@ export const AudioEditorModal = ({ initialData }: AudioEditorModalProps) => {
 
             {error && (
               <div className="text-sm text-destructive mt-2">
-                {error.message.startsWith("[") ? "Bad Request" : error.message}
+                {error.startsWith("[") ? "Bad Request" : error}
               </div>
             )}
           </motion.section>
