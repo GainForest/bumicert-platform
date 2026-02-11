@@ -177,3 +177,51 @@ time=2026-02-11T22:26:37.666+06:00 level=INFO msg="Starting %s..." !BADKEY=expor
 time=2026-02-11T22:26:37.666+06:00 level=INFO msg="Pre-export validation failed: %v" !BADKEY="refusing to export: JSONL content has changed since last import (import first to avoid data loss)"
 time=2026-02-11T22:26:38.256+06:00 level=INFO msg="Import triggered by file change"
 time=2026-02-11T22:26:38.257+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-11T22:26:55.101+06:00 level=INFO msg="Git ref change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.git/refs/heads/eco-277-send-an-invite-code-to-the-user-email.lock
+time=2026-02-11T22:26:56.102+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-11T22:26:56.103+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-11T22:27:40.421+06:00 level=INFO msg="Git ref change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.git/refs/heads/eco-277-send-an-invite-code-to-the-user-email.lock
+time=2026-02-11T22:27:41.422+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-11T22:27:41.423+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-11T22:27:45.490+06:00 level=INFO msg="Mutation detected: %s %s" status=bumicert-platform-e5f.4
+time=2026-02-11T22:27:45.584+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-11T22:27:45.584+06:00 level=INFO msg="File change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-11T22:27:45.991+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-11T22:27:45.991+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-11T22:27:45.992+06:00 level=INFO msg="Pre-export validation failed: %v" !BADKEY="refusing to export: JSONL content has changed since last import (import first to avoid data loss)"
+time=2026-02-11T22:27:46.586+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-11T22:27:46.587+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-11T22:28:04.973+06:00 level=INFO msg="Git ref change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.git/refs/heads/eco-277-send-an-invite-code-to-the-user-email.lock
+time=2026-02-11T22:28:05.974+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-11T22:28:05.975+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-11T22:28:53.326+06:00 level=INFO msg="Mutation detected: %s %s" create=bumicert-platform-e5f.5
+time=2026-02-11T22:28:53.826+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-11T22:28:53.826+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-11T22:28:53.830+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-11T22:28:53.830+06:00 level=INFO msg="File change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-11T22:28:53.831+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-11T22:28:53.831+06:00 level=INFO msg="Export complete"
+time=2026-02-11T22:28:54.832+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-11T22:28:54.833+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-11T22:29:00.432+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-11T22:29:00.432+06:00 level=INFO msg="File change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-11T22:29:01.433+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-11T22:29:01.434+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-11T22:45:56.250+06:00 level=INFO msg="Mutation detected: %s %s" create=bumicert-platform-e5f.6
+time=2026-02-11T22:45:56.750+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-11T22:45:56.751+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-11T22:45:56.754+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-11T22:45:56.755+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-11T22:45:56.755+06:00 level=INFO msg="Export complete"
+time=2026-02-11T22:45:57.755+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-11T22:45:57.756+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-11T22:45:57.756+06:00 level=INFO msg="JSONL content changed, proceeding with %s..." !BADKEY=auto-import
+time=2026-02-11T22:45:57.759+06:00 level=INFO msg="⚠️  WARNING: Uncommitted local changes detected in %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-11T22:45:57.759+06:00 level=INFO msg="   Pulling from remote may overwrite local unpushed changes."
+time=2026-02-11T22:45:57.759+06:00 level=INFO msg="   Consider running 'bd sync' to commit and push your changes first."
+time=2026-02-11T22:46:00.158+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-11T22:46:00.158+06:00 level=INFO msg="File change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-11T22:46:01.160+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-11T22:46:01.161+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-11T22:46:01.161+06:00 level=INFO msg="Skipping %s: JSONL content unchanged" !BADKEY=auto-import
+time=2026-02-11T22:46:01.331+06:00 level=INFO msg="Pull failed: %v (backoff: %v)" !BADKEY="git pull failed: exit status 1\nfatal: couldn't find remote ref eco-277-send-an-invite-code-to-the-user-email\n" !BADKEY=10m0s
