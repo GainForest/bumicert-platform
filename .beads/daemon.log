@@ -1,0 +1,113 @@
+time=2026-02-04T18:34:43.476+06:00 level=INFO msg="Daemon started (interval: %v, auto-commit: %v, auto-push: %v)" !BADKEY=5s !BADKEY=false !BADKEY=false
+time=2026-02-04T18:34:43.477+06:00 level=INFO msg="using database" path=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/beads.db
+time=2026-02-04T18:34:43.522+06:00 level=INFO msg="database opened" path=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/beads.db backend=sqlite freshness_checking=true
+time=2026-02-04T18:34:43.522+06:00 level=INFO msg="upgrading .beads/.gitignore"
+time=2026-02-04T18:34:43.522+06:00 level=WARN msg="failed to upgrade .gitignore" error="open .beads/.gitignore: no such file or directory"
+time=2026-02-04T18:34:43.524+06:00 level=INFO msg="Repository fingerprint validated: %s" !BADKEY=75e10e9e
+time=2026-02-04T18:34:43.525+06:00 level=INFO msg="starting RPC server" socket=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/bd.sock
+time=2026-02-04T18:34:43.525+06:00 level=INFO msg="RPC server ready (socket listening)"
+time=2026-02-04T18:34:43.529+06:00 level=INFO msg="registered in global registry"
+time=2026-02-04T18:34:43.529+06:00 level=INFO msg="Starting %s..." !BADKEY="sync cycle"
+time=2026-02-04T18:34:43.530+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-04T18:34:48.301+06:00 level=INFO msg="Pulled from remote"
+time=2026-02-04T18:34:48.312+06:00 level=INFO msg="Imported from JSONL"
+time=2026-02-04T18:34:48.321+06:00 level=INFO msg="Sync cycle complete"
+time=2026-02-04T18:34:48.321+06:00 level=INFO msg="monitoring parent process" pid=0
+time=2026-02-04T18:34:48.321+06:00 level=INFO msg="using event-driven mode"
+time=2026-02-04T18:34:48.321+06:00 level=INFO msg="Auto-pull disabled: use 'git pull' manually to sync remote changes"
+time=2026-02-04T18:34:48.321+06:00 level=INFO msg="Mutation detected: %s %s" create=bumicert-platform-19c
+time=2026-02-04T18:34:48.822+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-04T18:34:48.822+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-04T18:34:48.823+06:00 level=INFO msg="Pre-export validation failed: %v" !BADKEY="refusing to export: JSONL content has changed since last import (import first to avoid data loss)"
+time=2026-02-04T18:37:40.521+06:00 level=INFO msg="Git ref change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.git/refs/heads/setup-climateai-ouath.lock
+time=2026-02-04T18:37:41.522+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-04T18:37:41.523+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-04T18:37:41.524+06:00 level=INFO msg="JSONL content changed, proceeding with %s..." !BADKEY=auto-import
+time=2026-02-04T18:37:44.543+06:00 level=INFO msg="Git ref change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.git/refs/heads/setup-climateai-ouath.lock
+time=2026-02-04T18:37:45.545+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-04T18:37:45.546+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-04T18:37:45.546+06:00 level=INFO msg="JSONL content changed, proceeding with %s..." !BADKEY=auto-import
+time=2026-02-04T18:37:45.660+06:00 level=INFO msg="Pull failed: %v (backoff: %v)" !BADKEY="git pull failed: exit status 1\nFrom github.com:GainForest/bumicert-platform\n * branch            setup-climateai-ouath -> FETCH_HEAD\nwarning: fetch updated the current branch head.\nfast-forwarding your working tree from\ncommit 8d1e79966f66f678a9f6ad7ed9b7c93a85e1c9e0.\nThere are no candidates for merging among the refs that you just fetched.\nGenerally this means that you provided a wildcard refspec which had no\nmatches on the remote end.\n" !BADKEY=30s
+time=2026-02-04T18:37:50.080+06:00 level=INFO msg="Pull failed: %v (backoff: %v)" !BADKEY="git pull failed: exit status 128\nFrom github.com:GainForest/bumicert-platform\n * branch            setup-climateai-ouath -> FETCH_HEAD\nhint: You have divergent branches and need to specify how to reconcile them.\nhint: You can do so by running one of the following commands sometime before\nhint: your next pull:\nhint: \nhint:   git config pull.rebase false  # merge\nhint:   git config pull.rebase true   # rebase\nhint:   git config pull.ff only       # fast-forward only\nhint: \nhint: You can replace \"git config\" with \"git config --global\" to set a default\nhint: preference for all repositories. You can also pass --rebase, --no-rebase,\nhint: or --ff-only on the command line to override the configured default per\nhint: invocation.\nfatal: Need to specify how to reconcile divergent branches.\n" !BADKEY=1m0s
+time=2026-02-04T18:51:53.247+06:00 level=INFO msg="Git ref change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.git/refs/heads/setup-climateai-ouath.lock
+time=2026-02-04T18:51:54.249+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-04T18:51:54.249+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-04T18:51:54.249+06:00 level=INFO msg="JSONL content changed, proceeding with %s..." !BADKEY=auto-import
+time=2026-02-04T18:51:58.241+06:00 level=INFO msg="Git ref change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.git/refs/heads/setup-climateai-ouath.lock
+time=2026-02-04T18:51:58.519+06:00 level=INFO msg="Pull failed: %v (backoff: %v)" !BADKEY="git pull failed: exit status 1\nFrom github.com:GainForest/bumicert-platform\n * branch            setup-climateai-ouath -> FETCH_HEAD\nwarning: fetch updated the current branch head.\nfast-forwarding your working tree from\ncommit a5b936510ee1a6ec55dedb7b01693eb4f57b5789.\nThere are no candidates for merging among the refs that you just fetched.\nGenerally this means that you provided a wildcard refspec which had no\nmatches on the remote end.\n" !BADKEY=2m0s
+time=2026-02-04T18:51:59.243+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-04T18:51:59.243+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-04T19:00:20.264+06:00 level=INFO msg="Git ref change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.git/refs/heads/setup-climateai-ouath.lock
+time=2026-02-04T19:00:21.265+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-04T19:00:21.266+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-04T19:00:21.266+06:00 level=INFO msg="JSONL content changed, proceeding with %s..." !BADKEY=auto-import
+time=2026-02-04T19:00:25.418+06:00 level=INFO msg="Pulled from remote"
+time=2026-02-04T19:00:25.420+06:00 level=INFO msg="Imported from JSONL"
+time=2026-02-04T19:00:25.420+06:00 level=INFO msg="Auto-import complete"
+time=2026-02-04T19:00:25.773+06:00 level=INFO msg="Git ref change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.git/refs/heads/setup-climateai-ouath.lock
+time=2026-02-04T19:00:26.774+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-04T19:00:26.775+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-04T19:00:26.775+06:00 level=INFO msg="JSONL content changed, proceeding with %s..." !BADKEY=auto-import
+time=2026-02-04T19:00:30.936+06:00 level=INFO msg="Pull failed: %v (backoff: %v)" !BADKEY="git pull failed: exit status 128\nFrom github.com:GainForest/bumicert-platform\n * branch            setup-climateai-ouath -> FETCH_HEAD\nhint: You have divergent branches and need to specify how to reconcile them.\nhint: You can do so by running one of the following commands sometime before\nhint: your next pull:\nhint: \nhint:   git config pull.rebase false  # merge\nhint:   git config pull.rebase true   # rebase\nhint:   git config pull.ff only       # fast-forward only\nhint: \nhint: You can replace \"git config\" with \"git config --global\" to set a default\nhint: preference for all repositories. You can also pass --rebase, --no-rebase,\nhint: or --ff-only on the command line to override the configured default per\nhint: invocation.\nfatal: Need to specify how to reconcile divergent branches.\n" !BADKEY=30s
+time=2026-02-04T19:29:44.926+06:00 level=INFO msg="Git ref change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.git/refs/heads/setup-climateai-ouath.lock
+time=2026-02-04T19:29:45.928+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-04T19:29:45.928+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-04T19:29:45.928+06:00 level=INFO msg="JSONL content changed, proceeding with %s..." !BADKEY=auto-import
+time=2026-02-04T19:29:50.026+06:00 level=INFO msg="Pulled from remote"
+time=2026-02-04T19:29:50.027+06:00 level=INFO msg="Imported from JSONL"
+time=2026-02-04T19:29:50.027+06:00 level=INFO msg="Auto-import complete"
+time=2026-02-04T21:43:55.780+06:00 level=INFO msg="Git ref change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.git/refs/heads/setup-climateai-ouath.lock
+time=2026-02-04T21:43:56.782+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-04T21:43:56.782+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-04T21:43:56.783+06:00 level=INFO msg="JSONL content changed, proceeding with %s..." !BADKEY=auto-import
+time=2026-02-04T21:44:00.869+06:00 level=INFO msg="Git ref change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.git/refs/heads/setup-climateai-ouath.lock
+time=2026-02-04T21:44:00.984+06:00 level=INFO msg="Pull failed: %v (backoff: %v)" !BADKEY="git pull failed: exit status 1\nFrom github.com:GainForest/bumicert-platform\n * branch            setup-climateai-ouath -> FETCH_HEAD\nwarning: fetch updated the current branch head.\nfast-forwarding your working tree from\ncommit b2e4cb97d8c234f07a9855f71fb500a74b401b26.\nThere are no candidates for merging among the refs that you just fetched.\nGenerally this means that you provided a wildcard refspec which had no\nmatches on the remote end.\n" !BADKEY=30s
+time=2026-02-04T21:44:01.870+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-04T21:44:01.871+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-04T22:24:00.223+06:00 level=INFO msg="Received signal %v, shutting down..." !BADKEY=terminated
+time=2026-02-11T22:18:04.012+06:00 level=INFO msg="Daemon started (interval: %v, auto-commit: %v, auto-push: %v)" !BADKEY=5s !BADKEY=false !BADKEY=false
+time=2026-02-11T22:18:04.013+06:00 level=INFO msg="using database" path=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/beads.db
+time=2026-02-11T22:18:04.070+06:00 level=INFO msg="database opened" path=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/beads.db backend=sqlite freshness_checking=true
+time=2026-02-11T22:18:04.070+06:00 level=INFO msg="upgrading .beads/.gitignore"
+time=2026-02-11T22:18:04.070+06:00 level=WARN msg="failed to upgrade .gitignore" error="open .beads/.gitignore: no such file or directory"
+time=2026-02-11T22:18:04.072+06:00 level=INFO msg="Repository fingerprint validated: %s" !BADKEY=75e10e9e
+time=2026-02-11T22:18:04.072+06:00 level=INFO msg="starting RPC server" socket=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/bd.sock
+time=2026-02-11T22:18:04.073+06:00 level=INFO msg="RPC server ready (socket listening)"
+time=2026-02-11T22:18:04.074+06:00 level=INFO msg="registered in global registry"
+time=2026-02-11T22:18:04.074+06:00 level=INFO msg="Starting %s..." !BADKEY="sync cycle"
+time=2026-02-11T22:18:04.074+06:00 level=INFO msg="Pre-export validation failed: %v" !BADKEY="refusing to export: JSONL content has changed since last import (import first to avoid data loss)"
+time=2026-02-11T22:18:04.074+06:00 level=INFO msg="monitoring parent process" pid=0
+time=2026-02-11T22:18:04.074+06:00 level=INFO msg="using event-driven mode"
+time=2026-02-11T22:18:04.075+06:00 level=INFO msg="Auto-pull disabled: use 'git pull' manually to sync remote changes"
+time=2026-02-11T22:18:04.135+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-11T22:18:04.135+06:00 level=INFO msg="File change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-11T22:18:05.136+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-11T22:18:05.143+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-11T22:18:05.144+06:00 level=INFO msg="JSONL content changed, proceeding with %s..." !BADKEY=auto-import
+time=2026-02-11T22:18:09.422+06:00 level=INFO msg="Pull failed: %v (backoff: %v)" !BADKEY="git pull failed: exit status 1\nfatal: couldn't find remote ref eco-277-send-an-invite-code-to-the-user-email\n" !BADKEY=30s
+time=2026-02-11T22:18:53.520+06:00 level=INFO msg="Mutation detected: %s %s" create=bumicert-platform-e5f
+time=2026-02-11T22:18:54.021+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-11T22:18:54.021+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-11T22:18:54.030+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-11T22:18:54.031+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-11T22:18:54.031+06:00 level=INFO msg="Export complete"
+time=2026-02-11T22:18:55.031+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-11T22:18:55.032+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-11T22:18:55.032+06:00 level=INFO msg="JSONL content changed, proceeding with %s..." !BADKEY=auto-import
+time=2026-02-11T22:18:58.933+06:00 level=INFO msg="Pull failed: %v (backoff: %v)" !BADKEY="git pull failed: exit status 1\nfatal: couldn't find remote ref eco-277-send-an-invite-code-to-the-user-email\n" !BADKEY=1m0s
+time=2026-02-11T22:19:01.055+06:00 level=INFO msg="Mutation detected: %s %s" create=bumicert-platform-e5f.1
+time=2026-02-11T22:19:01.068+06:00 level=INFO msg="Mutation detected: %s %s" create=bumicert-platform-e5f.2
+time=2026-02-11T22:19:01.108+06:00 level=INFO msg="Mutation detected: %s %s" create=bumicert-platform-e5f.3
+time=2026-02-11T22:19:01.125+06:00 level=INFO msg="Mutation detected: %s %s" create=bumicert-platform-e5f.4
+time=2026-02-11T22:19:01.625+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-11T22:19:01.626+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-11T22:19:01.628+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-11T22:19:01.628+06:00 level=INFO msg="File change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-11T22:19:01.629+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-11T22:19:01.629+06:00 level=INFO msg="Export complete"
+time=2026-02-11T22:19:02.630+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-11T22:19:02.630+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-11T22:19:04.459+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-11T22:19:04.459+06:00 level=INFO msg="File change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-11T22:19:05.461+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-11T22:19:05.462+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
