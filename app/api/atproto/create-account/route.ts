@@ -1,6 +1,10 @@
 import { NextRequest } from "next/server";
 import postgres from "postgres";
-import { defaultPdsDomain } from "@/config/gainforest-sdk";
+import {
+  allowedPDSDomains,
+  defaultPdsDomain,
+  type AllowedPDSDomain,
+} from "@/config/gainforest-sdk";
 import { env } from "process";
 import { gainforestSdk } from "@/config/gainforest-sdk.server";
 
@@ -20,10 +24,14 @@ export async function POST(req: NextRequest) {
       password: string;
       handle: string;
       inviteCode: string;
+      pdsDomain?: string;
       updateCookies?: boolean;
     };
     let { email, password, handle, inviteCode } = body;
     const { updateCookies } = body;
+    const pdsDomain = (body.pdsDomain ?? defaultPdsDomain)
+      .trim()
+      .toLowerCase();
     email = (email ?? "").trim().toLowerCase();
     password = (password ?? "").trim();
     handle = (handle ?? "").trim();
@@ -39,8 +47,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (!allowedPDSDomains.includes(pdsDomain as AllowedPDSDomain)) {
+      return new Response(
+        JSON.stringify({
+          error: "BadRequest",
+          message: "Unsupported pdsDomain",
+        }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
     const inviteCodeInfo =
-      await sql`SELECT * FROM invites WHERE invite_token = ${inviteCode}`;
+      await sql`SELECT * FROM invites WHERE invite_token = ${inviteCode} AND pds_domain = ${pdsDomain}`;
     if (inviteCodeInfo.length === 0) {
       return new Response(
         JSON.stringify({ error: "Invite code not found in db" }),
@@ -54,7 +72,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const service = defaultPdsDomain;
+    const service = pdsDomain;
 
     const response = await fetch(
       `https://${service}/xrpc/com.atproto.server.createAccount`,

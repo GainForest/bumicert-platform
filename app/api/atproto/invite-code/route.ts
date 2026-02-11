@@ -2,6 +2,11 @@
 
 import { NextRequest } from "next/server";
 import postgres from "postgres";
+import {
+  allowedPDSDomains,
+  defaultPdsDomain,
+  type AllowedPDSDomain,
+} from "@/config/gainforest-sdk";
 
 if (!process.env.POSTGRES_URL_NON_POOLING_ATPROTO_AUTH_MAPPING) {
   throw new Error("Missing POSTGRES_URL_NON_POOLING_ATPROTO_AUTH_MAPPING env var");
@@ -25,13 +30,19 @@ export async function POST(req: NextRequest) {
     const body = (await req.json()) as {
       email?: string;
       emails?: string[];
-      password?: string; 
+      password?: string;
+      pdsDomain?: string;
     };
 
     const emailsInput =
-      Array.isArray(body.emails) && body.emails.length > 0 ? body.emails
+      Array.isArray(body.emails) && body.emails.length > 0
+        ? body.emails
       : body.email ? [body.email]
       : [];
+
+    const pdsDomain = (body.pdsDomain ?? defaultPdsDomain)
+      .trim()
+      .toLowerCase();
 
     const emails = emailsInput
       .map((e) => (e ?? "").trim().toLowerCase())
@@ -45,6 +56,15 @@ export async function POST(req: NextRequest) {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
+    }
+    if (!allowedPDSDomains.includes(pdsDomain as AllowedPDSDomain)) {
+      return new Response(
+        JSON.stringify({
+          error: "BadRequest",
+          message: "Unsupported pdsDomain",
+        }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
     }
     if (!Number.isInteger(useCount) || useCount <= 0) {
       return new Response(JSON.stringify({ error: "BadRequest", message: "`useCount` must be a positive integer" }), {
@@ -80,7 +100,7 @@ export async function POST(req: NextRequest) {
 
         for (const email of emails) {
           const existing = await sql`
-            SELECT invite_token FROM invites WHERE email = ${email} LIMIT 1
+            SELECT invite_token FROM invites WHERE email = ${email} AND pds_domain = ${pdsDomain} LIMIT 1
           `;
 
           if (existing.length > 0 && existing[0].invite_token) {
@@ -114,7 +134,8 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const service = process.env.NEXT_PUBLIC_ATPROTO_SERVICE_URL || "https://climateai.org";
+    const service =
+      process.env.NEXT_PUBLIC_ATPROTO_SERVICE_URL || `https://${pdsDomain}`;
     const adminUsername = process.env.PDS_ADMIN_IDENTIFIER!;
     const adminPassword = process.env.PDS_ADMIN_PASSWORD!;
     const adminBasic = Buffer.from(`${adminUsername}:${adminPassword}`).toString("base64");
@@ -170,8 +191,8 @@ export async function POST(req: NextRequest) {
         const inviteCode = minted[i];
 
         await sql`
-          INSERT INTO invites (email, invite_token)
-          VALUES (${email}, ${inviteCode})
+          INSERT INTO invites (email, invite_token, pds_domain)
+          VALUES (${email}, ${inviteCode}, ${pdsDomain})
         `;
 
         results.push({ email, inviteCode });
