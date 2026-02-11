@@ -12,11 +12,11 @@ Added audio recordings management page for organizations
 ## Features
 
 - View all audio recordings in a 3-column grid layout
-- Play/pause audio directly from cards with built-in audio player
-- Display recording metadata (duration, sample rate, format, recorded date)
+- Native HTML5 audio player with browser controls
+- Display recording metadata (duration, sample rate, format, recorded date, coordinates)
 - Create new audio recordings with file upload (supports WAV, MP3, M4A, AAC, FLAC, OGG, Opus, WebM, AIFF up to 100MB)
-- Edit existing recordings (name, description, recorded date, or replace audio file)
-- Delete recordings via dropdown menu
+- Edit existing recordings (name, description, recorded date, coordinates, or replace audio file)
+- Delete recordings with confirmation dialog to prevent accidental data loss
 - Authorization: only organization owners can add/edit/delete recordings
 - Empty state with call-to-action for owners
 
