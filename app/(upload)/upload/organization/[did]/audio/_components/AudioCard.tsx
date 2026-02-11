@@ -1,17 +1,13 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import {
   Loader2,
   MoreVertical,
-  Pause,
   Pencil,
-  Play,
   Trash2,
-  Clock,
-  Music,
+  MapPin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { AllAudioData } from "./AudioClient";
 import {
   DropdownMenu,
@@ -45,8 +41,7 @@ const AudioCard = ({ audioData, did }: AudioCardProps) => {
   const { pushModal, show } = useModal();
   const utils = trpcApi.useUtils();
 
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
 
   const { mutate: deleteAudio, isPending: isDeletingAudio } =
     trpcApi.gainforest.organization.recordings.audio.delete.useMutation({
@@ -55,6 +50,10 @@ const AudioCard = ({ audioData, did }: AudioCardProps) => {
           did,
           pdsDomain: allowedPDSDomains[0],
         });
+        setIsConfirmingDelete(false);
+      },
+      onError: () => {
+        setIsConfirmingDelete(false);
       },
     });
 
@@ -69,27 +68,20 @@ const AudioCard = ({ audioData, did }: AudioCardProps) => {
     show();
   };
 
-  const handlePlayPause = () => {
-    if (!audioRef.current) return;
-
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
-    }
-    setIsPlaying(!isPlaying);
+  const handleDeleteClick = () => {
+    setIsConfirmingDelete(true);
   };
 
-  const handleAudioEnded = () => {
-    setIsPlaying(false);
+  const handleConfirmDelete = () => {
+    deleteAudio({
+      did,
+      audioRecordingAtUri: audioData.uri,
+      pdsDomain: allowedPDSDomains[0],
+    });
   };
 
-  const formatDuration = (durationInSeconds: string) => {
-    const seconds = parseFloat(durationInSeconds);
-    if (isNaN(seconds)) return durationInSeconds;
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
-    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+  const handleCancelDelete = () => {
+    setIsConfirmingDelete(false);
   };
 
   const disableActions = isDeletingAudio;
@@ -97,26 +89,12 @@ const AudioCard = ({ audioData, did }: AudioCardProps) => {
   return (
     <div className="border border-border rounded-xl overflow-hidden shadow-lg">
       <div className="bg-background rounded-xl shadow-sm">
-        <div className="flex items-center justify-between p-3">
-          <Button
-            variant="outline"
-            size="icon"
-            className="rounded-full h-12 w-12"
-            onClick={handlePlayPause}
-          >
-            {isPlaying ? (
-              <Pause className="size-5" />
-            ) : (
-              <Play className="size-5 ml-0.5" />
-            )}
-          </Button>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Music className="size-3" />
-            <span className="uppercase">{audio.metadata.format}</span>
-          </div>
+        <div className="p-3">
+          <audio controls className="w-full h-10" preload="metadata">
+            <source src={audioUrl} type={`audio/${audio.metadata.format}`} />
+            Your browser does not support the audio element.
+          </audio>
         </div>
-
-        <audio ref={audioRef} src={audioUrl} onEnded={handleAudioEnded} />
 
         <hr className="opacity-50" />
         <div className="px-3 py-2">
@@ -128,14 +106,15 @@ const AudioCard = ({ audioData, did }: AudioCardProps) => {
               {audio.description.text}
             </p>
           )}
+          {audio.metadata.coordinates && (
+            <div className="flex items-center gap-1 text-sm text-muted-foreground mt-2">
+              <MapPin className="size-4" />
+              <span>{audio.metadata.coordinates}</span>
+            </div>
+          )}
           <div className="flex items-center justify-between mt-2">
-            <span className="flex items-center gap-1 text-sm text-muted-foreground">
-              <Clock className="size-4" />
-              <span>{formatDuration(audio.metadata.duration)}</span>
-            </span>
-
-            <span className="text-sm text-muted-foreground">
-              {audio.metadata.sampleRate / 1000}kHz
+            <span className="text-sm text-muted-foreground uppercase">
+              {audio.metadata.format} · {audio.metadata.sampleRate / 1000}kHz
             </span>
           </div>
           <hr className="mt-3 opacity-50" />
@@ -145,7 +124,7 @@ const AudioCard = ({ audioData, did }: AudioCardProps) => {
             </span>
 
             <div className="flex items-center">
-              {shouldEdit && (
+              {shouldEdit && !isConfirmingDelete && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant={"ghost"} size={"sm"}>
@@ -168,13 +147,7 @@ const AudioCard = ({ audioData, did }: AudioCardProps) => {
                     <DropdownMenuItem
                       disabled={disableActions}
                       variant="destructive"
-                      onClick={() =>
-                        deleteAudio({
-                          did,
-                          audioRecordingAtUri: audioData.uri,
-                          pdsDomain: allowedPDSDomains[0],
-                        })
-                      }
+                      onClick={handleDeleteClick}
                     >
                       <Trash2 />
                       Delete
@@ -184,6 +157,38 @@ const AudioCard = ({ audioData, did }: AudioCardProps) => {
               )}
             </div>
           </div>
+
+          {isConfirmingDelete && (
+            <div className="mt-3 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+              <p className="text-sm text-destructive font-medium mb-2">
+                Delete this audio recording?
+              </p>
+              <p className="text-xs text-muted-foreground mb-3">
+                This action cannot be undone.
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleConfirmDelete}
+                  disabled={isDeletingAudio}
+                >
+                  {isDeletingAudio ? (
+                    <Loader2 className="animate-spin mr-1 size-3" />
+                  ) : null}
+                  Delete
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCancelDelete}
+                  disabled={isDeletingAudio}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
