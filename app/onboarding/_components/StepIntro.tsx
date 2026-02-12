@@ -9,17 +9,32 @@ import {
   Building2,
   BadgeDollarSign,
   LeafIcon,
-  Rocket,
+  Globe,
 } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import Image from "next/image";
 
+function isValidUrl(url: string): boolean {
+  if (!url) return true; // Empty is valid (optional field)
+  try {
+    const urlToTest = url.startsWith("http") ? url : `https://${url}`;
+    const parsed = new URL(urlToTest);
+    // Must have a valid hostname with at least one dot (e.g., example.com)
+    return parsed.hostname.includes(".");
+  } catch {
+    return false;
+  }
+}
+
 export function StepIntro() {
   const { data, updateData, nextStep } = useOnboardingStore();
 
+  const websiteValid = isValidUrl(data.website);
   const canContinue =
-    data.organizationName.trim().length > 0 && data.acceptedCodeOfConduct;
+    data.organizationName.trim().length > 0 &&
+    data.acceptedCodeOfConduct &&
+    websiteValid;
 
   const handleContinue = () => {
     if (canContinue) {
@@ -46,30 +61,9 @@ export function StepIntro() {
 
         {/* Title */}
         <h1 className="text-3xl font-serif font-bold">Join GainForest</h1>
-
-        {/* Features list */}
-        <ul className="w-full flex flex-col my-2 gap-1">
-          <li className="flex items-start gap-3 bg-muted/40 p-2 rounded-md">
-            <div className="h-8 w-8 bg-accent flex items-center justify-center rounded-full shrink-0">
-              <Building2 className="size-4 text-primary" />
-            </div>
-            <span className="mt-1 text-sm">Join 50+ organizations</span>
-          </li>
-          <li className="flex items-start gap-3 bg-muted/40 p-2 rounded-md">
-            <div className="h-8 w-8 bg-accent flex items-center justify-center rounded-full shrink-0">
-              <LeafIcon className="size-4 text-primary" />
-            </div>
-            <span className="mt-1 text-sm">Publish Bumicerts</span>
-          </li>
-          <li className="flex items-start gap-3 bg-muted/40 p-2 rounded-md">
-            <div className="h-8 w-8 bg-accent flex items-center justify-center rounded-full shrink-0">
-              <BadgeDollarSign className="size-4 text-primary" />
-            </div>
-            <span className="mt-1 text-sm">
-              Get more donations for the work you do
-            </span>
-          </li>
-        </ul>
+        <p className="text-muted-foreground text-center text-pretty max-w-sm">
+          Create your organization account and start publishing bumicerts.
+        </p>
 
         {/* Form */}
         <div className="w-full space-y-4 mt-2">
@@ -78,7 +72,7 @@ export function StepIntro() {
               htmlFor="organization-name"
               className="text-sm font-medium leading-none"
             >
-              Organization Name
+              Organization Name <span className="text-destructive">*</span>
             </label>
             <Input
               id="organization-name"
@@ -90,9 +84,31 @@ export function StepIntro() {
               aria-describedby="org-name-hint"
               autoFocus
             />
-            <p id="org-name-hint" className="text-xs text-muted-foreground mt-1">
-              This will be displayed on your organization profile
-            </p>
+          </div>
+
+          <div>
+            <label
+              htmlFor="website"
+              className="text-sm font-medium leading-none flex items-center gap-1.5"
+            >
+              <Globe className="w-3.5 h-3.5" />
+              Website
+              <span className="text-muted-foreground font-normal">(optional)</span>
+            </label>
+            <Input
+              id="website"
+              type="url"
+              placeholder="https://your-organization.org"
+              value={data.website}
+              className="mt-1"
+              onChange={(e) => updateData({ website: e.target.value })}
+              aria-describedby="website-hint"
+            />
+            {data.website && !websiteValid && (
+              <p className="text-xs text-destructive mt-1">
+                Please enter a valid URL (e.g., https://example.com)
+              </p>
+            )}
           </div>
 
           <div className="flex items-start space-x-3 mt-10">

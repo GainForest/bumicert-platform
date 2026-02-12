@@ -26,8 +26,8 @@ import {
 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useModal } from "@/components/ui/modal/context";
-import { GetAnInviteModal, GetAnInviteModalId } from "./get-an-invite";
 import SignInModal, { SignInModalId } from "./sign-in";
+import Link from "next/link";
 import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { useAtprotoStore } from "@/components/stores/atproto";
 
@@ -117,17 +117,12 @@ const SignUpModal = () => {
           </InputGroup>
           <span className="text-xs text-muted-foreground">
             Don&apos;t have an invite code yet?{" "}
-            <button
-              className="text-primary font-medium cursor-pointer"
-              onClick={() => {
-                pushModal({
-                  id: GetAnInviteModalId,
-                  content: <GetAnInviteModal />,
-                });
-              }}
+            <Link
+              href="/onboarding"
+              className="text-primary font-medium cursor-pointer hover:underline"
             >
               Get an invite code
-            </button>{" "}
+            </Link>{" "}
             now.
           </span>
         </div>

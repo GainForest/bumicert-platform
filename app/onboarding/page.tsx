@@ -9,15 +9,26 @@ import { StepCredentials } from "./_components/StepCredentials";
 import { StepComplete } from "./_components/StepComplete";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import Link from "next/link";
-import { ArrowRight, Building2, FileText, Loader2 } from "lucide-react";
+import { ArrowRight, Building2, Loader2 } from "lucide-react";
 import { links } from "@/lib/links";
 import { useEffect } from "react";
 import Image from "next/image";
 import BumicertIcon from "@/icons/BumicertIcon";
+import { useModal } from "@/components/ui/modal/context";
+import SignInModal, { SignInModalId } from "@/components/global/modals/sign-in";
 
 export default function OnboardingPage() {
   const { currentStep, data } = useOnboardingStore();
   const auth = useAtprotoStore((state) => state.auth);
+  const { show, pushModal } = useModal();
+
+  const handleSignInClick = () => {
+    pushModal({
+      id: SignInModalId,
+      content: <SignInModal />,
+    }, true);
+    show();
+  };
 
   // Check if there's unsaved data in the form
   const hasUnsavedData =
@@ -165,9 +176,12 @@ export default function OnboardingPage() {
       <footer className="py-4 text-center text-xs text-muted-foreground">
         <p>
           Already have an account?{" "}
-          <Link href={links.myOrganization()} className="text-primary hover:underline">
+          <button
+            onClick={handleSignInClick}
+            className="text-primary hover:underline"
+          >
             Sign in here
-          </Link>
+          </button>
         </p>
       </footer>
     </div>

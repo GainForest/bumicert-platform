@@ -3,18 +3,54 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useOnboardingStore } from "../store";
-import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { ArrowLeft, ArrowRight, Loader2, Mail, RefreshCw, KeyRound } from "lucide-react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { links } from "@/lib/links";
+import { defaultPdsDomain } from "@/config/gainforest-sdk";
+
+type Phase = "email" | "code";
 
 export function StepEmail() {
   const { data, updateData, nextStep, prevStep, setError, error } =
     useOnboardingStore();
+  const [phase, setPhase] = useState<Phase>(data.inviteCode ? "code" : "email");
   const [isLoading, setIsLoading] = useState(false);
+  const [retryAfter, setRetryAfter] = useState<Date | null>(null);
+  const [countdown, setCountdown] = useState<number>(0);
+  const [hasExistingCode, setHasExistingCode] = useState(false);
 
   const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email);
+  const isValidCode = data.inviteCode.trim().length > 0;
 
-  const handleContinue = async () => {
+  // Clear any errors from other steps on mount
+  useEffect(() => {
+    setError(null);
+  }, [setError]);
+
+  // Countdown timer for rate limit
+  useEffect(() => {
+    if (!retryAfter) {
+      setCountdown(0);
+      return;
+    }
+
+    const updateCountdown = () => {
+      const now = new Date();
+      const diff = Math.max(0, Math.ceil((retryAfter.getTime() - now.getTime()) / 1000));
+      setCountdown(diff);
+
+      if (diff === 0) {
+        setRetryAfter(null);
+      }
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, [retryAfter]);
+
+  const handleSendCode = async () => {
     if (!isValidEmail) {
       setError("Please enter a valid email address");
       return;
@@ -24,35 +60,202 @@ export function StepEmail() {
     setError(null);
 
     try {
-      const response = await fetch("/api/atproto/invite-code", {
+      const response = await fetch(links.api.onboarding.sendInviteEmail, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: data.email.trim().toLowerCase(),
-          password: "insecure",
+          pdsDomain: defaultPdsDomain,
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed");
-      }
-
       const result = await response.json();
-      const inviteCode = result.invites?.[0]?.inviteCode;
 
-      if (!inviteCode) {
-        throw new Error("No invite code");
+      if (!response.ok) {
+        if (response.status === 429 && result.retryAfter) {
+          // Rate limited
+          setRetryAfter(new Date(result.retryAfter));
+          setError(result.message || "Please wait before requesting another code");
+        } else {
+          setError(result.message || "Failed to send verification code");
+        }
+        return;
       }
 
-      updateData({ inviteCode });
-      nextStep();
+      // Success - move to code entry phase
+      setPhase("code");
+      setError(null);
     } catch {
-      setError("Something went wrong. Please try a different email.");
+      setError("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleVerifyCode = async () => {
+    if (!isValidCode) {
+      setError("Please enter the verification code");
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(links.api.onboarding.verifyInviteCode, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: data.email.trim().toLowerCase(),
+          inviteCode: data.inviteCode.trim(),
+          pdsDomain: defaultPdsDomain,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        setError(result.message || "Invalid verification code");
+        return;
+      }
+
+      // Success - advance to next step
+      nextStep();
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleChangeEmail = () => {
+    setPhase("email");
+    updateData({ inviteCode: "" });
+    setError(null);
+    setHasExistingCode(false);
+  };
+
+  const handleHaveCode = () => {
+    if (!isValidEmail) {
+      setError("Please enter your email address first");
+      return;
+    }
+    setHasExistingCode(true);
+    setPhase("code");
+    setError(null);
+  };
+
+  const handleResendCode = async () => {
+    if (countdown > 0) return;
+    setHasExistingCode(false); // Reset since we're sending a new code
+    await handleSendCode();
+  };
+
+  const formatCountdown = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+  };
+
+  // Phase 1: Email input
+  if (phase === "email") {
+    return (
+      <motion.div
+        className="w-full max-w-md mx-auto"
+        initial={{ opacity: 0, filter: "blur(10px)", scale: 0.95 }}
+        animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
+        exit={{ opacity: 0, filter: "blur(10px)", scale: 0.95 }}
+        transition={{ duration: 0.3 }}
+      >
+        <div className="flex flex-col items-center gap-4">
+          {/* Header */}
+          <div className="text-center space-y-1">
+            <h1 className="text-2xl font-serif font-bold">Verify Your Email</h1>
+            <p className="text-sm text-muted-foreground">
+              We&apos;ll send a verification code to your email.
+            </p>
+          </div>
+
+          {/* Form */}
+          <div className="w-full space-y-4">
+            <div className="space-y-1.5">
+              <label htmlFor="email" className="text-sm font-medium leading-none">
+                Email Address
+              </label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="you@organization.com"
+                value={data.email}
+                onChange={(e) => {
+                  updateData({ email: e.target.value });
+                  setError(null);
+                }}
+                disabled={isLoading}
+                aria-describedby="email-hint"
+              />
+              <p id="email-hint" className="text-xs text-muted-foreground">
+                This email will be associated with your organization account
+              </p>
+            </div>
+
+            {/* Error display */}
+            {error && (
+              <div
+                className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg"
+                role="alert"
+              >
+                <p className="text-sm text-destructive">{error}</p>
+              </div>
+            )}
+
+            {/* Already have a code link */}
+            <div className="flex items-center justify-end -mb-2">
+              <button
+                type="button"
+                onClick={handleHaveCode}
+                disabled={isLoading}
+                className="text-sm text-primary hover:text-foreground inline-flex items-center gap-1.5 underline underline-offset-2"
+              >
+                <KeyRound className="w-3.5 h-3.5" />
+                Already have a code?
+              </button>
+            </div>
+          </div>
+
+          {/* Navigation */}
+          <div className="w-full flex justify-between mt-2">
+            <Button onClick={prevStep} variant="ghost" disabled={isLoading}>
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
+            </Button>
+            <Button
+              onClick={handleSendCode}
+              disabled={!isValidEmail || isLoading || countdown > 0}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Sending...
+                </>
+              ) : countdown > 0 ? (
+                <>
+                  Wait {formatCountdown(countdown)}
+                </>
+              ) : (
+                <>
+                  <Mail className="w-4 h-4 mr-2" />
+                  Send Code
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  // Phase 2: Code verification
   return (
     <motion.div
       className="w-full max-w-md mx-auto"
@@ -64,33 +267,65 @@ export function StepEmail() {
       <div className="flex flex-col items-center gap-4">
         {/* Header */}
         <div className="text-center space-y-1">
-          <h1 className="text-2xl font-serif font-bold">Verify Your Email</h1>
+          <h1 className="text-2xl font-serif font-bold">Enter Verification Code</h1>
           <p className="text-sm text-muted-foreground">
-            We&apos;ll use your email to create your account.
+            {hasExistingCode ? (
+              <>
+                Enter the code you received for{" "}
+                <span className="font-medium text-foreground">{data.email}</span>
+              </>
+            ) : (
+              <>
+                We sent a code to{" "}
+                <span className="font-medium text-foreground">{data.email}</span>
+              </>
+            )}
           </p>
         </div>
 
         {/* Form */}
         <div className="w-full space-y-4">
           <div className="space-y-1.5">
-            <label htmlFor="email" className="text-sm font-medium leading-none">
-              Email Address
+            <label htmlFor="invite-code" className="text-sm font-medium leading-none">
+              Verification Code
             </label>
             <Input
-              id="email"
-              type="email"
-              placeholder="you@organization.com"
-              value={data.email}
+              id="invite-code"
+              type="text"
+              placeholder="Enter the code from your email"
+              value={data.inviteCode}
               onChange={(e) => {
-                updateData({ email: e.target.value });
+                updateData({ inviteCode: e.target.value });
                 setError(null);
               }}
               disabled={isLoading}
-              aria-describedby="email-hint"
+              autoComplete="one-time-code"
             />
-            <p id="email-hint" className="text-xs text-muted-foreground">
-              This email will be associated with your organization account
-            </p>
+          </div>
+
+          {/* Action links */}
+          <div className="flex items-center justify-between text-sm">
+            <button
+              type="button"
+              onClick={handleChangeEmail}
+              className="text-muted-foreground hover:text-foreground underline underline-offset-2"
+              disabled={isLoading}
+            >
+              Change email
+            </button>
+            <button
+              type="button"
+              onClick={handleResendCode}
+              disabled={isLoading || countdown > 0}
+              className="text-primary hover:text-primary/80 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+            >
+              <RefreshCw className="w-3 h-3" />
+              {countdown > 0
+                ? `Resend in ${formatCountdown(countdown)}`
+                : hasExistingCode
+                  ? "Send new code"
+                  : "Resend code"}
+            </button>
           </div>
 
           {/* Error display */}
@@ -106,11 +341,11 @@ export function StepEmail() {
 
         {/* Navigation */}
         <div className="w-full flex justify-between mt-2">
-          <Button onClick={prevStep} variant="ghost" disabled={isLoading}>
+          <Button onClick={handleChangeEmail} variant="ghost" disabled={isLoading}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
-          <Button onClick={handleContinue} disabled={!isValidEmail || isLoading}>
+          <Button onClick={handleVerifyCode} disabled={!isValidCode || isLoading}>
             {isLoading ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -118,7 +353,7 @@ export function StepEmail() {
               </>
             ) : (
               <>
-                Continue
+                Verify
                 <ArrowRight className="w-4 h-4 ml-2" />
               </>
             )}

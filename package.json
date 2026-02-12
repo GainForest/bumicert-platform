@@ -22,6 +22,7 @@
     "@base-ui/react": "^1.1.0",
     "@ethereum-attestation-service/eas-sdk": "^2.9.1-beta.1",
     "@formkit/auto-animate": "^0.8.2",
+    "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^5.2.1",
     "@hypercerts-org/marketplace-sdk": "^0.8.0",
     "@mdxeditor/editor": "^3.42.0",

@@ -22,7 +22,14 @@ export const links = {
     view: (bumicertId: string) => `/bumicert/${bumicertId}`,
   },
   api: {
-    onboarding: "/api/airtable/onboarding",
+    onboarding: {
+      createAccount: "/onboarding/api/create-account",
+      sendInviteEmail: "/onboarding/api/send-invite-email",
+      verifyInviteCode: "/onboarding/api/verify-invite-code",
+      generateShortDescription: "/onboarding/api/generate-short-description",
+      fetchBrandInfo: "/onboarding/api/fetch-brand-info",
+      onboard: "/onboarding/api/onboard",
+    },
     aws: {
       upload: {
         image: "/api/aws/upload/image",

@@ -7,11 +7,23 @@ import {
   calculatePasswordStrength,
   PasswordStrength,
 } from "../store";
-import { ArrowLeft, ArrowRight, Eye, EyeOff, AlertCircle } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Eye,
+  EyeOff,
+  AlertCircle,
+  Loader2,
+  Check,
+  X,
+} from "lucide-react";
 import { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { useDebounce } from "@/hooks/use-debounce";
+import { links } from "@/lib/links";
 
 const STRENGTH_COLORS: Record<PasswordStrength, string> = {
   weak: "bg-red-500",
@@ -34,8 +46,11 @@ const STRENGTH_WIDTH: Record<PasswordStrength, string> = {
   strong: "w-full",
 };
 
+type HandleAvailability = "checking" | "available" | "taken" | "idle";
+
 export function StepCredentials() {
-  const { data, updateData, nextStep, prevStep, error, setError } = useOnboardingStore();
+  const { data, updateData, nextStep, prevStep, error, setError } =
+    useOnboardingStore();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -45,6 +60,44 @@ export function StepCredentials() {
     () => calculatePasswordStrength(data.password),
     [data.password]
   );
+
+  // Debounce handle for availability check
+  const debouncedHandle = useDebounce(data.handle, 500);
+  const fullHandle = `${debouncedHandle}.${allowedPDSDomains[0]}`;
+
+  // Check handle availability
+  const { data: handleCheckResult, isLoading: isCheckingHandle } = useQuery({
+    queryKey: ["handleAvailability", debouncedHandle],
+    queryFn: async () => {
+      if (!debouncedHandle || debouncedHandle.length < 3) {
+        return { available: true, checked: false };
+      }
+
+      const response = await fetch(links.api.searchActors(fullHandle, 1));
+      if (!response.ok) {
+        // On error, assume available (don't block user)
+        return { available: true, checked: true };
+      }
+
+      const result = await response.json();
+      // Check if any actor has an exact handle match
+      const exactMatch = result.actors?.some(
+        (actor: { handle: string }) =>
+          actor.handle.toLowerCase() === fullHandle.toLowerCase()
+      );
+
+      return { available: !exactMatch, checked: true };
+    },
+    enabled: debouncedHandle.length >= 3,
+    staleTime: 30 * 1000, // Cache for 30 seconds
+  });
+
+  const handleAvailability: HandleAvailability = useMemo(() => {
+    if (data.handle.length < 3) return "idle";
+    if (data.handle !== debouncedHandle || isCheckingHandle) return "checking";
+    if (!handleCheckResult?.checked) return "idle";
+    return handleCheckResult.available ? "available" : "taken";
+  }, [data.handle, debouncedHandle, isCheckingHandle, handleCheckResult]);
 
   const passwordsMatch =
     data.password.length > 0 && data.password === data.confirmPassword;
@@ -57,12 +110,18 @@ export function StepCredentials() {
     : passwordAnalysis.strength !== "weak" && data.password.length >= 8;
 
   const canContinue =
-    data.handle.trim().length > 0 && isPasswordValid && passwordsMatch;
+    data.handle.trim().length >= 3 &&
+    isPasswordValid &&
+    passwordsMatch &&
+    handleAvailability !== "taken" &&
+    handleAvailability !== "checking";
 
   const handleContinue = () => {
     if (!canContinue) {
-      if (!data.handle.trim()) {
-        setError("Please enter a handle");
+      if (!data.handle.trim() || data.handle.trim().length < 3) {
+        setError("Handle must be at least 3 characters");
+      } else if (handleAvailability === "taken") {
+        setError("This handle is already taken");
       } else if (!isPasswordValid) {
         setError("Please choose a stronger password");
       } else if (!passwordsMatch) {
@@ -120,19 +179,52 @@ export function StepCredentials() {
                 placeholder="your-organization"
                 value={data.handle}
                 onChange={(e) => handleHandleChange(e.target.value)}
-                className="rounded-r-none h-9"
+                className={cn(
+                  "rounded-r-none h-9",
+                  handleAvailability === "taken" &&
+                    "border-destructive focus-visible:ring-destructive/50",
+                  handleAvailability === "available" &&
+                    "border-green-500 focus-visible:ring-green-500/50"
+                )}
                 aria-describedby="handle-hint"
               />
               <div className="flex items-center px-2 bg-muted border border-l-0 rounded-r-md text-xs text-muted-foreground">
                 .{allowedPDSDomains[0]}
               </div>
             </div>
-            <p id="handle-hint" className="text-xs text-muted-foreground">
-              Your handle:{" "}
-              <span className="font-medium text-foreground">
-                @{data.handle || "handle"}.{allowedPDSDomains[0]}
-              </span>
-            </p>
+
+            {/* Handle availability indicator */}
+            <div className="flex items-center justify-between">
+              <p id="handle-hint" className="text-xs text-muted-foreground">
+                Your handle:{" "}
+                <span className="font-medium text-foreground">
+                  @{data.handle || "handle"}.{allowedPDSDomains[0]}
+                </span>
+              </p>
+
+              {data.handle.length >= 3 && (
+                <div className="flex items-center gap-1 text-xs">
+                  {handleAvailability === "checking" && (
+                    <>
+                      <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
+                      <span className="text-muted-foreground">Checking...</span>
+                    </>
+                  )}
+                  {handleAvailability === "available" && (
+                    <>
+                      <Check className="w-3 h-3 text-green-500" />
+                      <span className="text-green-500">Available</span>
+                    </>
+                  )}
+                  {handleAvailability === "taken" && (
+                    <>
+                      <X className="w-3 h-3 text-destructive" />
+                      <span className="text-destructive">Taken</span>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Password */}

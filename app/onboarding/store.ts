@@ -30,6 +30,7 @@ export type OnboardingData = {
   longDescription: string;
   shortDescription: string;
   website: string;
+  logo: File | undefined;
 
   // Step 4: Credentials
   handle: string;
@@ -69,6 +70,7 @@ const initialData: OnboardingData = {
   longDescription: "",
   shortDescription: "",
   website: "",
+  logo: undefined,
   handle: "",
   password: "",
   confirmPassword: "",

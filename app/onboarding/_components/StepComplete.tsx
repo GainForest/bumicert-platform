@@ -7,29 +7,23 @@ import {
   ArrowRight,
   Building2,
   CheckCircle2,
-  FileText,
   Loader2,
   XCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { allowedPDSDomains, trpcClient } from "@/config/gainforest-sdk";
-import { useAtprotoStore } from "@/components/stores/atproto";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { links } from "@/lib/links";
+import BumicertIcon from "@/icons/BumicertIcon";
 
-type CompletionState =
-  | "idle"
-  | "creating-account"
-  | "initializing-org"
-  | "success"
-  | "error";
+type CompletionState = "idle" | "creating" | "success" | "error";
 
 export function StepComplete() {
   const { data, updateData, setError, error, prevStep } = useOnboardingStore();
   const [completionState, setCompletionState] = useState<CompletionState>(
     data.accountCreated ? "success" : "idle"
   );
-  const setAuth = useAtprotoStore((state) => state.setAuth);
   const userDid = data.did;
 
   // Start account creation when component mounts
@@ -41,69 +35,57 @@ export function StepComplete() {
   }, []);
 
   const createAccount = async () => {
-    setCompletionState("creating-account");
+    setCompletionState("creating");
     setError(null);
 
     try {
-      // Step 1: Create the account and sign in via cookie
-      const accountResponse = await fetch("/api/atproto/create-account", {
+      // Build FormData for the combined onboard API
+      const formData = new FormData();
+      formData.append("email", data.email.trim().toLowerCase());
+      formData.append("password", data.password);
+      formData.append("handle", data.handle);
+      formData.append("inviteCode", data.inviteCode);
+      formData.append("pdsDomain", allowedPDSDomains[0]);
+      formData.append("displayName", data.organizationName);
+      formData.append("shortDescription", data.shortDescription);
+      formData.append("longDescription", data.longDescription);
+      formData.append("country", data.country);
+
+      if (data.website) {
+        formData.append("website", data.website);
+      }
+      if (data.startDate) {
+        formData.append("startDate", data.startDate);
+      }
+      if (data.logo) {
+        formData.append("logo", data.logo);
+      }
+
+      const response = await fetch(links.api.onboarding.onboard, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: data.email.trim().toLowerCase(),
-          password: data.password,
-          handle: `${data.handle}.${allowedPDSDomains[0]}`,
-          inviteCode: data.inviteCode,
-          updateCookies: true,
-        }),
+        body: formData,
       });
 
-      if (!accountResponse.ok) {
-        const errorData = await accountResponse.json().catch(() => ({}));
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
         throw new Error(
           errorData.message || errorData.error || "Failed to create account"
         );
       }
 
-      const accountResult = await accountResponse.json();
-      const did = accountResult.did;
-      const handle = accountResult.handle;
+      const result = await response.json();
+      const { did, handle, organizationInitialized } = result;
 
       if (!did) {
         throw new Error("Account created but no DID returned");
       }
 
-      updateData({ did, accountCreated: true });
-
-      // Step 2: Update client-side auth state if server signed us in
-      if (accountResult.signedIn) {
-        setAuth({ did, handle });
-      }
-
-      // Step 3: Initialize organization data on PDS
-      setCompletionState("initializing-org");
-
-      try {
-        await trpcClient.gainforest.organization.info.createOrUpdate.mutate({
-          did,
-          info: {
-            displayName: data.organizationName,
-            shortDescription: data.shortDescription,
-            longDescription: data.longDescription,
-            country: data.country,
-            startDate: data.startDate ?? undefined,
-            website: data.website || undefined,
-            visibility: "Public",
-            objectives: [],
-          },
-          pdsDomain: allowedPDSDomains[0],
-        });
-
-        updateData({ organizationInitialized: true });
-      } catch (orgErr) {
-        console.error("Failed to save organization info:", orgErr);
-        // Don't block the user — they can edit org info from their org page
-      }
+      // Update store with success data
+      updateData({
+        did,
+        accountCreated: true,
+        organizationInitialized: organizationInitialized ?? false,
+      });
 
       setCompletionState("success");
     } catch (err) {
@@ -122,7 +104,7 @@ export function StepComplete() {
   };
 
   // Render based on completion state
-  if (completionState === "creating-account") {
+  if (completionState === "creating") {
     return (
       <motion.div
         className="w-full max-w-md mx-auto text-center"
@@ -142,40 +124,8 @@ export function StepComplete() {
               Creating Your Account
             </h1>
             <p className="text-sm text-muted-foreground">
-              Please wait while we set up your account...
+              Please wait while we set up your account and organization...
             </p>
-          </div>
-        </div>
-      </motion.div>
-    );
-  }
-
-  if (completionState === "initializing-org") {
-    return (
-      <motion.div
-        className="w-full max-w-md mx-auto text-center"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
-      >
-        <div className="flex flex-col items-center gap-4">
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="h-16 w-16 bg-primary blur-2xl rounded-full animate-pulse" />
-            </div>
-            <Loader2 className="w-16 h-16 text-primary animate-spin" />
-          </div>
-          <div className="space-y-1">
-            <h1 className="text-2xl font-serif font-bold">
-              Initializing Organization
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Creating your organization profile...
-            </p>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-green-600">
-            <CheckCircle2 className="w-4 h-4" />
-            Account created successfully
           </div>
         </div>
       </motion.div>
@@ -268,11 +218,11 @@ export function StepComplete() {
             </Button>
           </Link>
 
-          <Link href="/upload/bumicert" className="block">
+          <Link href={links.bumicert.create} className="block">
             <Button className="w-full h-auto py-3">
               <div className="flex items-center gap-3 w-full">
                 <div className="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center shrink-0">
-                  <FileText className="w-5 h-5" />
+                  <BumicertIcon className="w-5 h-5" />
                 </div>
                 <div className="text-left flex-1">
                   <div className="font-semibold text-sm">
