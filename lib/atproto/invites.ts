@@ -104,10 +104,12 @@ export const getOrCreateInviteCode = async (
   email: string,
   pdsDomain: AllowedPDSDomain
 ): Promise<string> => {
+  const normalizedEmail = email.trim().toLowerCase();
+
   const existing = await supabase
     .from("invites")
     .select("invite_token")
-    .eq("email", email)
+    .eq("email", normalizedEmail)
     .eq("pds_domain", pdsDomain)
     .maybeSingle();
 
@@ -122,7 +124,7 @@ export const getOrCreateInviteCode = async (
   const [inviteCode] = await mintInviteCodes(pdsDomain, 1);
   const insertResult = await supabase
     .from("invites")
-    .insert({ email, invite_token: inviteCode, pds_domain: pdsDomain });
+    .insert({ email: normalizedEmail, invite_token: inviteCode, pds_domain: pdsDomain });
 
   if (insertResult.error) {
     throwInviteError(500, "DatabaseError", "Failed to persist invite");
@@ -140,10 +142,12 @@ export const fetchExistingInvites = async (
     return [];
   }
 
+  const normalizedEmails = emails.map(e => e.trim().toLowerCase());
+
   const existing = await supabase
     .from("invites")
     .select("email, invite_token")
-    .in("email", emails)
+    .in("email", normalizedEmails)
     .eq("pds_domain", pdsDomain);
 
   if (existing.error) {
