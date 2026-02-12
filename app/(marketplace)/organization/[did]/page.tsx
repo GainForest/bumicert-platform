@@ -23,7 +23,7 @@ const EMPTY_ORGANIZATION_DATA = {
   shortDescription: { text: "", facets: [] },
   longDescription: { blocks: [] },
   objectives: [],
-  startDate: "",
+  startDate: undefined,
   country: "",
   visibility: "Public" as const,
   createdAt: new Date().toISOString(),
