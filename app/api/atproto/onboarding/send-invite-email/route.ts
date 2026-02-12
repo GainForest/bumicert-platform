@@ -72,9 +72,7 @@ export async function POST(req: NextRequest) {
     const pdsDomain = parsed.data.pdsDomain as AllowedPDSDomain;
 
     // Rate limiting check
-    const rateLimitMinutes = parseInt(
-      process.env.INVITE_EMAIL_RATE_LIMIT_MINUTES || "5"
-    );
+    const rateLimitMinutes = 5;
     const endpoint = "/api/atproto/onboarding/send-invite-email";
 
     const { data: recentLimits } = await supabase

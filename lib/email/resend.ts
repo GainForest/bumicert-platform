@@ -9,7 +9,7 @@ if (!resendApiKey) {
 export const resend = new Resend(resendApiKey);
 
 export const getInviteEmailConfig = () => {
-  const from = process.env.RESEND_INVITE_FROM;
+  const from = "noreply@gainforest.id";
   const subject = "Welcome to GainForest - Your Invite Code";
 
   if (!from) {

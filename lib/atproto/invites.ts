@@ -1,19 +1,46 @@
+/**
+ * ATProto Invite Code Management
+ * 
+ * This module handles invite code generation and management for ATProto Personal Data Servers (PDS).
+ * ATProto requires invite codes to create new accounts on PDS instances.
+ * 
+ * ## Why This Exists
+ * - PDS instances (climateai.org, gainforest.id) use invite-only registration
+ * - We need to programmatically mint invite codes using admin credentials
+ * - Invite codes are stored in our database and tied to user emails
+ * 
+ * ## Error Handling
+ * Functions throw structured errors with HTTP status codes and error types because:
+ * - Consumed by API routes that need to return proper HTTP responses
+ * - Different error types (BadRequest, DatabaseError, UpstreamError) require different status codes
+ * - The `isInviteCodeError` type guard allows API routes to distinguish our errors from unexpected ones
+ * 
+ * ## Key Functions
+ * - `mintInviteCodes`: Calls PDS admin API to generate new invite codes
+ * - `getOrCreateInviteCode`: Gets existing code or mints a new one for an email
+ * - `fetchExistingInvites`: Batch fetch existing invite codes for multiple emails
+ */
+
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { AllowedPDSDomain } from "@/config/gainforest-sdk";
 
-type InviteCodeError = Error & {
+interface InviteCodeError extends Error {
   status: number;
-  payload: { error: string; message: string } | Record<string, unknown>;
-};
+  payload: { error: string; message: string };
+}
 
-const createInviteCodeError = (
+function throwInviteError(
   status: number,
-  payload: InviteCodeError["payload"],
+  errorType: string,
   message: string
-): InviteCodeError => Object.assign(new Error(message), { status, payload });
+): never {
+  const error = new Error(message) as InviteCodeError;
+  error.status = status;
+  error.payload = { error: errorType, message };
+  throw error;
+}
 
-const resolvePdsServiceUrl = (pdsDomain: AllowedPDSDomain) =>
-  process.env.NEXT_PUBLIC_ATPROTO_SERVICE_URL || `https://${pdsDomain}`;
+const resolvePdsServiceUrl = (pdsDomain: AllowedPDSDomain) =>`https://${pdsDomain}`;
 
 const getAdminBasicAuth = () => {
   if (!process.env.PDS_ADMIN_IDENTIFIER || !process.env.PDS_ADMIN_PASSWORD) {
@@ -34,11 +61,7 @@ export const mintInviteCodes = async (
   codeCount: number
 ): Promise<string[]> => {
   if (!Number.isInteger(codeCount) || codeCount <= 0) {
-    throw createInviteCodeError(
-      400,
-      { error: "BadRequest", message: "`codeCount` must be a positive integer" },
-      "Invalid code count"
-    );
+    throwInviteError(400, "BadRequest", "`codeCount` must be a positive integer");
   }
 
   const adminBasic = getAdminBasicAuth();
@@ -55,10 +78,9 @@ export const mintInviteCodes = async (
   );
 
   if (!response.ok) {
-    const error = await response.json();
-    throw createInviteCodeError(
+    throwInviteError(
       response.status,
-      error,
+      "UpstreamError",
       "Failed to create invite codes"
     );
   }
@@ -67,13 +89,10 @@ export const mintInviteCodes = async (
   const minted = data?.codes?.[0]?.codes ?? [];
 
   if (!Array.isArray(minted) || minted.length < codeCount) {
-    throw createInviteCodeError(
+    throwInviteError(
       502,
-      {
-        error: "UpstreamError",
-        message: `PDS returned ${minted.length || 0} code(s) for ${codeCount} request(s)`,
-      },
-      "PDS did not return expected invite codes"
+      "UpstreamError",
+      `PDS returned ${minted.length || 0} code(s) for ${codeCount} request(s)`
     );
   }
 
@@ -93,11 +112,7 @@ export const getOrCreateInviteCode = async (
     .maybeSingle();
 
   if (existing.error) {
-    throw createInviteCodeError(
-      500,
-      { error: "DatabaseError", message: "Failed to check existing invites" },
-      "Failed to check existing invites"
-    );
+    throwInviteError(500, "DatabaseError", "Failed to check existing invites");
   }
 
   if (existing.data?.invite_token) {
@@ -110,24 +125,7 @@ export const getOrCreateInviteCode = async (
     .insert({ email, invite_token: inviteCode, pds_domain: pdsDomain });
 
   if (insertResult.error) {
-    if (insertResult.error.code === "23505") {
-      const fallback = await supabase
-        .from("invites")
-        .select("invite_token")
-        .eq("email", email)
-        .eq("pds_domain", pdsDomain)
-        .maybeSingle();
-
-      if (fallback.data?.invite_token) {
-        return fallback.data.invite_token;
-      }
-    }
-
-    throw createInviteCodeError(
-      500,
-      { error: "DatabaseError", message: "Failed to persist invite" },
-      "Failed to persist invite"
-    );
+    throwInviteError(500, "DatabaseError", "Failed to persist invite");
   }
 
   return inviteCode;
@@ -149,11 +147,7 @@ export const fetchExistingInvites = async (
     .eq("pds_domain", pdsDomain);
 
   if (existing.error) {
-    throw createInviteCodeError(
-      500,
-      { error: "DatabaseError", message: "Failed to fetch existing invites" },
-      "Failed to fetch existing invites"
-    );
+    throwInviteError(500, "DatabaseError", "Failed to fetch existing invites");
   }
 
   return (existing.data ?? []).map((row) => ({
