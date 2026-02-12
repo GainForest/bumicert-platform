@@ -6,6 +6,7 @@ import {
   ArrowRightIcon,
   CircleAlertIcon,
   CircleCheckIcon,
+  Hand,
   Loader2,
   LucideIcon,
   PartyPopper,
@@ -40,10 +41,11 @@ const ProgressItem = ({
   iconset: {
     Error: LucideIcon;
     Success: LucideIcon;
+    Input?: LucideIcon;
   };
   title: string;
   description: string;
-  status: "pending" | "success" | "error";
+  status: "pending" | "success" | "error" | "input";
   isLastStep?: boolean;
   children?: React.ReactNode;
 }) => {
@@ -80,15 +82,22 @@ const ProgressItem = ({
 
       <div
         className={cn(
-          "relative z-5 bg-primary p-2 rounded-full",
+          "relative h-12 w-12 z-5 bg-primary rounded-full border border-transparent flex items-center justify-center",
           status === "error" && "bg-destructive",
-          status === "pending" && "bg-background border border-border"
+          status === "pending" && "bg-background border-border",
+          status === "input" && "bg-background border-border"
         )}
       >
         {status === "error" ? (
           <iconset.Error className="size-8 text-white" />
         ) : status === "success" ? (
           <iconset.Success className="size-8 text-primary-foreground" />
+        ) : status === "input" ? (
+          iconset.Input ? (
+            <iconset.Input className="size-8 text-muted-foreground animate-pulse" />
+          ) : (
+            <Hand className="size-8 text-muted-foreground animate-pulse" />
+          )
         ) : (
           <Loader2 className="size-8 animate-spin text-primary" />
         )}
@@ -99,7 +108,8 @@ const ProgressItem = ({
           className={cn(
             "text-xl font-medium",
             status === "error" && "text-destructive",
-            status === "success" && "text-primary"
+            status === "success" && "text-primary",
+            status === "input" && "text-foreground"
           )}
         >
           {title}
@@ -152,11 +162,13 @@ const Step5 = () => {
   const [hasClickedPublish, setHasClickedPublish] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
-  const createBumicertStatus: "pending" | "success" | "error" =
+  const createBumicertStatus: "pending" | "success" | "error" | "input" =
     createBumicertError
       ? "error"
       : createdBumicertResponse === null
-        ? "pending"
+        ? isBumicertCreationMutationInFlight
+          ? "pending"
+          : "input"
         : "success";
 
   const { mutate: createBumicert } =
@@ -305,13 +317,16 @@ const Step5 = () => {
           iconset={{
             Error: CircleAlertIcon,
             Success: CircleCheckIcon,
+            Input: Hand,
           }}
           title={
             createBumicertError
               ? "Failed to publish."
               : createBumicertStatus === "success"
                 ? "Published!"
-                : "Ready to publish your bumicert"
+                : createBumicertStatus === "pending"
+                  ? "Publishing your bumicert"
+                  : "Ready to publish your bumicert"
           }
           description={
             createBumicertError
