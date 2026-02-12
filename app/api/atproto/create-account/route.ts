@@ -76,26 +76,8 @@ export async function POST(req: NextRequest) {
       did: string;
     };
 
-    // Optionally sign in the user by setting auth cookies
-    const signedIn = false;
-    // if (updateCookies) {
-    //   try {
-    //     const handlePrefix = handle.split(".")[0];
-    //     const serverCaller = gainforestSdk.getServerCaller();
-    //     await serverCaller.login({
-    //       handlePrefix,
-    //       service: service,
-    //       password,
-    //     });
-    //     signedIn = true;
-    //   } catch (loginErr) {
-    //     console.error("Auto sign-in after account creation failed:", loginErr);
-    //     // Don't fail the request — account was already created successfully
-    //   }
-    // }
-
     return new Response(
-      JSON.stringify({ ...data, signedIn }),
+      JSON.stringify(data),
       { status: 200 }
     );
   } catch (err: unknown) {

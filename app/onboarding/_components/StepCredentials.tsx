@@ -10,7 +10,7 @@ import {
 import { ArrowLeft, ArrowRight, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { motion } from "framer-motion";
 
 const STRENGTH_COLORS: Record<PasswordStrength, string> = {
