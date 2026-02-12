@@ -12,7 +12,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
+import { allowedPDSDomains, trpcClient } from "@/config/gainforest-sdk";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import Link from "next/link";
 import { motion } from "framer-motion";

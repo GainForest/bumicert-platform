@@ -239,3 +239,6 @@ time=2026-02-11T22:50:21.260+06:00 level=INFO msg="Starting %s..." !BADKEY=expor
 time=2026-02-11T22:50:21.260+06:00 level=INFO msg="Pre-export validation failed: %v" !BADKEY="refusing to export: JSONL content has changed since last import (import first to avoid data loss)"
 time=2026-02-11T22:50:21.844+06:00 level=INFO msg="Import triggered by file change"
 time=2026-02-11T22:50:21.845+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-11T22:50:38.775+06:00 level=INFO msg="Git ref change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.git/refs/heads/eco-277-send-an-invite-code-to-the-user-email.lock
+time=2026-02-11T22:50:39.776+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-11T22:50:39.777+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import

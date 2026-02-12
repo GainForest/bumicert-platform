@@ -10,7 +10,7 @@ import { getInviteEmailConfig, resend } from "@/lib/email/resend";
 import { getSupabaseAdmin } from "@/lib/supabase/server";
 
 const requestSchema = z.object({
-  email: z.string().trim().toLowerCase().email(),
+  email: z.email(),
   pdsDomain: z
     .string()
     .trim()
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
         {
           error: "BadRequest",
           message: "Invalid request body",
-          issues: parsed.error.flatten(),
+          issues: parsed.error,
         },
         { status: 400 }
       );
