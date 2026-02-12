@@ -1,5 +1,5 @@
 ---
-"bumicertain": minor
+"bumicerts": minor
 ---
 
 ## Improved Bumicert Publishing Display
