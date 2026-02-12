@@ -1,2 +1,2 @@
 
-bunx run lint
+bun run lint
