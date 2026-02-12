@@ -19,6 +19,7 @@ import { useModal } from "@/components/ui/modal/context";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import AuthenticatedModalContent from "./authenticated";
 import { authorize } from "@/components/actions/oauth";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 
 export const SignInModalId = "auth/sign-in";
 
@@ -52,7 +53,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
       if (typeof window !== "undefined") {
         sessionStorage.setItem(
           "pending_oauth_handle",
-          `${inputHandlePrefix}.climateai.org`
+          `${inputHandlePrefix}.${allowedPDSDomains[0]}`
         );
       }
 
@@ -104,7 +105,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
               }}
             />
             <InputGroupAddon align="inline-end" className="text-primary">
-              .climateai.org
+              .{allowedPDSDomains[0]}
             </InputGroupAddon>
           </InputGroup>
           <div className="w-full bg-muted rounded-md flex flex-col gap-0.5 p-1">
@@ -121,7 +122,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
               }
               const prefix = handleSplit[0];
               const suffix = handleSplit.slice(1).join(".");
-              if (suffix !== "climateai.org") {
+              if (suffix !== allowedPDSDomains[0]) {
                 return null;
               }
 

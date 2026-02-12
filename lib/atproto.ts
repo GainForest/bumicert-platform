@@ -1,3 +1,4 @@
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { createClient } from "@supabase/supabase-js";
 import {
   createATProtoSDK,
@@ -101,7 +102,7 @@ export const PROD_OAUTH_CONFIG = {
 export const atprotoSDK = createATProtoSDK({
   oauth: isDev ? DEV_OAUTH_CONFIG : PROD_OAUTH_CONFIG,
   servers: {
-    pds: process.env.NEXT_PUBLIC_PDS_URL,
+    pds: `https://${allowedPDSDomains[0]}`,
   },
   storage: {
     sessionStore: createSupabaseSessionStore(supabase, APP_ID),

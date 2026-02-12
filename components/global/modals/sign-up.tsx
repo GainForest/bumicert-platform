@@ -157,7 +157,7 @@ const SignUpModal = () => {
               disabled={isSigningUp}
             />
             <InputGroupAddon align="inline-end" className="text-primary">
-              .climateai.org
+              .{allowedPDSDomains[0]}
             </InputGroupAddon>
           </InputGroup>
         </div>
