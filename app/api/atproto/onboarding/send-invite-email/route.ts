@@ -50,6 +50,47 @@ export async function POST(req: NextRequest) {
     const email = parsed.data.email;
     const pdsDomain = parsed.data.pdsDomain as AllowedPDSDomain;
 
+    // Rate limiting check
+    const rateLimitMinutes = parseInt(
+      process.env.INVITE_EMAIL_RATE_LIMIT_MINUTES || "5"
+    );
+    const endpoint = "/api/atproto/onboarding/send-invite-email";
+
+    const { data: recentLimits } = await supabase
+      .from("rate_limits")
+      .select("created_at")
+      .eq("identifier", email)
+      .eq("endpoint", endpoint)
+      .order("created_at", { ascending: false })
+      .limit(1);
+
+    const rateLimit = recentLimits?.[0];
+    if (rateLimit) {
+      const minutesAgo =
+        (Date.now() - new Date(rateLimit.created_at).getTime()) / 60000;
+
+      if (minutesAgo < rateLimitMinutes) {
+        const retryAfter = Math.ceil((rateLimitMinutes - minutesAgo) * 60); // seconds
+        const retryAt = new Date(
+          Date.now() + retryAfter * 1000
+        ).toISOString();
+
+        return Response.json(
+          {
+            error: "RateLimitExceeded",
+            message: `Please wait ${Math.ceil(rateLimitMinutes - minutesAgo)} minute(s) before requesting another invite code`,
+            retryAfter: retryAt,
+          },
+          {
+            status: 429,
+            headers: {
+              "Retry-After": retryAfter.toString(),
+            },
+          }
+        );
+      }
+    }
+
     const inviteCode = await getOrCreateInviteCode(
       supabase,
       email,
@@ -71,6 +112,19 @@ export async function POST(req: NextRequest) {
         { status: 502 }
       );
     }
+
+    // Update rate limit after successful email send
+    await supabase
+      .from("rate_limits")
+      .delete()
+      .eq("identifier", email)
+      .eq("endpoint", endpoint);
+
+    await supabase.from("rate_limits").insert({
+      identifier: email,
+      endpoint: endpoint,
+      created_at: new Date().toISOString(),
+    });
 
     return Response.json({ success: true });
   } catch (err: unknown) {
