@@ -102,7 +102,10 @@ export async function POST(req: NextRequest) {
       did: string;
     };
 
-    return Response.json(data, { status: 200 });
+    return new Response(
+      JSON.stringify(data),
+      { status: 200 }
+    );
   } catch (err: unknown) {
     console.error("Unexpected error:", err);
     return Response.json(
