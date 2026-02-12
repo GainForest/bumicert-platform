@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { allowedPDSDomains } from "@/config/gainforest-sdk";
+import { defaultPdsDomain } from "@/config/gainforest-sdk";
 
 /**
  * POST /api/atproto/request-password-reset
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const service = allowedPDSDomains[0];
+    const service = defaultPdsDomain;
 
     const response = await fetch(
       `https://${service}/xrpc/com.atproto.server.requestPasswordReset`,

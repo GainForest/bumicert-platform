@@ -180,14 +180,17 @@ export type Database = {
         Row: {
           email: string
           invite_token: string
+          pds_domain: string
         }
         Insert: {
           email: string
           invite_token: string
+          pds_domain: string
         }
         Update: {
           email?: string
           invite_token?: string
+          pds_domain?: string
         }
         Relationships: []
       }
