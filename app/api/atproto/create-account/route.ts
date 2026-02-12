@@ -8,7 +8,7 @@ import { z } from "zod";
 import { getSupabaseAdmin } from "@/lib/supabase/server";
 
 const requestSchema = z.object({
-  email: z.string().email().trim().toLowerCase(),
+  email: z.email().trim().toLowerCase(),
   password: z.string().trim().min(1, "Password is required"),
   handle: z.string().trim().min(1, "Handle is required"),
   inviteCode: z.string().trim().min(1, "Invite code is required"),

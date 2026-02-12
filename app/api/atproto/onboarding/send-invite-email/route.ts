@@ -8,7 +8,7 @@
  *   Body: { email: "user@example.com", pdsDomain: "climateai.org" | "gainforest.id" }
  *
  * How it works:
- *   1. Rate limiting: Max 1 email per address per 5 minutes (configurable via INVITE_EMAIL_RATE_LIMIT_MINUTES)
+ *   1. Rate limiting: Max 1 email per address per 5 minutes
  *   2. Invite code: Checks DB for existing code matching email+pdsDomain, reuses if found, otherwise mints new one via PDS admin API
  *   3. Email: Sends invite code via Resend
  *   4. Tracking: Updates rate_limits table only after successful send
@@ -31,7 +31,7 @@ import { getInviteEmailConfig, resend } from "@/lib/email/resend";
 import { getSupabaseAdmin } from "@/lib/supabase/server";
 
 const requestSchema = z.object({
-  email: z.email(),
+  email: z.email().toLowerCase(),
   pdsDomain: z
     .string()
     .trim()

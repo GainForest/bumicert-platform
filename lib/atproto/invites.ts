@@ -12,7 +12,7 @@
  * ## Error Handling
  * Functions throw structured errors with HTTP status codes and error types because:
  * - Consumed by API routes that need to return proper HTTP responses
- * - Different error types (BadRequest, DatabaseError, UpstreamError) require different status codes
+ * - Different error types (BadRequest, DatabaseError, UpstreamError, ServerMisconfigured) require different status codes
  * - The `isInviteCodeError` type guard allows API routes to distinguish our errors from unexpected ones
  * 
  * ## Key Functions
@@ -44,7 +44,11 @@ const resolvePdsServiceUrl = (pdsDomain: AllowedPDSDomain) =>`https://${pdsDomai
 
 const getAdminBasicAuth = () => {
   if (!process.env.PDS_ADMIN_IDENTIFIER || !process.env.PDS_ADMIN_PASSWORD) {
-    throw new Error("Missing PDS_ADMIN_IDENTIFIER / PDS_ADMIN_PASSWORD env vars");
+    throwInviteError(
+      500,
+      "ServerMisconfigured",
+      "Missing PDS_ADMIN_IDENTIFIER / PDS_ADMIN_PASSWORD env vars"
+    );
   }
 
   const adminUsername = process.env.PDS_ADMIN_IDENTIFIER;

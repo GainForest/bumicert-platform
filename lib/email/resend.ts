@@ -12,9 +12,5 @@ export const getInviteEmailConfig = () => {
   const from = "noreply@gainforest.id";
   const subject = "Welcome to GainForest - Your Invite Code";
 
-  if (!from) {
-    throw new Error("Missing RESEND_INVITE_FROM env var");
-  }
-
   return { from, subject };
 };
