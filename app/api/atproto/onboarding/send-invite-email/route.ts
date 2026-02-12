@@ -1,3 +1,24 @@
+/**
+ * POST /api/atproto/onboarding/send-invite-email
+ *
+ * Sends an ATProto PDS invite code to a user's email address.
+ *
+ * Usage:
+ *   POST /api/atproto/onboarding/send-invite-email
+ *   Body: { email: "user@example.com", pdsDomain: "climateai.org" | "gainforest.id" }
+ *
+ * How it works:
+ *   1. Rate limiting: Max 1 email per address per 5 minutes (configurable via INVITE_EMAIL_RATE_LIMIT_MINUTES)
+ *   2. Invite code: Checks DB for existing code matching email+pdsDomain, reuses if found, otherwise mints new one via PDS admin API
+ *   3. Email: Sends invite code via Resend
+ *   4. Tracking: Updates rate_limits table only after successful send
+ *
+ * Responses:
+ *   200: { success: true }
+ *   429: { error: "RateLimitExceeded", message: "...", retryAfter: "ISO timestamp" }
+ *   400: Invalid request body
+ *   500/502: Server or email service error
+ */
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { allowedPDSDomains, type AllowedPDSDomain } from "@/config/gainforest-sdk";
