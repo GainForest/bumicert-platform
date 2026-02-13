@@ -22,7 +22,7 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { allowedPDSDomains, type AllowedPDSDomain } from "@/config/gainforest-sdk";
-import { InviteCodeEmail } from "@/components/email/InviteCodeEmail";
+import { InviteCodeEmail } from "@/email-templates/InviteCodeEmail";
 import {
   getOrCreateInviteCode,
   isInviteCodeError,

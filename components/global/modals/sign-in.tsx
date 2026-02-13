@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 import { useModal } from "@/components/ui/modal/context";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import AuthenticatedModalContent from "./authenticated";
-import { authorize } from "@/components/actions/oauth";
+import { authorize } from "@/lib/oauth/oauth";
 import { allowedPDSDomains } from "@/config/gainforest-sdk";
 
 export const SignInModalId = "auth/sign-in";
@@ -79,8 +79,8 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
           stack.length === 1
             ? undefined
             : () => {
-                popModal();
-              }
+              popModal();
+            }
         }
       >
         <ModalTitle>Sign In</ModalTitle>

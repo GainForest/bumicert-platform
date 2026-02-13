@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useAtprotoStore } from "@/components/stores/atproto";
-import { checkSession, getProfile } from "@/components/actions/oauth";
+import { checkSession, getProfile } from "@/lib/oauth/oauth";
 
 /**
  * Provider component that initializes ATProto session state.
