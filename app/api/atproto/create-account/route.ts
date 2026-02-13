@@ -51,7 +51,22 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const service = allowedPDSDomains[0];
+    // Determine which PDS to use based on the handle suffix
+    const handleDomain = allowedPDSDomains.find(
+      (domain) => handle.endsWith(`.${domain}`)
+    );
+
+    if (!handleDomain) {
+      return new Response(
+        JSON.stringify({
+          error: "BadRequest",
+          message: `Handle must end with one of: ${allowedPDSDomains.map(d => "." + d).join(", ")}`,
+        }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const service = handleDomain;
 
     const response = await fetch(
       `https://${service}/xrpc/com.atproto.server.createAccount`,
