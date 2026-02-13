@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Get Started - Create Your Organization",
@@ -26,6 +28,15 @@ export default function OnboardingLayout({
       role="main"
       aria-label="Onboarding"
     >
+      <header className="w-full px-4 py-3">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Home
+        </Link>
+      </header>
       {children}
     </main>
   );

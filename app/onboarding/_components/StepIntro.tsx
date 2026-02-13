@@ -3,12 +3,12 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useOnboardingStore } from "../store";
-import { ArrowRight, Globe } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 
 function isValidUrl(url: string): boolean {
-  if (!url) return true; // Empty is valid (optional field)
+  if (!url) return true; // Empty is valid
   try {
     const urlToTest = url.startsWith("http") ? url : `https://${url}`;
     const parsed = new URL(urlToTest);
@@ -22,14 +22,19 @@ function isValidUrl(url: string): boolean {
 export function StepIntro() {
   const { data, updateData, nextStep } = useOnboardingStore();
 
+  const hasWebsite = data.website.trim().length > 0;
   const websiteValid = isValidUrl(data.website);
-  const canContinue =
-    data.organizationName.trim().length > 0 && websiteValid;
+  const canContinueWithWebsite = hasWebsite && websiteValid;
 
   const handleContinue = () => {
-    if (canContinue) {
+    if (canContinueWithWebsite) {
       nextStep();
     }
+  };
+
+  const handleSkip = () => {
+    updateData({ website: "" });
+    nextStep();
   };
 
   return (
@@ -46,7 +51,7 @@ export function StepIntro() {
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="h-16 w-16 bg-primary blur-2xl rounded-full animate-pulse" />
           </div>
-          <Image src="/assets/media/images/logo.svg" className="brightness-50" alt="Door Open" width={64} height={64} />
+          <Image src="/assets/media/images/logo.svg" className="brightness-50" alt="GainForest Logo" width={64} height={64} />
         </div>
 
         {/* Title */}
@@ -59,31 +64,10 @@ export function StepIntro() {
         <div className="w-full space-y-4 mt-2">
           <div>
             <label
-              htmlFor="organization-name"
+              htmlFor="website"
               className="text-sm font-medium leading-none"
             >
-              Organization Name <span className="text-destructive">*</span>
-            </label>
-            <Input
-              id="organization-name"
-              type="text"
-              placeholder="e.g., Green Forest Initiative"
-              value={data.organizationName}
-              className="mt-1"
-              onChange={(e) => updateData({ organizationName: e.target.value })}
-              aria-describedby="org-name-hint"
-              autoFocus
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="website"
-              className="text-sm font-medium leading-none flex items-center gap-1.5"
-            >
-              <Globe className="w-3.5 h-3.5" />
               Website
-              <span className="text-muted-foreground font-normal">(optional)</span>
             </label>
             <Input
               id="website"
@@ -92,9 +76,9 @@ export function StepIntro() {
               value={data.website}
               className="mt-1"
               onChange={(e) => updateData({ website: e.target.value })}
-              aria-describedby="website-hint"
+              autoFocus
             />
-            {data.website && !websiteValid && (
+            {hasWebsite && !websiteValid && (
               <p className="text-xs text-destructive mt-1">
                 Please enter a valid URL (e.g., https://example.com)
               </p>
@@ -102,15 +86,24 @@ export function StepIntro() {
           </div>
         </div>
 
-        {/* Continue button */}
-        <Button
-          onClick={handleContinue}
-          disabled={!canContinue}
-          className="w-full mt-2"
-        >
-          Continue
-          <ArrowRight className="w-4 h-4 ml-2" />
-        </Button>
+        {/* Buttons */}
+        <div className="w-full flex flex-col gap-2 mt-2">
+          <Button
+            onClick={handleContinue}
+            disabled={!canContinueWithWebsite}
+            className="w-full"
+          >
+            Continue
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Button>
+          <Button
+            onClick={handleSkip}
+            variant="ghost"
+            className="w-full text-muted-foreground"
+          >
+            Skip
+          </Button>
+        </div>
       </div>
     </motion.div>
   );

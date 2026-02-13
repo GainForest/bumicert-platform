@@ -9,9 +9,9 @@ This release introduces a comprehensive redesign of the organization onboarding 
 ## New Multi-Step Onboarding Flow
 
 ### Step 1: Introduction
-- Organization name input (required)
-- Optional website URL field with client-side validation
-- Real-time URL validation with error messages
+- Website URL input with real-time validation
+- Two action buttons: "Continue" (with website) and "Skip" (without website)
+- Clean, focused UI that encourages providing website for auto-fill in Step 3
 
 ### Step 2: Email Verification
 - Two-phase verification flow:
@@ -24,7 +24,7 @@ This release introduces a comprehensive redesign of the organization onboarding 
 
 ### Step 3: Organization Details
 - **BrandFetch Integration**: Auto-fill organization details from website
-  - Fetches logo, description, country, and founding year
+  - Fetches organization name, logo, description, country, and founding year
   - Manual trigger via wand icon button
   - Auto-fetches on first render if website is provided
 - **Logo Upload**: Image editor modal for uploading and cropping organization logo
@@ -78,6 +78,7 @@ All onboarding APIs moved from `/api/atproto/onboarding/` to `/onboarding/api/` 
 - **Animated Transitions**: Framer Motion animations between steps and during loading states
 - **Loading Animations**: Pulsing blur effect on form during BrandFetch fetch
 - **Sign In Modal Integration**: Sign in link on onboarding page opens modal instead of navigating away
+- **Home Navigation**: Header with "← Home" link on all onboarding pages for easy exit
 
 ## Removed Features
 
@@ -102,3 +103,4 @@ All onboarding APIs moved from `/api/atproto/onboarding/` to `/onboarding/api/` 
 - **Hyphens in handle**: Fixed handle input to allow typing hyphens (e.g., "my-org-name") by deferring trailing hyphen cleanup to form submission
 - **Full handle in Sign In modal**: Sign In modal now pre-fills with the complete handle including domain (e.g., "my-org.gainforest.earth")
 - **Removed unused endpoint**: Deleted `/onboarding/api/create-account` endpoint which was superseded by the combined `/onboarding/api/onboard` endpoint
+- **startDate format**: Fixed ISO datetime format for SDK compatibility (was sending date-only, now sends full datetime)

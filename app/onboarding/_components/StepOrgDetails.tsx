@@ -199,6 +199,10 @@ export function StepOrgDetails() {
         const updates: Partial<typeof data> = {};
 
         // Always update fields with BrandFetch data (overwrite existing values)
+        if (brandInfo.name) {
+          updates.organizationName = brandInfo.name;
+        }
+
         if (brandInfo.description) {
           updates.longDescription = brandInfo.description;
         }
@@ -229,11 +233,12 @@ export function StepOrgDetails() {
 
         // Auto-generate short description after BrandFetch completes
         const newLongDesc = updates.longDescription ?? data.longDescription;
+        const newOrgName = updates.organizationName ?? data.organizationName;
         const newCountry = updates.country ?? data.country;
         if (newLongDesc.trim().length >= 50) {
           // Small delay to let state update
           setTimeout(() => {
-            handleGenerateShortDescription(newLongDesc, data.organizationName, newCountry);
+            handleGenerateShortDescription(newLongDesc, newOrgName, newCountry);
           }, 100);
         }
       } else if (!isAutoFetch) {
