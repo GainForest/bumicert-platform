@@ -23,7 +23,6 @@ export const links = {
   },
   api: {
     onboarding: {
-      createAccount: "/onboarding/api/create-account",
       sendInviteEmail: "/onboarding/api/send-invite-email",
       verifyInviteCode: "/onboarding/api/verify-invite-code",
       generateShortDescription: "/onboarding/api/generate-short-description",

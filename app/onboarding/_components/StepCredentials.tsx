@@ -29,7 +29,7 @@ const STRENGTH_COLORS: Record<PasswordStrength, string> = {
   weak: "bg-red-500",
   fair: "bg-orange-500",
   good: "bg-yellow-500",
-  strong: "bg-green-500",
+  strong: "bg-primary",
 };
 
 const STRENGTH_LABELS: Record<PasswordStrength, string> = {
@@ -117,6 +117,12 @@ export function StepCredentials() {
     handleAvailability !== "checking";
 
   const handleContinue = () => {
+    // Clean trailing hyphens before validation
+    const cleanHandle = data.handle.replace(/-+$/, "");
+    if (cleanHandle !== data.handle) {
+      updateData({ handle: cleanHandle });
+    }
+
     if (!canContinue) {
       if (!data.handle.trim() || data.handle.trim().length < 3) {
         setError("Handle must be at least 3 characters");
@@ -134,13 +140,13 @@ export function StepCredentials() {
   };
 
   const handleHandleChange = (value: string) => {
-    // Normalize handle: lowercase, remove special chars except hyphens, no leading/trailing hyphens
+    // Normalize handle: lowercase, remove special chars except hyphens, no leading hyphens
+    // Note: trailing hyphens are cleaned on continue/blur to allow typing "my-org-name"
     const normalized = value
       .toLowerCase()
       .replace(/[^a-z0-9-]/g, "")
       .replace(/^-+/, "")
-      .replace(/-+$/, "")
-      .replace(/-+/g, "-");
+      .replace(/-{2,}/g, "-");
     updateData({ handle: normalized });
     if (error) setError(null);
   };
@@ -184,7 +190,7 @@ export function StepCredentials() {
                   handleAvailability === "taken" &&
                     "border-destructive focus-visible:ring-destructive/50",
                   handleAvailability === "available" &&
-                    "border-green-500 focus-visible:ring-green-500/50"
+                    "border-primary focus-visible:ring-primary/50"
                 )}
                 aria-describedby="handle-hint"
               />
@@ -212,8 +218,8 @@ export function StepCredentials() {
                   )}
                   {handleAvailability === "available" && (
                     <>
-                      <Check className="w-3 h-3 text-green-500" />
-                      <span className="text-green-500">Available</span>
+                      <Check className="w-3 h-3 text-primary" />
+                      <span className="text-primary">Available</span>
                     </>
                   )}
                   {handleAvailability === "taken" && (
@@ -280,7 +286,7 @@ export function StepCredentials() {
                       passwordAnalysis.strength === "weak" && "text-red-500",
                       passwordAnalysis.strength === "fair" && "text-orange-500",
                       passwordAnalysis.strength === "good" && "text-yellow-600",
-                      passwordAnalysis.strength === "strong" && "text-green-500"
+                      passwordAnalysis.strength === "strong" && "text-primary"
                     )}
                   >
                     {STRENGTH_LABELS[passwordAnalysis.strength]}
@@ -316,7 +322,7 @@ export function StepCredentials() {
                 className={cn(
                   "pr-10 h-9",
                   passwordsMatch &&
-                    "border-green-500 focus-visible:ring-green-500/50",
+                    "border-primary focus-visible:ring-primary/50",
                   passwordsDontMatch &&
                     "border-destructive focus-visible:ring-destructive/50"
                 )}
@@ -342,7 +348,7 @@ export function StepCredentials() {
               <p
                 className={cn(
                   "text-xs flex items-center gap-1",
-                  passwordsMatch ? "text-green-500" : "text-destructive"
+                  passwordsMatch ? "text-primary" : "text-destructive"
                 )}
               >
                 {passwordsMatch ? (
@@ -375,7 +381,7 @@ export function StepCredentials() {
             Back
           </Button>
           <Button onClick={handleContinue} disabled={!canContinue}>
-            Create Account
+            Continue
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </div>

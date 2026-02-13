@@ -98,7 +98,7 @@ export function StepComplete() {
     pushModal(
       {
         id: SignInModalId,
-        content: <SignInModal initialHandle={data.handle} />,
+        content: <SignInModal initialHandle={`${data.handle}.${allowedPDSDomains[0]}`} />,
       },
       true
     );

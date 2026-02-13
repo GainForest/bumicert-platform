@@ -93,3 +93,12 @@ All onboarding APIs moved from `/api/atproto/onboarding/` to `/onboarding/api/` 
 ## Dependencies Added
 
 - `@google/generative-ai` - Google Gemini SDK for AI text generation
+
+## Bug Fixes (v0.1 Feedback)
+
+- **Consistent color scheme**: Replaced green success colors with primary color throughout Step 4 (handle availability, password strength, password match indicators)
+- **Clearer button text**: Changed "Create Account" button to "Continue" in Step 4, since account creation happens in Step 5
+- **BrandFetch overwrites fields**: Clicking the wand icon now always updates fields with BrandFetch data, even if they already have values
+- **Hyphens in handle**: Fixed handle input to allow typing hyphens (e.g., "my-org-name") by deferring trailing hyphen cleanup to form submission
+- **Full handle in Sign In modal**: Sign In modal now pre-fills with the complete handle including domain (e.g., "my-org.gainforest.earth")
+- **Removed unused endpoint**: Deleted `/onboarding/api/create-account` endpoint which was superseded by the combined `/onboarding/api/onboard` endpoint

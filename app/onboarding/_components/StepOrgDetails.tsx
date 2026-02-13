@@ -198,23 +198,23 @@ export function StepOrgDetails() {
       if (brandInfo.found) {
         const updates: Partial<typeof data> = {};
 
-        // Only update fields that are empty
-        if (brandInfo.description && data.longDescription.trim().length === 0) {
+        // Always update fields with BrandFetch data (overwrite existing values)
+        if (brandInfo.description) {
           updates.longDescription = brandInfo.description;
         }
 
-        // Fill country if empty and countryCode is valid
-        if (brandInfo.countryCode && !data.country && brandInfo.countryCode in countries) {
+        // Fill country if countryCode is valid
+        if (brandInfo.countryCode && brandInfo.countryCode in countries) {
           updates.country = brandInfo.countryCode;
         }
 
-        // Fill start date from foundedYear if empty
-        if (brandInfo.foundedYear && !data.startDate) {
+        // Fill start date from foundedYear
+        if (brandInfo.foundedYear) {
           updates.startDate = `${brandInfo.foundedYear}-01-01`;
         }
 
-        // Fetch and set logo if empty and logoUrl is available
-        if (brandInfo.logoUrl && !data.logo) {
+        // Fetch and set logo if logoUrl is available
+        if (brandInfo.logoUrl) {
           const logoFile = await fetchLogoAsFile(brandInfo.logoUrl);
           if (logoFile) {
             updates.logo = logoFile;
