@@ -2,16 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useOnboardingStore } from "../store";
-import {
-  ArrowRight,
-  Building2,
-  BadgeDollarSign,
-  LeafIcon,
-  Globe,
-} from "lucide-react";
-import Link from "next/link";
+import { ArrowRight, Globe } from "lucide-react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 
@@ -32,9 +24,7 @@ export function StepIntro() {
 
   const websiteValid = isValidUrl(data.website);
   const canContinue =
-    data.organizationName.trim().length > 0 &&
-    data.acceptedCodeOfConduct &&
-    websiteValid;
+    data.organizationName.trim().length > 0 && websiteValid;
 
   const handleContinue = () => {
     if (canContinue) {
@@ -109,37 +99,6 @@ export function StepIntro() {
                 Please enter a valid URL (e.g., https://example.com)
               </p>
             )}
-          </div>
-
-          <div className="flex items-start space-x-3 mt-10">
-            <Checkbox
-              id="code-of-conduct"
-              checked={data.acceptedCodeOfConduct}
-              onCheckedChange={(checked) =>
-                updateData({ acceptedCodeOfConduct: checked === true })
-              }
-              aria-describedby="coc-description"
-            />
-            <div className="grid gap-1 leading-none">
-              <label
-                htmlFor="code-of-conduct"
-                className="text-sm font-medium leading-none cursor-pointer"
-              >
-                I agree to the Code of Conduct
-              </label>
-              <p id="coc-description" className="text-xs text-muted-foreground">
-                Please review our{" "}
-                <Link
-                  href="https://gainforest.notion.site/GainForest-Community-Code-of-Conduct-23094a2f76b380118bc0dfe560df4a2e"
-                  className="text-primary hover:underline"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Code of Conduct
-                </Link>{" "}
-                before continuing.
-              </p>
-            </div>
           </div>
         </div>
 
