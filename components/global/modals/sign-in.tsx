@@ -54,7 +54,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
 
     try {
       // Call the server action to get the authorization URL
-      const { authorizationUrl } = await authorize(inputHandlePrefix);
+      const { authorizationUrl } = await authorize(inputHandlePrefix, selectedDomain);
 
       // Store the handle prefix for later (to add to previous sessions after callback)
       if (typeof window !== "undefined") {
