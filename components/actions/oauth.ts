@@ -15,7 +15,7 @@ import { allowedPDSDomains } from "@/config/gainforest-sdk";
  * This server action generates an authorization URL for the given handle.
  * The client should redirect to this URL to start the OAuth flow.
  *
- * @param handle - The user's ATProto handle (e.g., "alice.climateai.org" or just "alice")
+ * @param handle - The user's ATProto handle (e.g., "alice.gainforest.id" or just "alice")
  * @returns The authorization URL to redirect the user to
  *
  * @example
