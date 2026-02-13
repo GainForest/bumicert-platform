@@ -15,7 +15,7 @@ import { links } from "@/lib/links";
 import { Building, Loader2, LogOut, UploadIcon } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { logout } from "@/components/actions/oauth";
+import { logout } from "@/lib/oauth/oauth";
 
 export const ProfileModalId = "profile";
 
@@ -46,8 +46,8 @@ export const ProfileModal = () => {
             stack.length === 1
               ? undefined
               : () => {
-                  popModal();
-                }
+                popModal();
+              }
           }
         >
           <ModalTitle>Not signed in.</ModalTitle>
@@ -73,8 +73,8 @@ export const ProfileModal = () => {
           stack.length === 1
             ? undefined
             : () => {
-                popModal();
-              }
+              popModal();
+            }
         }
       >
         <ModalTitle></ModalTitle>
