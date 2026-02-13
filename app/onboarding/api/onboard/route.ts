@@ -37,6 +37,9 @@ import { gainforestSdk } from "@/config/gainforest-sdk.server";
 import { getSupabaseAdmin } from "@/lib/supabase/server";
 import { organizationInfoSchema } from "./schema";
 
+const VALID_OBJECTIVES = ["Conservation", "Research", "Education", "Community", "Other"] as const;
+type Objective = (typeof VALID_OBJECTIVES)[number];
+
 const requestSchema = z.object({
   email: z.string().email().trim().toLowerCase(),
   password: z.string().min(8, "Password must be at least 8 characters"),
@@ -58,6 +61,7 @@ const requestSchema = z.object({
   country: z.string().length(2),
   website: z.string().optional(),
   startDate: z.string().optional(),
+  objectives: z.array(z.enum(VALID_OBJECTIVES)).optional().default(["Other"]),
 });
 
 type AccountCreationResponse = {
@@ -85,6 +89,19 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
 
     // Extract form fields
+    const objectivesRaw = formData.get("objectives") as string;
+    let objectives: Objective[] = ["Other"];
+    if (objectivesRaw) {
+      try {
+        const parsed = JSON.parse(objectivesRaw);
+        if (Array.isArray(parsed) && parsed.every(o => VALID_OBJECTIVES.includes(o))) {
+          objectives = parsed as Objective[];
+        }
+      } catch {
+        // Keep default
+      }
+    }
+
     const rawData = {
       email: formData.get("email") as string,
       password: formData.get("password") as string,
@@ -97,6 +114,7 @@ export async function POST(req: NextRequest) {
       country: formData.get("country") as string,
       website: formData.get("website") as string,
       startDate: formData.get("startDate") as string,
+      objectives,
     };
 
     const logoFile = formData.get("logo") as File | null;
@@ -244,7 +262,7 @@ export async function POST(req: NextRequest) {
           displayName: orgInfo.displayName,
           shortDescription: orgInfo.shortDescription,
           longDescription: orgInfo.longDescription,
-          objectives: ["Other"],
+          objectives: parsed.data.objectives,
           country: orgInfo.country,
           visibility: "Public",
           website: orgInfo.website || undefined,

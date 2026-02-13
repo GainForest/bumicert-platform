@@ -15,6 +15,8 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
   "complete",
 ];
 
+export type Objective = "Conservation" | "Research" | "Education" | "Community" | "Other";
+
 export type OnboardingData = {
   // Step 1: Intro
   organizationName: string;
@@ -29,6 +31,7 @@ export type OnboardingData = {
   startDate: string | null;
   longDescription: string;
   shortDescription: string;
+  objectives: Objective[];
   website: string;
   logo: File | undefined;
 
@@ -69,6 +72,7 @@ const initialData: OnboardingData = {
   startDate: null,
   longDescription: "",
   shortDescription: "",
+  objectives: [],
   website: "",
   logo: undefined,
   handle: "",

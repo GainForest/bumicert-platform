@@ -1,27 +1,47 @@
 /**
  * POST /onboarding/api/generate-short-description
  *
- * Generates a short description using Google Gemini Flash.
+ * Generates a short description and objectives using Google Gemini Flash.
  *
  * Usage:
  *   POST /onboarding/api/generate-short-description
  *   Body: { longDescription: string, organizationName: string, country?: string }
  *
  * Responses:
- *   200: { shortDescription: string, success: true }
+ *   200: { shortDescription: string, objectives: string[], success: true }
  *   400: Invalid request body
- *   500: Server error
  */
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { countries } from "@/lib/countries";
 
+const VALID_OBJECTIVES = ["Conservation", "Research", "Education", "Community", "Other"] as const;
+type Objective = (typeof VALID_OBJECTIVES)[number];
+
 const requestSchema = z.object({
   longDescription: z.string().min(50, "Description must be at least 50 characters"),
   organizationName: z.string().min(1, "Organization name is required"),
   country: z.string().optional(),
 });
+
+function createFallbackResponse(organizationName: string, countryName?: string): { shortDescription: string; objectives: Objective[] } {
+  const locationPart = countryName ? ` based in ${countryName}` : "";
+  return {
+    shortDescription: `${organizationName} is an environmental organization${locationPart} working towards a sustainable future.`,
+    objectives: ["Other"],
+  };
+}
+
+function parseObjectives(text: string): Objective[] {
+  const objectives: Objective[] = [];
+  for (const obj of VALID_OBJECTIVES) {
+    if (text.toLowerCase().includes(obj.toLowerCase()) && obj !== "Other") {
+      objectives.push(obj);
+    }
+  }
+  return objectives.length > 0 ? objectives : ["Other"];
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -39,66 +59,87 @@ export async function POST(req: NextRequest) {
     }
 
     const { longDescription, organizationName, country } = parsed.data;
-
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      console.error("GEMINI_API_KEY not configured");
-      return Response.json(
-        {
-          error: "ServerMisconfigured",
-          message: "AI service not configured",
-        },
-        { status: 500 }
-      );
-    }
-
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-
     const countryName = country ? countries[country]?.name : undefined;
     const countryContext = countryName ? ` based in ${countryName}` : "";
 
-    const prompt = `You are a copywriter helping an environmental conservation organization create a short description for their profile.
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      console.warn("GEMINI_API_KEY not configured, using fallback");
+      const fallback = createFallbackResponse(organizationName, countryName);
+      return Response.json({ ...fallback, success: true });
+    }
+
+    try {
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+      const prompt = `You are a copywriter helping an environmental conservation organization create a short description for their profile.
 
 Organization Name: ${organizationName}${countryContext}
 
 Full Description:
 ${longDescription}
 
-Write a compelling short description (1-2 sentences, maximum 300 characters) that:
+TASK 1: Write a compelling short description (1-2 sentences, maximum 300 characters) that:
 - Captures the organization's core mission and impact
 - Is suitable for previews and search results
 - Uses active, engaging language
 - Does not start with "We" or the organization name
-- Does not include any quotation marks in your response
+- Does not include any quotation marks
 
-Respond with ONLY the short description, nothing else.`;
+TASK 2: Based on the description, identify which of these objectives apply to this organization (can be multiple):
+- Conservation: Wildlife protection, habitat preservation, biodiversity
+- Research: Scientific studies, data collection, monitoring
+- Education: Training, awareness, outreach, capacity building
+- Community: Local engagement, indigenous peoples, social impact
+- Other: If none of the above clearly apply
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    let shortDescription = response.text().trim();
+Respond in this exact format:
+SHORT_DESCRIPTION: <your short description here>
+OBJECTIVES: <comma-separated list of applicable objectives>`;
 
-    // Remove any quotation marks that might have been added
-    shortDescription = shortDescription.replace(/^["']|["']$/g, "");
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text().trim();
 
-    // Ensure it's not too long
-    if (shortDescription.length > 300) {
-      shortDescription = shortDescription.substring(0, 297) + "...";
+      // Parse the response (using [\s\S] instead of . with s flag for multiline matching)
+      const shortDescMatch = text.match(/SHORT_DESCRIPTION:\s*([\s\S]+?)(?=\nOBJECTIVES:|$)/);
+      const objectivesMatch = text.match(/OBJECTIVES:\s*([\s\S]+)/);
+
+      let shortDescription = shortDescMatch?.[1]?.trim() || "";
+      const objectivesText = objectivesMatch?.[1]?.trim() || "";
+
+      // Clean up short description
+      shortDescription = shortDescription.replace(/^["']|["']$/g, "");
+      if (shortDescription.length > 300) {
+        shortDescription = shortDescription.substring(0, 297) + "...";
+      }
+
+      // If parsing failed, use fallback for short description
+      if (!shortDescription) {
+        shortDescription = createFallbackResponse(organizationName, countryName).shortDescription;
+      }
+
+      // Parse objectives
+      const objectives = parseObjectives(objectivesText);
+
+      return Response.json({
+        shortDescription,
+        objectives,
+        success: true,
+      });
+    } catch (aiError) {
+      console.error("Gemini API error, using fallback:", aiError);
+      const fallback = createFallbackResponse(organizationName, countryName);
+      return Response.json({ ...fallback, success: true });
     }
-
+  } catch (err) {
+    console.error("Error in generate-short-description:", err);
+    // Even on unexpected errors, return a valid response so onboarding can continue
     return Response.json({
-      shortDescription,
+      shortDescription: "An environmental organization working towards a sustainable future.",
+      objectives: ["Other"],
       success: true,
     });
-  } catch (err) {
-    console.error("Error generating short description:", err);
-    return Response.json(
-      {
-        error: "GenerationError",
-        message:
-          err instanceof Error ? err.message : "Failed to generate description",
-      },
-      { status: 500 }
-    );
   }
 }

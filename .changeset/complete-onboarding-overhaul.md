@@ -104,3 +104,6 @@ All onboarding APIs moved from `/api/atproto/onboarding/` to `/onboarding/api/` 
 - **Full handle in Sign In modal**: Sign In modal now pre-fills with the complete handle including domain (e.g., "my-org.gainforest.earth")
 - **Removed unused endpoint**: Deleted `/onboarding/api/create-account` endpoint which was superseded by the combined `/onboarding/api/onboard` endpoint
 - **startDate format**: Fixed ISO datetime format for SDK compatibility (was sending date-only, now sends full datetime)
+- **Short description generation**: Removed from UI; now auto-generated when clicking "Continue" in Step 3
+- **Objectives AI detection**: API now uses Gemini to detect organization objectives (Conservation, Research, Education, Community) from description, with "Other" as fallback
+- **Robust generation fallback**: If AI generation fails, a fallback description is used and onboarding continues without error

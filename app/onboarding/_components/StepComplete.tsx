@@ -52,6 +52,11 @@ export function StepComplete() {
       if (data.logo) {
         formData.append("logo", data.logo);
       }
+      // Ensure objectives is never empty - always send at least ["Other"]
+      const objectives = data.objectives && data.objectives.length > 0
+        ? data.objectives
+        : ["Other"];
+      formData.append("objectives", JSON.stringify(objectives));
 
       const response = await fetch(links.api.onboarding.onboard, {
         method: "POST",

@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useOnboardingStore, generateHandle } from "../store";
+import { useOnboardingStore, generateHandle, type Objective } from "../store";
 import {
   ArrowRight,
   ArrowLeft,
@@ -11,7 +11,6 @@ import {
   Globe,
   Loader2,
   MapPin,
-  Sparkles,
   ImageIcon,
   X,
   Wand2,
@@ -38,7 +37,6 @@ import {
 import { format, parseISO } from "date-fns";
 import { links } from "@/lib/links";
 import Image from "next/image";
-import { organizationInfoSchema } from "../api/onboard/schema";
 
 type BrandInfo = {
   found: boolean;
@@ -64,7 +62,7 @@ function extractDomain(url: string): string | null {
 export function StepOrgDetails() {
   const { data, updateData, nextStep, prevStep, setError, error } =
     useOnboardingStore();
-  const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [isFetchingBrandInfo, setIsFetchingBrandInfo] = useState(false);
   const [brandInfoFetched, setBrandInfoFetched] = useState(false);
   const [websiteError, setWebsiteError] = useState<string | null>(null);
@@ -101,61 +99,16 @@ export function StepOrgDetails() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Validate using the shared schema
-  const validationResult = useMemo(() => {
-    return organizationInfoSchema.safeParse({
-      displayName: data.organizationName.trim(),
-      shortDescription: data.shortDescription.trim(),
-      longDescription: data.longDescription.trim(),
-      country: data.country,
-      website: data.website || undefined,
-      startDate: data.startDate || undefined,
-    });
-  }, [data.organizationName, data.shortDescription, data.longDescription, data.country, data.website, data.startDate]);
-
-  const canContinue = validationResult.success;
-
-  // Generate short description
-  const handleGenerateShortDescription = useCallback(async (longDesc?: string, orgName?: string, countryCode?: string) => {
-    const description = longDesc ?? data.longDescription;
-    const name = orgName ?? data.organizationName;
-    const country = countryCode ?? data.country;
-
-    if (description.trim().length < 50) {
-      return; // Silently return if not enough content
-    }
-
-    setIsGeneratingDescription(true);
-    setError(null);
-
-    try {
-      const response = await fetch(
-        links.api.onboarding.generateShortDescription,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            longDescription: description,
-            organizationName: name,
-            country: country,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to generate description");
-      }
-
-      const result = await response.json();
-      updateData({ shortDescription: result.shortDescription });
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to generate description"
-      );
-    } finally {
-      setIsGeneratingDescription(false);
-    }
-  }, [data.longDescription, data.organizationName, data.country, setError, updateData]);
+  // UI validation - doesn't require shortDescription (it's generated on Continue)
+  const canContinue = useMemo(() => {
+    return (
+      data.organizationName.trim().length > 0 &&
+      data.longDescription.trim().length >= 50 &&
+      data.country.length === 2 &&
+      data.country in countries &&
+      !isGenerating
+    );
+  }, [data.organizationName, data.longDescription, data.country, isGenerating]);
 
   // Fetch logo from URL and convert to File
   const fetchLogoAsFile = async (logoUrl: string): Promise<File | null> => {
@@ -230,17 +183,6 @@ export function StepOrgDetails() {
         }
 
         setBrandInfoFetched(true);
-
-        // Auto-generate short description after BrandFetch completes
-        const newLongDesc = updates.longDescription ?? data.longDescription;
-        const newOrgName = updates.organizationName ?? data.organizationName;
-        const newCountry = updates.country ?? data.country;
-        if (newLongDesc.trim().length >= 50) {
-          // Small delay to let state update
-          setTimeout(() => {
-            handleGenerateShortDescription(newLongDesc, newOrgName, newCountry);
-          }, 100);
-        }
       } else if (!isAutoFetch) {
         setError("Could not find information for this website");
       }
@@ -251,7 +193,7 @@ export function StepOrgDetails() {
     } finally {
       setIsFetchingBrandInfo(false);
     }
-  }, [data.website, data.longDescription, data.country, data.startDate, data.logo, data.organizationName, setError, updateData, handleGenerateShortDescription]);
+  }, [data.website, setError, updateData]);
 
   // Auto-fetch brand info on first render if website is provided
   useEffect(() => {
@@ -261,12 +203,54 @@ export function StepOrgDetails() {
     }
   }, [data.website, handleFetchBrandInfo]);
 
-  const handleContinue = () => {
-    if (canContinue) {
-      // Pre-generate handle for next step
-      const handle = generateHandle(data.organizationName, data.country);
-      updateData({ handle });
+  // Generate short description and objectives, then proceed to next step
+  const handleContinue = async () => {
+    if (!canContinue) return;
+
+    setIsGenerating(true);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        links.api.onboarding.generateShortDescription,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            longDescription: data.longDescription,
+            organizationName: data.organizationName,
+            country: data.country,
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      // Update store with generated data (ensure objectives is never empty)
+      const objectives: Objective[] = (result.objectives && result.objectives.length > 0)
+        ? result.objectives
+        : ["Other"];
+
+      const updates: { shortDescription: string; objectives: Objective[]; handle: string } = {
+        shortDescription: result.shortDescription || `${data.organizationName} is an environmental organization working towards sustainability.`,
+        objectives,
+        handle: generateHandle(data.organizationName, data.country),
+      };
+
+      updateData(updates);
       nextStep();
+    } catch (err) {
+      // Even on error, provide fallback values and proceed
+      console.error("Error generating description:", err);
+      const countryName = countries[data.country]?.name;
+      updateData({
+        shortDescription: `${data.organizationName} is an environmental organization${countryName ? ` based in ${countryName}` : ""} working towards sustainability.`,
+        objectives: ["Other"],
+        handle: generateHandle(data.organizationName, data.country),
+      });
+      nextStep();
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -596,48 +580,6 @@ export function StepOrgDetails() {
               </div>
             </div>
 
-            {/* Short description with generate button */}
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <label
-                  htmlFor="short-description"
-                  className="text-sm font-medium leading-none"
-                >
-                  Short Description <span className="text-destructive">*</span>
-                </label>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleGenerateShortDescription()}
-                  disabled={
-                    isGeneratingDescription || data.longDescription.length < 50
-                  }
-                  className="h-6 text-xs px-2"
-                >
-                  {isGeneratingDescription ? (
-                    <>
-                      <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                      Generating...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-3 h-3 mr-1" />
-                      Generate
-                    </>
-                  )}
-                </Button>
-              </div>
-              <Textarea
-                id="short-description"
-                placeholder="A brief summary (for previews)"
-                value={data.shortDescription}
-                onChange={(e) => updateData({ shortDescription: e.target.value })}
-                rows={2}
-                className="resize-none text-sm"
-              />
-            </div>
-
             {/* Error display */}
             {error && (
               <div
@@ -652,13 +594,22 @@ export function StepOrgDetails() {
 
         {/* Navigation */}
         <div className="w-full flex justify-between mt-1">
-          <Button onClick={prevStep} variant="ghost">
+          <Button onClick={prevStep} variant="ghost" disabled={isGenerating}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
-          <Button onClick={handleContinue} disabled={!canContinue}>
-            Continue
-            <ArrowRight className="w-4 h-4 ml-2" />
+          <Button onClick={handleContinue} disabled={!canContinue || isGenerating}>
+            {isGenerating ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              <>
+                Continue
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </>
+            )}
           </Button>
         </div>
       </div>
