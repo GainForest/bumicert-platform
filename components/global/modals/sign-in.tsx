@@ -138,7 +138,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
               }
               const prefix = handleSplit[0];
               const suffix = handleSplit.slice(1).join(".");
-              if (!allowedPDSDomains.includes(suffix as any)) {
+              if (!allowedPDSDomains.some(domain => domain === suffix)) {
                 return null;
               }
 
