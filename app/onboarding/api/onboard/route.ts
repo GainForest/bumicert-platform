@@ -248,7 +248,8 @@ export async function POST(req: NextRequest) {
           country: orgInfo.country,
           visibility: "Public",
           website: orgInfo.website || undefined,
-          startDate: orgInfo.startDate || undefined,
+          // SDK expects full ISO datetime, convert date-only to datetime
+          startDate: orgInfo.startDate ? `${orgInfo.startDate}T00:00:00.000Z` : undefined,
         },
         uploads: logoUpload ? { logo: logoUpload } : undefined,
       });
