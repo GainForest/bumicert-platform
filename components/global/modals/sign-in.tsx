@@ -157,6 +157,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
                     disabled={isRedirecting}
                     onClick={() => {
                       setInputHandlePrefix(`${prefix}`);
+                      setSelectedDomain(suffix);
                     }}
                   >
                     <span className="text-sm font-medium">
