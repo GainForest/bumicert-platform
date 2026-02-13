@@ -33,6 +33,7 @@ import {
   defaultPdsDomain,
   type AllowedPDSDomain,
 } from "@/config/gainforest-sdk";
+import { gainforestSdk } from "@/config/gainforest-sdk.server";
 import { getSupabaseAdmin } from "@/lib/supabase/server";
 import { countries } from "@/lib/countries";
 
@@ -78,114 +79,17 @@ type AccountCreationResponse = {
   refreshJwt: string;
 };
 
-type UploadBlobResponse = {
-  blob: {
-    $type: "blob";
-    ref: { $link: string };
-    mimeType: string;
-    size: number;
+/**
+ * Convert a File to base64 data URL format for SDK upload
+ */
+async function fileToBase64(file: File): Promise<{ name: string; type: string; dataBase64: string }> {
+  const arrayBuffer = await file.arrayBuffer();
+  const base64 = Buffer.from(arrayBuffer).toString("base64");
+  return {
+    name: file.name,
+    type: file.type,
+    dataBase64: base64,
   };
-};
-
-async function uploadBlob(
-  pdsDomain: string,
-  accessJwt: string,
-  file: File
-): Promise<UploadBlobResponse["blob"] | null> {
-  try {
-    const arrayBuffer = await file.arrayBuffer();
-    const response = await fetch(
-      `https://${pdsDomain}/xrpc/com.atproto.repo.uploadBlob`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessJwt}`,
-          "Content-Type": file.type,
-        },
-        body: arrayBuffer,
-      }
-    );
-
-    if (!response.ok) {
-      console.error("Failed to upload blob:", await response.text());
-      return null;
-    }
-
-    const data = (await response.json()) as UploadBlobResponse;
-    return data.blob;
-  } catch (error) {
-    console.error("Error uploading blob:", error);
-    return null;
-  }
-}
-
-async function createOrganizationRecord(
-  pdsDomain: string,
-  did: string,
-  accessJwt: string,
-  info: {
-    displayName: string;
-    shortDescription: string;
-    longDescription: string;
-    country: string;
-    website?: string;
-    startDate?: string;
-    logo?: { $type: "blob"; ref: { $link: string }; mimeType: string; size: number } | null;
-  }
-): Promise<boolean> {
-  try {
-    const record = {
-      $type: "app.gainforest.organization.info",
-      displayName: info.displayName,
-      shortDescription: {
-        text: info.shortDescription,
-        facets: [],
-      },
-      longDescription: {
-        blocks: [
-          {
-            text: info.longDescription,
-            facets: [],
-          },
-        ],
-      },
-      country: info.country,
-      website: info.website || undefined,
-      startDate: info.startDate || undefined,
-      logo: info.logo || undefined,
-      visibility: "Public",
-      objectives: ["Other"],
-      createdAt: new Date().toISOString(),
-    };
-
-    const response = await fetch(
-      `https://${pdsDomain}/xrpc/com.atproto.repo.putRecord`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessJwt}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          repo: did,
-          collection: "app.gainforest.organization.info",
-          rkey: "self",
-          record,
-        }),
-      }
-    );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Failed to create organization record:", errorText);
-      return false;
-    }
-
-    return true;
-  } catch (error) {
-    console.error("Error creating organization record:", error);
-    return false;
-  }
 }
 
 export async function POST(req: NextRequest) {
@@ -324,41 +228,51 @@ export async function POST(req: NextRequest) {
     }
 
     const accountData = (await accountResponse.json()) as AccountCreationResponse;
-    const { did, accessJwt } = accountData;
+    const { did, accessJwt, refreshJwt } = accountData;
 
-    // Step 4: Upload logo if provided
-    let logoBlob: UploadBlobResponse["blob"] | null = null;
+    // Step 4: Prepare logo upload if provided
+    let logoUpload: { name: string; type: string; dataBase64: string } | undefined;
     if (logoFile && logoFile.size > 0) {
-      logoBlob = await uploadBlob(pdsDomain, accessJwt, logoFile);
-      // If logo upload fails, we continue without it (non-blocking)
-      if (!logoBlob) {
-        console.warn("Logo upload failed, continuing without logo");
+      try {
+        logoUpload = await fileToBase64(logoFile);
+      } catch (error) {
+        console.warn("Failed to process logo file, continuing without it:", error);
       }
     }
 
-    // Step 5: Initialize organization data on PDS
-    const orgCreated = await createOrganizationRecord(
-      pdsDomain,
-      did,
-      accessJwt,
-      {
-        displayName: orgInfo.displayName,
-        shortDescription: orgInfo.shortDescription,
-        longDescription: orgInfo.longDescription,
-        country: orgInfo.country,
-        website: orgInfo.website || undefined,
-        startDate: orgInfo.startDate || undefined,
-        logo: logoBlob,
-      }
-    );
-
-    // If org creation fails, log it but don't fail the request
-    // The account is created, user can edit profile later
-    if (!orgCreated) {
+    // Step 5: Initialize organization using SDK's onboard method
+    let organizationInitialized = false;
+    try {
+      const apiCaller = gainforestSdk.getServerCaller();
+      await apiCaller.miscellaneous.onboard({
+        credentials: {
+          did,
+          handle: fullHandle,
+          accessJwt,
+          refreshJwt,
+        },
+        pdsDomain: pdsDomain as AllowedPDSDomain,
+        info: {
+          displayName: orgInfo.displayName,
+          shortDescription: orgInfo.shortDescription,
+          longDescription: orgInfo.longDescription,
+          objectives: ["Other"],
+          country: orgInfo.country,
+          visibility: "Public",
+          website: orgInfo.website || undefined,
+          startDate: orgInfo.startDate || undefined,
+        },
+        uploads: logoUpload ? { logo: logoUpload } : undefined,
+      });
+      organizationInitialized = true;
+    } catch (error) {
+      // If org creation fails, log it but don't fail the request
+      // The account is created, user can edit profile later
       console.error(
         "Failed to initialize organization for DID:",
         did,
-        "- user can complete profile later"
+        "- user can complete profile later. Error:",
+        error
       );
     }
 
@@ -366,7 +280,7 @@ export async function POST(req: NextRequest) {
       success: true,
       did,
       handle: fullHandle,
-      organizationInitialized: orgCreated,
+      organizationInitialized,
     });
   } catch (err: unknown) {
     console.error("Unexpected error in onboard:", err);
