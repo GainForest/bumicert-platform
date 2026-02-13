@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import useCopy from "@/hooks/use-copy";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 
 const InviteCodePage = () => {
   const [emails, setEmails] = useState<string[]>([""]);
@@ -14,6 +15,7 @@ const InviteCodePage = () => {
   const [invites, setInvites] = useState<
     Array<{ email: string; inviteCode: string }>
   >([]);
+  const [selectedDomain, setSelectedDomain] = useState<string>(allowedPDSDomains[0]);
   const { copy, isCopied } = useCopy();
 
   async function onSubmit(e: React.FormEvent) {
@@ -40,7 +42,7 @@ const InviteCodePage = () => {
       const res = await fetch("/api/atproto/invite-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ emails: trimmed, password }),
+        body: JSON.stringify({ emails: trimmed, password, domain: selectedDomain }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -117,6 +119,25 @@ const InviteCodePage = () => {
               </div>
             ))}
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium" htmlFor="pds-domain">
+            PDS Domain
+          </label>
+          <select
+            id="pds-domain"
+            value={selectedDomain}
+            onChange={(e) => setSelectedDomain(e.target.value)}
+            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          >
+            {allowedPDSDomains.map((domain) => (
+              <option key={domain} value={domain}>{domain}</option>
+            ))}
+          </select>
+          <p className="text-xs text-muted-foreground">
+            Invite codes will be minted on the selected PDS.
+          </p>
         </div>
 
         <div className="space-y-2">

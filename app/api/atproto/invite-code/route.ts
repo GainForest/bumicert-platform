@@ -26,7 +26,8 @@ export async function POST(req: NextRequest) {
     const body = (await req.json()) as {
       email?: string;
       emails?: string[];
-      password?: string; 
+      password?: string;
+      domain?: string;
     };
 
     const emailsInput =
@@ -62,7 +63,10 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const service = process.env.NEXT_PUBLIC_ATPROTO_SERVICE_URL || `https://${allowedPDSDomains[0]}`;
+    const requestedDomain = body.domain && allowedPDSDomains.includes(body.domain as (typeof allowedPDSDomains)[number])
+      ? body.domain
+      : allowedPDSDomains[0];
+    const service = `https://${requestedDomain}`;
     const adminUsername = process.env.PDS_ADMIN_IDENTIFIER!;
     const adminPassword = process.env.PDS_ADMIN_PASSWORD!;
     const adminBasic = Buffer.from(`${adminUsername}:${adminPassword}`).toString("base64");
@@ -110,7 +114,7 @@ export async function POST(req: NextRequest) {
 
         await sql`
           INSERT INTO invites (email, invite_token, pds_domain)
-          VALUES (${email}, ${inviteCode}, ${allowedPDSDomains[0]})
+          VALUES (${email}, ${inviteCode}, ${requestedDomain})
         `;
 
         results.push({ email, inviteCode });

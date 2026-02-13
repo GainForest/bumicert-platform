@@ -27,8 +27,15 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
   const initialHandlePrefix = initialHandle.includes(".")
     ? initialHandle.split(".")[0]
     : undefined;
+  
+  // Detect domain from initialHandle if provided
+  const initialDomain = allowedPDSDomains.find(d => initialHandle.endsWith(`.${d}`));
+  
   const [inputHandlePrefix, setInputHandlePrefix] = useState(
     initialHandlePrefix ?? ""
+  );
+  const [selectedDomain, setSelectedDomain] = useState<string>(
+    initialDomain ?? allowedPDSDomains[0]
   );
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,13 +54,13 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
 
     try {
       // Call the server action to get the authorization URL
-      const { authorizationUrl } = await authorize(inputHandlePrefix);
+      const { authorizationUrl } = await authorize(inputHandlePrefix, selectedDomain);
 
       // Store the handle prefix for later (to add to previous sessions after callback)
       if (typeof window !== "undefined") {
         sessionStorage.setItem(
           "pending_oauth_handle",
-          `${inputHandlePrefix}.${allowedPDSDomains[0]}`
+          `${inputHandlePrefix}.${selectedDomain}`
         );
       }
 
@@ -85,7 +92,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
       >
         <ModalTitle>Sign In</ModalTitle>
         <ModalDescription>
-          Sign in with your ClimateAI account
+          Sign in with your account
         </ModalDescription>
       </ModalHeader>
       <div className="flex flex-col gap-3 mt-4">
@@ -105,7 +112,16 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
               }}
             />
             <InputGroupAddon align="inline-end" className="text-primary">
-              .{allowedPDSDomains[0]}
+              <select
+                value={selectedDomain}
+                onChange={(e) => setSelectedDomain(e.target.value)}
+                disabled={isRedirecting}
+                className="bg-transparent border-none outline-none text-primary cursor-pointer text-sm"
+              >
+                {allowedPDSDomains.map((domain) => (
+                  <option key={domain} value={domain}>.{domain}</option>
+                ))}
+              </select>
             </InputGroupAddon>
           </InputGroup>
           <div className="w-full bg-muted rounded-md flex flex-col gap-0.5 p-1">
@@ -122,7 +138,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
               }
               const prefix = handleSplit[0];
               const suffix = handleSplit.slice(1).join(".");
-              if (suffix !== allowedPDSDomains[0]) {
+              if (!allowedPDSDomains.some(domain => domain === suffix)) {
                 return null;
               }
 
@@ -141,6 +157,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
                     disabled={isRedirecting}
                     onClick={() => {
                       setInputHandlePrefix(`${prefix}`);
+                      setSelectedDomain(suffix);
                     }}
                   >
                     <span className="text-sm font-medium">
@@ -173,7 +190,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
         </div>
 
         <p className="text-xs text-muted-foreground">
-          You will be redirected to ClimateAI to authenticate.
+          You will be redirected to authenticate.
         </p>
       </div>
       <ModalFooter>
@@ -188,7 +205,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
               Redirecting...
             </>
           ) : (
-            "Sign in with ClimateAI"
+            "Sign in"
           )}
         </Button>
       </ModalFooter>

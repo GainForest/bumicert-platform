@@ -15,7 +15,8 @@ import { allowedPDSDomains } from "@/config/gainforest-sdk";
  * This server action generates an authorization URL for the given handle.
  * The client should redirect to this URL to start the OAuth flow.
  *
- * @param handle - The user's ATProto handle (e.g., "alice.climateai.org" or just "alice")
+ * @param handle - The user's ATProto handle (e.g., "alice.gainforest.id" or just "alice")
+ * @param domain - Optional domain to use if handle doesn't include one (defaults to allowedPDSDomains[0])
  * @returns The authorization URL to redirect the user to
  *
  * @example
@@ -24,11 +25,11 @@ import { allowedPDSDomains } from "@/config/gainforest-sdk";
  * window.location.href = authorizationUrl;
  * ```
  */
-export async function authorize(handle: string): Promise<{ authorizationUrl: string }> {
+export async function authorize(handle: string, domain?: string): Promise<{ authorizationUrl: string }> {
   // Normalize the handle - add domain if not present
   const normalizedHandle = handle.includes(".")
     ? handle
-    : `${handle}.${allowedPDSDomains[0]}`;
+    : `${handle}.${domain ?? allowedPDSDomains[0]}`;
 
   const authUrl = await atprotoSDK.authorize(normalizedHandle);
 

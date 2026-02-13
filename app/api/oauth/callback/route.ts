@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     const session = await atprotoSDK.callback(searchParams);
 
     // Resolve handle from DID -- OAuthSession only has sub/did, NOT handle
-    // Using describeRepo since climateai.org PDS doesn't support resolveIdentity
+    // Using describeRepo since the PDS doesn't support resolveIdentity
     const agent = new Agent(session);
     const { data: repo } = await agent.com.atproto.repo.describeRepo({
       repo: session.did,

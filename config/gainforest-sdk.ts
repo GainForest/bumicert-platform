@@ -1,9 +1,10 @@
 import { SupportedPDSDomain } from "gainforest-sdk";
 import { createTRPCClient } from "gainforest-sdk/client";
 
-export const allowedPDSDomains = (process.env.NEXT_PUBLIC_VERCEL_ENV === "production" ? ["gainforest.id"] : [
+export const allowedPDSDomains = [
+  "gainforest.id",
   "climateai.org",
-]) satisfies SupportedPDSDomain[];
+] satisfies SupportedPDSDomain[];
 export type AllowedPDSDomain = (typeof allowedPDSDomains)[number];
 
 export const trpcClient = createTRPCClient<AllowedPDSDomain>("/api/trpc");

@@ -39,6 +39,7 @@ const SignUpModal = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [selectedDomain, setSelectedDomain] = useState<string>(allowedPDSDomains[0]);
   const { popModal, stack, pushModal } = useModal();
   const auth = useAtprotoStore((state) => state.auth);
 
@@ -55,7 +56,7 @@ const SignUpModal = () => {
         body: JSON.stringify({
           email,
           password,
-          handle: handle.replace(/^@/, "").trim() + `.${allowedPDSDomains[0]}`,
+          handle: handle.replace(/^@/, "").trim() + `.${selectedDomain}`,
           inviteCode,
         }),
       });
@@ -157,7 +158,16 @@ const SignUpModal = () => {
               disabled={isSigningUp}
             />
             <InputGroupAddon align="inline-end" className="text-primary">
-              .{allowedPDSDomains[0]}
+              <select
+                value={selectedDomain}
+                onChange={(e) => setSelectedDomain(e.target.value)}
+                disabled={isSigningUp}
+                className="bg-transparent border-none outline-none text-primary cursor-pointer text-sm"
+              >
+                {allowedPDSDomains.map((domain) => (
+                  <option key={domain} value={domain}>.{domain}</option>
+                ))}
+              </select>
             </InputGroupAddon>
           </InputGroup>
         </div>
@@ -235,7 +245,7 @@ const SignUpModal = () => {
                   id: SignInModalId,
                   content: (
                     <SignInModal
-                      initialHandle={`${handle}.${allowedPDSDomains[0]}`}
+                      initialHandle={`${handle}.${selectedDomain}`}
                     />
                   ),
                 },
