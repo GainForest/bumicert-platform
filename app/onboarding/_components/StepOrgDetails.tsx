@@ -15,6 +15,11 @@ import {
   X,
   Wand2,
   Sparkle,
+  Sparkles,
+  Trash2,
+  UploadIcon,
+  Building2,
+  BuildingIcon,
 } from "lucide-react";
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { countries } from "@/lib/countries";
@@ -37,6 +42,8 @@ import {
 import { format, parseISO } from "date-fns";
 import { links } from "@/lib/links";
 import Image from "next/image";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
+import QuickTooltip from "@/components/ui/quick-tooltip";
 
 type BrandInfo = {
   found: boolean;
@@ -344,6 +351,48 @@ export function StepOrgDetails() {
           </p>
         </div>
 
+        {/* Spacer */}
+        <div className="w-full h-2"></div>
+
+        <div className="flex flex-col gap-1.5 w-full">
+          <div className="flex items-center gap-2">
+
+            <InputGroup>
+              <InputGroupAddon>
+                <Globe />
+              </InputGroupAddon>
+              <InputGroupInput
+                id="website"
+                type="url"
+                placeholder="Your organization's website"
+                value={data.website}
+                onChange={(e) => handleWebsiteChange(e.target.value)}
+                className={cn(
+                  "h-9 text-sm",
+                  websiteError &&
+                  "border-destructive focus-visible:ring-destructive/50"
+                )}
+              />
+            </InputGroup>
+            <QuickTooltip asChild content={"Auto-fill based on your organization's website"}>
+              <Button
+                variant="secondary"
+                onClick={() => handleFetchBrandInfo(false)}
+                disabled={!canFetchBrandInfo}
+              >
+                {isFetchingBrandInfo ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  <Sparkles className="fill-current" />
+                )} Generate
+              </Button>
+            </QuickTooltip>
+          </div>
+          {websiteError && (
+            <p className="text-xs text-destructive">{websiteError}</p>
+          )}
+        </div>
+
         {/* Form */}
         <div
           className={cn("w-full relative")}
@@ -369,35 +418,15 @@ export function StepOrgDetails() {
             )}
 
           {/* Content */}
-          <div className={cn("flex flex-col gap-3 w-full", isFetchingBrandInfo && "animate-pulse blur-xs pointer-events-none")}>
+          <div className={cn("flex flex-col gap-3 w-full mt-2", isFetchingBrandInfo && "animate-pulse blur-xs pointer-events-none")}>
             {/* Logo and Organization Name row */}
             <div className="flex gap-3 items-start">
-              {/* Organization Name - left side */}
-              <div className="flex-1 space-y-1.5">
-                <label
-                  htmlFor="org-name"
-                  className="text-sm font-medium leading-none"
-                >
-                  Organization Name <span className="text-destructive">*</span>
-                </label>
-                <Input
-                  id="org-name"
-                  type="text"
-                  placeholder="e.g., Green Forest Initiative"
-                  value={data.organizationName}
-                  onChange={(e) => updateData({ organizationName: e.target.value })}
-                  className="h-9 text-sm"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Displayed on your profile
-                </p>
-              </div>
-              {/* Logo upload - right side */}
+              {/* Logo upload - left side */}
               <div className="space-y-1.5">
                 <div className="flex flex-col items-center gap-2">
                   {logoPreviewUrl ? (
                     <div className="relative">
-                      <div className="w-16 h-16 rounded-lg overflow-hidden border bg-muted">
+                      <div className="w-16 h-16 rounded-full overflow-hidden border bg-muted">
                         <Image
                           src={logoPreviewUrl}
                           alt="Logo preview"
@@ -406,13 +435,6 @@ export function StepOrgDetails() {
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <button
-                        type="button"
-                        onClick={handleRemoveLogo}
-                        className="absolute z-1 -top-2 -right-2 w-5 h-5 bg-foreground/40 backdrop-blur-sm text-background rounded-full flex items-center justify-center"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
                     </div>
                   ) : (
                     <div
@@ -422,137 +444,108 @@ export function StepOrgDetails() {
                       <ImageIcon className="w-6 h-6 text-muted-foreground/50" />
                     </div>
                   )}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleOpenLogoEditor}
-                    className="text-xs h-7 px-2"
-                  >
-                    {logoPreviewUrl ? "Change" : "Upload"}
-                  </Button>
-                </div>
-              </div>
-            </div>
+                  <div className="flex items-center border border-border rounded-full overflow-hidden">
 
-            {/* Country selector */}
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium leading-none flex items-center gap-2">
-                <MapPin className="w-3.5 h-3.5" />
-                Country <span className="text-destructive">*</span>
-              </label>
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full justify-start text-left font-normal h-9"
-                onClick={handleOpenCountrySelector}
-              >
-                {selectedCountry ? (
-                  <span className="flex items-center gap-2">
-                    <span className="text-lg">{selectedCountry.emoji}</span>
-                    <span className="text-sm">{selectedCountry.name}</span>
-                  </span>
-                ) : (
-                  <span className="text-muted-foreground text-sm">
-                    Select a country
-                  </span>
-                )}
-              </Button>
-            </div>
-
-            {/* Start date and Website in a row */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium leading-none flex items-center gap-1">
-                  <CalendarIcon className="w-3.5 h-3.5" />
-                  <span className="text-xs">Start Date</span>
-                </label>
-                <Popover>
-                  <PopoverTrigger asChild>
                     <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal h-9 text-sm",
-                        !selectedDate && "text-muted-foreground"
-                      )}
+                      variant="ghost"
+                      size="xs"
+                      onClick={handleOpenLogoEditor}
+                      className="px-2!"
                     >
-                      {selectedDate ? (
-                        format(selectedDate, "MMM d, yyyy")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
+                      <UploadIcon />
                     </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={(date) =>
-                        updateData({
-                          startDate: date ? format(date, "yyyy-MM-dd") : null,
-                        })
-                      }
-                      disabled={(date) => date > new Date()}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                    {
+                      logoPreviewUrl &&
+                      <>
+                        <div className="h-4 w-px bg-border"></div>
+                        <Button
+                          variant="ghost"
+                          size="xs"
+                          onClick={handleRemoveLogo}
+                          className="px-2!"
+                        >
+                          <Trash2 className="text-destructive" />
+                        </Button>
+                      </>
+                    }
+                  </div>
+                </div>
+              </div>
+              {/* Organization Name - left side */}
+              <div className="flex flex-col gap-2 w-full">
+
+                <InputGroup>
+                  <InputGroupAddon>
+                    <BuildingIcon />
+                  </InputGroupAddon>
+                  <InputGroupInput
+                    id="org-name"
+                    type="text"
+                    placeholder="e.g., Green Forest Initiative"
+                    value={data.organizationName}
+                    onChange={(e) => updateData({ organizationName: e.target.value })}
+                    className="h-9 text-sm"
+                  />
+                </InputGroup>
+                <ul className="flex flex-col gap-1.5 mt-2">
+                  <li className="flex items-center gap-3">
+                    <MapPin className="size-3 -mr-2" />
+                    <span className="font-medium text-sm">
+
+                      Based <span className="text-destructive">*</span></span>
+                    <button
+                      className="bg-primary/5 hover:bg-primary/10 text-primary text-sm px-2 rounded-md"
+                      onClick={handleOpenCountrySelector}
+                    >
+                      {selectedCountry ? (
+                        <span className="flex items-center gap-1">
+                          <span>{selectedCountry.emoji}</span>
+                          <span>{selectedCountry.name}</span>
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">
+                          Select a country
+                        </span>
+                      )}
+                    </button>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <CalendarIcon className="size-3 -mr-2" />
+                    <span className="font-medium text-sm">Founded</span>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button
+                          className="bg-primary/5 hover:bg-primary/10 text-primary text-sm px-2 rounded-md"
+                        >
+                          {selectedDate ? (
+                            format(selectedDate, "MMM d, yyyy")
+                          ) : (
+                            <span className="text-muted-foreground">Pick a date</span>
+                          )}
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={selectedDate}
+                          onSelect={(date) =>
+                            updateData({
+                              startDate: date ? format(date, "yyyy-MM-dd") : null,
+                            })
+                          }
+                          disabled={(date) => date > new Date()}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </li>
+                </ul>
               </div>
 
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label
-                    htmlFor="website"
-                    className="text-sm font-medium leading-none flex items-center gap-1"
-                  >
-                    <Globe className="w-3.5 h-3.5" />
-                    <span className="text-xs">Website</span>
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => handleFetchBrandInfo(false)}
-                    disabled={!canFetchBrandInfo}
-                    className={cn(
-                      "p-1 rounded-md transition-colors",
-                      canFetchBrandInfo
-                        ? "text-primary hover:bg-primary/10 cursor-pointer"
-                        : "text-muted-foreground/50 cursor-not-allowed"
-                    )}
-                    title="Auto-fill from website"
-                  >
-                    {isFetchingBrandInfo ? (
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    ) : (
-                      <Wand2 className="w-3.5 h-3.5" />
-                    )}
-                  </button>
-                </div>
-                <Input
-                  id="website"
-                  type="url"
-                  placeholder="https://..."
-                  value={data.website}
-                  onChange={(e) => handleWebsiteChange(e.target.value)}
-                  className={cn(
-                    "h-9 text-sm",
-                    websiteError &&
-                    "border-destructive focus-visible:ring-destructive/50"
-                  )}
-                />
-                {websiteError && (
-                  <p className="text-xs text-destructive">{websiteError}</p>
-                )}
-              </div>
             </div>
 
             {/* Long description */}
-            <div className="space-y-1.5">
-              <label
-                htmlFor="long-description"
-                className="text-sm font-medium leading-none"
-              >
-                About <span className="text-destructive">*</span>
-              </label>
+            <div className="w-full relative mt-2">
               <Textarea
                 id="long-description"
                 placeholder="Describe your organization's mission and impact..."
@@ -561,23 +554,16 @@ export function StepOrgDetails() {
                 rows={3}
                 className="resize-none text-sm"
               />
-              <div className="flex justify-between text-xs">
-                {brandInfoFetched && (
-                  <span className="text-muted-foreground">
-                    Pre-filled from website
-                  </span>
+              <span
+                className={cn(
+                  "absolute right-0 -top-5 text-xs",
+                  data.longDescription.length < 50
+                    ? "text-destructive"
+                    : "text-muted-foreground"
                 )}
-                <span
-                  className={cn(
-                    "ml-auto",
-                    data.longDescription.length < 50
-                      ? "text-destructive"
-                      : "text-muted-foreground"
-                  )}
-                >
-                  {data.longDescription.length}/50+
-                </span>
-              </div>
+              >
+                {data.longDescription.length}/50+
+              </span>
             </div>
 
             {/* Error display */}
