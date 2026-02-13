@@ -35,19 +35,7 @@ import {
 } from "@/config/gainforest-sdk";
 import { gainforestSdk } from "@/config/gainforest-sdk.server";
 import { getSupabaseAdmin } from "@/lib/supabase/server";
-import { countries } from "@/lib/countries";
-
-const organizationInfoSchema = z.object({
-  displayName: z.string().min(1, "Display name is required").max(100),
-  shortDescription: z.string().min(1, "Short description is required").max(300),
-  longDescription: z.string().min(50, "Long description must be at least 50 characters").max(5000),
-  country: z.string().length(2, "Country must be a 2-letter ISO code").refine(
-    (code) => code in countries,
-    "Invalid country code"
-  ),
-  website: z.string().url("Invalid website URL").optional().or(z.literal("")),
-  startDate: z.string().optional(),
-});
+import { organizationInfoSchema } from "./schema";
 
 const requestSchema = z.object({
   email: z.string().email().trim().toLowerCase(),
@@ -65,7 +53,7 @@ const requestSchema = z.object({
       { message: "Unsupported pdsDomain" }
     ),
   displayName: z.string().min(1).max(100),
-  shortDescription: z.string().min(1).max(300),
+  shortDescription: z.string().min(1).max(500),
   longDescription: z.string().min(50).max(5000),
   country: z.string().length(2),
   website: z.string().optional(),
@@ -120,7 +108,7 @@ export async function POST(req: NextRequest) {
       return Response.json(
         {
           error: "ValidationError",
-          message: "Invalid request data",
+          message: `Error in ${parsed.error.issues[0].path.join(".")}: ${parsed.error.issues[0].message}`,
           issues: parsed.error.issues,
         },
         { status: 400 }
@@ -141,7 +129,7 @@ export async function POST(req: NextRequest) {
       return Response.json(
         {
           error: "ValidationError",
-          message: "Invalid organization information",
+          message: `Error in ${orgInfoParsed.error.issues[0].path.join(".")}: ${orgInfoParsed.error.issues[0].message}`,
           issues: orgInfoParsed.error.issues,
         },
         { status: 400 }

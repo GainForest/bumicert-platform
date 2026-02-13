@@ -38,6 +38,7 @@ import {
 import { format, parseISO } from "date-fns";
 import { links } from "@/lib/links";
 import Image from "next/image";
+import { organizationInfoSchema } from "../api/onboard/schema";
 
 type BrandInfo = {
   found: boolean;
@@ -100,12 +101,19 @@ export function StepOrgDetails() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const canContinue =
-    data.country.length > 0 &&
-    data.longDescription.trim().length >= 50 &&
-    data.shortDescription.trim().length > 0 &&
-    data.organizationName.trim().length > 0 &&
-    (data.website === "" || validateUrl(data.website));
+  // Validate using the shared schema
+  const validationResult = useMemo(() => {
+    return organizationInfoSchema.safeParse({
+      displayName: data.organizationName.trim(),
+      shortDescription: data.shortDescription.trim(),
+      longDescription: data.longDescription.trim(),
+      country: data.country,
+      website: data.website || undefined,
+      startDate: data.startDate || undefined,
+    });
+  }, [data.organizationName, data.shortDescription, data.longDescription, data.country, data.website, data.startDate]);
+
+  const canContinue = validationResult.success;
 
   // Generate short description
   const handleGenerateShortDescription = useCallback(async (longDesc?: string, orgName?: string, countryCode?: string) => {
