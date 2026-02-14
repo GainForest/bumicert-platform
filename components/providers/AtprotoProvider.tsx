@@ -38,9 +38,14 @@ export function AtprotoProvider({ children }: { children: React.ReactNode }) {
           // Fetch profile to get handle, displayName, avatar
           const profile = await getProfile(result.did);
 
+          // Use handle from session cookie if profile.get() returns invalid handle
+          const validHandle = profile?.handle && profile.handle !== 'handle.invalid' 
+            ? profile.handle 
+            : result.handle;
+
           setAuth({
             did: result.did,
-            handle: profile?.handle,
+            handle: validHandle,
             displayName: profile?.displayName,
             avatar: profile?.avatar,
           });

@@ -39,6 +39,8 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
     { handle: string }[]
   >("previous-sessions", []);
 
+  const accountSignupDomain = process.env.NEXT_PUBLIC_VERCEL_ENV === "production" ? "GainforestId" : "ClimateAI"
+
   const handleSignIn = async () => {
     if (!inputHandlePrefix) return;
 
@@ -85,7 +87,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
       >
         <ModalTitle>Sign In</ModalTitle>
         <ModalDescription>
-          Sign in with your ClimateAI account
+          Sign in with your {accountSignupDomain} account
         </ModalDescription>
       </ModalHeader>
       <div className="flex flex-col gap-3 mt-4">
@@ -173,7 +175,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
         </div>
 
         <p className="text-xs text-muted-foreground">
-          You will be redirected to ClimateAI to authenticate.
+          You will be redirected to {accountSignupDomain} to authenticate.
         </p>
       </div>
       <ModalFooter>
@@ -188,7 +190,7 @@ const SignInModal = ({ initialHandle = "" }: { initialHandle?: string }) => {
               Redirecting...
             </>
           ) : (
-            "Sign in with ClimateAI"
+            `Sign in with ${accountSignupDomain}`
           )}
         </Button>
       </ModalFooter>
