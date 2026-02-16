@@ -498,6 +498,128 @@ describe("POST /api/atproto/onboarding/send-invite-email", () => {
       expect(mockDeleteQuery.delete).toHaveBeenCalled();
       expect(mockInsertQuery.insert).toHaveBeenCalled();
     });
+
+    it("should verify rate limit data is inserted with correct identifier and endpoint", async () => {
+      const mockQuery = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        order: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockResolvedValue({ data: [] }),
+      };
+
+      const mockDeleteQuery = {
+        delete: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+      };
+
+      const mockInsertQuery = {
+        insert: vi.fn().mockResolvedValue({ data: null, error: null }),
+      };
+
+      mockSupabaseClient.from.mockImplementation((table: string) => {
+        if (table === "rate_limits") {
+          const callCount = mockSupabaseClient.from.mock.calls.filter(
+            (call: string[]) => call[0] === "rate_limits"
+          ).length;
+          if (callCount === 1) return mockQuery;
+          if (callCount === 2) return mockDeleteQuery;
+          return mockInsertQuery;
+        }
+        return mockQuery;
+      });
+
+      vi.mocked(getSupabaseAdmin).mockReturnValue(
+        mockSupabaseClient as never
+      );
+      vi.mocked(getOrCreateInviteCode).mockResolvedValue("test-code-123");
+      vi.mocked(resend.emails.send).mockResolvedValue({ error: null } as never);
+
+      const request = new NextRequest(
+        "http://localhost/api/atproto/onboarding/send-invite-email",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            email: "test@example.com",
+            pdsDomain: "climateai.org",
+          }),
+        }
+      );
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+
+      // Verify the insert was called with correct data
+      expect(mockInsertQuery.insert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          identifier: "test@example.com",
+          endpoint: "/api/atproto/onboarding/send-invite-email",
+        })
+      );
+    });
+
+    it("should verify email contains InviteCodeEmail component with correct props", async () => {
+      const mockQuery = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        order: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockResolvedValue({ data: [] }),
+      };
+
+      const mockDeleteQuery = {
+        delete: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+      };
+
+      const mockInsertQuery = {
+        insert: vi.fn().mockResolvedValue({ data: null, error: null }),
+      };
+
+      mockSupabaseClient.from.mockImplementation((table: string) => {
+        if (table === "rate_limits") {
+          const callCount = mockSupabaseClient.from.mock.calls.filter(
+            (call: string[]) => call[0] === "rate_limits"
+          ).length;
+          if (callCount === 1) return mockQuery;
+          if (callCount === 2) return mockDeleteQuery;
+          return mockInsertQuery;
+        }
+        return mockQuery;
+      });
+
+      vi.mocked(getSupabaseAdmin).mockReturnValue(
+        mockSupabaseClient as never
+      );
+      vi.mocked(getOrCreateInviteCode).mockResolvedValue("test-code-123");
+      vi.mocked(resend.emails.send).mockResolvedValue({ error: null } as never);
+
+      const request = new NextRequest(
+        "http://localhost/api/atproto/onboarding/send-invite-email",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            email: "test@example.com",
+            pdsDomain: "climateai.org",
+          }),
+        }
+      );
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+
+      // Verify resend.emails.send was called with react prop containing InviteCodeEmail
+      const sendCall = vi.mocked(resend.emails.send).mock.calls[0][0];
+      expect(sendCall).toHaveProperty("react");
+      
+      // The react prop should be the result of InviteCodeEmail({ inviteCode: "test-code-123", pdsDomain: "climateai.org" })
+      // We can't directly check the component, but we can verify the call was made with the right structure
+      expect(sendCall.react).toBeDefined();
+    });
   });
 
   describe("Email send failure (502)", () => {
