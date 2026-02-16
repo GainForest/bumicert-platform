@@ -189,6 +189,101 @@ describe("POST /api/atproto/onboarding/send-invite-email", () => {
       expect(Number(retryAfterHeader)).toBeGreaterThan(0);
     });
 
+    it("should normalize email case for rate limiting (Test@Example.COM treated as test@example.com)", async () => {
+      const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000).toISOString();
+
+      const mockQuery = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        order: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockResolvedValue({
+          data: [{ created_at: twoMinutesAgo }],
+        }),
+      };
+
+      mockSupabaseClient.from.mockReturnValue(mockQuery);
+      vi.mocked(getSupabaseAdmin).mockReturnValue(
+        mockSupabaseClient as never
+      );
+
+      const request = new NextRequest(
+        "http://localhost/api/atproto/onboarding/send-invite-email",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            email: "Test@Example.COM",
+            pdsDomain: "climateai.org",
+          }),
+        }
+      );
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(429);
+      expect(data.error).toBe("RateLimitExceeded");
+
+      // Verify the query was called with normalized (lowercase) email
+      expect(mockQuery.eq).toHaveBeenCalledWith("identifier", "test@example.com");
+    });
+
+    it("should not rate limit at exact 5 minute boundary", async () => {
+      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+
+      const mockQuery = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        order: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockResolvedValue({
+          data: [{ created_at: fiveMinutesAgo }],
+        }),
+      };
+
+      const mockDeleteQuery = {
+        delete: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+      };
+
+      const mockInsertQuery = {
+        insert: vi.fn().mockResolvedValue({ data: null, error: null }),
+      };
+
+      mockSupabaseClient.from.mockImplementation((table: string) => {
+        if (table === "rate_limits") {
+          const callCount = mockSupabaseClient.from.mock.calls.filter(
+            (call: string[]) => call[0] === "rate_limits"
+          ).length;
+          if (callCount === 1) return mockQuery;
+          if (callCount === 2) return mockDeleteQuery;
+          return mockInsertQuery;
+        }
+        return mockQuery;
+      });
+
+      vi.mocked(getSupabaseAdmin).mockReturnValue(
+        mockSupabaseClient as never
+      );
+      vi.mocked(getOrCreateInviteCode).mockResolvedValue("test-code-123");
+      vi.mocked(resend.emails.send).mockResolvedValue({ error: null } as never);
+
+      const request = new NextRequest(
+        "http://localhost/api/atproto/onboarding/send-invite-email",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            email: "test@example.com",
+            pdsDomain: "climateai.org",
+          }),
+        }
+      );
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+    });
+
     it("should proceed when rate limit is expired (6 minutes ago)", async () => {
       const sixMinutesAgo = new Date(Date.now() - 6 * 60 * 1000).toISOString();
 
@@ -298,6 +393,38 @@ describe("POST /api/atproto/onboarding/send-invite-email", () => {
 
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
+    });
+
+    it("should return 500 when database error occurs during rate limit check", async () => {
+      const mockQuery = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        order: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockRejectedValue(new Error("Database connection failed")),
+      };
+
+      mockSupabaseClient.from.mockReturnValue(mockQuery);
+      vi.mocked(getSupabaseAdmin).mockReturnValue(
+        mockSupabaseClient as never
+      );
+
+      const request = new NextRequest(
+        "http://localhost/api/atproto/onboarding/send-invite-email",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            email: "test@example.com",
+            pdsDomain: "climateai.org",
+          }),
+        }
+      );
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(500);
+      expect(data.error).toBe("InternalServerError");
+      expect(data.message).toBe("Database connection failed");
     });
   });
 
@@ -510,6 +637,75 @@ describe("POST /api/atproto/onboarding/send-invite-email", () => {
       expect(response.status).toBe(500);
       expect(data.error).toBe("InternalServerError");
       expect(data.message).toBe("Unexpected error");
+    });
+  });
+
+  describe("Rate limit insert failure", () => {
+    it("should still return 200 when rate limit insert fails after successful email send", async () => {
+      const mockQuery = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        order: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockResolvedValue({ data: [] }),
+      };
+
+      const mockDeleteQuery = {
+        delete: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+      };
+
+      const mockInsertQuery = {
+        insert: vi.fn().mockResolvedValue({ 
+          data: null, 
+          error: { message: "Database constraint violation", code: "23505" } 
+        }),
+      };
+
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      mockSupabaseClient.from.mockImplementation((table: string) => {
+        if (table === "rate_limits") {
+          const callCount = mockSupabaseClient.from.mock.calls.filter(
+            (call: string[]) => call[0] === "rate_limits"
+          ).length;
+          if (callCount === 1) return mockQuery;
+          if (callCount === 2) return mockDeleteQuery;
+          return mockInsertQuery;
+        }
+        return mockQuery;
+      });
+
+      vi.mocked(getSupabaseAdmin).mockReturnValue(
+        mockSupabaseClient as never
+      );
+      vi.mocked(getOrCreateInviteCode).mockResolvedValue("test-code-123");
+      vi.mocked(resend.emails.send).mockResolvedValue({ error: null } as never);
+
+      const request = new NextRequest(
+        "http://localhost/api/atproto/onboarding/send-invite-email",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            email: "test@example.com",
+            pdsDomain: "climateai.org",
+          }),
+        }
+      );
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      // Should still return success since email was sent
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+
+      // Verify error was logged
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Failed to update rate limit (email was sent):',
+        expect.objectContaining({ message: "Database constraint violation" })
+      );
+
+      consoleErrorSpy.mockRestore();
     });
   });
 });

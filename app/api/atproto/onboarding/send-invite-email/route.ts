@@ -139,11 +139,15 @@ export async function POST(req: NextRequest) {
       .eq("identifier", email)
       .eq("endpoint", endpoint);
 
-    await supabase.from("rate_limits").insert({
+    const { error: insertError } = await supabase.from("rate_limits").insert({
       identifier: email,
       endpoint: endpoint,
       created_at: new Date().toISOString(),
     });
+
+    if (insertError) {
+      console.error('Failed to update rate limit (email was sent):', insertError);
+    }
 
     return Response.json({ success: true });
   } catch (err: unknown) {
