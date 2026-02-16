@@ -1,0 +1,387 @@
+time=2026-02-16T10:31:46.727+06:00 level=INFO msg="Daemon started (interval: %v, auto-commit: %v, auto-push: %v)" !BADKEY=5s !BADKEY=false !BADKEY=false
+time=2026-02-16T10:31:46.728+06:00 level=INFO msg="using database" path=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/beads.db
+time=2026-02-16T10:31:46.772+06:00 level=INFO msg="database opened" path=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/beads.db backend=sqlite freshness_checking=true
+time=2026-02-16T10:31:46.772+06:00 level=INFO msg="upgrading .beads/.gitignore"
+time=2026-02-16T10:31:46.772+06:00 level=WARN msg="failed to upgrade .gitignore" error="open .beads/.gitignore: no such file or directory"
+time=2026-02-16T10:31:46.774+06:00 level=INFO msg="Repository fingerprint validated: %s" !BADKEY=75e10e9e
+time=2026-02-16T10:31:46.775+06:00 level=INFO msg="starting RPC server" socket=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/bd.sock
+time=2026-02-16T10:31:46.775+06:00 level=INFO msg="RPC server ready (socket listening)"
+time=2026-02-16T10:31:46.777+06:00 level=INFO msg="registered in global registry"
+time=2026-02-16T10:31:46.777+06:00 level=INFO msg="Starting %s..." !BADKEY="sync cycle"
+time=2026-02-16T10:31:46.781+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-16T10:31:51.502+06:00 level=INFO msg="Pull failed: %v" !BADKEY="git pull failed: exit status 1\nfatal: couldn't find remote ref eco-277-invites-emails-test\n"
+time=2026-02-16T10:31:51.502+06:00 level=INFO msg="monitoring parent process" pid=0
+time=2026-02-16T10:31:51.502+06:00 level=INFO msg="using event-driven mode"
+time=2026-02-16T10:31:51.502+06:00 level=INFO msg="Auto-pull disabled: use 'git pull' manually to sync remote changes"
+time=2026-02-16T10:36:42.496+06:00 level=INFO msg="Mutation detected: %s %s" create=bumicert-platform-ta0
+time=2026-02-16T10:36:42.997+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-16T10:36:42.997+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-16T10:36:43.000+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T10:36:43.007+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-16T10:36:43.007+06:00 level=INFO msg="Export complete"
+time=2026-02-16T10:36:44.001+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T10:36:44.008+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-16T10:36:44.009+06:00 level=INFO msg="JSONL content changed, proceeding with %s..." !BADKEY=auto-import
+time=2026-02-16T10:36:48.939+06:00 level=INFO msg="Pull failed: %v (backoff: %v)" !BADKEY="git pull failed: exit status 1\nfatal: couldn't find remote ref eco-277-invites-emails-test\n" !BADKEY=30s
+time=2026-02-16T10:48:50.658+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T10:48:50.658+06:00 level=INFO msg="File change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T10:48:51.659+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T10:48:51.660+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-16T10:48:51.660+06:00 level=INFO msg="Skipping %s: JSONL content unchanged" !BADKEY=auto-import
+time=2026-02-16T10:49:04.943+06:00 level=INFO msg="Mutation detected: %s %s" update=bumicert-platform-ta0
+time=2026-02-16T10:49:05.443+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-16T10:49:05.444+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-16T10:49:05.447+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T10:49:05.449+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-16T10:49:05.449+06:00 level=INFO msg="Export complete"
+time=2026-02-16T10:49:06.449+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T10:49:06.450+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-16T10:49:06.451+06:00 level=INFO msg="JSONL content changed, proceeding with %s..." !BADKEY=auto-import
+time=2026-02-16T10:49:15.396+06:00 level=INFO msg="Pull failed: %v (backoff: %v)" !BADKEY="git pull failed: exit status 1\nfatal: couldn't find remote ref eco-277-invites-emails-test\n" !BADKEY=1m0s
+time=2026-02-16T10:49:17.578+06:00 level=INFO msg="Mutation detected: %s %s" create=bumicert-platform-ta0.1
+time=2026-02-16T10:49:18.078+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-16T10:49:18.079+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-16T10:49:18.082+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T10:49:18.091+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-16T10:49:18.091+06:00 level=INFO msg="Export complete"
+time=2026-02-16T10:49:19.083+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T10:49:19.084+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-16T10:49:37.957+06:00 level=INFO msg="Mutation detected: %s %s" create=bumicert-platform-ta0.2
+time=2026-02-16T10:49:38.457+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-16T10:49:38.457+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-16T10:49:38.462+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T10:49:38.470+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-16T10:49:38.470+06:00 level=INFO msg="Export complete"
+time=2026-02-16T10:49:39.463+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T10:49:39.463+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-16T10:49:56.710+06:00 level=INFO msg="Mutation detected: %s %s" create=bumicert-platform-ta0.3
+time=2026-02-16T10:49:57.212+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-16T10:49:57.212+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-16T10:49:57.216+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T10:49:57.224+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-16T10:49:57.224+06:00 level=INFO msg="Export complete"
+time=2026-02-16T10:49:58.217+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T10:49:58.218+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-16T10:50:12.751+06:00 level=INFO msg="Mutation detected: %s %s" create=bumicert-platform-ta0.4
+time=2026-02-16T10:50:13.251+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-16T10:50:13.252+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-16T10:50:13.256+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T10:50:13.265+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-16T10:50:13.265+06:00 level=INFO msg="Export complete"
+time=2026-02-16T10:50:14.258+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T10:50:14.259+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-16T10:50:32.549+06:00 level=INFO msg="Mutation detected: %s %s" create=bumicert-platform-ta0.5
+time=2026-02-16T10:50:33.049+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-16T10:50:33.050+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-16T10:50:33.054+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T10:50:33.062+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-16T10:50:33.062+06:00 level=INFO msg="Export complete"
+time=2026-02-16T10:50:34.055+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T10:50:34.056+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-16T10:50:34.056+06:00 level=INFO msg="JSONL content changed, proceeding with %s..." !BADKEY=auto-import
+time=2026-02-16T10:50:38.667+06:00 level=INFO msg="Pull failed: %v (backoff: %v)" !BADKEY="git pull failed: exit status 1\nfatal: couldn't find remote ref eco-277-invites-emails-test\n" !BADKEY=2m0s
+time=2026-02-16T10:50:52.015+06:00 level=INFO msg="Mutation detected: %s %s" create=bumicert-platform-ta0.6
+time=2026-02-16T10:50:52.515+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-16T10:50:52.516+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-16T10:50:52.521+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T10:50:52.530+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-16T10:50:52.530+06:00 level=INFO msg="Export complete"
+time=2026-02-16T10:50:53.523+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T10:50:53.524+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-16T10:51:07.187+06:00 level=INFO msg="Mutation detected: %s %s" create=bumicert-platform-ta0.7
+time=2026-02-16T10:51:07.688+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-16T10:51:07.688+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-16T10:51:07.693+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T10:51:07.702+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-16T10:51:07.702+06:00 level=INFO msg="Export complete"
+time=2026-02-16T10:51:08.695+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T10:51:08.699+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-16T10:51:13.636+06:00 level=INFO msg="Mutation detected: %s %s" update=bumicert-platform-ta0.2
+time=2026-02-16T10:51:13.691+06:00 level=INFO msg="Mutation detected: %s %s" update=bumicert-platform-ta0.3
+time=2026-02-16T10:51:13.742+06:00 level=INFO msg="Mutation detected: %s %s" update=bumicert-platform-ta0.4
+time=2026-02-16T10:51:13.794+06:00 level=INFO msg="Mutation detected: %s %s" update=bumicert-platform-ta0.5
+time=2026-02-16T10:51:13.845+06:00 level=INFO msg="Mutation detected: %s %s" update=bumicert-platform-ta0.6
+time=2026-02-16T10:51:13.894+06:00 level=INFO msg="Mutation detected: %s %s" update=bumicert-platform-ta0.7
+time=2026-02-16T10:51:14.395+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-16T10:51:14.396+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-16T10:51:14.401+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T10:51:14.402+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-16T10:51:14.402+06:00 level=INFO msg="Export complete"
+time=2026-02-16T10:51:15.402+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T10:51:15.403+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-16T10:51:18.344+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T10:51:18.344+06:00 level=INFO msg="File change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T10:51:19.345+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T10:51:19.346+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-16T10:51:42.149+06:00 level=INFO msg="Git ref change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.git/refs/heads/eco-277-invites-emails-test.lock
+time=2026-02-16T10:51:43.150+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T10:51:43.151+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-16T10:54:59.299+06:00 level=INFO msg="Git ref change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.git/refs/heads/eco-277-invites-emails-test.lock
+time=2026-02-16T10:55:00.301+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T10:55:00.301+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-16T10:55:00.302+06:00 level=INFO msg="Skipping %s: JSONL content unchanged" !BADKEY=auto-import
+time=2026-02-16T10:57:38.271+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T10:57:38.271+06:00 level=INFO msg="File change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T10:57:39.272+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T10:57:39.272+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-16T10:57:39.272+06:00 level=INFO msg="Skipping %s: JSONL content unchanged" !BADKEY=auto-import
+time=2026-02-16T10:57:44.702+06:00 level=INFO msg="Mutation detected: %s %s" update=bumicert-platform-ta0.1
+time=2026-02-16T10:57:45.202+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-16T10:57:45.203+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-16T10:57:45.209+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T10:57:45.211+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-16T10:57:45.211+06:00 level=INFO msg="Export complete"
+time=2026-02-16T10:57:46.210+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T10:57:46.211+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-16T10:57:46.212+06:00 level=INFO msg="JSONL content changed, proceeding with %s..." !BADKEY=auto-import
+time=2026-02-16T10:57:46.217+06:00 level=INFO msg="⚠️  WARNING: Uncommitted local changes detected in %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T10:57:46.217+06:00 level=INFO msg="   Pulling from remote may overwrite local unpushed changes."
+time=2026-02-16T10:57:46.217+06:00 level=INFO msg="   Consider running 'bd sync' to commit and push your changes first."
+time=2026-02-16T10:57:48.047+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T10:57:48.047+06:00 level=INFO msg="File change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T10:57:49.049+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T10:57:49.049+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-16T10:57:49.050+06:00 level=INFO msg="Skipping %s: JSONL content unchanged" !BADKEY=auto-import
+time=2026-02-16T10:57:51.370+06:00 level=INFO msg="Pull failed: %v (backoff: %v)" !BADKEY="git pull failed: exit status 1\nfatal: couldn't find remote ref eco-277-invites-emails-test\n" !BADKEY=5m0s
+time=2026-02-16T11:01:37.851+06:00 level=INFO msg="Git ref change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.git/refs/heads/eco-277-invites-emails-test.lock
+time=2026-02-16T11:01:38.853+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:01:38.854+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-16T11:01:46.594+06:00 level=INFO msg="Mutation detected: %s %s" status=bumicert-platform-ta0.1
+time=2026-02-16T11:01:47.095+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-16T11:01:47.095+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-16T11:01:47.101+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:01:47.102+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-16T11:01:47.102+06:00 level=INFO msg="Export complete"
+time=2026-02-16T11:01:48.102+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:01:48.103+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-16T11:01:49.881+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:01:49.881+06:00 level=INFO msg="File change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:01:50.883+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:01:50.883+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-16T11:02:22.818+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:02:22.818+06:00 level=INFO msg="File change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:02:23.819+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:02:23.820+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-16T11:02:29.706+06:00 level=INFO msg="Mutation detected: %s %s" update=bumicert-platform-ta0.5
+time=2026-02-16T11:02:30.207+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-16T11:02:30.207+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-16T11:02:30.211+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:02:30.212+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-16T11:02:30.212+06:00 level=INFO msg="Export complete"
+time=2026-02-16T11:02:31.213+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:02:31.213+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-16T11:02:33.057+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:02:33.057+06:00 level=INFO msg="File change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:02:34.058+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:02:34.059+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-16T11:02:41.838+06:00 level=INFO msg="File change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:02:41.838+06:00 level=INFO msg="JSONL removed/renamed, re-establishing watch"
+time=2026-02-16T11:02:41.889+06:00 level=INFO msg="JSONL still missing after %v, retrying..." !BADKEY=50ms
+time=2026-02-16T11:02:41.990+06:00 level=INFO msg="JSONL still missing after %v, retrying..." !BADKEY=100ms
+time=2026-02-16T11:02:42.190+06:00 level=INFO msg="JSONL still missing after %v, retrying..." !BADKEY=200ms
+time=2026-02-16T11:02:42.591+06:00 level=INFO msg="JSONL still missing after %v, retrying..." !BADKEY=400ms
+time=2026-02-16T11:02:42.591+06:00 level=INFO msg="Failed to re-establish JSONL watch after all retries"
+time=2026-02-16T11:02:42.591+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:02:42.591+06:00 level=INFO msg="File change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:02:42.591+06:00 level=INFO msg="JSONL removed/renamed, re-establishing watch"
+time=2026-02-16T11:02:42.641+06:00 level=INFO msg="JSONL still missing after %v, retrying..." !BADKEY=50ms
+time=2026-02-16T11:02:42.742+06:00 level=INFO msg="JSONL still missing after %v, retrying..." !BADKEY=100ms
+time=2026-02-16T11:02:42.839+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:02:42.840+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-16T11:02:42.942+06:00 level=INFO msg="JSONL still missing after %v, retrying..." !BADKEY=200ms
+time=2026-02-16T11:02:43.343+06:00 level=INFO msg="JSONL still missing after %v, retrying..." !BADKEY=400ms
+time=2026-02-16T11:02:43.343+06:00 level=INFO msg="Failed to re-establish JSONL watch after all retries"
+time=2026-02-16T11:02:43.592+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:02:43.593+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-16T11:02:49.385+06:00 level=INFO msg="Git ref change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.git/refs/heads/eco-277-send-an-invite-code-to-the-user-email.lock
+time=2026-02-16T11:02:50.386+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:02:50.387+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-16T11:03:18.458+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:03:18.458+06:00 level=INFO msg="File change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:03:19.459+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:03:19.459+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-16T11:03:19.460+06:00 level=INFO msg="Skipping %s: JSONL content unchanged" !BADKEY=auto-import
+time=2026-02-16T11:03:21.860+06:00 level=INFO msg="File change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:03:21.860+06:00 level=INFO msg="JSONL removed/renamed, re-establishing watch"
+time=2026-02-16T11:03:21.910+06:00 level=INFO msg="Successfully re-established JSONL watch after %v" !BADKEY=50ms
+time=2026-02-16T11:03:21.911+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:03:22.912+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:03:22.913+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-16T11:03:22.914+06:00 level=INFO msg="Skipping %s: JSONL content unchanged" !BADKEY=auto-import
+time=2026-02-16T11:03:38.064+06:00 level=INFO msg="File change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:03:38.064+06:00 level=INFO msg="JSONL removed/renamed, re-establishing watch"
+time=2026-02-16T11:03:38.114+06:00 level=INFO msg="Successfully re-established JSONL watch after %v" !BADKEY=50ms
+time=2026-02-16T11:03:38.114+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:03:39.115+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:03:39.116+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-16T11:03:39.116+06:00 level=INFO msg="JSONL content changed, proceeding with %s..." !BADKEY=auto-import
+time=2026-02-16T11:03:39.121+06:00 level=INFO msg="⚠️  WARNING: Uncommitted local changes detected in %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:03:39.121+06:00 level=INFO msg="   Pulling from remote may overwrite local unpushed changes."
+time=2026-02-16T11:03:39.121+06:00 level=INFO msg="   Consider running 'bd sync' to commit and push your changes first."
+time=2026-02-16T11:03:39.132+06:00 level=INFO msg="Pull failed: %v (backoff: %v)" !BADKEY="git pull failed: exit status 128\nerror: Pulling is not possible because you have unmerged files.\nhint: Fix them up in the work tree, and then use 'git add/rm <file>'\nhint: as appropriate to mark resolution and make a commit.\nfatal: Exiting because of an unresolved conflict.\n" !BADKEY=10m0s
+time=2026-02-16T11:03:41.368+06:00 level=INFO msg="File change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:03:41.368+06:00 level=INFO msg="JSONL removed/renamed, re-establishing watch"
+time=2026-02-16T11:03:41.418+06:00 level=INFO msg="JSONL still missing after %v, retrying..." !BADKEY=50ms
+time=2026-02-16T11:03:41.519+06:00 level=INFO msg="JSONL still missing after %v, retrying..." !BADKEY=100ms
+time=2026-02-16T11:03:41.719+06:00 level=INFO msg="JSONL still missing after %v, retrying..." !BADKEY=200ms
+time=2026-02-16T11:03:42.120+06:00 level=INFO msg="JSONL still missing after %v, retrying..." !BADKEY=400ms
+time=2026-02-16T11:03:42.120+06:00 level=INFO msg="Failed to re-establish JSONL watch after all retries"
+time=2026-02-16T11:03:42.369+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:03:42.370+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-16T11:04:02.187+06:00 level=INFO msg="Git ref change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.git/refs/heads/eco-277-send-an-invite-code-to-the-user-email.lock
+time=2026-02-16T11:04:03.188+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:04:03.189+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-16T11:05:25.098+06:00 level=INFO msg="Git ref change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.git/refs/heads/eco-277-send-an-invite-code-to-the-user-email.lock
+time=2026-02-16T11:05:26.099+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:05:26.100+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-16T11:05:34.753+06:00 level=INFO msg="Mutation detected: %s %s" status=bumicert-platform-ta0.5
+time=2026-02-16T11:05:35.253+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-16T11:05:35.254+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-16T11:05:35.258+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:05:35.260+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-16T11:05:35.260+06:00 level=INFO msg="Export complete"
+time=2026-02-16T11:05:36.263+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:05:36.264+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-16T11:05:37.781+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:05:37.781+06:00 level=INFO msg="File change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:05:38.782+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:05:38.783+06:00 level=INFO msg="Skipping %s: in backoff period" !BADKEY=auto-import
+time=2026-02-16T11:18:01.111+06:00 level=INFO msg="Mutation detected: %s %s" create=bumicert-platform-cos
+time=2026-02-16T11:18:01.612+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-16T11:18:01.612+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-16T11:18:01.617+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:18:01.619+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-16T11:18:01.619+06:00 level=INFO msg="Export complete"
+time=2026-02-16T11:18:02.618+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:18:02.619+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-16T11:18:02.619+06:00 level=INFO msg="JSONL content changed, proceeding with %s..." !BADKEY=auto-import
+time=2026-02-16T11:18:07.199+06:00 level=INFO msg="Pulled from remote"
+time=2026-02-16T11:18:07.203+06:00 level=INFO msg="Imported from JSONL"
+time=2026-02-16T11:18:07.204+06:00 level=INFO msg="Auto-import complete"
+time=2026-02-16T11:18:13.327+06:00 level=INFO msg="Mutation detected: %s %s" create=bumicert-platform-nnt
+time=2026-02-16T11:18:13.827+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-16T11:18:13.827+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-16T11:18:13.832+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:18:13.833+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-16T11:18:13.833+06:00 level=INFO msg="Export complete"
+time=2026-02-16T11:18:14.833+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:18:14.833+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-16T11:18:14.834+06:00 level=INFO msg="JSONL content changed, proceeding with %s..." !BADKEY=auto-import
+time=2026-02-16T11:18:18.097+06:00 level=INFO msg="Mutation detected: %s %s" update=bumicert-platform-cos
+time=2026-02-16T11:18:18.548+06:00 level=INFO msg="Mutation detected: %s %s" update=bumicert-platform-nnt
+time=2026-02-16T11:18:19.048+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-16T11:18:19.048+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-16T11:18:19.053+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:18:19.053+06:00 level=INFO msg="File change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:18:19.055+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-16T11:18:19.055+06:00 level=INFO msg="Export complete"
+time=2026-02-16T11:18:19.337+06:00 level=INFO msg="Pulled from remote"
+time=2026-02-16T11:18:19.342+06:00 level=INFO msg="Imported from JSONL"
+time=2026-02-16T11:18:19.342+06:00 level=INFO msg="Auto-import complete"
+time=2026-02-16T11:18:20.055+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:18:20.055+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-16T11:18:20.056+06:00 level=INFO msg="JSONL content changed, proceeding with %s..." !BADKEY=auto-import
+time=2026-02-16T11:18:24.332+06:00 level=INFO msg="Pulled from remote"
+time=2026-02-16T11:18:24.338+06:00 level=INFO msg="Imported from JSONL"
+time=2026-02-16T11:18:24.339+06:00 level=INFO msg="Auto-import complete"
+time=2026-02-16T11:18:45.450+06:00 level=INFO msg="Mutation detected: %s %s" create=bumicert-platform-d4f
+time=2026-02-16T11:18:45.950+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-16T11:18:45.951+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-16T11:18:45.955+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:18:45.957+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-16T11:18:45.957+06:00 level=INFO msg="Export complete"
+time=2026-02-16T11:18:46.957+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:18:46.957+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-16T11:18:46.958+06:00 level=INFO msg="JSONL content changed, proceeding with %s..." !BADKEY=auto-import
+time=2026-02-16T11:18:49.389+06:00 level=INFO msg="Mutation detected: %s %s" update=bumicert-platform-d4f
+time=2026-02-16T11:18:49.890+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-16T11:18:49.890+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-16T11:18:49.895+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:18:49.895+06:00 level=INFO msg="File change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:18:49.897+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-16T11:18:49.897+06:00 level=INFO msg="Export complete"
+time=2026-02-16T11:18:50.898+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:18:50.898+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-16T11:18:50.899+06:00 level=INFO msg="JSONL content changed, proceeding with %s..." !BADKEY=auto-import
+time=2026-02-16T11:18:51.451+06:00 level=INFO msg="Pulled from remote"
+time=2026-02-16T11:18:51.457+06:00 level=INFO msg="Imported from JSONL"
+time=2026-02-16T11:18:51.457+06:00 level=INFO msg="Auto-import complete"
+time=2026-02-16T11:18:55.539+06:00 level=INFO msg="Pulled from remote"
+time=2026-02-16T11:18:55.544+06:00 level=INFO msg="Imported from JSONL"
+time=2026-02-16T11:18:55.545+06:00 level=INFO msg="Auto-import complete"
+time=2026-02-16T11:19:18.723+06:00 level=INFO msg="Mutation detected: %s %s" create=bumicert-platform-ctv
+time=2026-02-16T11:19:19.224+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-16T11:19:19.224+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-16T11:19:19.228+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:19:19.238+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-16T11:19:19.238+06:00 level=INFO msg="Export complete"
+time=2026-02-16T11:19:20.230+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:19:20.233+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-16T11:19:20.233+06:00 level=INFO msg="JSONL content changed, proceeding with %s..." !BADKEY=auto-import
+time=2026-02-16T11:19:23.437+06:00 level=INFO msg="Mutation detected: %s %s" update=bumicert-platform-ctv
+time=2026-02-16T11:19:23.938+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-16T11:19:23.938+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-16T11:19:23.943+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:19:23.945+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-16T11:19:23.945+06:00 level=INFO msg="Export complete"
+time=2026-02-16T11:19:24.753+06:00 level=INFO msg="Pulled from remote"
+time=2026-02-16T11:19:24.758+06:00 level=INFO msg="Imported from JSONL"
+time=2026-02-16T11:19:24.758+06:00 level=INFO msg="Auto-import complete"
+time=2026-02-16T11:19:24.944+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:19:24.944+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-16T11:19:24.944+06:00 level=INFO msg="JSONL content changed, proceeding with %s..." !BADKEY=auto-import
+time=2026-02-16T11:19:29.397+06:00 level=INFO msg="Pulled from remote"
+time=2026-02-16T11:19:29.401+06:00 level=INFO msg="Imported from JSONL"
+time=2026-02-16T11:19:29.402+06:00 level=INFO msg="Auto-import complete"
+time=2026-02-16T11:19:43.375+06:00 level=INFO msg="Mutation detected: %s %s" create=bumicert-platform-8vg
+time=2026-02-16T11:19:43.877+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-16T11:19:43.877+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-16T11:19:43.884+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:19:43.884+06:00 level=INFO msg="File change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:19:43.886+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-16T11:19:43.886+06:00 level=INFO msg="Export complete"
+time=2026-02-16T11:19:44.885+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:19:44.886+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-16T11:19:44.887+06:00 level=INFO msg="JSONL content changed, proceeding with %s..." !BADKEY=auto-import
+time=2026-02-16T11:19:47.665+06:00 level=INFO msg="Mutation detected: %s %s" update=bumicert-platform-8vg
+time=2026-02-16T11:19:48.166+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-16T11:19:48.166+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-16T11:19:48.171+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:19:48.173+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-16T11:19:48.173+06:00 level=INFO msg="Export complete"
+time=2026-02-16T11:19:49.172+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:19:49.173+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-16T11:19:49.173+06:00 level=INFO msg="JSONL content changed, proceeding with %s..." !BADKEY=auto-import
+time=2026-02-16T11:19:49.388+06:00 level=INFO msg="Pull failed: %v (backoff: %v)" !BADKEY="git pull failed: exit status 1\nFrom github.com:GainForest/bumicert-platform\n * branch            eco-277-send-an-invite-code-to-the-user-email -> FETCH_HEAD\nThere are no candidates for merging among the refs that you just fetched.\nGenerally this means that you provided a wildcard refspec which had no\nmatches on the remote end.\n" !BADKEY=30s
+time=2026-02-16T11:19:53.497+06:00 level=INFO msg="Pulled from remote"
+time=2026-02-16T11:19:53.502+06:00 level=INFO msg="Imported from JSONL"
+time=2026-02-16T11:19:53.503+06:00 level=INFO msg="Auto-import complete"
+time=2026-02-16T11:20:26.481+06:00 level=INFO msg="Mutation detected: %s %s" create=bumicert-platform-ymk
+time=2026-02-16T11:20:26.981+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-16T11:20:26.982+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-16T11:20:26.987+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:20:26.990+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-16T11:20:26.990+06:00 level=INFO msg="Export complete"
+time=2026-02-16T11:20:27.988+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:20:27.988+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-16T11:20:27.989+06:00 level=INFO msg="JSONL content changed, proceeding with %s..." !BADKEY=auto-import
+time=2026-02-16T11:20:30.778+06:00 level=INFO msg="Mutation detected: %s %s" update=bumicert-platform-ymk
+time=2026-02-16T11:20:31.278+06:00 level=INFO msg="Export triggered by mutation events"
+time=2026-02-16T11:20:31.278+06:00 level=INFO msg="Starting %s..." !BADKEY=export
+time=2026-02-16T11:20:31.285+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:20:31.287+06:00 level=INFO msg="Exported to JSONL"
+time=2026-02-16T11:20:31.287+06:00 level=INFO msg="Export complete"
+time=2026-02-16T11:20:32.286+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:20:32.286+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-16T11:20:32.286+06:00 level=INFO msg="JSONL content changed, proceeding with %s..." !BADKEY=auto-import
+time=2026-02-16T11:20:33.453+06:00 level=INFO msg="Pulled from remote"
+time=2026-02-16T11:20:33.458+06:00 level=INFO msg="Imported from JSONL"
+time=2026-02-16T11:20:33.458+06:00 level=INFO msg="Auto-import complete"
+time=2026-02-16T11:20:35.081+06:00 level=INFO msg="JSONL file created: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:20:35.081+06:00 level=INFO msg="File change detected: %s" !BADKEY=/home/kzoeps/Projects/gainforest/bumicert-platform/.beads/issues.jsonl
+time=2026-02-16T11:20:36.082+06:00 level=INFO msg="Import triggered by file change"
+time=2026-02-16T11:20:36.083+06:00 level=INFO msg="Starting %s..." !BADKEY=auto-import
+time=2026-02-16T11:20:36.083+06:00 level=INFO msg="Skipping %s: JSONL content unchanged" !BADKEY=auto-import
+time=2026-02-16T11:20:36.934+06:00 level=INFO msg="Pulled from remote"
+time=2026-02-16T11:20:36.939+06:00 level=INFO msg="Imported from JSONL"
+time=2026-02-16T11:20:36.940+06:00 level=INFO msg="Auto-import complete"
