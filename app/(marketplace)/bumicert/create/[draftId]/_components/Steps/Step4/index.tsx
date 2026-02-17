@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect } from "react";
+import dynamic from "next/dynamic";
 import ReviewStepCard from "./ReviewStepCard";
 import { STEPS as steps } from "../../../_data/steps";
 import useNewBumicertStore from "../../../store";
@@ -13,6 +14,11 @@ import { format } from "date-fns";
 import BumicertPreviewCard from "./BumicertPreviewCard";
 import { useNavbarContext } from "@/components/global/Navbar/context";
 import { cn } from "@/lib/utils";
+
+const DynamicRichTextDisplay = dynamic(
+  () => import("bsky-richtext-react").then((mod) => mod.RichTextDisplay),
+  { ssr: false }
+);
 
 const FormValue = ({
   label,
@@ -123,7 +129,16 @@ const Step4 = () => {
           {step2Errors.description ? null : (
             <FormValue
               label="Your Impact Story"
-              value={step2FormValues.description}
+              value={
+                <div className="whitespace-pre-wrap text-sm line-clamp-4">
+                  <DynamicRichTextDisplay
+                    value={{
+                      text: step2FormValues.description,
+                      facets: step2FormValues.descriptionFacets,
+                    }}
+                  />
+                </div>
+              }
             />
           )}
         </ReviewStepCard>

@@ -8,12 +8,19 @@ import {
 } from "gainforest-sdk/zod";
 import { BlobRef } from "gainforest-sdk/zod";
 import { PutRecordResponse } from "gainforest-sdk/types";
+import type { RichTextRecord } from "bsky-richtext-react";
 
 const EMPTY_LINEAR_DOCUMENT: LinearDocument.Main = { blocks: [] };
 
 export type HeroEditingData = {
   displayName: string;
-  shortDescription: string;
+  // shortDescription uses RichTextRecord from bsky-richtext-react (text + facets).
+  // Note: RichTextRecord.facets uses bsky-richtext-react's Facet type, which is structurally
+  // compatible with AppBskyRichtextFacet.Main at runtime but differs in TypeScript types
+  // (the SDK type includes an extra `{ $type: string }` union member in features).
+  // We use RichTextRecord here because it is what the RichTextEditor onChange produces,
+  // and the shapes are wire-compatible with the API's Richtext type.
+  shortDescription: RichTextRecord;
   coverImage: File | BlobRef | undefined;
   logoImage: File | BlobRef | undefined;
 };
@@ -59,7 +66,7 @@ export const useOrganizationPageStore = create<
   did: "",
   heroEditingData: {
     displayName: "",
-    shortDescription: "",
+    shortDescription: { text: "" },
     coverImage: undefined,
     logoImage: undefined,
   },
@@ -107,7 +114,10 @@ export const useOrganizationPageStore = create<
         displayName: heroEditingData.displayName,
         logo: logoImageBlobRef,
         coverImage: coverImageBlobRef,
-        shortDescription: heroEditingData.shortDescription,
+        // The TRPC mutation input accepts shortDescription as a plain string.
+        // We pass only the text here; facets are preserved in the editing state
+        // but the current API does not have a shortDescriptionFacets input field.
+        shortDescription: heroEditingData.shortDescription.text,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         longDescription: aboutEditingData.longDescription as any,
         objectives: subHeroEditingData.objectives.length > 0 ? subHeroEditingData.objectives : ["Other"],

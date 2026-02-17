@@ -16,12 +16,22 @@ import {
 } from "gainforest-sdk/utilities/transform";
 import { BadgeCheck, CircleAlert, Pencil } from "lucide-react";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { useEffect, useMemo } from "react";
 import {
   ImageEditorModal,
   ImageEditorModalId,
 } from "../../_modals/image-editor";
 import { useOrganizationPageStore } from "../../store";
+
+const DynamicRichTextEditor = dynamic(
+  () => import("bsky-richtext-react").then(mod => mod.RichTextEditor),
+  { ssr: false }
+);
+const DynamicRichTextDisplay = dynamic(
+  () => import("bsky-richtext-react").then(mod => mod.RichTextDisplay),
+  { ssr: false }
+);
 
 const Hero = ({
   initialData,
@@ -60,7 +70,7 @@ const Hero = ({
 
   const shortDescriptionError = useMemo(() => {
     if (!isEditing) return null;
-    const shortDescription = editingData.shortDescription;
+    const shortDescription = editingData.shortDescription.text;
     if (shortDescription.length < 50) return "Short description is too short.";
     if (shortDescription.length > 2000) return "Short description is too long.";
     return null;
@@ -69,7 +79,12 @@ const Hero = ({
   useEffect(() => {
     setEditingData({
       displayName: data.displayName,
-      shortDescription: data?.shortDescription?.text || "",
+      // Note: data.shortDescription is AppGainforestCommonDefs.Richtext (SDK type) which uses
+      // AppBskyRichtextFacet.Main[] for facets. RichTextRecord (bsky-richtext-react) uses its
+      // own Facet[] type. These are structurally incompatible in TypeScript due to the SDK's
+      // extra `{ $type: string }` catch-all union member in features. We initialize with just
+      // the text to avoid the type mismatch; the editor will re-detect facets as the user types.
+      shortDescription: { text: data?.shortDescription?.text || "" },
       coverImage: data.coverImage ? data.coverImage.image : undefined,
       logoImage: data.logo ? data.logo.image : undefined,
     });
@@ -236,34 +251,36 @@ const Hero = ({
             </div>
           </div>
           <div className="w-full mt-2 relative">
-            <EditableText
-              component="p"
-              className={cn(
-                "w-full outline-none focus:outline-none rounded-lg",
-                !isEditing && "line-clamp-2 whitespace-pre-wrap",
-                isEditing &&
-                  "py-1 px-2 ring-2 ring-black/20 dark:ring-white/20 focus:ring-primary dark:focus:ring-primary",
-                isEditing &&
+            {isEditing ? (
+              <DynamicRichTextEditor
+                initialValue={editingData.shortDescription}
+                onChange={(record) => {
+                  setEditingData({
+                    ...editingData,
+                    shortDescription: record,
+                  });
+                }}
+                placeholder="No short description provided."
+                className={cn(
+                  "w-full outline-none focus:outline-none rounded-lg py-1 px-2 ring-2 ring-black/20 dark:ring-white/20 focus:ring-primary dark:focus:ring-primary",
                   shortDescriptionError &&
-                  "ring-destructive/50 dark:ring-destructive/50 focus:ring-destructive dark:focus:ring-destructive pr-8",
-                isEditing &&
-                  editingData.shortDescription.replaceAll("\n", "") === "" &&
-                  "text-muted-foreground"
-              )}
-              placeholder="No short description provided."
-              editable={isEditing}
-              multiline={true}
-              value={
-                isEditing ? editingData.shortDescription : (data?.shortDescription?.text || "")
-              }
-              onChange={(value: string) => {
-                console.log(value);
-                setEditingData({
-                  ...editingData,
-                  shortDescription: value,
-                });
-              }}
-            />
+                    "ring-destructive/50 dark:ring-destructive/50 focus:ring-destructive dark:focus:ring-destructive pr-8"
+                )}
+              />
+            ) : (
+              <div className={cn("w-full mt-2", !data?.shortDescription?.text && "text-muted-foreground")}>
+                {data?.shortDescription?.text ? (
+                  // Note: data.shortDescription is AppGainforestCommonDefs.Richtext (SDK type).
+                  // Its facets use AppBskyRichtextFacet.Main[] which is structurally incompatible
+                  // with bsky-richtext-react's Facet[] (the SDK adds a `{ $type: string }` catch-all
+                  // union member). We pass only the text here; facets from stored data cannot be
+                  // rendered until the SDK and bsky-richtext-react align their facet types.
+                  <DynamicRichTextDisplay value={data.shortDescription.text} />
+                ) : (
+                  "No short description provided."
+                )}
+              </div>
+            )}
             {shortDescriptionError && (
               <QuickTooltip
                 asChild

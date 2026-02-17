@@ -1,19 +1,53 @@
 "use client";
 
 import { useNavbarContext } from "@/components/global/Navbar/context";
-import MarkdownEditor from "@/components/ui/markdown-editor";
 import { cn } from "@/lib/utils";
 import React, { useState, useRef, useEffect } from "react";
 import SiteBoundaries from "./SiteBoundaries";
-import { FullHypercert } from "@/graphql/hypercerts/queries/fullHypercertById";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ChevronDownIcon } from "lucide-react";
-import { OrgHypercertsClaimActivity } from "gainforest-sdk/lex-api";
+import { OrgHypercertsClaimActivity, AppBskyRichtextFacet } from "gainforest-sdk/lex-api";
 import {
   deserialize,
   SerializedSuperjson,
 } from "gainforest-sdk/utilities/transform";
+import {
+  RichTextDisplay,
+  type RichTextRecord,
+  type FacetFeature,
+} from "bsky-richtext-react";
+
+const KNOWN_FEATURE_TYPES = new Set([
+  "app.bsky.richtext.facet#mention",
+  "app.bsky.richtext.facet#link",
+  "app.bsky.richtext.facet#tag",
+]);
+
+/**
+ * Type guard that checks whether an SDK facet feature is a known
+ * bsky-richtext-react FacetFeature (mention, link, or tag).
+ * The SDK's facet type includes a catch-all `{ $type: string }` in the
+ * features union; this guard narrows it to the three concrete types.
+ */
+function isKnownFacetFeature(
+  f: AppBskyRichtextFacet.Main["features"][number]
+): f is FacetFeature {
+  return typeof f.$type === "string" && KNOWN_FEATURE_TYPES.has(f.$type);
+}
+
+/**
+ * Converts SDK facets (AppBskyRichtextFacet.Main[]) to bsky-richtext-react
+ * Facet[] by filtering out any features with unknown $type values.
+ */
+function toRichTextFacets(
+  facets: AppBskyRichtextFacet.Main[]
+): RichTextRecord["facets"] {
+  return facets.map((facet) => ({
+    index: facet.index,
+    features: facet.features.filter(isKnownFacetFeature),
+  }));
+}
 
 // Custom hook to handle collapsible content
 const useCollapsible = (maxHeight: number = 320) => {
@@ -46,9 +80,11 @@ const useCollapsible = (maxHeight: number = 320) => {
 // Collapsible Description Component
 const CollapsibleDescription = ({
   description,
+  descriptionFacets,
   maxHeight = 360,
 }: {
   description: string;
+  descriptionFacets?: RichTextRecord["facets"];
   maxHeight?: number;
 }) => {
   const { isExpanded, setIsExpanded, shouldShowButton, contentRef } =
@@ -65,8 +101,11 @@ const CollapsibleDescription = ({
         <h2 className="text-2xl font-bold font-serif px-3 text-primary">
           Description
         </h2>
-        <div className="p-3">{description}</div>
-        {/* <MarkdownEditor markdown={description} showToolbar={false} readOnly /> */}
+        <div className="p-3">
+          <RichTextDisplay
+            value={{ text: description, facets: descriptionFacets }}
+          />
+        </div>
       </div>
       {shouldShowButton && (
         <div
@@ -111,6 +150,10 @@ const Body = ({
     displayMode = "side-by-side";
   }
 
+  const descriptionFacets = bumicert.descriptionFacets
+    ? toRichTextFacets(bumicert.descriptionFacets)
+    : undefined;
+
   return (
     <div
       className={cn(
@@ -120,7 +163,10 @@ const Body = ({
           : "grid-cols-1 min-[1000px]:grid-cols-[1fr_300px]"
       )}
     >
-      <CollapsibleDescription description={bumicert.description ?? ""} />
+      <CollapsibleDescription
+        description={bumicert.description ?? ""}
+        descriptionFacets={descriptionFacets}
+      />
       <div className="flex flex-col px-3 min-[1000px]:px-0">
         {bumicert.locations && bumicert.locations.length > 0 && (
           <SiteBoundaries locationAtUri={bumicert.locations[0].uri} />
