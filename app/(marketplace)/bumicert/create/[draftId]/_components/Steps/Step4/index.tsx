@@ -14,7 +14,7 @@ import { format } from "date-fns";
 import BumicertPreviewCard from "./BumicertPreviewCard";
 import { useNavbarContext } from "@/components/global/Navbar/context";
 import { cn } from "@/lib/utils";
-import { defaultDisplayClassNames, generateClassNames } from "bsky-richtext-react";
+import { richTextDisplayClassNames } from "@/lib/richtext";
 
 const DynamicRichTextDisplay = dynamic(
   () => import("bsky-richtext-react").then((mod) => mod.RichTextDisplay),
@@ -137,10 +137,7 @@ const Step4 = () => {
                       text: step2FormValues.description,
                       facets: step2FormValues.descriptionFacets,
                     }}
-                    classNames={generateClassNames([defaultDisplayClassNames, {
-                      mention: "text-primary",
-                      link: "text-primary",
-                    }], cn)}
+                    classNames={richTextDisplayClassNames}
                   />
                 </div>
               }
