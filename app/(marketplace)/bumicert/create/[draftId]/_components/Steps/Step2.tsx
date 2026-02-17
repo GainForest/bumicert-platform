@@ -48,7 +48,7 @@ const Step2 = () => {
       >
         <div className="w-full bg-background rounded-md border border-border overflow-hidden p-3">
           <DynamicRichTextEditor
-            initialValue={{ text: description, facets: undefined }}
+            initialValue={{ text: description, facets: descriptionFacets }}
             onChange={(record) => {
               setFormValue("description", record.text);
               setFormValue("descriptionFacets", record.facets);
