@@ -33,6 +33,7 @@ export const step2Schema = z.object({
     .min(50, "At least 50 characters required")
     .max(30000, "No more than 8000 characters allowed")
     .describe("Your Impact Story"),
+  descriptionFacets: z.array(z.any()).optional(),
   shortDescription: z
     .string()
     .min(1, "Required")
@@ -42,6 +43,7 @@ export const step2Schema = z.object({
 export type Step2FormValues = z.infer<typeof step2Schema>;
 export const step2InitialValues: Step2FormValues = {
   description: "",
+  descriptionFacets: [],
   shortDescription: "",
 };
 
