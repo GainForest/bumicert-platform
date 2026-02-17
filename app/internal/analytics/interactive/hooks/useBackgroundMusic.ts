@@ -16,16 +16,17 @@ export function useBackgroundMusic(currentCardId: string) {
             const audio = new Audio(`/audio/${n}.mp3`);
             audio.loop = true;
             audio.preload = 'auto';
-            audio.volume = 0.5; // 50% volume by default
+            audio.volume = 0.5;
             return audio;
         });
 
-        // Attempt autoplay (usually blocked by browsers)
-        audiosRef.current[0]
+        // Use the initial targetTrack (derived from currentCardId at mount)
+        const initialTrack = CARD_TO_TRACK[currentCardId] ?? 0;
+        audiosRef.current[initialTrack]
             ?.play()
             .then(() => {
                 hasStartedRef.current = true;
-                currentTrackRef.current = 0;
+                currentTrackRef.current = initialTrack;
                 setIsPlaying(true);
             })
             .catch(() => {
@@ -38,6 +39,7 @@ export function useBackgroundMusic(currentCardId: string) {
                 audio.src = '';
             });
         };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Switch tracks when card section changes
