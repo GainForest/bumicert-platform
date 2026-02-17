@@ -48,11 +48,11 @@
 .backgroundBurst {
     position: absolute;
     inset: -50%;
-    animation: burstRotate 120s linear infinite;
+    animation: burst-rotate 120s linear infinite;
     pointer-events: none;
 }
 
-@keyframes burstRotate {
+@keyframes burst-rotate {
     from {
         transform: rotate(0deg);
     }
@@ -267,7 +267,7 @@
 }
 
 .headlineRow {
-    animation: headlineReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: headline-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .headlineRow:nth-child(1) {
@@ -286,7 +286,7 @@
     animation-delay: 0.9s;
 }
 
-@keyframes headlineReveal {
+@keyframes headline-reveal {
     from {
         opacity: 0;
         transform: translateY(20px) rotate(-2deg);
@@ -473,10 +473,10 @@
     box-shadow:
         4px 4px 0 var(--bumi-primary-light),
         8px 8px 0 var(--bumi-chart2);
-    animation: bannerPulse 2s ease-in-out infinite;
+    animation: banner-pulse 2s ease-in-out infinite;
 }
 
-@keyframes bannerPulse {
+@keyframes banner-pulse {
     0%,
     100% {
         transform: scale(1);

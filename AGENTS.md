@@ -46,9 +46,9 @@ Quick reference:
 
 ### 1. Documenting Changes (Changesets)
 - **Crucial**: Every PR must have **exactly one** changeset file documenting all significant changes.
-- -   **Rule**: If you modify code, you must create/update a changeset. Do not create multiple changeset files for the same PR; consolidate them if needed.
-- -   **Quality**: The summary must be human-readable and descriptive (e.g., "Added a new pricing page" instead of "feat: add page").
-- -   **Screenshots**: If the change involves UI and you are editing the **CHANGELOG** (not the changeset), you MUST include a Vercel Blob URL to a screenshot. **Prompt the user to provide a screenshot if you cannot capture one yourself.**
+-   **Rule**: If you modify code, you must create/update a changeset. Do not create multiple changeset files for the same PR; consolidate them if needed.
+-   **Quality**: The summary must be human-readable and descriptive (e.g., "Added a new pricing page" instead of "feat: add page").
+-   **Screenshots**: If the change involves UI and you are editing the **CHANGELOG** (not the changeset), you MUST include a Vercel Blob URL to a screenshot. **Prompt the user to provide a screenshot if you cannot capture one yourself.**
 -   See [changeset.md](./changeset.md) for detailed instructions on how to create a changeset.
 -   **Command**: `bun run changeset`
 
@@ -82,7 +82,7 @@ Quick reference:
 4. **PUSH TO REMOTE** - This is MANDATORY:
    ```bash
    git pull --rebase
-   bd sync
+   hb sync
    git push
    git status  # MUST show "up to date with origin"
    ```

@@ -5,6 +5,7 @@ export function useBackgroundMusic(currentCardId: string) {
     const audiosRef = useRef<HTMLAudioElement[]>([]);
     const currentTrackRef = useRef<number>(-1);
     const hasStartedRef = useRef(false);
+    const isMutedRef = useRef(false);
     const [isMuted, setIsMuted] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
 
@@ -48,7 +49,7 @@ export function useBackgroundMusic(currentCardId: string) {
             return;
         }
 
-        // Fade out current track and fade in new track
+        // Switch tracks: pause current, play new
         const currentAudio = audiosRef.current[currentTrackRef.current];
         const newAudio = audiosRef.current[targetTrack];
 
@@ -87,24 +88,22 @@ export function useBackgroundMusic(currentCardId: string) {
 
     // Toggle mute/unmute
     const toggleMute = useCallback(() => {
-        setIsMuted((prev) => {
-            const newMuted = !prev;
+        const newMuted = !isMutedRef.current;
+        isMutedRef.current = newMuted;
+        setIsMuted(newMuted);
 
-            if (newMuted) {
-                // Mute: pause current track
-                audiosRef.current.forEach((audio) => {
-                    audio.pause();
-                });
-            } else {
-                // Unmute: resume current track
-                const currentAudio = audiosRef.current[currentTrackRef.current];
-                if (currentAudio && hasStartedRef.current) {
-                    currentAudio.play().catch(() => { });
-                }
+        if (newMuted) {
+            // Mute: pause current track
+            audiosRef.current.forEach((audio) => {
+                audio.pause();
+            });
+        } else {
+            // Unmute: resume current track
+            const currentAudio = audiosRef.current[currentTrackRef.current];
+            if (currentAudio && hasStartedRef.current) {
+                currentAudio.play().catch(() => { });
             }
-
-            return newMuted;
-        });
+        }
     }, []);
 
     // Set volume (0 to 1)
