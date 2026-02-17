@@ -30,7 +30,6 @@ const Step2 = () => {
     updateErrorsAndCompletion();
   }, [shouldShowValidationErrors]);
 
-  console.log("==============", { description, descriptionFacets });
 
   return (
     <div>
