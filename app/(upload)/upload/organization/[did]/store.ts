@@ -1,13 +1,13 @@
 import { create } from "zustand";
-import { AppGainforestOrganizationInfo } from "climateai-sdk/lex-api";
-import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
+import { AppGainforestOrganizationInfo } from "gainforest-sdk/lex-api";
+import { allowedPDSDomains, trpcClient } from "@/config/gainforest-sdk";
 import {
   BlobRefGenerator,
   toBlobRefGenerator,
   toFileGenerator,
-} from "climateai-sdk/zod";
-import { BlobRef } from "climateai-sdk/zod";
-import { PutRecordResponse } from "climateai-sdk/types";
+} from "gainforest-sdk/zod";
+import { BlobRef } from "gainforest-sdk/zod";
+import { PutRecordResponse } from "gainforest-sdk/types";
 
 export type HeroEditingData = {
   displayName: string;
@@ -107,8 +107,8 @@ export const useOrganizationPageStore = create<
         coverImage: coverImageBlobRef,
         shortDescription: heroEditingData.shortDescription,
         longDescription: aboutEditingData.longDescription,
-        objectives: subHeroEditingData.objectives,
-        startDate: subHeroEditingData.startDate ?? undefined,
+        objectives: subHeroEditingData.objectives.length > 0 ? subHeroEditingData.objectives : ["Other"],
+        startDate: subHeroEditingData.startDate && subHeroEditingData.startDate.trim() !== "" ? subHeroEditingData.startDate : undefined,
         country: subHeroEditingData.country,
         visibility: subHeroEditingData.visibility,
         website: subHeroEditingData.website ?? undefined,

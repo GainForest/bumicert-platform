@@ -2,8 +2,14 @@
 import { useNavbarContext } from "@/components/global/Navbar/context";
 import { useHeaderContext } from "@/components/providers/HeaderProvider";
 import { Button } from "@/components/ui/button";
-import { Combobox } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   ArrowDown01,
   ArrowDownNarrowWide,
@@ -144,16 +150,24 @@ const SortingOptions = () => {
 
   return (
     <div className="flex items-center gap-2">
-      <Combobox
-        options={sortingOptions}
+      <Select
         value={sortKey}
-        onChange={(value) => {
+        onValueChange={(value) => {
           const validatedValue = sortKeys.find((key) => key === value);
           setSortKey(validatedValue ?? "date-created");
         }}
-        placeholder="Sort by"
-        size={"sm"}
-      />
+      >
+        <SelectTrigger className="h-8 w-auto">
+          <SelectValue placeholder="Sort by" />
+        </SelectTrigger>
+        <SelectContent>
+          {sortingOptions.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
       <div className="flex items-center border border-border bg-background rounded-lg p-0.5 gap-0.5 overflow-hidden">
         <Button
           size={"icon"}

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { BlobRefGenerator } from "climateai-sdk/zod";
+import { BlobRefGenerator } from "gainforest-sdk/zod";
 
 export type SiteData = {
   name: string;

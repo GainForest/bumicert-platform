@@ -1,15 +1,15 @@
 import Container from "@/components/ui/container";
 import React from "react";
-import { getSessionFromRequest } from "climateai-sdk/session";
+import { getAppSession } from "gainforest-sdk/oauth";
 import { redirect } from "next/navigation";
 import ProjectsClient, {
   AllProjectsData,
 } from "./_components/Projects/ProjectsClient";
 import { tryCatch } from "@/lib/tryCatch";
 import { TRPCError } from "@trpc/server";
-import { serialize } from "climateai-sdk/utilities/transform";
-import { climateAiSdk } from "@/config/climateai-sdk.server";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { serialize } from "gainforest-sdk/utilities/transform";
+import { gainforestSdk } from "@/config/gainforest-sdk.server";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import HeaderContent from "../_components/HeaderContent";
 import ProjectsHeaderContent from "./HeaderContent";
 import ErrorPage from "./error";
@@ -22,21 +22,20 @@ const ProjectsPage = async ({
   const { did: encodedDid } = await params;
   const did = decodeURIComponent(encodedDid);
 
-  // Check if user is authenticated and owns this organization
-  let session;
-  try {
-    session = await getSessionFromRequest();
-  } catch {
-    // Not authenticated, redirect to organization page
-    redirect(`/organization/${encodeURIComponent(did)}`);
+  const pdsDomain = allowedPDSDomains[0];
+  if (!pdsDomain) {
+    return <ErrorPage error={new Error("No PDS domain configured.")} />;
   }
 
-  if (!session || session.did !== did) {
+  // Check if user is authenticated and owns this organization
+  const session = await getAppSession();
+
+  if (!session.isLoggedIn || session.did !== did) {
     // User doesn't own this organization, redirect to organization page
     redirect(`/organization/${encodeURIComponent(did)}`);
   }
 
-  const apiCaller = climateAiSdk.getServerCaller();
+  const apiCaller = gainforestSdk.getServerCaller();
 
   // Placeholder API call - replace with actual endpoint when available
   // For now, gracefully handle if the endpoint doesn't exist
@@ -49,7 +48,7 @@ const ProjectsPage = async ({
     const [response, error] = await tryCatch(
       apiCaller.hypercerts.claim.project.getAll({
         did,
-        pdsDomain: allowedPDSDomains[0],
+        pdsDomain,
       })
     );
     if (error) {

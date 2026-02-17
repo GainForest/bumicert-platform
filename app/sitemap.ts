@@ -4,7 +4,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://bumicerts.com";
 
   // Static routes that should be in the sitemap
-  const routes = ["", "/explore", "/bumicert/create"].map((route) => ({
+  const routes = ["", "/explore", "/organization/all", "/bumicert/create"].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
     changeFrequency: "daily" as const,

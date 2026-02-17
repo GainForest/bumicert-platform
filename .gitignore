@@ -45,5 +45,10 @@ bun.lock
 bun.lockb
 yarn.lock
 
+# agent stuff
+AGENTS.local.md
+agent-docs/
+app/agents-test-pages/
+
 # Audio files
 public/audio/

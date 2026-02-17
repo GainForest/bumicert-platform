@@ -6,7 +6,7 @@ import { useAtprotoStore } from "@/components/stores/atproto";
 import { BuildingIcon, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import AtprotoSignInButton from "@/components/global/Header/AtprotoSignInButton";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { motion } from "framer-motion";

@@ -1,6 +1,6 @@
 "use client";
 
-import { Ecocert as Bumicert } from "climateai-sdk/types";
+import { Ecocert as Bumicert } from "gainforest-sdk/types";
 import { useQueryState } from "nuqs";
 import { useMemo } from "react";
 

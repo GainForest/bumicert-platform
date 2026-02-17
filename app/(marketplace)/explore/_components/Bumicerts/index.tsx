@@ -10,8 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Eraser } from "lucide-react";
 import { useQueryState } from "nuqs";
 import { AnimatePresence } from "framer-motion";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
-import { getEcocertsFromClaimActivities as getBumicertsFromClaimActivities } from "climateai-sdk/utilities/hypercerts";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
+import { getEcocertsFromClaimActivities as getBumicertsFromClaimActivities } from "gainforest-sdk/utilities/hypercerts";
 import { trpcApi } from "@/components/providers/TrpcProvider";
 import { useExploreStore } from "../../store";
 

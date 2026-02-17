@@ -1,4 +1,4 @@
-import { footerLinks } from "@/app/(marketplace)/_components/Home/Navbar/data";
+import { footerLinks } from "@/app/(marketplace)/_components/Navbar/data";
 import { NavLinkConfig } from "@/components/global/Navbar/types";
 import { links } from "@/lib/links";
 import {

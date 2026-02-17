@@ -33,7 +33,9 @@ const AtprotoSignInButton = () => {
       }}
     >
       {isAuthenticated ? <User /> : <LogIn />}
-      {isAuthenticated ? auth.user.handle.split(".")[0] : "Sign in or Register"}
+      {isAuthenticated
+        ? auth.user.handle?.split(".")[0] ?? auth.user.did.slice(0, 8)
+        : "Sign in or Register"}
     </Button>
   );
 };
