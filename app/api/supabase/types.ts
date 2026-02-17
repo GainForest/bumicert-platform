@@ -380,6 +380,27 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limits: {
+        Row: {
+          id: string
+          identifier: string
+          endpoint: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          identifier: string
+          endpoint: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          identifier?: string
+          endpoint?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       telemetry_sessions: {
         Row: {
           created_at: string
