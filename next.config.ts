@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   /* config options here */
   // Turn react strict mode off
   reactStrictMode: false,
+  turbopack: {},
   images: {
     remotePatterns: [
       {

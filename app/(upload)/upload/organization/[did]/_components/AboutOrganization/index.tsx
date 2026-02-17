@@ -12,8 +12,12 @@ import { CircleAlert } from "lucide-react";
 import QuickTooltip from "@/components/ui/quick-tooltip";
 import { Button } from "@/components/ui/button";
 import dynamic from "next/dynamic";
-import { LinearDocument } from 'leaflet-parser';
 import type { LinearDocumentType } from 'leaflet-parser';
+
+const DynamicLinearDocument = dynamic(
+  () => import('leaflet-parser').then(mod => mod.LinearDocument),
+  { ssr: false }
+);
 
 const DynamicEditableLinearDocument = dynamic(
   () => import('leaflet-parser').then(mod => mod.EditableLinearDocument),
@@ -103,7 +107,7 @@ const AboutOrganization = ({
               No long description provided.
             </span>
           ) : (
-            <LinearDocument document={data.longDescription} />
+            <DynamicLinearDocument document={data.longDescription} />
           )}
         </div>
       )}
