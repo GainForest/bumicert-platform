@@ -52,7 +52,7 @@ export default function CardTimeDistribution({ data, isActive }: BaseCardProps):
                                 <motion.div
                                     className={styles.timeDistBar}
                                     initial={{ width: 0 }}
-                                    animate={isActive ? { width: `${Math.max(item.percentage, 5)}%` } : { width: 0 }}
+                                    animate={isActive ? { width: `${Math.min(100, Math.max(item.percentage, 5))}%` } : { width: 0 }}
                                     transition={{ delay: 1 + index * 0.12, duration: 0.6 }}
                                 />
                                 <span className={styles.timeDistValue}>

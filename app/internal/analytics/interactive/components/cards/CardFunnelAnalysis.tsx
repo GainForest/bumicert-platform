@@ -49,7 +49,8 @@ export default function CardFunnelAnalysis({ data, isActive }: BaseCardProps): R
                 >
                     {data.funnelSteps.map((step, index) => {
                         const isHighest = step.dropOff === highestDropOff.dropOff && step.dropOff > 0;
-                        const barWidth = data.totalFlowStarts > 0 ? (step.users / data.totalFlowStarts) * 100 : 0;
+                        const rawWidth = data.totalFlowStarts > 0 ? (step.users / data.totalFlowStarts) * 100 : 0;
+                        const barWidth = Math.min(100, Math.max(0, rawWidth));
 
                         // Color based on position
                         let barColor = PALETTE.muted;
