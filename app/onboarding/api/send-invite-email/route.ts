@@ -28,6 +28,7 @@ import {
   isInviteCodeError,
 } from "@/lib/atproto/invites";
 import { getInviteEmailConfig, resend } from "@/lib/email/resend";
+import { checkRateLimit, recordRateLimitAttempt, getClientIp, RATE_LIMITS } from "@/lib/rate-limit";
 import { getSupabaseAdmin } from "@/lib/supabase/server";
 
 const requestSchema = z.object({
@@ -71,43 +72,32 @@ export async function POST(req: NextRequest) {
     const email = parsed.data.email;
     const pdsDomain = parsed.data.pdsDomain as AllowedPDSDomain;
 
-    // Rate limiting check
-    const rateLimitMinutes = 5;
-    const endpoint = "/api/atproto/onboarding/send-invite-email";
+    const clientIp = getClientIp(req.headers);
 
-    const { data: recentLimits } = await supabase
-      .from("rate_limits")
-      .select("created_at")
-      .eq("identifier", email)
-      .eq("endpoint", endpoint)
-      .order("created_at", { ascending: false })
-      .limit(1);
+    // Check IP rate limit
+    const ipLimit = await checkRateLimit(
+      `ip:${clientIp}`,
+      'send-invite-email',
+      RATE_LIMITS.sendInviteEmail.byIp
+    );
+    if (!ipLimit.allowed) {
+      return Response.json(
+        { error: 'RateLimitExceeded', message: 'Too many requests', retryAfter: ipLimit.resetAt.toISOString() },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil((ipLimit.resetAt.getTime() - Date.now()) / 1000)) } }
+      );
+    }
 
-    const rateLimit = recentLimits?.[0];
-    if (rateLimit) {
-      const minutesAgo =
-        (Date.now() - new Date(rateLimit.created_at).getTime()) / 60000;
-
-      if (minutesAgo < rateLimitMinutes) {
-        const retryAfter = Math.ceil((rateLimitMinutes - minutesAgo) * 60); // seconds
-        const retryAt = new Date(
-          Date.now() + retryAfter * 1000
-        ).toISOString();
-
-        return Response.json(
-          {
-            error: "RateLimitExceeded",
-            message: `Please wait ${Math.ceil(rateLimitMinutes - minutesAgo)} minute(s) before requesting another invite code`,
-            retryAfter: retryAt,
-          },
-          {
-            status: 429,
-            headers: {
-              "Retry-After": retryAfter.toString(),
-            },
-          }
-        );
-      }
+    // Check email rate limit
+    const emailLimit = await checkRateLimit(
+      `email:${email}`,
+      'send-invite-email',
+      RATE_LIMITS.sendInviteEmail.byEmail
+    );
+    if (!emailLimit.allowed) {
+      return Response.json(
+        { error: 'RateLimitExceeded', message: 'Please wait before requesting another invite code', retryAfter: emailLimit.resetAt.toISOString() },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil((emailLimit.resetAt.getTime() - Date.now()) / 1000)) } }
+      );
     }
 
     const inviteCode = await getOrCreateInviteCode(
@@ -132,18 +122,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Update rate limit after successful email send
-    await supabase
-      .from("rate_limits")
-      .delete()
-      .eq("identifier", email)
-      .eq("endpoint", endpoint);
-
-    await supabase.from("rate_limits").insert({
-      identifier: email,
-      endpoint: endpoint,
-      created_at: new Date().toISOString(),
-    });
+    // Record rate limit attempts after successful email send
+    await recordRateLimitAttempt(`ip:${clientIp}`, 'send-invite-email');
+    await recordRateLimitAttempt(`email:${email}`, 'send-invite-email');
 
     return Response.json({ success: true });
   } catch (err: unknown) {

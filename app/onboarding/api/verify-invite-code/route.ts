@@ -6,6 +6,12 @@ import {
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { getSupabaseAdmin } from "@/lib/supabase/server";
+import {
+  checkRateLimit,
+  recordRateLimitAttempt,
+  getClientIp,
+  RATE_LIMITS,
+} from "@/lib/rate-limit";
 
 const requestSchema = z.object({
   email: z.string().email().trim().toLowerCase(),
@@ -24,6 +30,27 @@ const requestSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    const clientIp = getClientIp(req.headers);
+
+    const ipLimit = await checkRateLimit(
+      `ip:${clientIp}`,
+      "verify-invite-code",
+      RATE_LIMITS.verifyInviteCode.byIp
+    );
+    if (!ipLimit.allowed) {
+      return Response.json(
+        { error: "RateLimitExceeded", message: "Too many requests" },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(
+              Math.ceil((ipLimit.resetAt.getTime() - Date.now()) / 1000)
+            ),
+          },
+        }
+      );
+    }
+
     const parsed = requestSchema.safeParse(await req.json());
 
     if (!parsed.success) {
@@ -59,6 +86,7 @@ export async function POST(req: NextRequest) {
 
     if (inviteResult.error) {
       console.error("Database error checking invite:", inviteResult.error);
+      await recordRateLimitAttempt(`ip:${clientIp}`, "verify-invite-code");
       return Response.json(
         { error: "DatabaseError", message: "Failed to check invite code" },
         { status: 500 }
@@ -66,6 +94,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!inviteResult.data) {
+      await recordRateLimitAttempt(`ip:${clientIp}`, "verify-invite-code");
       return Response.json(
         { error: "InvalidInvite", message: "Invite code not found" },
         { status: 400 }
@@ -73,12 +102,14 @@ export async function POST(req: NextRequest) {
     }
 
     if (inviteResult.data.email !== email) {
+      await recordRateLimitAttempt(`ip:${clientIp}`, "verify-invite-code");
       return Response.json(
         { error: "InvalidInvite", message: "Invite code does not match email" },
         { status: 400 }
       );
     }
 
+    await recordRateLimitAttempt(`ip:${clientIp}`, "verify-invite-code");
     return Response.json(
       {
         valid: true,
