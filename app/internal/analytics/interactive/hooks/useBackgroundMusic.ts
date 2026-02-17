@@ -58,7 +58,11 @@ export function useBackgroundMusic(currentCardId: string) {
 
         if (!isMuted && newAudio) {
             newAudio.currentTime = 0;
-            newAudio.play().catch(() => { });
+            newAudio.play()
+                .then(() => setIsPlaying(true))
+                .catch(() => setIsPlaying(false));
+        } else {
+            setIsPlaying(false);
         }
 
         currentTrackRef.current = targetTrack;

@@ -20,6 +20,8 @@ export interface NavigationEvent {
     isCardChange: boolean;
 }
 
+const ANIMATION_DURATION_MS = 500;
+
 export function useCardNavigation(
     cards: CardConfig[],
     onNavigate?: (event: NavigationEvent) => void,
@@ -46,7 +48,7 @@ export function useCardNavigation(
             setIsAnimating(true);
             setDirection('next');
             setCurrentSubcard(currentSubcard + 1);
-            setTimeout(() => setIsAnimating(false), 500);
+            setTimeout(() => setIsAnimating(false), ANIMATION_DURATION_MS);
             return;
         }
 
@@ -61,7 +63,7 @@ export function useCardNavigation(
             setDirection('next');
             setCurrentCard(nextCardIndex);
             setCurrentSubcard(0);
-            setTimeout(() => setIsAnimating(false), 500);
+            setTimeout(() => setIsAnimating(false), ANIMATION_DURATION_MS);
         }
     }, [cards, currentCard, currentSubcard, isAnimating, onNavigate, totalCards]);
 
@@ -77,7 +79,7 @@ export function useCardNavigation(
             setIsAnimating(true);
             setDirection('prev');
             setCurrentSubcard(currentSubcard - 1);
-            setTimeout(() => setIsAnimating(false), 500);
+            setTimeout(() => setIsAnimating(false), ANIMATION_DURATION_MS);
             return;
         }
 
@@ -94,7 +96,7 @@ export function useCardNavigation(
             const prevCardMaxSubcard = prevCardConfig?.subcards || 0;
             setCurrentCard(prevCardIndex);
             setCurrentSubcard(prevCardMaxSubcard);
-            setTimeout(() => setIsAnimating(false), 500);
+            setTimeout(() => setIsAnimating(false), ANIMATION_DURATION_MS);
         }
     }, [cards, currentCard, currentSubcard, isAnimating, onNavigate]);
 
@@ -112,7 +114,7 @@ export function useCardNavigation(
                 setDirection(cardIndex > currentCard ? 'next' : 'prev');
                 setCurrentCard(cardIndex);
                 setCurrentSubcard(0);
-                setTimeout(() => setIsAnimating(false), 500);
+                setTimeout(() => setIsAnimating(false), ANIMATION_DURATION_MS);
             }
         },
         [cards, currentCard, isAnimating, onNavigate, totalCards],
