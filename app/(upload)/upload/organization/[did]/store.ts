@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { AppGainforestOrganizationInfo } from "gainforest-sdk/lex-api";
+import { AppGainforestOrganizationInfo, PubLeafletPagesLinearDocument as LinearDocument } from "gainforest-sdk/lex-api";
 import { allowedPDSDomains, trpcClient } from "@/config/gainforest-sdk";
 import {
   BlobRefGenerator,
@@ -8,6 +8,8 @@ import {
 } from "gainforest-sdk/zod";
 import { BlobRef } from "gainforest-sdk/zod";
 import { PutRecordResponse } from "gainforest-sdk/types";
+
+const EMPTY_LINEAR_DOCUMENT: LinearDocument.Main = { blocks: [] };
 
 export type HeroEditingData = {
   displayName: string;
@@ -25,7 +27,7 @@ export type SubHeroEditingData = {
 };
 
 export type AboutEditingData = {
-  longDescription: string;
+  longDescription: LinearDocument.Main;
 };
 
 export type OrganizationPageStoreState = {
@@ -69,7 +71,7 @@ export const useOrganizationPageStore = create<
     objectives: [],
   },
   aboutEditingData: {
-    longDescription: "",
+    longDescription: EMPTY_LINEAR_DOCUMENT,
   },
   setData: (data) => set({ data }),
   setDid: (did) => set({ did }),
@@ -106,7 +108,8 @@ export const useOrganizationPageStore = create<
         logo: logoImageBlobRef,
         coverImage: coverImageBlobRef,
         shortDescription: heroEditingData.shortDescription,
-        longDescription: aboutEditingData.longDescription,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        longDescription: aboutEditingData.longDescription as any,
         objectives: subHeroEditingData.objectives.length > 0 ? subHeroEditingData.objectives : ["Other"],
         startDate: subHeroEditingData.startDate && subHeroEditingData.startDate.trim() !== "" ? subHeroEditingData.startDate : undefined,
         country: subHeroEditingData.country,

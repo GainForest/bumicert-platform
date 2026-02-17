@@ -54,12 +54,6 @@ export const UploadLogoModal = () => {
     if (!organizationInfo)
       throw new Error("Organization information is required");
     
-    // temp fixes until parser is ready
-    const firstBlock = organizationInfo.longDescription?.blocks?.[0]?.block;
-    const longDescription = firstBlock?.$type === "pub.leaflet.blocks.text" 
-      ? (firstBlock as $Typed<PubLeafletBlocksText.Main>).plaintext 
-      : "";
-    
     const shortDescription = organizationInfo?.shortDescription?.text || ""; 
     
     await uploadLogo({
@@ -70,7 +64,8 @@ export const UploadLogoModal = () => {
       info: {
         displayName: organizationInfo.displayName,
         shortDescription,
-        longDescription,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        longDescription: organizationInfo.longDescription as any,
         objectives: organizationInfo.objectives,
         country: organizationInfo.country,
         visibility: organizationInfo.visibility,
