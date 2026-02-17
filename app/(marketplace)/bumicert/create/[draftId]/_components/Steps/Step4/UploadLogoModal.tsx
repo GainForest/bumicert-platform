@@ -54,7 +54,7 @@ export const UploadLogoModal = () => {
     if (!organizationInfo)
       throw new Error("Organization information is required");
     
-    const shortDescription = organizationInfo?.shortDescription?.text || ""; 
+    const shortDescription = organizationInfo?.shortDescription || { text: "", facets: [] };
     
     await uploadLogo({
       did: auth.user?.did ?? "",
@@ -63,6 +63,10 @@ export const UploadLogoModal = () => {
       },
       info: {
         displayName: organizationInfo.displayName,
+        // The TRPC mutation input types shortDescription as `string`, but the API
+        // accepts the full Richtext object (text + facets). The SDK input type is
+        // incorrect — same mismatch as longDescription below.
+        // @ts-expect-error SDK input type incorrectly narrows shortDescription to string
         shortDescription,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         longDescription: organizationInfo.longDescription as any,
