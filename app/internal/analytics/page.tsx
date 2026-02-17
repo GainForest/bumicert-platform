@@ -45,8 +45,9 @@ type AnalyticsData = {
 };
 
 const formatTime = (seconds: number): string => {
-  const minutes = Math.floor(seconds / 60);
-  const secs = seconds % 60;
+  const total = Math.floor(seconds);
+  const minutes = Math.floor(total / 60);
+  const secs = total % 60;
   return `${minutes}m ${secs}s`;
 };
 
