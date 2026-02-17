@@ -65,13 +65,8 @@ export default function InteractiveModeHeader({
             {/* Navigation row */}
             <div className={styles.headerNav}>
                 <div className={styles.headerLeft}>
-                    <Link href="/internal/analytics">
-                        <button
-                            className={styles.exitButton}
-                            aria-label="Close"
-                        >
-                            ✕
-                        </button>
+                    <Link href="/internal/analytics" className={styles.exitButton} aria-label="Close">
+                        ✕
                     </Link>
                 </div>
                 <div className={styles.logoCenter}>
@@ -84,7 +79,7 @@ export default function InteractiveModeHeader({
                     <motion.button
                         className={styles.exitButton}
                         onClick={handleMusicClick}
-                        aria-label={isMuted ? 'Unmute music' : 'Mute music'}
+                        aria-label={!isPlaying ? 'Start music' : isMuted ? 'Unmute music' : 'Mute music'}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
                         animate={!isPlaying ? { scale: [1, 1.1, 1] } : {}}
