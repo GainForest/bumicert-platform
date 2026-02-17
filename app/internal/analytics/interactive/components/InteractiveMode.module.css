@@ -328,7 +328,7 @@
     font-size: 2.25rem;
     letter-spacing: 0.08em;
     color: var(--bumi-primary-light);
-    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+    text-shadow: 2px 2px 0 oklch(0 0 0 / 0.3);
     display: block;
 }
 
