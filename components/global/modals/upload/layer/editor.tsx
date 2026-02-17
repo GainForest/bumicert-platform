@@ -8,12 +8,16 @@ import {
   ModalHeader,
   ModalTitle,
 } from "@/components/ui/modal/modal";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useMemo, useState } from "react";
+import { allowedPDSDomains } from "@/config/climateai-sdk";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { trpcApi } from "@/components/providers/TrpcProvider";
 import { GetRecordResponse } from "climateai-sdk/types";
 import { AppGainforestOrganizationLayer } from "climateai-sdk/lex-api";
+import { useAtprotoStore } from "@/components/stores/atproto";
+import { parseAtUri } from "climateai-sdk/utilities/atproto";
 import {
   Select,
   SelectContent,
@@ -48,6 +52,10 @@ const layerTypes: {
 export const LayerEditorModal = ({ initialData }: LayerEditorModalProps) => {
   const initialLayer = initialData?.value;
   const mode = initialData ? "edit" : "add";
+  const rkey = useMemo(
+    () => (initialData?.uri ? parseAtUri(initialData.uri).rkey : undefined),
+    [initialData]
+  );
 
   const [name, setName] = useState(initialLayer?.name ?? "");
   const [type, setType] = useState<
@@ -58,61 +66,43 @@ export const LayerEditorModal = ({ initialData }: LayerEditorModalProps) => {
     initialLayer?.description ?? ""
   );
 
+  const auth = useAtprotoStore((state) => state.auth);
+  const did = auth.user?.did ?? "";
+
   const { stack, popModal, hide } = useModal();
+  const utils = trpcApi.useUtils();
+  const layerRouter = trpcApi.gainforest.organization.layer;
 
-  // TODO: SDK does not yet support layer.createOrUpdate - this feature is temporarily disabled
-  // Once climateai-sdk adds the createOrUpdate procedure for layers, uncomment the following:
-  // import { useMemo } from "react";
-  // import { allowedPDSDomains } from "@/config/climateai-sdk";
-  // import { trpcApi } from "@/components/providers/TrpcProvider";
-  // import { useAtprotoStore } from "@/components/stores/atproto";
-  // import { parseAtUri } from "climateai-sdk/utilities/atproto";
-  //
-  // const rkey = useMemo(
-  //   () => (initialData?.uri ? parseAtUri(initialData.uri).rkey : undefined),
-  //   [initialData]
-  // );
-  // const auth = useAtprotoStore((state) => state.auth);
-  // const did = auth.user?.did ?? "";
-  // const utils = trpcApi.useUtils();
-  // const layerRouter = trpcApi.gainforest.organization.layer;
-  // const [isCompleted, setIsCompleted] = useState(false);
-  //
-  // const {
-  //   mutate: handleCreateOrUpdate,
-  //   isPending,
-  //   error,
-  // } = layerRouter.createOrUpdate.useMutation({
-  //   onSuccess: () => {
-  //     utils.gainforest.organization.layer.getAll.invalidate({
-  //       did,
-  //       pdsDomain: allowedPDSDomains[0],
-  //     });
-  //     setIsCompleted(true);
-  //   },
-  // });
+  const [isCompleted, setIsCompleted] = useState(false);
 
-  const isCompleted = false; // Will be state when feature is enabled
-  const isPending = false;
-  const error = null;
-  const isFeatureDisabled = true; // Remove this when SDK supports layer.createOrUpdate
+  const {
+    mutate: handleCreateOrUpdate,
+    isPending,
+    error,
+  } = layerRouter.createOrUpdate.useMutation({
+    onSuccess: () => {
+      utils.gainforest.organization.layer.getAll.invalidate({
+        did,
+        pdsDomain: allowedPDSDomains[0],
+      });
+      setIsCompleted(true);
+    },
+  });
 
-  const disableSubmit = !name.trim() || !type || !uri.trim() || isFeatureDisabled;
+  const disableSubmit = !name.trim() || !type || !uri.trim();
 
   const onSubmit = () => {
-    // TODO: Restore when SDK supports layer.createOrUpdate
-    // handleCreateOrUpdate({
-    //   did,
-    //   rkey,
-    //   layer: {
-    //     name: name.trim(),
-    //     type: type as AppGainforestOrganizationLayer.Record["type"],
-    //     uri: uri.trim(),
-    //     description: description.trim() || undefined,
-    //   },
-    //   pdsDomain: allowedPDSDomains[0],
-    // });
-    console.warn("Layer create/update is not yet supported by the SDK");
+    handleCreateOrUpdate({
+      did,
+      rkey,
+      layer: {
+        name: name.trim(),
+        type: type as AppGainforestOrganizationLayer.Record["type"],
+        uri: uri.trim(),
+        description: description.trim() || undefined,
+      },
+      pdsDomain: allowedPDSDomains[0],
+    });
   };
 
   return (
@@ -219,22 +209,14 @@ export const LayerEditorModal = ({ initialData }: LayerEditorModalProps) => {
 
             {error && (
               <div className="text-sm text-destructive">
-                {String(error)}
-              </div>
-            )}
-
-            {isFeatureDisabled && (
-              <div className="text-sm text-muted-foreground bg-muted p-3 rounded-md">
-                Layer creation/editing is coming soon. This feature is not yet available.
+                {error.message.startsWith("[") ? "Bad request" : error.message}
               </div>
             )}
 
             <ModalFooter>
               <Button onClick={onSubmit} disabled={disableSubmit || isPending}>
                 {isPending && <Loader2 className="animate-spin mr-2" />}
-                {isFeatureDisabled
-                  ? "Coming soon"
-                  : mode === "edit"
+                {mode === "edit"
                   ? isPending
                     ? "Saving..."
                     : "Save"

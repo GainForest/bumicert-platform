@@ -72,42 +72,6 @@ export type Database = {
         }
         Relationships: []
       }
-      email_otps: {
-        Row: {
-          id: string
-          email: string
-          code: string
-          purpose: string
-          expires_at: string
-          attempts: number
-          verified_at: string | null
-          created_at: string
-          metadata: Json | null
-        }
-        Insert: {
-          id?: string
-          email: string
-          code: string
-          purpose: string
-          expires_at: string
-          attempts?: number
-          verified_at?: string | null
-          created_at?: string
-          metadata?: Json | null
-        }
-        Update: {
-          id?: string
-          email?: string
-          code?: string
-          purpose?: string
-          expires_at?: string
-          attempts?: number
-          verified_at?: string | null
-          created_at?: string
-          metadata?: Json | null
-        }
-        Relationships: []
-      }
       form_events: {
         Row: {
           context: Json | null
@@ -410,27 +374,6 @@ export type Database = {
           feedback?: string | null
           id?: number
           rating?: number
-        }
-        Relationships: []
-      }
-      rate_limits: {
-        Row: {
-          id: string
-          identifier: string
-          endpoint: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          identifier: string
-          endpoint: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          identifier?: string
-          endpoint?: string
-          created_at?: string
         }
         Relationships: []
       }
