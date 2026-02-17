@@ -7,7 +7,7 @@ import SiteBoundaries from "./SiteBoundaries";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ChevronDownIcon } from "lucide-react";
-import { OrgHypercertsClaimActivity, AppBskyRichtextFacet } from "gainforest-sdk/lex-api";
+import { OrgHypercertsClaimActivity } from "gainforest-sdk/lex-api";
 import {
   deserialize,
   SerializedSuperjson,
@@ -15,40 +15,8 @@ import {
 import {
   RichTextDisplay,
   type RichTextRecord,
-  type FacetFeature,
 } from "bsky-richtext-react";
-import { richTextDisplayClassNames } from "@/lib/richtext";
-
-const KNOWN_FEATURE_TYPES = new Set([
-  "app.bsky.richtext.facet#mention",
-  "app.bsky.richtext.facet#link",
-  "app.bsky.richtext.facet#tag",
-]);
-
-/**
- * Type guard that checks whether an SDK facet feature is a known
- * bsky-richtext-react FacetFeature (mention, link, or tag).
- * The SDK's facet type includes a catch-all `{ $type: string }` in the
- * features union; this guard narrows it to the three concrete types.
- */
-function isKnownFacetFeature(
-  f: AppBskyRichtextFacet.Main["features"][number]
-): f is FacetFeature {
-  return typeof f.$type === "string" && KNOWN_FEATURE_TYPES.has(f.$type);
-}
-
-/**
- * Converts SDK facets (AppBskyRichtextFacet.Main[]) to bsky-richtext-react
- * Facet[] by filtering out any features with unknown $type values.
- */
-function toRichTextFacets(
-  facets: AppBskyRichtextFacet.Main[]
-): RichTextRecord["facets"] {
-  return facets.map((facet) => ({
-    index: facet.index,
-    features: facet.features.filter(isKnownFacetFeature),
-  }));
-}
+import { richTextDisplayClassNames, toRichTextFacets } from "@/lib/richtext";
 
 // Custom hook to handle collapsible content
 const useCollapsible = (maxHeight: number = 320) => {

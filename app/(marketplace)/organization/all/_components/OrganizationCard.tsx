@@ -5,29 +5,13 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { countries } from "@/lib/countries";
-import { richTextDisplayClassNames } from "@/lib/richtext";
-import type { AppGainforestCommonDefs } from "gainforest-sdk/lex-api";
-import { type RichTextRecord, type FacetFeature } from "bsky-richtext-react";
+import { richTextDisplayClassNames, toRichTextRecord } from "@/lib/richtext";
 import type { OrganizationWithBumicertCount } from "../page";
 
 const DynamicRichTextDisplay = dynamic(
   () => import("bsky-richtext-react").then((mod) => mod.RichTextDisplay),
   { ssr: false }
 );
-
-function toRichTextRecord(richtext: AppGainforestCommonDefs.Richtext): RichTextRecord {
-  return {
-    text: richtext.text,
-    facets: richtext.facets?.map((facet) => ({
-      index: facet.index,
-      features: facet.features.filter((f): f is FacetFeature =>
-        f.$type === "app.bsky.richtext.facet#mention" ||
-        f.$type === "app.bsky.richtext.facet#link" ||
-        f.$type === "app.bsky.richtext.facet#tag"
-      ),
-    })),
-  };
-}
 
 interface OrganizationCardProps {
   organization: OrganizationWithBumicertCount;

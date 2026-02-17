@@ -28,15 +28,15 @@ const EMPTY_LINEAR_DOCUMENT = { blocks: [] };
 
 const AboutOrganization = ({
   initialData,
-  dynamic = true,
+  enableReactiveData = true,
 }: {
   initialData: SerializedSuperjson<AppGainforestOrganizationInfo.Record>;
-  dynamic?: boolean;
+  enableReactiveData?: boolean;
 }) => {
   const reactiveData = useOrganizationPageStore((state) => state.data);
   const data = useHydratedData(
     deserialize(initialData),
-    dynamic ? reactiveData : null
+    enableReactiveData ? reactiveData : null
   );
   const isEditing = useOrganizationPageStore((state) => state.isEditing);
   const editingData = useOrganizationPageStore(

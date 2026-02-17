@@ -7,10 +7,9 @@ import QuickTooltip from "@/components/ui/quick-tooltip";
 import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import useHydratedData from "@/hooks/use-hydration";
 import { cn } from "@/lib/utils";
-import { richTextEditorClassNames, richTextDisplayClassNames } from "@/lib/richtext";
+import { richTextEditorClassNames, richTextDisplayClassNames, toRichTextRecord } from "@/lib/richtext";
 import { AnimatePresence, motion } from "framer-motion";
-import type { AppGainforestOrganizationInfo, AppGainforestCommonDefs } from "gainforest-sdk/lex-api";
-import { type RichTextRecord, type FacetFeature } from "bsky-richtext-react";
+import type { AppGainforestOrganizationInfo } from "gainforest-sdk/lex-api";
 import { getBlobUrl } from "gainforest-sdk/utilities/atproto";
 import {
   deserialize,
@@ -34,20 +33,6 @@ const DynamicRichTextDisplay = dynamic(
   () => import("bsky-richtext-react").then(mod => mod.RichTextDisplay),
   { ssr: false }
 );
-
-function toRichTextRecord(richtext: AppGainforestCommonDefs.Richtext): RichTextRecord {
-  return {
-    text: richtext.text,
-    facets: richtext.facets?.map((facet) => ({
-      index: facet.index,
-      features: facet.features.filter((f): f is FacetFeature =>
-        f.$type === "app.bsky.richtext.facet#mention" ||
-        f.$type === "app.bsky.richtext.facet#link" ||
-        f.$type === "app.bsky.richtext.facet#tag"
-      ),
-    })),
-  };
-}
 
 const Hero = ({
   initialData,
