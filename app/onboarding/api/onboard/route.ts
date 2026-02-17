@@ -35,6 +35,7 @@ import {
 } from "@/config/gainforest-sdk";
 import { gainforestSdk } from "@/config/gainforest-sdk.server";
 import { getSupabaseAdmin } from "@/lib/supabase/server";
+import { checkRateLimit, recordRateLimitAttempt, getClientIp, RATE_LIMITS } from "@/lib/rate-limit";
 import { organizationInfoSchema } from "./schema";
 
 const VALID_OBJECTIVES = ["Conservation", "Research", "Education", "Community", "Other"] as const;
@@ -86,6 +87,20 @@ async function fileToBase64(file: File): Promise<{ name: string; type: string; d
 
 export async function POST(req: NextRequest) {
   try {
+    const clientIp = getClientIp(req.headers);
+
+    const ipLimit = await checkRateLimit(
+      `ip:${clientIp}`,
+      'onboard',
+      RATE_LIMITS.onboard.byIp
+    );
+    if (!ipLimit.allowed) {
+      return Response.json(
+        { error: 'RateLimitExceeded', message: 'Too many requests' },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil((ipLimit.resetAt.getTime() - Date.now()) / 1000)) } }
+      );
+    }
+
     const formData = await req.formData();
 
     // Extract form fields
@@ -235,6 +250,9 @@ export async function POST(req: NextRequest) {
 
     const accountData = (await accountResponse.json()) as AccountCreationResponse;
     const { did, accessJwt, refreshJwt } = accountData;
+
+    // Record rate limit attempt after successful account creation
+    await recordRateLimitAttempt(`ip:${clientIp}`, 'onboard');
 
     // Step 4: Prepare logo upload if provided
     let logoUpload: { name: string; type: string; dataBase64: string } | undefined;

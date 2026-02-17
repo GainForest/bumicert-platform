@@ -1,5 +1,11 @@
 import { NextRequest } from "next/server";
 import { defaultPdsDomain } from "@/config/gainforest-sdk";
+import {
+  checkRateLimit,
+  recordRateLimitAttempt,
+  getClientIp,
+  RATE_LIMITS,
+} from "@/lib/rate-limit";
 
 /**
  * POST /api/atproto/reset-password
@@ -13,6 +19,28 @@ import { defaultPdsDomain } from "@/config/gainforest-sdk";
  */
 export async function POST(req: NextRequest) {
   try {
+    const clientIp = getClientIp(req.headers);
+
+    const ipLimit = await checkRateLimit(
+      `ip:${clientIp}`,
+      "password-reset",
+      RATE_LIMITS.passwordReset.byIp
+    );
+    if (!ipLimit.allowed) {
+      return new Response(
+        JSON.stringify({ error: "RateLimitExceeded", message: "Too many requests" }),
+        {
+          status: 429,
+          headers: {
+            "Content-Type": "application/json",
+            "Retry-After": String(
+              Math.ceil((ipLimit.resetAt.getTime() - Date.now()) / 1000)
+            ),
+          },
+        }
+      );
+    }
+
     const body = (await req.json()) as { token?: string; password?: string };
     let { token, password } = body;
     token = (token ?? "").trim();
@@ -59,6 +87,9 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify({ token, password }),
       }
     );
+
+    // Record attempt regardless of PDS success/failure to prevent brute-force token guessing
+    await recordRateLimitAttempt(`ip:${clientIp}`, "password-reset");
 
     if (!response.ok) {
       const error = await response.json();
