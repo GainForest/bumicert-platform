@@ -52,20 +52,20 @@ function toRichTextRecord(richtext: AppGainforestCommonDefs.Richtext): RichTextR
 const Hero = ({
   initialData,
   initialDid,
-  dynamic = true,
+  enableReactiveData = true,
 }: {
   initialData: SerializedSuperjson<AppGainforestOrganizationInfo.Record>;
   initialDid: string;
-  dynamic?: boolean;
+  enableReactiveData?: boolean;
 }) => {
   const reactiveData = useOrganizationPageStore((state) => state.data);
   const data = useHydratedData(
     deserialize(initialData),
-    dynamic ? reactiveData : null
+    enableReactiveData ? reactiveData : null
   );
 
   const reactiveDid = useOrganizationPageStore((state) => state.did);
-  const did = useHydratedData(initialDid, dynamic ? reactiveDid : null);
+  const did = useHydratedData(initialDid, enableReactiveData ? reactiveDid : null);
 
   const isEditing = useOrganizationPageStore((state) => state.isEditing);
   const editingData = useOrganizationPageStore(

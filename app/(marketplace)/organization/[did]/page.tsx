@@ -84,7 +84,7 @@ const OrganizationPage = async ({
     >
       <Container>
         <HeaderContent did={did} />
-        <Hero initialData={serializedData} initialDid={did} dynamic={false} />
+        <Hero initialData={serializedData} initialDid={did} enableReactiveData={false} />
         <SubHero initialData={serializedData} dynamic={false} />
         <AboutOrganization initialData={serializedData} dynamic={false} />
         <hr />
