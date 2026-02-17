@@ -16,9 +16,8 @@ import {
   RichTextDisplay,
   type RichTextRecord,
   type FacetFeature,
-  defaultDisplayClassNames,
-  generateClassNames,
 } from "bsky-richtext-react";
+import { richTextDisplayClassNames } from "@/lib/richtext";
 
 const KNOWN_FEATURE_TYPES = new Set([
   "app.bsky.richtext.facet#mention",
@@ -106,10 +105,7 @@ const CollapsibleDescription = ({
         <div className="p-3">
           <RichTextDisplay
             value={{ text: description, facets: descriptionFacets }}
-            classNames={generateClassNames([defaultDisplayClassNames, {
-              mention: "text-primary",
-              link: "text-primary",
-            }], cn)}
+            classNames={richTextDisplayClassNames}
           />
         </div>
       </div>

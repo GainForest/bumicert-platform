@@ -8,8 +8,7 @@ import useNewBumicertStore from "../../store";
 import { Button } from "@/components/ui/button";
 import QuickTooltip from "@/components/ui/quick-tooltip";
 import dynamic from 'next/dynamic';
-import { defaultEditorClassNames, generateClassNames } from "bsky-richtext-react";
-import { cn } from "@/lib/utils";
+import { richTextEditorClassNames } from "@/lib/richtext";
 const DynamicRichTextEditor = dynamic(
   () => import('bsky-richtext-react').then((mod) => mod.RichTextEditor),
   { ssr: false }  // <-- This is critical!
@@ -55,10 +54,7 @@ const Step2 = () => {
               setFormValue("descriptionFacets", record.facets);
             }}
             placeholder="Describe your impact story..."
-            classNames={generateClassNames([defaultEditorClassNames, {
-              mention: "text-primary",
-              link: "text-primary",
-            }], cn)}
+            classNames={richTextEditorClassNames}
             className="min-h-[200px]"
           />
         </div>
