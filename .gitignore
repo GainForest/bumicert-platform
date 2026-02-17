@@ -45,5 +45,9 @@ bun.lock
 bun.lockb
 yarn.lock
 
-# Audio files (large assets)
-public/audio
+# agent stuff
+AGENTS.local.md
+agent-docs/
+app/agents-test-pages/
+
+/public/audio
