@@ -1,10 +1,32 @@
 "use client";
 
-import { Building2, BuildingIcon, Globe, Leaf } from "lucide-react";
+import { BuildingIcon, Globe, Leaf } from "lucide-react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { countries } from "@/lib/countries";
+import type { AppGainforestCommonDefs } from "gainforest-sdk/lex-api";
+import type { RichTextRecord, FacetFeature } from "bsky-richtext-react";
 import type { OrganizationWithBumicertCount } from "../page";
+
+const DynamicRichTextDisplay = dynamic(
+  () => import("bsky-richtext-react").then((mod) => mod.RichTextDisplay),
+  { ssr: false }
+);
+
+function toRichTextRecord(richtext: AppGainforestCommonDefs.Richtext): RichTextRecord {
+  return {
+    text: richtext.text,
+    facets: richtext.facets?.map((facet) => ({
+      index: facet.index,
+      features: facet.features.filter((f): f is FacetFeature =>
+        f.$type === "app.bsky.richtext.facet#mention" ||
+        f.$type === "app.bsky.richtext.facet#link" ||
+        f.$type === "app.bsky.richtext.facet#tag"
+      ),
+    })),
+  };
+}
 
 interface OrganizationCardProps {
   organization: OrganizationWithBumicertCount;
@@ -50,9 +72,13 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="text-sm text-muted-foreground line-clamp-4 p-1">
-          {organization.shortDescription}
-        </p>
+        <div className="text-sm text-muted-foreground line-clamp-4 p-1">
+          {organization.shortDescription.text ? (
+            <DynamicRichTextDisplay value={toRichTextRecord(organization.shortDescription)} />
+          ) : (
+            "No description provided."
+          )}
+        </div>
       </div>
 
       <div className="mt-4 flex items-center justify-between">
