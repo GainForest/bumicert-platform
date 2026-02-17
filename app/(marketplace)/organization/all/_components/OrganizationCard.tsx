@@ -1,13 +1,13 @@
 "use client";
 
 import { BuildingIcon, Globe, Leaf } from "lucide-react";
-import { cn } from "@/lib/utils";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { countries } from "@/lib/countries";
+import { richTextDisplayClassNames } from "@/lib/richtext";
 import type { AppGainforestCommonDefs } from "gainforest-sdk/lex-api";
-import { defaultDisplayClassNames, generateClassNames, type RichTextRecord, type FacetFeature } from "bsky-richtext-react";
+import { type RichTextRecord, type FacetFeature } from "bsky-richtext-react";
 import type { OrganizationWithBumicertCount } from "../page";
 
 const DynamicRichTextDisplay = dynamic(
@@ -75,7 +75,7 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
       <div className="flex-1 min-w-0">
         <div className="text-sm text-muted-foreground line-clamp-4 p-1">
           {organization.shortDescription.text ? (
-            <DynamicRichTextDisplay value={toRichTextRecord(organization.shortDescription)} classNames={generateClassNames([defaultDisplayClassNames, { mention: "text-primary", link: "text-primary" }], cn)} />
+            <DynamicRichTextDisplay value={toRichTextRecord(organization.shortDescription)} classNames={richTextDisplayClassNames} />
           ) : (
             "No description provided."
           )}

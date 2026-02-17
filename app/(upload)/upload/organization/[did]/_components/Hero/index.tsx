@@ -7,9 +7,10 @@ import QuickTooltip from "@/components/ui/quick-tooltip";
 import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import useHydratedData from "@/hooks/use-hydration";
 import { cn } from "@/lib/utils";
+import { richTextEditorClassNames, richTextDisplayClassNames } from "@/lib/richtext";
 import { AnimatePresence, motion } from "framer-motion";
 import type { AppGainforestOrganizationInfo, AppGainforestCommonDefs } from "gainforest-sdk/lex-api";
-import { defaultEditorClassNames, defaultDisplayClassNames, generateClassNames, type RichTextRecord, type FacetFeature } from "bsky-richtext-react";
+import { type RichTextRecord, type FacetFeature } from "bsky-richtext-react";
 import { getBlobUrl } from "gainforest-sdk/utilities/atproto";
 import {
   deserialize,
@@ -271,10 +272,7 @@ const Hero = ({
                   });
                 }}
                 placeholder="No short description provided."
-                classNames={generateClassNames([defaultEditorClassNames, {
-                  mention: "text-primary",
-                  link: "text-primary",
-                }], cn)}
+                classNames={richTextEditorClassNames}
                 className={cn(
                   "w-full outline-none focus:outline-none rounded-lg py-1 px-2 ring-2 ring-black/20 dark:ring-white/20 focus:ring-primary dark:focus:ring-primary",
                   shortDescriptionError &&
@@ -284,7 +282,7 @@ const Hero = ({
             ) : (
               <div className={cn("w-full mt-2", !data?.shortDescription?.text && "text-muted-foreground")}>
                 {data?.shortDescription?.text ? (
-                  <DynamicRichTextDisplay value={toRichTextRecord(data.shortDescription)} classNames={generateClassNames([defaultDisplayClassNames, { mention: "text-primary", link: "text-primary" }], cn)} />
+                  <DynamicRichTextDisplay value={toRichTextRecord(data.shortDescription)} classNames={richTextDisplayClassNames} />
                 ) : (
                   "No short description provided."
                 )}
