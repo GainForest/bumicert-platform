@@ -86,6 +86,12 @@ export const LayerEditorModal = ({ initialData }: LayerEditorModalProps) => {
     console.warn("Layer create/update is not yet supported by the SDK");
   };
 
+  const getButtonText = () => {
+    if (isFeatureDisabled) return 'Coming soon';
+    if (mode === 'edit') return isPending ? 'Saving...' : 'Save';
+    return isPending ? 'Adding...' : 'Add layer';
+  };
+
   return (
     <ModalContent>
       <ModalHeader
@@ -203,15 +209,7 @@ export const LayerEditorModal = ({ initialData }: LayerEditorModalProps) => {
             <ModalFooter>
               <Button onClick={onSubmit} disabled={disableSubmit || isPending}>
                 {isPending && <Loader2 className="animate-spin mr-2" />}
-                {isFeatureDisabled
-                  ? "Coming soon"
-                  : mode === "edit"
-                  ? isPending
-                    ? "Saving..."
-                    : "Save"
-                  : isPending
-                  ? "Adding..."
-                  : "Add layer"}
+                {getButtonText()}
               </Button>
             </ModalFooter>
           </motion.section>
