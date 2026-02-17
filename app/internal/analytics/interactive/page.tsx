@@ -148,6 +148,12 @@ export default function InteractiveModePage(): React.ReactElement {
 
     // Handle click navigation
     const handleCardClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+        // Don't navigate when clicking interactive elements inside cards
+        const target = e.target as Element;
+        if (target.closest('button, a, input, textarea, select, [role="button"]')) {
+            return;
+        }
+
         const rect = e.currentTarget.getBoundingClientRect();
         const clickX = e.clientX - rect.left;
         const midpoint = rect.width / 2;
