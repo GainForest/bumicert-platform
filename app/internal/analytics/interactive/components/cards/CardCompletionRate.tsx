@@ -9,7 +9,7 @@ import type { BaseCardProps } from '../types';
 
 export default function CardCompletionRate({ data, isActive }: BaseCardProps): ReactElement {
     const animatedRate = useAnimatedNumber(
-        Math.round(data.completionRate * 10) / 10,
+        Math.round(data.completionRate * 10),
         { delay: 500, duration: 1200, enabled: isActive }
     );
     const animatedCompletions = useAnimatedNumber(data.totalCompletions, { delay: 800, enabled: isActive });
@@ -33,7 +33,7 @@ export default function CardCompletionRate({ data, isActive }: BaseCardProps): R
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.5 }}
                 >
-                    <span className={styles.headlineBig}>{animatedRate.toFixed(1)}%</span>
+                    <span className={styles.headlineBig}>{(animatedRate / 10).toFixed(1)}%</span>
                 </motion.div>
                 <motion.div
                     className={styles.headlineRow}

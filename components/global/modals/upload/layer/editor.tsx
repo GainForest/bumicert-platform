@@ -60,37 +60,8 @@ export const LayerEditorModal = ({ initialData }: LayerEditorModalProps) => {
 
   const { stack, popModal, hide } = useModal();
 
-  // TODO: SDK does not yet support layer.createOrUpdate - this feature is temporarily disabled
-  // Once climateai-sdk adds the createOrUpdate procedure for layers, uncomment the following:
-  // import { useMemo } from "react";
-  // import { allowedPDSDomains } from "@/config/climateai-sdk";
-  // import { trpcApi } from "@/components/providers/TrpcProvider";
-  // import { useAtprotoStore } from "@/components/stores/atproto";
-  // import { parseAtUri } from "climateai-sdk/utilities/atproto";
-  //
-  // const rkey = useMemo(
-  //   () => (initialData?.uri ? parseAtUri(initialData.uri).rkey : undefined),
-  //   [initialData]
-  // );
-  // const auth = useAtprotoStore((state) => state.auth);
-  // const did = auth.user?.did ?? "";
-  // const utils = trpcApi.useUtils();
-  // const layerRouter = trpcApi.gainforest.organization.layer;
-  // const [isCompleted, setIsCompleted] = useState(false);
-  //
-  // const {
-  //   mutate: handleCreateOrUpdate,
-  //   isPending,
-  //   error,
-  // } = layerRouter.createOrUpdate.useMutation({
-  //   onSuccess: () => {
-  //     utils.gainforest.organization.layer.getAll.invalidate({
-  //       did,
-  //       pdsDomain: allowedPDSDomains[0],
-  //     });
-  //     setIsCompleted(true);
-  //   },
-  // });
+  // TODO: Restore layer.createOrUpdate when SDK supports it
+  // See: https://github.com/GainForest/bumicerts-platform/issues/TBD
 
   const isCompleted = false; // Will be state when feature is enabled
   const isPending = false;
@@ -219,7 +190,7 @@ export const LayerEditorModal = ({ initialData }: LayerEditorModalProps) => {
 
             {error && (
               <div className="text-sm text-destructive">
-                {String(error)}
+                {(error as { message?: string })?.message ?? String(error)}
               </div>
             )}
 
