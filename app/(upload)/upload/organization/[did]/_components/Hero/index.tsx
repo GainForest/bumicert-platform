@@ -8,7 +8,8 @@ import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import useHydratedData from "@/hooks/use-hydration";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import type { AppGainforestOrganizationInfo } from "gainforest-sdk/lex-api";
+import type { AppGainforestOrganizationInfo, AppGainforestCommonDefs } from "gainforest-sdk/lex-api";
+import type { RichTextRecord, FacetFeature } from "bsky-richtext-react";
 import { getBlobUrl } from "gainforest-sdk/utilities/atproto";
 import {
   deserialize,
@@ -32,6 +33,20 @@ const DynamicRichTextDisplay = dynamic(
   () => import("bsky-richtext-react").then(mod => mod.RichTextDisplay),
   { ssr: false }
 );
+
+function toRichTextRecord(richtext: AppGainforestCommonDefs.Richtext): RichTextRecord {
+  return {
+    text: richtext.text,
+    facets: richtext.facets?.map((facet) => ({
+      index: facet.index,
+      features: facet.features.filter((f): f is FacetFeature =>
+        f.$type === "app.bsky.richtext.facet#mention" ||
+        f.$type === "app.bsky.richtext.facet#link" ||
+        f.$type === "app.bsky.richtext.facet#tag"
+      ),
+    })),
+  };
+}
 
 const Hero = ({
   initialData,
@@ -79,12 +94,7 @@ const Hero = ({
   useEffect(() => {
     setEditingData({
       displayName: data.displayName,
-      // Note: data.shortDescription is AppGainforestCommonDefs.Richtext (SDK type) which uses
-      // AppBskyRichtextFacet.Main[] for facets. RichTextRecord (bsky-richtext-react) uses its
-      // own Facet[] type. These are structurally incompatible in TypeScript due to the SDK's
-      // extra `{ $type: string }` catch-all union member in features. We initialize with just
-      // the text to avoid the type mismatch; the editor will re-detect facets as the user types.
-      shortDescription: { text: data?.shortDescription?.text || "" },
+      shortDescription: data?.shortDescription ? toRichTextRecord(data.shortDescription) : { text: "" },
       coverImage: data.coverImage ? data.coverImage.image : undefined,
       logoImage: data.logo ? data.logo.image : undefined,
     });
@@ -270,12 +280,7 @@ const Hero = ({
             ) : (
               <div className={cn("w-full mt-2", !data?.shortDescription?.text && "text-muted-foreground")}>
                 {data?.shortDescription?.text ? (
-                  // Note: data.shortDescription is AppGainforestCommonDefs.Richtext (SDK type).
-                  // Its facets use AppBskyRichtextFacet.Main[] which is structurally incompatible
-                  // with bsky-richtext-react's Facet[] (the SDK adds a `{ $type: string }` catch-all
-                  // union member). We pass only the text here; facets from stored data cannot be
-                  // rendered until the SDK and bsky-richtext-react align their facet types.
-                  <DynamicRichTextDisplay value={data.shortDescription.text} />
+                  <DynamicRichTextDisplay value={toRichTextRecord(data.shortDescription)} />
                 ) : (
                   "No short description provided."
                 )}

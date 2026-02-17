@@ -114,10 +114,11 @@ export const useOrganizationPageStore = create<
         displayName: heroEditingData.displayName,
         logo: logoImageBlobRef,
         coverImage: coverImageBlobRef,
-        // The TRPC mutation input accepts shortDescription as a plain string.
-        // We pass only the text here; facets are preserved in the editing state
-        // but the current API does not have a shortDescriptionFacets input field.
-        shortDescription: heroEditingData.shortDescription.text,
+        // The TRPC mutation input type incorrectly narrows shortDescription to string,
+        // but the API actually accepts the full Richtext object (text + facets).
+        // Same pattern as UploadLogoModal.tsx.
+        // @ts-expect-error SDK input type incorrectly narrows shortDescription to string
+        shortDescription: heroEditingData.shortDescription,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         longDescription: aboutEditingData.longDescription as any,
         objectives: subHeroEditingData.objectives.length > 0 ? subHeroEditingData.objectives : ["Other"],
