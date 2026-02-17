@@ -8,7 +8,6 @@ import {
   Baskervville,
 } from "next/font/google";
 import "./globals.css";
-import "bsky-richtext-react/styles.css";
 import PrivyProvider from "@/components/providers/PrivyProvider";
 import { NavbarContextProvider } from "@/components/global/Navbar/context";
 import NavbarLayout from "@/components/global/Navbar/NavbarLayout";

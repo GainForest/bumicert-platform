@@ -7,13 +7,13 @@ import { useFormStore } from "../../form-store";
 import useNewBumicertStore from "../../store";
 import { Button } from "@/components/ui/button";
 import QuickTooltip from "@/components/ui/quick-tooltip";
-import 'bsky-richtext-react/styles.css';
-import dynamic from "next/dynamic";
-
-const DynamicRichTextEditor = dynamic(() => import('bsky-richtext-react').then(mod => mod.RichTextEditor), {
-  ssr: false
-});
-
+import dynamic from 'next/dynamic';
+import { defaultEditorClassNames, generateClassNames } from "bsky-richtext-react";
+import { cn } from "@/lib/utils";
+const DynamicRichTextEditor = dynamic(
+  () => import('bsky-richtext-react').then((mod) => mod.RichTextEditor),
+  { ssr: false }  // <-- This is critical!
+);
 const Step2 = () => {
   const { maxStepIndexReached, currentStepIndex } = useNewBumicertStore();
   const shouldShowValidationErrors = currentStepIndex < maxStepIndexReached;
@@ -29,6 +29,8 @@ const Step2 = () => {
   useEffect(() => {
     updateErrorsAndCompletion();
   }, [shouldShowValidationErrors]);
+
+  console.log("==============", { description, descriptionFacets });
 
   return (
     <div>
@@ -48,12 +50,16 @@ const Step2 = () => {
       >
         <div className="w-full bg-background rounded-md border border-border overflow-hidden p-3">
           <DynamicRichTextEditor
-            initialValue={{ text: description, facets: descriptionFacets || [] }}
+            initialValue={{ text: description, facets: undefined }}
             onChange={(record) => {
               setFormValue("description", record.text);
               setFormValue("descriptionFacets", record.facets);
             }}
             placeholder="Describe your impact story..."
+            classNames={generateClassNames([defaultEditorClassNames, {
+              mention: "text-primary",
+              link: "text-primary",
+            }], cn)}
             className="min-h-[200px]"
           />
         </div>
