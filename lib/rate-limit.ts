@@ -151,12 +151,14 @@ export const RATE_LIMITS = {
   passwordReset: {
     byIp: { windowMs: 15 * 60 * 1000, maxAttempts: 10 }, // 10 per 15 min per IP
   },
-  onboardingSubmit: {
+  sendInviteEmail: {
     byIp: { windowMs: 60 * 60 * 1000, maxAttempts: 10 }, // 10 per hour per IP
-    byEmail: { windowMs: 60 * 60 * 1000, maxAttempts: 5 }, // 5 per hour per email
+    byEmail: { windowMs: 5 * 60 * 1000, maxAttempts: 1 }, // 1 per 5 min per email
   },
-  onboardingEmailVerify: {
+  verifyInviteCode: {
     byIp: { windowMs: 15 * 60 * 1000, maxAttempts: 20 }, // 20 per 15 min per IP
-    byEmail: { windowMs: 15 * 60 * 1000, maxAttempts: 10 }, // 10 per 15 min per email
+  },
+  onboard: {
+    byIp: { windowMs: 60 * 60 * 1000, maxAttempts: 5 }, // 5 per hour per IP
   },
 } as const;
