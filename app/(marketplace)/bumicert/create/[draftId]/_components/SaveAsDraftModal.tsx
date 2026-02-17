@@ -119,7 +119,9 @@ const SaveAsDraftModal = () => {
         description: step2.description || undefined,
         shortDescription: step2.shortDescription || undefined,
         contributors:
-          step3.contributors.length > 0 ? step3.contributors : undefined,
+          step3.contributors.length > 0
+            ? step3.contributors.map((c) => c.name)
+            : undefined,
         siteBoundaries:
           step3.siteBoundaries.length > 0 ? step3.siteBoundaries : undefined,
       };

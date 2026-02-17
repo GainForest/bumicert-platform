@@ -45,9 +45,16 @@ export const step2InitialValues: Step2FormValues = {
   shortDescription: "",
 };
 
+const contributorSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "All contributors must have a name"),
+});
+
+export type Contributor = z.infer<typeof contributorSchema>;
+
 export const step3Schema = z.object({
   contributors: z
-    .array(z.string().min(1, "All contributors must have a name"))
+    .array(contributorSchema)
     .min(1, "Required")
     .describe("List of Contributors"),
   siteBoundaries: z

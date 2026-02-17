@@ -3,13 +3,13 @@
 import Container from "@/components/ui/container";
 import GenericErrorPage from "@/components/error-page";
 
-const ErrorPage = ({ error }: { error: Error }) => {
+const ErrorPage = ({ error }: { error: Error | string }) => {
   console.error(error);
   return (
     <Container>
       <GenericErrorPage
-        title={error.message}
-        description="We are unable to display the organization you are looking for."
+        title={typeof error === "string" ? error : error.message}
+        description="We are unable to display the organization."
         showRefreshButton={false}
       />
     </Container>

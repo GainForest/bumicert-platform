@@ -5,14 +5,15 @@ import CircularProgressBar from "@/components/circular-progressbar";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
-import { Ecocert as Bumicert } from "climateai-sdk/types";
-import { getBlobUrl } from "climateai-sdk/utilities/atproto";
-import { OrgHypercertsDefs as Defs } from "climateai-sdk/lex-api";
-import { $Typed } from "climateai-sdk/lex-api/utils";
+import { Ecocert as Bumicert } from "gainforest-sdk/types";
+import { getBlobUrl } from "gainforest-sdk/utilities/atproto";
+import { OrgHypercertsDefs as Defs } from "gainforest-sdk/lex-api";
+import { $Typed } from "gainforest-sdk/lex-api/utils";
 import { BumicertArt } from "@/app/(marketplace)/bumicert/create/[draftId]/_components/Steps/Step4/BumicertPreviewCard";
-import { parseAtUri } from "climateai-sdk/utilities/atproto";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { parseAtUri } from "gainforest-sdk/utilities/atproto";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { links } from "@/lib/links";
+import { getWorkScopeItems } from "@/lib/bumicert";
 
 const StripedDiv = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -63,9 +64,9 @@ const BumicertCard = ({ bumicert }: { bumicert: Bumicert }) => {
           logoUrl={bumicert.organizationInfo.logoUrl}
           coverImage={imageUrl}
           title={bumicert.claimActivity.value.title}
-          objectives={bumicert.claimActivity.value.workScope?.withinAnyOf ?? []}
-          startDate={new Date(bumicert.claimActivity.value.startDate)}
-          endDate={new Date(bumicert.claimActivity.value.endDate)}
+          objectives={getWorkScopeItems(bumicert.claimActivity.value.workScope)}
+          startDate={bumicert.claimActivity.value.startDate ? new Date(bumicert.claimActivity.value.startDate) : undefined}
+          endDate={bumicert.claimActivity.value.endDate ? new Date(bumicert.claimActivity.value.endDate) : undefined}
         />
       </Link>
     </motion.div>

@@ -6,14 +6,14 @@ import {
   ModalHeader,
   ModalTitle,
 } from "@/components/ui/modal/modal";
-import { getBlobUrl } from "climateai-sdk/utilities/atproto";
-import { BlobRef } from "climateai-sdk/zod";
+import { getBlobUrl } from "gainforest-sdk/utilities/atproto";
+import { BlobRef } from "gainforest-sdk/zod";
 import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Loader2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useModal } from "@/components/ui/modal/context";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 
 const isBlobRef = (value: unknown): value is BlobRef => {
   return Boolean(value && typeof value === "object" && "ref" in value);

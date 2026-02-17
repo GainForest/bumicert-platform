@@ -6,18 +6,26 @@ export type ClientLink = {
   Mobile: FC;
 };
 
-export type NavLinkConfig = {
+type NavLinkBase = {
   id: string;
   showIconOnlyOnDesktop?: boolean;
   openInNewTab?: boolean;
-  pathCheck:
-    | {
-        equals: string | ((did?: string) => string);
-      }
-    | {
-        startsWith: string | ((did?: string) => string);
-      };
-  href: string | ((did?: string) => string);
-  text: string;
   Icon: FC<LucideProps>;
+  text: string;
 };
+
+export type NavLinkLeaf = NavLinkBase & {
+  href: string | ((did?: string) => string);
+  pathCheck:
+    | { equals: string | ((did?: string) => string) }
+    | { startsWith: string | ((did?: string) => string) };
+  children?: never;
+};
+
+type NavLinkGroup = NavLinkBase & {
+  children: NavLinkLeaf[];
+  href?: never;
+  pathCheck?: never;
+};
+
+export type NavLinkConfig = NavLinkLeaf | NavLinkGroup;

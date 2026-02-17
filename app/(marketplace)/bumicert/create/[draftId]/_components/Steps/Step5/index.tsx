@@ -6,22 +6,24 @@ import {
   ArrowRightIcon,
   CircleAlertIcon,
   CircleCheckIcon,
+  Hand,
   Loader2,
   LucideIcon,
+  PartyPopper,
   ShieldCheckIcon,
   ShieldXIcon,
 } from "lucide-react";
 
 import { useAtprotoStore } from "@/components/stores/atproto";
-import { allowedPDSDomains, trpcClient } from "@/config/climateai-sdk";
+import { allowedPDSDomains, trpcClient } from "@/config/gainforest-sdk";
 import { cn } from "@/lib/utils";
 import { useFormStore } from "../../../form-store";
 import { useStep5Store } from "./store";
-import { toFileGenerator } from "climateai-sdk/zod";
+import { toFileGenerator } from "gainforest-sdk/zod";
 import { links } from "@/lib/links";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { parseAtUri } from "climateai-sdk/utilities/atproto";
+import { parseAtUri } from "gainforest-sdk/utilities/atproto";
 import { trpcApi } from "@/components/providers/TrpcProvider";
 import { usePathname } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
@@ -34,15 +36,18 @@ const ProgressItem = ({
   description,
   status,
   isLastStep = false,
+  children,
 }: {
   iconset: {
     Error: LucideIcon;
     Success: LucideIcon;
+    Input?: LucideIcon;
   };
   title: string;
   description: string;
-  status: "pending" | "success" | "error";
+  status: "pending" | "success" | "error" | "input";
   isLastStep?: boolean;
+  children?: React.ReactNode;
 }) => {
   return (
     <motion.div
@@ -77,26 +82,34 @@ const ProgressItem = ({
 
       <div
         className={cn(
-          "relative z-5 bg-primary p-2 rounded-full",
+          "relative h-12 w-12 z-5 bg-primary rounded-full border border-transparent flex items-center justify-center",
           status === "error" && "bg-destructive",
-          status === "pending" && "bg-background border border-border"
+          status === "pending" && "bg-background border-border",
+          status === "input" && "bg-background border-border"
         )}
       >
         {status === "error" ? (
           <iconset.Error className="size-8 text-white" />
         ) : status === "success" ? (
           <iconset.Success className="size-8 text-primary-foreground" />
+        ) : status === "input" ? (
+          iconset.Input ? (
+            <iconset.Input className="size-8 text-muted-foreground animate-pulse" />
+          ) : (
+            <Hand className="size-8 text-muted-foreground animate-pulse" />
+          )
         ) : (
           <Loader2 className="size-8 animate-spin text-primary" />
         )}
       </div>
 
-      <div>
+      <div className="flex-1">
         <h3
           className={cn(
             "text-xl font-medium",
             status === "error" && "text-destructive",
-            status === "success" && "text-primary"
+            status === "success" && "text-primary",
+            status === "input" && "text-foreground"
           )}
         >
           {title}
@@ -104,6 +117,7 @@ const ProgressItem = ({
         {status !== "success" && (
           <p className="text-base text-muted-foreground">{description}</p>
         )}
+        {children && <div className="mt-3">{children}</div>}
       </div>
     </motion.div>
   );
@@ -117,8 +131,8 @@ const Step5 = () => {
     auth.status === "RESUMING"
       ? "pending"
       : auth.status === "AUTHENTICATED"
-      ? "success"
-      : "error";
+        ? "success"
+        : "error";
 
   const formValues = useFormStore((state) => state.formValues);
   const step1FormValues = formValues[0];
@@ -148,12 +162,14 @@ const Step5 = () => {
   const [hasClickedPublish, setHasClickedPublish] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
-  const createBumicertStatus: "pending" | "success" | "error" =
+  const createBumicertStatus: "pending" | "success" | "error" | "input" =
     createBumicertError
       ? "error"
       : createdBumicertResponse === null
-      ? "pending"
-      : "success";
+        ? isBumicertCreationMutationInFlight
+          ? "pending"
+          : "input"
+        : "success";
 
   const { mutate: createBumicert } =
     trpcApi.hypercerts.claim.activity.create.useMutation({
@@ -188,7 +204,7 @@ const Step5 = () => {
         // Track successful bumicert publication
         const duration = getFlowDurationSeconds() ?? 0;
         trackBumicertPublished({
-          draftId: data.data?.cid ?? "unknown",
+          draftId: data.cid ?? "unknown",
           totalDurationSeconds: duration,
         });
 
@@ -223,12 +239,18 @@ const Step5 = () => {
       return;
     }
 
+    if (!auth.user?.did) {
+      setCreateBumicertError("You must be signed in to publish.");
+      return;
+    }
+
     try {
       const coverImageFileGen = await toFileGenerator(
         step1FormValues.coverImage
       );
 
       const data = {
+        did: auth.user.did,
         activity: {
           title: step1FormValues.projectName,
           shortDescription: step2FormValues.shortDescription,
@@ -236,7 +258,7 @@ const Step5 = () => {
           workScopes: step1FormValues.workType,
           startDate: step1FormValues.projectDateRange[0].toISOString(),
           endDate: step1FormValues.projectDateRange[1].toISOString(),
-          contributors: step3FormValues.contributors,
+          contributors: step3FormValues.contributors.map((contributor) => ({ identity: contributor.name })),
           locations: step3FormValues.siteBoundaries.map((sb) => ({
             $type: "com.atproto.repo.strongRef" as const,
             cid: sb.cid,
@@ -277,16 +299,6 @@ const Step5 = () => {
         open={showFeedbackModal}
         onOpenChange={setShowFeedbackModal}
       />
-      {authStatus === "success" && createBumicertStatus !== "success" && (
-        <div className="mt-4 flex justify-end">
-          <Button
-            onClick={handlePublishClick}
-            disabled={isBumicertCreationMutationInFlight}
-          >
-            Publish Bumicert <ArrowRightIcon className="ml-2" />
-          </Button>
-        </div>
-      )}
       <ProgressItem
         iconset={{
           Error: ShieldXIcon,
@@ -305,44 +317,68 @@ const Step5 = () => {
           iconset={{
             Error: CircleAlertIcon,
             Success: CircleCheckIcon,
+            Input: Hand,
           }}
           title={
             createBumicertError
               ? "Failed to publish."
               : createBumicertStatus === "success"
-              ? "Published!"
-              : "Ready to publish your bumicert"
+                ? "Published!"
+                : createBumicertStatus === "pending"
+                  ? "Publishing your bumicert"
+                  : "Ready to publish your bumicert"
           }
           description={
             createBumicertError
               ? createBumicertError
               : isBumicertCreationMutationInFlight
-              ? "We are publishing your bumicert."
-              : "Review your details, then publish your bumicert."
+                ? "We are publishing your bumicert."
+                : "Please click the button below to publish your bumicert."
           }
           status={createBumicertStatus}
           isLastStep={true}
-        />
+        >
+          {createBumicertStatus !== "success" && (
+            <Button
+              onClick={handlePublishClick}
+              disabled={isBumicertCreationMutationInFlight}
+            >
+              Publish Bumicert <ArrowRightIcon className="ml-2" />
+            </Button>
+          )}
+        </ProgressItem>
       )}
       {createBumicertStatus === "success" &&
-        createdBumicertResponse?.data.cid && (
-          <div className="mt-4 flex flex-col items-center border border-border rounded-lg">
-            <CircleCheckIcon className="size-6" />
+        createdBumicertResponse?.cid && (
+          <motion.div
+            initial={{
+              opacity: 0,
+              scale: 0.5,
+              y: 10,
+              filter: "blur(10px)",
+            }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              y: 0,
+              filter: "blur(0px)",
+            }}
+            className="mt-4 flex flex-col items-center border border-border rounded-lg p-6">
+            <PartyPopper className="size-10 text-primary" />
             <span className="mt-1">
-              Your bumicert has been published successfully.
+              Your bumicert was published successfully!
             </span>
-            <Button className="mt-2">
-              <Link
-                href={links.bumicert.view(
-                  `${parseAtUri(createdBumicertResponse.data.uri).did}-${
-                    parseAtUri(createdBumicertResponse.data.uri).rkey
-                  }`
-                )}
-              >
+            <Link
+              href={links.bumicert.view(
+                `${parseAtUri(createdBumicertResponse.uri).did}-${parseAtUri(createdBumicertResponse.uri).rkey
+                }`
+              )}
+            >
+              <Button className="mt-2">
                 View bumicert <ArrowRightIcon />
-              </Link>
-            </Button>
-          </div>
+              </Button>
+            </Link>
+          </motion.div>
         )}
     </div>
   );

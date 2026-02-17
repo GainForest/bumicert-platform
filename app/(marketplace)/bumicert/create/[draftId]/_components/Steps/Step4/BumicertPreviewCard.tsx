@@ -1,17 +1,16 @@
 "use client";
-import React, { useEffect, useRef } from "react";
-import { useFormStore } from "../../../form-store";
-import Image from "next/image";
-import { ProgressiveBlur } from "@/components/ui/progressive-blur";
-import { useAtprotoStore } from "@/components/stores/atproto";
-import { allowedPDSDomains } from "@/config/climateai-sdk";
-import { getBlobUrl } from "climateai-sdk/utilities/atproto";
-import { Loader2, UploadIcon } from "lucide-react";
 import { trpcApi } from "@/components/providers/TrpcProvider";
+import { useAtprotoStore } from "@/components/stores/atproto";
 import { useModal } from "@/components/ui/modal/context";
-import { UploadLogoModal, UploadLogoModalId } from "./UploadLogoModal";
-import { format } from "date-fns";
+import { ProgressiveBlur } from "@/components/ui/progressive-blur";
+import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { getBlobUrl } from "gainforest-sdk/utilities/atproto";
+import { Loader2, UploadIcon } from "lucide-react";
+import Image from "next/image";
+import { useFormStore } from "../../../form-store";
+import { UploadLogoModal, UploadLogoModalId } from "./UploadLogoModal";
 
 export const BumicertArt = ({
   logoUrl,
@@ -27,8 +26,8 @@ export const BumicertArt = ({
   coverImage: File | string;
   title: string;
   objectives: string[];
-  startDate: Date;
-  endDate: Date;
+  startDate?: Date;
+  endDate?: Date;
   className?: string;
   performant?: boolean;
 }) => {
@@ -75,7 +74,9 @@ export const BumicertArt = ({
             {title}
           </span>
           <span className="text-xs text-gray-200 text-shadow-lg mt-1">
-            {format(startDate, "LLL dd, y")} → {format(endDate, "LLL dd, y")}
+            {startDate && format(startDate, "LLL dd, y")}
+            {startDate && endDate && " → "}
+            {endDate && format(endDate, "LLL dd, y")}
           </span>
           <div className="flex items-center gap-1 flex-wrap mt-2">
             {objectives.slice(0, 2).map((objective) => (
@@ -130,7 +131,7 @@ const BumicertPreviewCard = () => {
   const isLoadingOrganizationInfo = isPendingOrganizationInfo || isOlderData;
 
   const isBumicertArtReady =
-    coverImage && title && objectives && startDate && endDate;
+    coverImage && title && objectives.length;
 
   return (
     <div className="rounded-xl border border-primary/10 shadow-lg overflow-hidden bg-primary/10 flex flex-col">
