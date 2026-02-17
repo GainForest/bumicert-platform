@@ -29,7 +29,7 @@ export default function InteractiveModeBackground({ theme }: InteractiveModeBack
             {/* Decorative stars */}
             <div className={styles.decorations}>
                 {STAR_POSITIONS.map((pos, i) => {
-                    const decoration = theme.decorations[i];
+                    const decoration = theme.decorations[i] ?? { char: '✦', color: 'var(--bumi-white-80)' };
                     const positionKey = `${pos.top || ''}-${pos.bottom || ''}-${pos.left || ''}-${pos.right || ''}-${pos.size}`;
                     return (
                         <motion.div

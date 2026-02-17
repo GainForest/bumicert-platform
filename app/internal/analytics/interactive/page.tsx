@@ -74,17 +74,6 @@ const defaultData: AnalyticsData = {
     avgDaysBeforeResume: 0,
 };
 
-// Card ID to theme mapping
-const CARD_IDS = [
-    'welcome',
-    'completion-rate',
-    'time-metrics',
-    'flow-starts',
-    'funnel-analysis',
-    'draft-analytics',
-    'time-distribution',
-    'summary',
-] as const;
 
 export default function InteractiveModePage(): React.ReactElement {
     const [data, setData] = useState<AnalyticsData>(defaultData);
@@ -135,7 +124,7 @@ export default function InteractiveModePage(): React.ReactElement {
     } = useCardNavigation(cards);
 
     // Get current theme
-    const currentCardId = CARD_IDS[currentCard] || 'welcome';
+    const currentCardId = cards[currentCard]?.id ?? 'welcome';
     const currentTheme = CARD_THEMES[currentCardId] || CARD_THEMES.welcome;
 
     // Background music hook
