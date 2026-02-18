@@ -75,20 +75,6 @@ const AudioEditor = ({
 
   const utils = trpcApi.useUtils();
 
-  const {
-    mutate: handleAdd,
-    isPending: isAdding,
-    error: addError,
-  } = trpcApi.gainforest.organization.recordings.audio.create.useMutation({
-    onSuccess: () => {
-      utils.gainforest.organization.recordings.audio.getAll.invalidate({
-        did,
-        pdsDomain: allowedPDSDomains[0],
-      });
-      setIsCompleted(true);
-    },
-  });
-
   const { mutateAsync: createAudioAsync } =
     trpcApi.gainforest.organization.recordings.audio.create.useMutation();
 
@@ -120,7 +106,7 @@ const AudioEditor = ({
     }
   }, [showSuccess, onSuccess, onClose]);
 
-  const executeAddOrEdit = async () => {
+  const executeEdit = async () => {
     if (!authenticatedDid) {
       setError("You must be authenticated to perform this action.");
       return;
@@ -129,16 +115,17 @@ const AudioEditor = ({
     setError(null);
 
     try {
-      if (mode === "add") {
-        if (!audioFile) {
-          setError("Audio file is required.");
-          return;
-        }
+      if (!rkey) {
+        setError("Record key is required for editing.");
+        return;
+      }
 
+      if (audioFile) {
         const audioFileInput = await toFileGenerator(audioFile);
 
-        handleAdd({
+        handleUpdate({
           did,
+          rkey,
           recording: {
             name: name.trim(),
             description: description.trim()
@@ -153,45 +140,19 @@ const AudioEditor = ({
           pdsDomain: allowedPDSDomains[0],
         });
       } else {
-        if (!rkey) {
-          setError("Record key is required for editing.");
-          return;
-        }
-
-        if (audioFile) {
-          const audioFileInput = await toFileGenerator(audioFile);
-
-          handleUpdate({
-            did,
-            rkey,
-            recording: {
-              name: name.trim(),
-              description: description.trim()
-                ? { text: description.trim() }
-                : undefined,
-              recordedAt: new Date(recordedAt).toISOString(),
-              coordinates: coordinates.trim() || undefined,
-            },
-            uploads: {
-              audioFile: audioFileInput,
-            },
-            pdsDomain: allowedPDSDomains[0],
-          });
-        } else {
-          handleUpdate({
-            did,
-            rkey,
-            recording: {
-              name: name.trim(),
-              description: description.trim()
-                ? { text: description.trim() }
-                : undefined,
-              recordedAt: new Date(recordedAt).toISOString(),
-              coordinates: coordinates.trim() || undefined,
-            },
-            pdsDomain: allowedPDSDomains[0],
-          });
-        }
+        handleUpdate({
+          did,
+          rkey,
+          recording: {
+            name: name.trim(),
+            description: description.trim()
+              ? { text: description.trim() }
+              : undefined,
+            recordedAt: new Date(recordedAt).toISOString(),
+            coordinates: coordinates.trim() || undefined,
+          },
+          pdsDomain: allowedPDSDomains[0],
+        });
       }
     } catch (err) {
       const errorMessage =
@@ -200,11 +161,11 @@ const AudioEditor = ({
     }
   };
 
-  const isPending = isAdding || isUpdating;
+  const isPending = isUpdating;
   const hasAudioInput = audioFile !== null;
   const isNameValid = name.trim().length > 0;
   const disableSubmission = !isNameValid || (mode === "add" && !hasAudioInput);
-  const displayError = error || addError?.message || updateError?.message;
+  const displayError = error || updateError?.message;
 
   // Handle files change in add mode — extract metadata for each new file
   const handleFilesChange = async (newFiles: File[]) => {
@@ -231,7 +192,15 @@ const AudioEditor = ({
 
   // Sequential batch upload
   const handleBatchUpload = async () => {
-    if (!authenticatedDid) return;
+    if (!authenticatedDid) {
+      setUploadState({
+        status: 'error',
+        message: 'You must be authenticated to upload recordings.',
+        uploaded: 0,
+        total: fileEntries.length,
+      });
+      return;
+    }
 
     cancelRef.current = false;
     setCancelClicked(false);
@@ -284,6 +253,12 @@ const AudioEditor = ({
     }
 
     if (cancelRef.current) {
+      if (completedCount > 0) {
+        utils.gainforest.organization.recordings.audio.getAll.invalidate({
+          did,
+          pdsDomain: allowedPDSDomains[0],
+        });
+      }
       setUploadState({
         status: "cancelled",
         uploaded: completedCount,
@@ -578,7 +553,7 @@ const AudioEditor = ({
           Cancel
         </Button>
         <Button
-          onClick={executeAddOrEdit}
+          onClick={executeEdit}
           disabled={disableSubmission || isPending}
         >
           {isPending ? <Loader2 className="animate-spin mr-2" /> : null}

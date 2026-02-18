@@ -67,7 +67,7 @@ const MultiAudioFileInput = ({
 
       if (totalRejected > 0) {
         setError(
-          `${totalRejected} file${totalRejected !== 1 ? "s" : ""} were skipped (unsupported format or too large).`
+          `${totalRejected} file${totalRejected !== 1 ? "s were" : " was"} skipped (unsupported format or too large).`
         );
       }
 

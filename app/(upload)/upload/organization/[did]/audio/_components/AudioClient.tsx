@@ -29,7 +29,7 @@ import {
   parseAsStringLiteral,
   parseAsFloat,
 } from "nuqs";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   haversineDistance,
@@ -98,22 +98,29 @@ const AudioClient = ({
   // Coordinate filter URL state
   const [filterLat, setFilterLat] = useQueryState(
     "filterLat",
-    parseAsFloat.withDefault(NaN)
+    parseAsFloat
   );
   const [filterLng, setFilterLng] = useQueryState(
     "filterLng",
-    parseAsFloat.withDefault(NaN)
+    parseAsFloat
   );
   const [filterPrecision, setFilterPrecision] = useQueryState(
     "filterPrecision",
     parseAsStringLiteral(precisionOptions).withDefault("nearby")
   );
 
+  // Redirect unauthenticated users away from add/edit views
+  useEffect(() => {
+    if ((viewMode === "add" || viewMode === "edit") && !shouldEdit) {
+      setViewMode("grid");
+      setEditUri(null);
+    }
+  }, [viewMode, shouldEdit, setViewMode, setEditUri]);
+
   // Local UI state
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const isFilterActive =
-    !Number.isNaN(filterLat) && !Number.isNaN(filterLng);
+  const isFilterActive = filterLat !== null && filterLng !== null;
 
   // Filter logic
   const filteredAudio = allAudio.filter((audio) => {
@@ -125,7 +132,7 @@ const AudioClient = ({
         .includes(searchQuery.toLowerCase());
 
     const matchesLocation = (() => {
-      if (Number.isNaN(filterLat) || Number.isNaN(filterLng)) return true; // no filter active
+      if (filterLat === null || filterLng === null) return true; // no filter active
       const coords = audio.value.metadata?.coordinates;
       if (!coords) return false; // recording has no coordinates, exclude it
       const parsed = parseCoordinateString(coords);
@@ -264,20 +271,20 @@ const AudioClient = ({
                       type="number"
                       step="any"
                       placeholder="Latitude (e.g. -3.4653)"
-                      value={Number.isNaN(filterLat) ? "" : filterLat}
+                      value={filterLat ?? ""}
                       onChange={(e) => {
                         const val = parseFloat(e.target.value);
-                        setFilterLat(isNaN(val) ? null : val);
+                        setFilterLat(Number.isNaN(val) ? null : val);
                       }}
                     />
                     <Input
                       type="number"
                       step="any"
                       placeholder="Longitude (e.g. 142.0723)"
-                      value={Number.isNaN(filterLng) ? "" : filterLng}
+                      value={filterLng ?? ""}
                       onChange={(e) => {
                         const val = parseFloat(e.target.value);
-                        setFilterLng(isNaN(val) ? null : val);
+                        setFilterLng(Number.isNaN(val) ? null : val);
                       }}
                     />
                   </div>
