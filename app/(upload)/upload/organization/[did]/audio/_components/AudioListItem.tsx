@@ -50,9 +50,11 @@ const CircularAudioPlayer = ({
     if (isPlaying) {
       audioRef.current.pause();
     } else {
-      audioRef.current.play();
+      audioRef.current.play().catch(() => {
+        // Browser blocked playback (e.g. autoplay policy)
+      });
     }
-    setIsPlaying(!isPlaying);
+    // Removed: setIsPlaying(!isPlaying) — event listeners handle state
   };
 
   useEffect(() => {
@@ -149,6 +151,7 @@ const AudioListItem = ({ audioData, did, onEdit }: AudioListItemProps) => {
   const utils = trpcApi.useUtils();
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const { mutate: deleteAudio, isPending: isDeletingAudio } =
     trpcApi.gainforest.organization.recordings.audio.delete.useMutation({
@@ -159,8 +162,8 @@ const AudioListItem = ({ audioData, did, onEdit }: AudioListItemProps) => {
         });
         setShowDeleteDialog(false);
       },
-      onError: () => {
-        setShowDeleteDialog(false);
+      onError: (err) => {
+        setDeleteError(err.message ?? "Failed to delete recording.");
       },
     });
 
@@ -214,7 +217,7 @@ const AudioListItem = ({ audioData, did, onEdit }: AudioListItemProps) => {
           <ActionsMenu
             isDeletingAudio={isDeletingAudio}
             onEdit={() => onEdit(audioData.uri)}
-            onDelete={() => setShowDeleteDialog(true)}
+            onDelete={() => { setShowDeleteDialog(true); setDeleteError(null); }}
           />
         )}
       </div>
@@ -239,7 +242,7 @@ const AudioListItem = ({ audioData, did, onEdit }: AudioListItemProps) => {
           <ActionsMenu
             isDeletingAudio={isDeletingAudio}
             onEdit={() => onEdit(audioData.uri)}
-            onDelete={() => setShowDeleteDialog(true)}
+            onDelete={() => { setShowDeleteDialog(true); setDeleteError(null); }}
           />
         )}
       </div>
@@ -254,6 +257,9 @@ const AudioListItem = ({ audioData, did, onEdit }: AudioListItemProps) => {
               action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
+          {deleteError && (
+            <p className="text-sm text-destructive">{deleteError}</p>
+          )}
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isDeletingAudio}>
               Cancel
