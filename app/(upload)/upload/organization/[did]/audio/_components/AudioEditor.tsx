@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, type ChangeEvent } from "react";
+import { useState, useEffect, useRef, type ChangeEvent } from "react";
 import { Loader2, CheckIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,10 @@ import { toFileGenerator } from "gainforest-sdk/zod";
 import { parseAtUri } from "gainforest-sdk/utilities/atproto";
 import { trpcApi } from "@/components/providers/TrpcProvider";
 import { useAtprotoStore } from "@/components/stores/atproto";
+import { parseAudioMetadata } from "@/lib/audio-metadata";
+import { cleanFilename } from "@/lib/clean-filename";
+import MultiAudioFileInput from "./MultiAudioFileInput";
+import AudioFileList, { type AudioFileEntry } from "./AudioFileList";
 import { AudioData } from "./AudioClient";
 
 type AudioEditorProps = {
@@ -53,6 +57,19 @@ const AudioEditor = ({
   const [error, setError] = useState<string | null>(null);
   const [isCompleted, setIsCompleted] = useState(false);
 
+  // Add mode state
+  const [fileEntries, setFileEntries] = useState<AudioFileEntry[]>([]);
+  const [addCoordinates, setAddCoordinates] = useState("");
+  const [uploadState, setUploadState] = useState<
+    | { status: "idle" }
+    | { status: "uploading"; current: number; total: number }
+    | { status: "cancelled"; uploaded: number; total: number }
+    | { status: "completed" }
+    | { status: "error"; message: string; uploaded: number; total: number }
+  >({ status: "idle" });
+  const cancelRef = useRef(false);
+  const [cancelClicked, setCancelClicked] = useState(false);
+
   const utils = trpcApi.useUtils();
 
   const {
@@ -68,6 +85,9 @@ const AudioEditor = ({
       setIsCompleted(true);
     },
   });
+
+  const { mutateAsync: createAudioAsync } =
+    trpcApi.gainforest.organization.recordings.audio.create.useMutation();
 
   const {
     mutate: handleUpdate,
@@ -179,6 +199,230 @@ const AudioEditor = ({
   const isNameValid = name.trim().length > 0;
   const disableSubmission = !isNameValid || (mode === "add" && !hasAudioInput);
   const displayError = error || addError?.message || updateError?.message;
+
+  // Handle files change in add mode — extract metadata for each new file
+  const handleFilesChange = async (newFiles: File[]) => {
+    const existingFiles = fileEntries.map((e) => e.file);
+    const addedFiles = newFiles.filter((f) => !existingFiles.includes(f));
+
+    const newEntries: AudioFileEntry[] = await Promise.all(
+      addedFiles.map(async (file) => {
+        const metadata = await parseAudioMetadata(file);
+        return {
+          file,
+          name: metadata.name ?? cleanFilename(file.name),
+          recordedAt: metadata.date
+            ? new Date(metadata.date).toISOString().slice(0, 16)
+            : new Date().toISOString().slice(0, 16),
+          dateAutoDetected: metadata.date !== null,
+          description: "",
+        };
+      })
+    );
+
+    setFileEntries((prev) => [...prev, ...newEntries]);
+  };
+
+  // Sequential batch upload
+  const handleBatchUpload = async () => {
+    if (!authenticatedDid) return;
+
+    cancelRef.current = false;
+    setCancelClicked(false);
+    setUploadState({ status: "uploading", current: 1, total: fileEntries.length });
+
+    let completedCount = 0;
+
+    for (let i = 0; i < fileEntries.length; i++) {
+      if (cancelRef.current) {
+        break;
+      }
+
+      setUploadState({
+        status: "uploading",
+        current: i + 1,
+        total: fileEntries.length,
+      });
+
+      const entry = fileEntries[i];
+
+      try {
+        const audioFileInput = await toFileGenerator(entry.file);
+        await createAudioAsync({
+          did,
+          recording: {
+            name: entry.name.trim(),
+            description: entry.description.trim()
+              ? { text: entry.description.trim() }
+              : undefined,
+            recordedAt: new Date(entry.recordedAt).toISOString(),
+            coordinates: addCoordinates.trim() || undefined,
+          },
+          uploads: {
+            audioFile: audioFileInput,
+          },
+          pdsDomain: allowedPDSDomains[0],
+        });
+        completedCount++;
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "An unexpected error occurred.";
+        setUploadState({
+          status: "error",
+          message,
+          uploaded: completedCount,
+          total: fileEntries.length,
+        });
+        return;
+      }
+    }
+
+    if (cancelRef.current) {
+      setUploadState({
+        status: "cancelled",
+        uploaded: completedCount,
+        total: fileEntries.length,
+      });
+    } else {
+      utils.gainforest.organization.recordings.audio.getAll.invalidate({
+        did,
+        pdsDomain: allowedPDSDomains[0],
+      });
+      setUploadState({ status: "completed" });
+    }
+  };
+
+  // ── ADD MODE ──────────────────────────────────────────────────────────────
+
+  if (mode === "add") {
+    // Completed state — reuse existing success UI
+    if (uploadState.status === "completed") {
+      return (
+        <div className="flex flex-col items-center justify-center h-40 text-center mt-4">
+          <div className="h-10 w-10 bg-primary rounded-full flex items-center justify-center">
+            <CheckIcon className="size-6 text-white" />
+          </div>
+          <span className="text-lg font-medium mt-2">
+            Audio uploaded successfully
+          </span>
+        </div>
+      );
+    }
+
+    // Cancelled state
+    if (uploadState.status === "cancelled") {
+      return (
+        <div className="mt-4 flex flex-col items-center justify-center gap-4 text-center">
+          <p className="text-muted-foreground">
+            {uploadState.uploaded} of {uploadState.total} recordings uploaded
+            successfully. {uploadState.total - uploadState.uploaded} were not
+            uploaded.
+          </p>
+          <Button variant="outline" onClick={onClose}>
+            Done
+          </Button>
+        </div>
+      );
+    }
+
+    // Error state
+    if (uploadState.status === "error") {
+      return (
+        <div className="mt-4 flex flex-col items-center justify-center gap-4 text-center">
+          <p className="text-destructive">{uploadState.message}</p>
+          <p className="text-muted-foreground">
+            {uploadState.uploaded} recording(s) were uploaded before the error.
+          </p>
+          <Button variant="outline" onClick={onClose}>
+            Done
+          </Button>
+        </div>
+      );
+    }
+
+    const isUploading = uploadState.status === "uploading";
+    const uploadDisabled =
+      fileEntries.length === 0 ||
+      fileEntries.some((e) => e.name.trim() === "") ||
+      isUploading;
+
+    return (
+      <div className="mt-4">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-medium text-lg">Add an Audio</h3>
+        </div>
+
+        <MultiAudioFileInput
+          files={fileEntries.map((e) => e.file)}
+          onFilesChange={handleFilesChange}
+        />
+
+        <AudioFileList entries={fileEntries} onEntriesChange={setFileEntries} />
+
+        {fileEntries.length > 0 && (
+          <>
+            <hr className="opacity-50 my-4" />
+            <div className="flex flex-col gap-1">
+              <label className="text-sm text-muted-foreground">
+                Coordinates (optional)
+              </label>
+              <Input
+                placeholder="-3.4653, 142.0723"
+                value={addCoordinates}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setAddCoordinates(e.target.value)
+                }
+              />
+              <span className="text-xs text-muted-foreground">
+                Format: latitude, longitude (optionally altitude)
+              </span>
+            </div>
+          </>
+        )}
+
+        {isUploading && (
+          <div className="mt-4">
+            <p className="text-sm text-muted-foreground">
+              Uploading {uploadState.current} of {uploadState.total}…
+            </p>
+            <div className="h-1 bg-muted rounded-full overflow-hidden mt-2">
+              <div
+                className="h-full bg-primary transition-all duration-300"
+                style={{
+                  width: `${(uploadState.current / uploadState.total) * 100}%`,
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+        <div className="flex justify-end gap-2 mt-6">
+          <Button variant="outline" onClick={onClose} disabled={isUploading}>
+            Cancel
+          </Button>
+          {isUploading && (
+            <Button
+              variant="outline"
+              disabled={cancelClicked}
+              onClick={() => {
+                cancelRef.current = true;
+                setCancelClicked(true);
+              }}
+            >
+              {cancelClicked ? "Cancelling…" : "Cancel upload"}
+            </Button>
+          )}
+          <Button onClick={handleBatchUpload} disabled={uploadDisabled}>
+            {isUploading ? <Loader2 className="animate-spin mr-2" /> : null}
+            Upload {fileEntries.length} recording
+            {fileEntries.length !== 1 ? "s" : ""}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── EDIT MODE (COMPLETELY UNCHANGED) ─────────────────────────────────────
 
   // Success feedback UI
   if (isCompleted) {
