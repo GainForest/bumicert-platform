@@ -2,7 +2,7 @@ import Container from "@/components/ui/container";
 import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { gainforestSdk } from "@/config/gainforest-sdk.server";
 import { tryCatch } from "@/lib/tryCatch";
-import { OrgHypercertsDefs } from "gainforest-sdk/lex-api";
+import { AppGainforestCommonDefs, OrgHypercertsDefs } from "gainforest-sdk/lex-api";
 import { getBlobUrl } from "gainforest-sdk/utilities/atproto";
 import { serialize } from "gainforest-sdk/utilities/transform";
 import { Suspense } from "react";
@@ -14,7 +14,7 @@ type SmallImage = OrgHypercertsDefs.SmallImage;
 export type OrganizationWithBumicertCount = {
   did: string;
   displayName: string;
-  shortDescription: string;
+  shortDescription: AppGainforestCommonDefs.Richtext;
   logoUrl: string | null;
   coverImageUrl: string | null;
   country: string;
@@ -60,7 +60,7 @@ const AllOrganizationsPage = async () => {
     .map((org) => ({
       did: org.repo.did,
       displayName: org.organizationInfo.displayName,
-      shortDescription: org.organizationInfo.shortDescription.text,
+      shortDescription: org.organizationInfo.shortDescription,
       logoUrl: getSmallImageUrl(org.repo.did, org.organizationInfo.logo),
       coverImageUrl: getSmallImageUrl(org.repo.did, org.organizationInfo.coverImage),
       country: org.organizationInfo.country,

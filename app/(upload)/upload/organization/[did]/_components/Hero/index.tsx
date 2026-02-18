@@ -7,6 +7,7 @@ import QuickTooltip from "@/components/ui/quick-tooltip";
 import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import useHydratedData from "@/hooks/use-hydration";
 import { cn } from "@/lib/utils";
+import { richTextEditorClassNames, richTextDisplayClassNames, toRichTextRecord } from "@/lib/richtext";
 import { AnimatePresence, motion } from "framer-motion";
 import type { AppGainforestOrganizationInfo } from "gainforest-sdk/lex-api";
 import { getBlobUrl } from "gainforest-sdk/utilities/atproto";
@@ -16,6 +17,7 @@ import {
 } from "gainforest-sdk/utilities/transform";
 import { BadgeCheck, CircleAlert, Pencil } from "lucide-react";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { useEffect, useMemo } from "react";
 import {
   ImageEditorModal,
@@ -23,23 +25,32 @@ import {
 } from "../../_modals/image-editor";
 import { useOrganizationPageStore } from "../../store";
 
+const DynamicRichTextEditor = dynamic(
+  () => import("bsky-richtext-react").then(mod => mod.RichTextEditor),
+  { ssr: false }
+);
+const DynamicRichTextDisplay = dynamic(
+  () => import("bsky-richtext-react").then(mod => mod.RichTextDisplay),
+  { ssr: false }
+);
+
 const Hero = ({
   initialData,
   initialDid,
-  dynamic = true,
+  enableReactiveData = true,
 }: {
   initialData: SerializedSuperjson<AppGainforestOrganizationInfo.Record>;
   initialDid: string;
-  dynamic?: boolean;
+  enableReactiveData?: boolean;
 }) => {
   const reactiveData = useOrganizationPageStore((state) => state.data);
   const data = useHydratedData(
     deserialize(initialData),
-    dynamic ? reactiveData : null
+    enableReactiveData ? reactiveData : null
   );
 
   const reactiveDid = useOrganizationPageStore((state) => state.did);
-  const did = useHydratedData(initialDid, dynamic ? reactiveDid : null);
+  const did = useHydratedData(initialDid, enableReactiveData ? reactiveDid : null);
 
   const isEditing = useOrganizationPageStore((state) => state.isEditing);
   const editingData = useOrganizationPageStore(
@@ -60,7 +71,7 @@ const Hero = ({
 
   const shortDescriptionError = useMemo(() => {
     if (!isEditing) return null;
-    const shortDescription = editingData.shortDescription;
+    const shortDescription = editingData.shortDescription.text;
     if (shortDescription.length < 50) return "Short description is too short.";
     if (shortDescription.length > 2000) return "Short description is too long.";
     return null;
@@ -69,7 +80,7 @@ const Hero = ({
   useEffect(() => {
     setEditingData({
       displayName: data.displayName,
-      shortDescription: data?.shortDescription?.text || "",
+      shortDescription: data?.shortDescription ? toRichTextRecord(data.shortDescription) : { text: "" },
       coverImage: data.coverImage ? data.coverImage.image : undefined,
       logoImage: data.logo ? data.logo.image : undefined,
     });
@@ -236,34 +247,32 @@ const Hero = ({
             </div>
           </div>
           <div className="w-full mt-2 relative">
-            <EditableText
-              component="p"
-              className={cn(
-                "w-full outline-none focus:outline-none rounded-lg",
-                !isEditing && "line-clamp-2 whitespace-pre-wrap",
-                isEditing &&
-                  "py-1 px-2 ring-2 ring-black/20 dark:ring-white/20 focus:ring-primary dark:focus:ring-primary",
-                isEditing &&
+            {isEditing ? (
+              <DynamicRichTextEditor
+                initialValue={editingData.shortDescription}
+                onChange={(record) => {
+                  setEditingData({
+                    ...editingData,
+                    shortDescription: record,
+                  });
+                }}
+                placeholder="No short description provided."
+                classNames={richTextEditorClassNames}
+                className={cn(
+                  "w-full outline-none focus:outline-none rounded-lg py-1 px-2 ring-2 ring-black/20 dark:ring-white/20 focus:ring-primary dark:focus:ring-primary",
                   shortDescriptionError &&
-                  "ring-destructive/50 dark:ring-destructive/50 focus:ring-destructive dark:focus:ring-destructive pr-8",
-                isEditing &&
-                  editingData.shortDescription.replaceAll("\n", "") === "" &&
-                  "text-muted-foreground"
-              )}
-              placeholder="No short description provided."
-              editable={isEditing}
-              multiline={true}
-              value={
-                isEditing ? editingData.shortDescription : (data?.shortDescription?.text || "")
-              }
-              onChange={(value: string) => {
-                console.log(value);
-                setEditingData({
-                  ...editingData,
-                  shortDescription: value,
-                });
-              }}
-            />
+                    "ring-destructive/50 dark:ring-destructive/50 focus:ring-destructive dark:focus:ring-destructive pr-8"
+                )}
+              />
+            ) : (
+              <div className={cn("w-full mt-2", !data?.shortDescription?.text && "text-muted-foreground")}>
+                {data?.shortDescription?.text ? (
+                  <DynamicRichTextDisplay value={toRichTextRecord(data.shortDescription)} classNames={richTextDisplayClassNames} />
+                ) : (
+                  "No short description provided."
+                )}
+              </div>
+            )}
             {shortDescriptionError && (
               <QuickTooltip
                 asChild
