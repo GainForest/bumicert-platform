@@ -38,7 +38,7 @@ export const resolvePublicUrl = (): string => {
     return process.env.NEXT_PUBLIC_BASE_URL;
   }
   if (process.env.VERCEL_BRANCH_URL) {
-    return `https://${process.env.VERCEL_BRANCH_URL}`;
+    return `https://${process.env.VERCEL_BRANCH_URL.trim()}`;
   }
   if (isDev) {
     return "http://127.0.0.1:3000";
