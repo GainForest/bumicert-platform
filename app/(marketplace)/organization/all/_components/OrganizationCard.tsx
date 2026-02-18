@@ -57,7 +57,7 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
       </div>
 
       <div className="flex-1 min-w-0">
-        <div className="text-sm text-muted-foreground line-clamp-4 p-1">
+        <div className="text-sm text-muted-foreground max-h-20 overflow-hidden p-1">
           {organization.shortDescription.text ? (
             <DynamicRichTextDisplay value={toRichTextRecord(organization.shortDescription)} classNames={richTextDisplayClassNames} />
           ) : (

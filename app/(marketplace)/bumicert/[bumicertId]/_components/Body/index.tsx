@@ -12,11 +12,14 @@ import {
   deserialize,
   SerializedSuperjson,
 } from "gainforest-sdk/utilities/transform";
-import {
-  RichTextDisplay,
-  type RichTextRecord,
-} from "bsky-richtext-react";
+import dynamic from "next/dynamic";
+import type { RichTextRecord } from "bsky-richtext-react";
 import { richTextDisplayClassNames, toRichTextFacets } from "@/lib/richtext";
+
+const DynamicRichTextDisplay = dynamic(
+  () => import("bsky-richtext-react").then((mod) => mod.RichTextDisplay),
+  { ssr: false }
+);
 
 // Custom hook to handle collapsible content
 const useCollapsible = (maxHeight: number = 320) => {
@@ -71,7 +74,7 @@ const CollapsibleDescription = ({
           Description
         </h2>
         <div className="p-3">
-          <RichTextDisplay
+          <DynamicRichTextDisplay
             value={{ text: description, facets: descriptionFacets }}
             classNames={richTextDisplayClassNames}
           />

@@ -48,10 +48,12 @@ export function toRichTextRecord(
 ): RichTextRecord {
   return {
     text: richtext.text,
-    facets: richtext.facets?.map((facet) => ({
-      index: facet.index,
-      features: facet.features.filter(isKnownFacetFeature),
-    })),
+    facets: richtext.facets
+      ?.map((facet) => ({
+        index: facet.index,
+        features: facet.features.filter(isKnownFacetFeature),
+      }))
+      .filter((facet) => facet.features.length > 0),
   };
 }
 
@@ -62,8 +64,10 @@ export function toRichTextRecord(
 export function toRichTextFacets(
   facets: AppBskyRichtextFacet.Main[]
 ): RichTextRecord["facets"] {
-  return facets.map((facet) => ({
-    index: facet.index,
-    features: facet.features.filter(isKnownFacetFeature),
-  }));
+  return facets
+    .map((facet) => ({
+      index: facet.index,
+      features: facet.features.filter(isKnownFacetFeature),
+    }))
+    .filter((facet) => facet.features.length > 0);
 }
