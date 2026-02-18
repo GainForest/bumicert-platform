@@ -2,7 +2,16 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { CirclePlusIcon, Search, LayoutGrid, List, ChevronLeft } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import {
+  CirclePlusIcon,
+  Search,
+  LayoutGrid,
+  List,
+  ChevronLeft,
+  MapPin,
+  X,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import useHydratedData from "@/hooks/use-hydration";
 import { allowedPDSDomains } from "@/config/gainforest-sdk";
@@ -18,7 +27,15 @@ import {
   useQueryState,
   parseAsString,
   parseAsStringLiteral,
+  parseAsFloat,
 } from "nuqs";
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  haversineDistance,
+  parseCoordinateString,
+  PRECISION_LEVELS,
+} from "@/lib/haversine";
 import AudioCard from "./AudioCard";
 import AudioEditor from "./AudioEditor";
 import AudioListItem from "./AudioListItem";
@@ -29,6 +46,15 @@ export type AllAudioData =
 export type AudioData = AllAudioData[number];
 
 const viewOptions = ["grid", "list", "add", "edit"] as const;
+
+const precisionOptions = ["exact", "nearby", "area", "region"] as const;
+
+const precisionLabels: Record<(typeof precisionOptions)[number], string> = {
+  exact: "Exact",
+  nearby: "Nearby",
+  area: "Area",
+  region: "Region",
+};
 
 const AudioClient = ({
   did,
@@ -69,6 +95,26 @@ const AudioClient = ({
     parseAsString.withDefault("")
   );
 
+  // Coordinate filter URL state
+  const [filterLat, setFilterLat] = useQueryState(
+    "filterLat",
+    parseAsFloat.withDefault(NaN)
+  );
+  const [filterLng, setFilterLng] = useQueryState(
+    "filterLng",
+    parseAsFloat.withDefault(NaN)
+  );
+  const [filterPrecision, setFilterPrecision] = useQueryState(
+    "filterPrecision",
+    parseAsStringLiteral(precisionOptions).withDefault("nearby")
+  );
+
+  // Local UI state
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  const isFilterActive =
+    !Number.isNaN(filterLat) && !Number.isNaN(filterLng);
+
   // Filter logic
   const filteredAudio = allAudio.filter((audio) => {
     const matchesSearch =
@@ -78,7 +124,22 @@ const AudioClient = ({
         ?.toLowerCase()
         .includes(searchQuery.toLowerCase());
 
-    return matchesSearch;
+    const matchesLocation = (() => {
+      if (Number.isNaN(filterLat) || Number.isNaN(filterLng)) return true; // no filter active
+      const coords = audio.value.metadata?.coordinates;
+      if (!coords) return false; // recording has no coordinates, exclude it
+      const parsed = parseCoordinateString(coords);
+      if (!parsed) return false;
+      const distance = haversineDistance(
+        filterLat,
+        filterLng,
+        parsed.lat,
+        parsed.lng
+      );
+      return distance <= PRECISION_LEVELS[filterPrecision];
+    })();
+
+    return matchesSearch && matchesLocation;
   });
 
   return (
@@ -129,46 +190,138 @@ const AudioClient = ({
 
       {/* Toolbar - only shown when not in add/edit mode */}
       {viewMode !== "add" && viewMode !== "edit" && (
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mt-4">
-          {/* Search Input */}
-          <div className="relative flex-1 sm:max-w-xs">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-            <Input
-              placeholder="Search recordings..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value || null)}
-              className="pl-9"
-            />
+        <div className="mt-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            {/* Search Input */}
+            <div className="relative flex-1 sm:max-w-xs">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+              <Input
+                placeholder="Search recordings..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value || null)}
+                className="pl-9"
+              />
+            </div>
+
+            {/* Location Filter Button */}
+            <Button
+              variant="outline"
+              onClick={() => setIsFilterOpen((prev) => !prev)}
+              className="flex items-center gap-2"
+            >
+              <MapPin className="size-4" />
+              Location
+              {isFilterActive && (
+                <Badge variant="secondary" className="ml-1">
+                  {precisionLabels[filterPrecision]}
+                </Badge>
+              )}
+            </Button>
+
+            {/* View Toggle */}
+            <div className="flex items-center border rounded-lg p-0.5 gap-0.5">
+              <Button
+                size="icon"
+                variant={viewMode === "grid" ? "secondary" : "ghost"}
+                onClick={() => setViewMode("grid")}
+                className="h-8 w-8"
+              >
+                <LayoutGrid className="size-4" />
+              </Button>
+              <div className="h-4 w-0.5 bg-border" />
+              <Button
+                size="icon"
+                variant={viewMode === "list" ? "secondary" : "ghost"}
+                onClick={() => setViewMode("list")}
+                className="h-8 w-8"
+              >
+                <List className="size-4" />
+              </Button>
+            </div>
+
+            {/* Add Button - at the end */}
+            {shouldEdit && (
+              <Button onClick={() => setViewMode("add")}>
+                <CirclePlusIcon className="opacity-60" />
+                Add
+              </Button>
+            )}
           </div>
 
-          {/* View Toggle */}
-          <div className="flex items-center border rounded-lg p-0.5 gap-0.5">
-            <Button
-              size="icon"
-              variant={viewMode === "grid" ? "secondary" : "ghost"}
-              onClick={() => setViewMode("grid")}
-              className="h-8 w-8"
-            >
-              <LayoutGrid className="size-4" />
-            </Button>
-            <div className="h-4 w-0.5 bg-border" />
-            <Button
-              size="icon"
-              variant={viewMode === "list" ? "secondary" : "ghost"}
-              onClick={() => setViewMode("list")}
-              className="h-8 w-8"
-            >
-              <List className="size-4" />
-            </Button>
-          </div>
+          {/* Expandable Filter Panel */}
+          <AnimatePresence>
+            {isFilterOpen && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                style={{ overflow: "hidden" }}
+              >
+                <div className="flex flex-col gap-3 mt-3 p-3 border border-border rounded-lg bg-muted/30">
+                  {/* Row 1: Lat/Lng inputs */}
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Input
+                      type="number"
+                      step="any"
+                      placeholder="Latitude (e.g. -3.4653)"
+                      value={Number.isNaN(filterLat) ? "" : filterLat}
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value);
+                        setFilterLat(isNaN(val) ? null : val);
+                      }}
+                    />
+                    <Input
+                      type="number"
+                      step="any"
+                      placeholder="Longitude (e.g. 142.0723)"
+                      value={Number.isNaN(filterLng) ? "" : filterLng}
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value);
+                        setFilterLng(isNaN(val) ? null : val);
+                      }}
+                    />
+                  </div>
 
-          {/* Add Button - at the end */}
-          {shouldEdit && (
-            <Button onClick={() => setViewMode("add")}>
-              <CirclePlusIcon className="opacity-60" />
-              Add
-            </Button>
-          )}
+                  {/* Row 2: Precision toggle */}
+                  <div className="flex items-center gap-1 flex-wrap">
+                    <span className="text-sm text-muted-foreground">
+                      Precision:
+                    </span>
+                    <div className="flex items-center border rounded-lg p-0.5 gap-0.5 flex-wrap">
+                      {precisionOptions.map((level, index) => (
+                        <span key={level} className="contents">
+                          {index > 0 && (
+                            <div className="h-4 w-0.5 bg-border" />
+                          )}
+                          <Button
+                            size="sm"
+                            variant={
+                              filterPrecision === level ? "secondary" : "ghost"
+                            }
+                            onClick={() => setFilterPrecision(level)}
+                          >
+                            {precisionLabels[level]}
+                          </Button>
+                        </span>
+                      ))}
+                    </div>
+                    {/* Clear button */}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        setFilterLat(null);
+                        setFilterLng(null);
+                        setFilterPrecision(null);
+                      }}
+                    >
+                      <X className="size-4" />
+                    </Button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       )}
 
@@ -193,7 +346,9 @@ const AudioClient = ({
                 </>
               ) : (
                 <span className="text-muted-foreground">
-                  No recordings match your search criteria.
+                  {isFilterActive
+                    ? "No recordings found near this location."
+                    : "No recordings match your search criteria."}
                 </span>
               )}
             </div>
