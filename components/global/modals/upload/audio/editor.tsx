@@ -56,7 +56,8 @@ export const AudioEditorModal = ({ initialData }: AudioEditorModalProps) => {
 
   const hasAudioInput = audioFile !== null;
   const isAuthenticated = did !== null;
-  const disableSubmission = !isAuthenticated || (mode === "add" && !hasAudioInput);
+  const isNameValid = name.trim().length > 0;
+  const disableSubmission = !isAuthenticated || !isNameValid || (mode === "add" && !hasAudioInput);
 
   const [isCompleted, setIsCompleted] = useState(false);
 
@@ -111,7 +112,7 @@ export const AudioEditorModal = ({ initialData }: AudioEditorModalProps) => {
         handleAdd({
           did,
           recording: {
-            name: name.trim() || undefined,
+            name: name.trim(),
             description: description.trim()
               ? { text: description.trim() }
               : undefined,
@@ -136,7 +137,7 @@ export const AudioEditorModal = ({ initialData }: AudioEditorModalProps) => {
             did,
             rkey,
             recording: {
-              name: name.trim() || undefined,
+              name: name.trim(),
               description: description.trim()
                 ? { text: description.trim() }
                 : undefined,
@@ -153,7 +154,7 @@ export const AudioEditorModal = ({ initialData }: AudioEditorModalProps) => {
             did,
             rkey,
             recording: {
-              name: name.trim() || undefined,
+              name: name.trim(),
               description: description.trim()
                 ? { text: description.trim() }
                 : undefined,
@@ -204,7 +205,7 @@ export const AudioEditorModal = ({ initialData }: AudioEditorModalProps) => {
                   htmlFor="name-for-audio"
                   className="text-sm text-muted-foreground"
                 >
-                  Name (optional)
+                  Name <span className="text-destructive">*</span>
                 </label>
                 <Input
                   placeholder="Morning bird calls"
@@ -300,9 +301,13 @@ export const AudioEditorModal = ({ initialData }: AudioEditorModalProps) => {
               </div>
             </div>
 
-            {error && (
+            {(!isNameValid || error) && (
               <div className="text-sm text-destructive mt-2">
-                {error.startsWith("[") ? "Bad Request" : error}
+                {!isNameValid
+                  ? "Name is required."
+                  : error?.startsWith("[")
+                    ? "Bad Request"
+                    : error}
               </div>
             )}
           </motion.section>

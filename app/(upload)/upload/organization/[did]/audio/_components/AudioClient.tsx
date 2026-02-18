@@ -2,13 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { CirclePlusIcon, Search, LayoutGrid, List, ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import useHydratedData from "@/hooks/use-hydration";
@@ -65,11 +58,6 @@ const AudioClient = ({
     parseAsString.withDefault("")
   );
 
-  const [formatFilter, setFormatFilter] = useQueryState(
-    "format",
-    parseAsString.withDefault("")
-  );
-
   const [viewMode, setViewMode] = useQueryState(
     "view",
     parseAsStringLiteral(viewOptions).withDefault("grid")
@@ -90,10 +78,7 @@ const AudioClient = ({
         ?.toLowerCase()
         .includes(searchQuery.toLowerCase());
 
-    const matchesFormat =
-      !formatFilter || audio.value.metadata.format === formatFilter;
-
-    return matchesSearch && matchesFormat;
+    return matchesSearch;
   });
 
   return (
@@ -155,25 +140,6 @@ const AudioClient = ({
               className="pl-9"
             />
           </div>
-
-          {/* Format Filter */}
-          <Select
-            value={formatFilter || "all"}
-            onValueChange={(v) => setFormatFilter(v === "all" ? null : v)}
-          >
-            <SelectTrigger className="w-full sm:w-40">
-              <SelectValue placeholder="All formats" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All formats</SelectItem>
-              <SelectItem value="mp3">MP3</SelectItem>
-              <SelectItem value="wav">WAV</SelectItem>
-              <SelectItem value="flac">FLAC</SelectItem>
-              <SelectItem value="ogg">OGG</SelectItem>
-              <SelectItem value="m4a">M4A</SelectItem>
-              <SelectItem value="aac">AAC</SelectItem>
-            </SelectContent>
-          </Select>
 
           {/* View Toggle */}
           <div className="flex items-center border rounded-lg p-0.5 gap-0.5">

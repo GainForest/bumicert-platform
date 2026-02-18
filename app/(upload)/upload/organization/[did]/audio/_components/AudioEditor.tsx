@@ -114,7 +114,7 @@ const AudioEditor = ({
         handleAdd({
           did,
           recording: {
-            name: name.trim() || undefined,
+            name: name.trim(),
             description: description.trim()
               ? { text: description.trim() }
               : undefined,
@@ -139,7 +139,7 @@ const AudioEditor = ({
             did,
             rkey,
             recording: {
-              name: name.trim() || undefined,
+              name: name.trim(),
               description: description.trim()
                 ? { text: description.trim() }
                 : undefined,
@@ -156,7 +156,7 @@ const AudioEditor = ({
             did,
             rkey,
             recording: {
-              name: name.trim() || undefined,
+              name: name.trim(),
               description: description.trim()
                 ? { text: description.trim() }
                 : undefined,
@@ -176,7 +176,8 @@ const AudioEditor = ({
 
   const isPending = isAdding || isUpdating;
   const hasAudioInput = audioFile !== null;
-  const disableSubmission = mode === "add" && !hasAudioInput;
+  const isNameValid = name.trim().length > 0;
+  const disableSubmission = !isNameValid || (mode === "add" && !hasAudioInput);
   const displayError = error || addError?.message || updateError?.message;
 
   // Success feedback UI
@@ -236,7 +237,7 @@ const AudioEditor = ({
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <label className="text-sm text-muted-foreground">
-              Name (optional)
+              Name <span className="text-destructive">*</span>
             </label>
             <Input
               placeholder="Morning bird calls"
@@ -290,9 +291,13 @@ const AudioEditor = ({
         </div>
       </div>
 
-      {displayError && (
+      {(!isNameValid || displayError) && (
         <div className="text-sm text-destructive mt-4">
-          {displayError.startsWith("[") ? "Bad Request" : displayError}
+          {!isNameValid
+            ? "Name is required."
+            : displayError?.startsWith("[")
+              ? "Bad Request"
+              : displayError}
         </div>
       )}
 

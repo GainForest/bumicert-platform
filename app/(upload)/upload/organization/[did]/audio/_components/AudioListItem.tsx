@@ -36,10 +36,10 @@ type AudioListItemProps = {
 // Circular audio player for mobile
 const CircularAudioPlayer = ({
   audioUrl,
-  format,
+  mimeType,
 }: {
   audioUrl: string;
-  format: string;
+  mimeType: string;
 }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -103,7 +103,7 @@ const CircularAudioPlayer = ({
         }
       />
       <audio ref={audioRef} preload="metadata">
-        <source src={audioUrl} type={`audio/${format}`} />
+        <source src={audioUrl} type={mimeType} />
       </audio>
     </button>
   );
@@ -142,7 +142,7 @@ const ActionsMenu = ({ isDeletingAudio, onEdit, onDelete }: ActionsMenuProps) =>
 
 const AudioListItem = ({ audioData, did, onEdit }: AudioListItemProps) => {
   const audio = audioData.value;
-  const audioUrl = getBlobUrl(did, audio.audioBlob.file, allowedPDSDomains[0]);
+  const audioUrl = getBlobUrl(did, audio.blob.file, allowedPDSDomains[0]);
 
   const auth = useAtprotoStore((state) => state.auth);
   const shouldEdit = auth.status === "AUTHENTICATED" && auth.user.did === did;
@@ -206,7 +206,7 @@ const AudioListItem = ({ audioData, did, onEdit }: AudioListItemProps) => {
 
         {/* Native Audio Player - takes remaining space */}
         <audio controls className="h-8 flex-1 min-w-[200px]" preload="metadata">
-          <source src={audioUrl} type={`audio/${audio.metadata.format}`} />
+          <source src={audioUrl} type={audio.blob.file.mimeType} />
         </audio>
 
         {/* Menu */}
@@ -222,7 +222,7 @@ const AudioListItem = ({ audioData, did, onEdit }: AudioListItemProps) => {
       {/* Mobile Layout (< md) */}
       <div className="flex md:hidden items-center gap-3 py-3">
         {/* Circular Audio Player */}
-        <CircularAudioPlayer audioUrl={audioUrl} format={audio.metadata.format} />
+        <CircularAudioPlayer audioUrl={audioUrl} mimeType={audio.blob.file.mimeType} />
 
         {/* Info Column */}
         <div className="flex flex-col flex-1 min-w-0">

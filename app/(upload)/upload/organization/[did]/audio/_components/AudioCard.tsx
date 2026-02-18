@@ -33,7 +33,7 @@ type AudioCardProps = {
 
 const AudioCard = ({ audioData, did }: AudioCardProps) => {
   const audio = audioData.value;
-  const audioUrl = getBlobUrl(did, audio.audioBlob.file, allowedPDSDomains[0]);
+  const audioUrl = getBlobUrl(did, audio.blob.file, allowedPDSDomains[0]);
 
   const auth = useAtprotoStore((state) => state.auth);
   const shouldEdit = auth.status === "AUTHENTICATED" && auth.user.did === did;
@@ -90,7 +90,7 @@ const AudioCard = ({ audioData, did }: AudioCardProps) => {
       <div className="bg-background rounded-xl shadow-sm">
         <div className="p-3">
           <audio controls className="w-full h-10" preload="metadata">
-            <source src={audioUrl} type={`audio/${audio.metadata.format}`} />
+            <source src={audioUrl} type={audio.blob.file.mimeType} />
             Your browser does not support the audio element.
           </audio>
         </div>
@@ -113,7 +113,7 @@ const AudioCard = ({ audioData, did }: AudioCardProps) => {
           )}
           <div className="flex items-center justify-between mt-2">
             <span className="text-sm text-muted-foreground uppercase">
-              {audio.metadata.format} · {audio.metadata.sampleRate / 1000}kHz
+              {audio.metadata.sampleRate / 1000}kHz
             </span>
           </div>
           <hr className="mt-3 opacity-50" />
