@@ -25,6 +25,8 @@ type AudioEditorProps = {
   onSuccess: () => void;
 };
 
+const AUTO_CLOSE_MS = 3000;
+
 const AudioEditor = ({
   did,
   mode,
@@ -56,6 +58,7 @@ const AudioEditor = ({
   );
   const [error, setError] = useState<string | null>(null);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [countdownStarted, setCountdownStarted] = useState(false);
 
   // Add mode state
   const [fileEntries, setFileEntries] = useState<AudioFileEntry[]>([]);
@@ -103,16 +106,19 @@ const AudioEditor = ({
     },
   });
 
-  // Auto-navigate back after 3 seconds of success
+  // Auto-navigate back after AUTO_CLOSE_MS of success (both add and edit modes)
+  const showSuccess = isCompleted || uploadState.status === "completed";
   useEffect(() => {
-    if (isCompleted) {
+    if (showSuccess) {
+      // Trigger the countdown bar animation on next frame
+      requestAnimationFrame(() => setCountdownStarted(true));
       const timer = setTimeout(() => {
         onSuccess();
         onClose();
-      }, 3000);
+      }, AUTO_CLOSE_MS);
       return () => clearTimeout(timer);
     }
-  }, [isCompleted, onSuccess, onClose]);
+  }, [showSuccess, onSuccess, onClose]);
 
   const executeAddOrEdit = async () => {
     if (!authenticatedDid) {
@@ -295,7 +301,7 @@ const AudioEditor = ({
   // ── ADD MODE ──────────────────────────────────────────────────────────────
 
   if (mode === "add") {
-    // Completed state — reuse existing success UI
+    // Completed state — success UI with countdown bar
     if (uploadState.status === "completed") {
       return (
         <div className="flex flex-col items-center justify-center h-40 text-center mt-4">
@@ -305,6 +311,17 @@ const AudioEditor = ({
           <span className="text-lg font-medium mt-2">
             Audio uploaded successfully
           </span>
+          <div className="w-full max-w-xs h-1 bg-muted rounded-full overflow-hidden mt-4">
+            <div
+              className="h-full bg-primary rounded-full"
+              style={{
+                width: countdownStarted ? "0%" : "100%",
+                transition: countdownStarted
+                  ? `width ${AUTO_CLOSE_MS}ms linear`
+                  : "none",
+              }}
+            />
+          </div>
         </div>
       );
     }
@@ -432,8 +449,19 @@ const AudioEditor = ({
           <CheckIcon className="size-6 text-white" />
         </div>
         <span className="text-lg font-medium mt-2">
-          Audio {mode === "edit" ? "updated" : "uploaded"} successfully
+          Audio updated successfully
         </span>
+        <div className="w-full max-w-xs h-1 bg-muted rounded-full overflow-hidden mt-4">
+          <div
+            className="h-full bg-primary rounded-full"
+            style={{
+              width: countdownStarted ? "0%" : "100%",
+              transition: countdownStarted
+                ? `width ${AUTO_CLOSE_MS}ms linear`
+                : "none",
+            }}
+          />
+        </div>
       </div>
     );
   }
