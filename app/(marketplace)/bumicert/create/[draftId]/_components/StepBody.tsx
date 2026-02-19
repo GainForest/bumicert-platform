@@ -17,6 +17,7 @@ import { useNavbarContext } from "@/components/global/Navbar/context";
 import { STEPS } from "../_data/steps";
 import { trackStepViewed, trackStepCompleted, getStepName } from "@/lib/analytics";
 import { useParams } from "next/navigation";
+import { useUnsavedChangesWarning } from "@/hooks/use-unsaved-changes-warning";
 
 const StepBody = () => {
   const { viewport, openState } = useNavbarContext();
@@ -25,6 +26,14 @@ const StepBody = () => {
   const params = useParams();
   const draftId = (params?.draftId as string) ?? "0";
   const previousStepRef = useRef<number | null>(null);
+  
+  // Get dirty state from form store for unsaved changes warning
+  const isDirty = useFormStore((state) => state.isDirty);
+  const isHydrated = useFormStore((state) => state.isHydrated);
+  
+  // Show browser warning when user tries to leave with unsaved changes
+  // Only enable after form is hydrated (to avoid false positives during initial load)
+  useUnsavedChangesWarning(isDirty, isHydrated);
 
   // Track step views when the step changes
   useEffect(() => {

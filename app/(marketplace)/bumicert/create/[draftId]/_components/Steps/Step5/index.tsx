@@ -17,7 +17,7 @@ import {
 import { useAtprotoStore } from "@/components/stores/atproto";
 import { allowedPDSDomains, trpcClient } from "@/config/gainforest-sdk";
 import { cn } from "@/lib/utils";
-import { useFormStore } from "../../../form-store";
+import { useFormStore, clearPersistedFormState } from "../../../form-store";
 import { useStep5Store } from "./store";
 import { toFileGenerator } from "gainforest-sdk/zod";
 import { links } from "@/lib/links";
@@ -201,6 +201,9 @@ const Step5 = () => {
           }
         }
 
+        // Clear localStorage backup after successful publish
+        clearPersistedFormState();
+        
         // Track successful bumicert publication
         const duration = getFlowDurationSeconds() ?? 0;
         trackBumicertPublished({
