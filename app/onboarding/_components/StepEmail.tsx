@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useOnboardingStore } from "../store";
 import { ArrowLeft, ArrowRight, Loader2, Mail, RefreshCw, KeyRound } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { links } from "@/lib/links";
 import { defaultPdsDomain } from "@/config/gainforest-sdk";
@@ -19,6 +19,8 @@ export function StepEmail() {
   const [retryAfter, setRetryAfter] = useState<Date | null>(null);
   const [countdown, setCountdown] = useState<number>(0);
   const [hasExistingCode, setHasExistingCode] = useState(false);
+  const isSubmittingRef = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email);
   const isValidCode = data.inviteCode.trim().length > 0;
@@ -56,6 +58,15 @@ export function StepEmail() {
       return;
     }
 
+    // Fix 1: Synchronous guard to prevent concurrent submissions
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
+
+    // Fix 3: Cancel any in-flight request before starting a new one
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = new AbortController();
+    const { signal } = abortControllerRef.current;
+
     setIsLoading(true);
     setError(null);
 
@@ -67,7 +78,11 @@ export function StepEmail() {
           email: data.email.trim().toLowerCase(),
           pdsDomain: defaultPdsDomain,
         }),
+        signal,
       });
+
+      // Fix 3: Ignore stale responses if a newer request has already been initiated
+      if (signal.aborted) return;
 
       const result = await response.json();
 
@@ -85,10 +100,16 @@ export function StepEmail() {
       // Success - move to code entry phase
       setPhase("code");
       setError(null);
-    } catch {
+      // Fix 2: Apply 60-second cooldown after successful send
+      setRetryAfter(new Date(Date.now() + 60_000));
+    } catch (err) {
+      // Ignore abort errors — they are intentional cancellations
+      if (err instanceof Error && err.name === "AbortError") return;
       setError("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
+      // Fix 1: Release the submission guard
+      isSubmittingRef.current = false;
     }
   };
 

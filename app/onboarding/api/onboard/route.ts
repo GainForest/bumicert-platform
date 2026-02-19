@@ -118,6 +118,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Record rate limit attempt immediately after check passes, before any validation or PDS calls.
+    // This ensures failed requests (validation errors, PDS errors) still consume a rate limit slot,
+    // preventing brute-force probing.
+    await recordRateLimitAttempt(`ip:${clientIp}`, 'onboard');
+
     const formData = await req.formData();
 
     // Extract form fields
@@ -268,8 +273,17 @@ export async function POST(req: NextRequest) {
     const accountData = (await accountResponse.json()) as AccountCreationResponse;
     const { did, accessJwt, refreshJwt } = accountData;
 
-    // Record rate limit attempt after successful account creation
-    await recordRateLimitAttempt(`ip:${clientIp}`, 'onboard');
+    // Mark invite code as consumed
+    try {
+      await supabase
+        .from("invites")
+        .update({ used_at: new Date().toISOString(), used_by_did: did })
+        .eq("invite_token", inviteCode)
+        .eq("pds_domain", pdsDomain);
+    } catch (error) {
+      // Non-fatal: PDS already consumed the code, this is just bookkeeping
+      console.warn("Failed to mark invite as consumed:", error);
+    }
 
     // Step 4: Prepare logo upload if provided
     let logoUpload: { name: string; type: string; dataBase64: string } | undefined;
@@ -329,8 +343,7 @@ export async function POST(req: NextRequest) {
     return Response.json(
       {
         error: "InternalServerError",
-        message:
-          (err as Error)?.message || "Unexpected error occurred",
+        message: "An unexpected error occurred. Please try again.",
       },
       { status: 500 }
     );

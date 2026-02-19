@@ -122,21 +122,21 @@ export async function recordRateLimitAttempt(
  * Extract client IP from Next.js request headers
  */
 export function getClientIp(headers: Headers): string {
-  // Check common headers set by proxies/load balancers
-  const forwarded = headers.get("x-forwarded-for");
-  if (forwarded) {
-    return forwarded.split(",")[0].trim();
+  // Prefer Vercel's trusted header (cannot be spoofed on Vercel)
+  const vercelForwardedFor = headers.get("x-vercel-forwarded-for");
+  if (vercelForwardedFor) {
+    return vercelForwardedFor.split(",")[0].trim();
   }
 
-  const realIp = headers.get("x-real-ip");
-  if (realIp) {
-    return realIp;
+  // Fallback for non-Vercel deployments
+  const xRealIp = headers.get("x-real-ip");
+  if (xRealIp) {
+    return xRealIp.trim();
   }
 
-  // Vercel-specific header
-  const vercelIp = headers.get("x-vercel-forwarded-for");
-  if (vercelIp) {
-    return vercelIp.split(",")[0].trim();
+  const xForwardedFor = headers.get("x-forwarded-for");
+  if (xForwardedFor) {
+    return xForwardedFor.split(",")[0].trim();
   }
 
   return "unknown";
