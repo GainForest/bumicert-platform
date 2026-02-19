@@ -15,6 +15,7 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { countries } from "@/lib/countries";
+import { checkRateLimit, recordRateLimitAttempt, getClientIp, RATE_LIMITS } from "@/lib/rate-limit";
 
 const VALID_OBJECTIVES = ["Conservation", "Research", "Education", "Community", "Other"] as const;
 type Objective = (typeof VALID_OBJECTIVES)[number];
@@ -45,6 +46,19 @@ function parseObjectives(text: string): Objective[] {
 
 export async function POST(req: NextRequest) {
   try {
+    const clientIp = getClientIp(req.headers);
+    const ipLimit = await checkRateLimit(
+      `ip:${clientIp}`,
+      "generate-short-description",
+      RATE_LIMITS.generateShortDescription.byIp
+    );
+    if (!ipLimit.allowed) {
+      return Response.json(
+        { error: "RateLimitExceeded", message: "Too many requests" },
+        { status: 429, headers: { "Retry-After": String(Math.ceil((ipLimit.resetAt.getTime() - Date.now()) / 1000)) } }
+      );
+    }
+
     const parsed = requestSchema.safeParse(await req.json());
 
     if (!parsed.success) {
@@ -68,6 +82,9 @@ export async function POST(req: NextRequest) {
       const fallback = createFallbackResponse(organizationName, countryName);
       return Response.json({ ...fallback, success: true });
     }
+
+    // Record attempt BEFORE the Gemini API call (to prevent TOCTOU race)
+    await recordRateLimitAttempt(`ip:${clientIp}`, "generate-short-description");
 
     try {
       const genAI = new GoogleGenerativeAI(apiKey);

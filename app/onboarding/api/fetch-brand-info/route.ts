@@ -14,6 +14,7 @@
  */
 import { NextRequest } from "next/server";
 import { z } from "zod";
+import { checkRateLimit, recordRateLimitAttempt, getClientIp, RATE_LIMITS } from "@/lib/rate-limit";
 
 const requestSchema = z.object({
   domain: z.string().min(1).transform((val) => {
@@ -111,6 +112,19 @@ function findBestLogo(logos?: BrandFetchLogo[]): string | undefined {
 
 export async function POST(req: NextRequest) {
   try {
+    const clientIp = getClientIp(req.headers);
+    const ipLimit = await checkRateLimit(
+      `ip:${clientIp}`,
+      "fetch-brand-info",
+      RATE_LIMITS.fetchBrandInfo.byIp
+    );
+    if (!ipLimit.allowed) {
+      return Response.json(
+        { error: "RateLimitExceeded", message: "Too many requests" },
+        { status: 429, headers: { "Retry-After": String(Math.ceil((ipLimit.resetAt.getTime() - Date.now()) / 1000)) } }
+      );
+    }
+
     const body = await req.json();
     const parsed = requestSchema.safeParse(body);
 
@@ -132,6 +146,9 @@ export async function POST(req: NextRequest) {
       console.warn("BRANDFETCH_API_KEY not configured");
       return Response.json({ found: false }, { status: 200 });
     }
+
+    // Record attempt BEFORE the BrandFetch API call (to prevent TOCTOU race)
+    await recordRateLimitAttempt(`ip:${clientIp}`, "fetch-brand-info");
 
     // Fetch from BrandFetch API
     const response = await fetch(

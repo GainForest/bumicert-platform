@@ -161,4 +161,10 @@ export const RATE_LIMITS = {
   onboard: {
     byIp: { windowMs: 60 * 60 * 1000, maxAttempts: 5 }, // 5 per hour per IP
   },
+  fetchBrandInfo: {
+    byIp: { windowMs: 60 * 60 * 1000, maxAttempts: 20 },
+  },
+  generateShortDescription: {
+    byIp: { windowMs: 60 * 60 * 1000, maxAttempts: 15 },
+  },
 } as const;
