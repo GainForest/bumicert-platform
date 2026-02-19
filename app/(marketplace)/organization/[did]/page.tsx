@@ -84,9 +84,9 @@ const OrganizationPage = async ({
     >
       <Container>
         <HeaderContent did={did} />
-        <Hero initialData={serializedData} initialDid={did} dynamic={false} />
-        <SubHero initialData={serializedData} dynamic={false} />
-        <AboutOrganization initialData={serializedData} dynamic={false} />
+        <Hero initialData={serializedData} initialDid={did} enableReactiveData={false} />
+        <SubHero initialData={serializedData} enableReactiveData={false} />
+        <AboutOrganization initialData={serializedData} enableReactiveData={false} />
         <hr />
         <SectionForData title="Bumicerts" userDid={did}>
           <div className="w-full h-40 bg-muted rounded-lg mt-2 flex flex-col items-center justify-center text-center text-pretty font-serif text-xl text-muted-foreground font-bold">

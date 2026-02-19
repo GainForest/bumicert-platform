@@ -180,14 +180,23 @@ export type Database = {
         Row: {
           email: string
           invite_token: string
+          pds_domain: string
+          used_at: string | null
+          used_by_did: string | null
         }
         Insert: {
           email: string
           invite_token: string
+          pds_domain: string
+          used_at?: string | null
+          used_by_did?: string | null
         }
         Update: {
           email?: string
           invite_token?: string
+          pds_domain?: string
+          used_at?: string | null
+          used_by_did?: string | null
         }
         Relationships: []
       }
@@ -374,6 +383,27 @@ export type Database = {
           feedback?: string | null
           id?: number
           rating?: number
+        }
+        Relationships: []
+      }
+      rate_limits: {
+        Row: {
+          id: string
+          identifier: string
+          endpoint: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          identifier: string
+          endpoint: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          identifier?: string
+          endpoint?: string
+          created_at?: string
         }
         Relationships: []
       }

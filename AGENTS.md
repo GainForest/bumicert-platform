@@ -28,13 +28,27 @@ This project uses [Git Worktrees](https://git-scm.com/docs/git-worktree) to mana
 -   **Usage**: When switching contexts or working on multiple features, check if a worktree already exists for your branch before creating a new one.
 -   **Path**: Be mindful of your current working directory (`cwd`). Ensure you are running commands (like `bun run dev` or git operations) within the correct worktree directory for the task at hand.
 
+## Issue Tracking
+
+This project uses **hb** for issue tracking.
+Run `hb prime` for workflow context.
+
+Quick reference:
+- `hb ready` - Find work
+- `hb create "Title" --type task --priority 2` - Create issue
+- `hb update <id> --claim` - Claim work
+- `hb comment get <id>` - Read comments
+- `hb comment add <id> "text"` - Post a comment
+- `hb close <id>` - Complete work
+- `hb sync` - Sync with git
+
 ## Workflows
 
 ### 1. Documenting Changes (Changesets)
 - **Crucial**: Every PR must have **exactly one** changeset file documenting all significant changes.
-- -   **Rule**: If you modify code, you must create/update a changeset. Do not create multiple changeset files for the same PR; consolidate them if needed.
-- -   **Quality**: The summary must be human-readable and descriptive (e.g., "Added a new pricing page" instead of "feat: add page").
-- -   **Screenshots**: If the change involves UI and you are editing the **CHANGELOG** (not the changeset), you MUST include a Vercel Blob URL to a screenshot. **Prompt the user to provide a screenshot if you cannot capture one yourself.**
+-   **Rule**: If you modify code, you must create/update a changeset. Do not create multiple changeset files for the same PR; consolidate them if needed.
+-   **Quality**: The summary must be human-readable and descriptive (e.g., "Added a new pricing page" instead of "feat: add page").
+-   **Screenshots**: If the change involves UI and you are editing the **CHANGELOG** (not the changeset), you MUST include a Vercel Blob URL to a screenshot. **Prompt the user to provide a screenshot if you cannot capture one yourself.**
 -   See [changeset.md](./changeset.md) for detailed instructions on how to create a changeset.
 -   **Command**: `bun run changeset`
 
@@ -54,3 +68,30 @@ This project uses [Git Worktrees](https://git-scm.com/docs/git-worktree) to mana
 -   `package.json`: Dependencies and scripts.
 -   `README.md`: General human-facing documentation.
 -   `changeset.md`: Specific instructions for versioning.
+
+
+## Landing the Plane (Session Completion)
+
+**When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.
+
+**MANDATORY WORKFLOW:**
+
+1. **File issues for remaining work** - Create issues for anything that needs follow-up
+2. **Run quality gates** (if code changed) - Tests, linters, builds
+3. **Update issue status** - Close finished work, update in-progress items
+4. **PUSH TO REMOTE** - This is MANDATORY:
+   ```bash
+   git pull --rebase
+   hb sync
+   git push
+   git status  # MUST show "up to date with origin"
+   ```
+5. **Clean up** - Clear stashes, prune remote branches
+6. **Verify** - All changes committed AND pushed
+7. **Hand off** - Provide context for next session
+
+**CRITICAL RULES:**
+- Work is NOT complete until `git push` succeeds
+- NEVER stop before pushing - that leaves work stranded locally
+- NEVER say "ready to push when you are" - YOU must push
+- If push fails, resolve and retry until it succeeds

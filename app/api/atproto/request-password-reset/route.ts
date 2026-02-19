@@ -1,5 +1,11 @@
 import { NextRequest } from "next/server";
-import { allowedPDSDomains } from "@/config/gainforest-sdk";
+import { defaultPdsDomain } from "@/config/gainforest-sdk";
+import {
+  checkRateLimit,
+  recordRateLimitAttempt,
+  getClientIp,
+  RATE_LIMITS,
+} from "@/lib/rate-limit";
 
 /**
  * POST /api/atproto/request-password-reset
@@ -38,7 +44,42 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const service = allowedPDSDomains[0];
+    const clientIp = getClientIp(req.headers);
+
+    const ipLimit = await checkRateLimit(
+      `ip:${clientIp}`,
+      "password-reset-request",
+      RATE_LIMITS.passwordResetRequest.byIp
+    );
+    if (!ipLimit.allowed) {
+      return new Response(
+        JSON.stringify({ error: "RateLimitExceeded", message: "Too many requests" }),
+        {
+          status: 429,
+          headers: {
+            "Content-Type": "application/json",
+            "Retry-After": String(
+              Math.ceil((ipLimit.resetAt.getTime() - Date.now()) / 1000)
+            ),
+          },
+        }
+      );
+    }
+
+    const emailLimit = await checkRateLimit(
+      `email:${email}`,
+      "password-reset-request",
+      RATE_LIMITS.passwordResetRequest.byEmail
+    );
+    if (!emailLimit.allowed) {
+      // Return generic success to prevent email enumeration
+      return new Response(JSON.stringify({ success: true }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    const service = defaultPdsDomain;
 
     const response = await fetch(
       `https://${service}/xrpc/com.atproto.server.requestPasswordReset`,
@@ -57,6 +98,10 @@ export async function POST(req: NextRequest) {
         headers: { "Content-Type": "application/json" },
       });
     }
+
+    // Record rate limit attempts after successful PDS call
+    await recordRateLimitAttempt(`ip:${clientIp}`, "password-reset-request");
+    await recordRateLimitAttempt(`email:${email}`, "password-reset-request");
 
     // Return success (PDS will send the email)
     return new Response(JSON.stringify({ success: true }), {

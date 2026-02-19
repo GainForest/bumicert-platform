@@ -12,6 +12,7 @@ export const links = {
     projects: didCatcher((did) => `/upload/organization/${did}/projects`),
     sites: didCatcher((did) => `/upload/organization/${did}/sites`),
     layers: didCatcher((did) => `/upload/organization/${did}/layers`),
+    audio: didCatcher((did) => `/upload/organization/${did}/audio`),
     bumicerts: didCatcher((did) => `/upload/organization/${did}/bumicerts`),
   },
   user: didCatcher((did) => `/user/${did}`),
@@ -22,7 +23,13 @@ export const links = {
     view: (bumicertId: string) => `/bumicert/${bumicertId}`,
   },
   api: {
-    onboarding: "/api/airtable/onboarding",
+    onboarding: {
+      sendInviteEmail: "/onboarding/api/send-invite-email",
+      verifyInviteCode: "/onboarding/api/verify-invite-code",
+      generateShortDescription: "/onboarding/api/generate-short-description",
+      fetchBrandInfo: "/onboarding/api/fetch-brand-info",
+      onboard: "/onboarding/api/onboard",
+    },
     aws: {
       upload: {
         image: "/api/aws/upload/image",

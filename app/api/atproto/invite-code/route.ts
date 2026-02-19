@@ -22,6 +22,8 @@ type XrpcInviteResponse = {
 
 export async function POST(req: NextRequest) {
   try {
+    const existingInvites: { email: string; inviteCode: string }[] = [];
+
     // --- Parse & normalize body ---
     const body = (await req.json()) as {
       email?: string;
@@ -34,7 +36,7 @@ export async function POST(req: NextRequest) {
       : body.email ? [body.email]
       : [];
 
-    const emails = emailsInput
+    let emails = emailsInput
       .map((e) => (e ?? "").trim().toLowerCase())
       .filter(Boolean);
 
@@ -54,12 +56,61 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const isAdmin = process.env.INVITE_CODES_PASSWORD === (body.password ?? "");
+    // Allow "insecure" password for onboarding flow (works in all environments for testing)
+    const isInsecureMode = (body.password ?? "") === "insecure";
+    const isAdmin =
+      isInsecureMode ||
+      process.env.INVITE_CODES_PASSWORD === (body.password ?? "");
+
     if (!isAdmin) {
-      return new Response(JSON.stringify({ error: "Unauthorized", message: "Invalid admin credentials" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({
+          error: "Unauthorized",
+          message: "Invalid admin credentials",
+        }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // When using "insecure" mode, check if invite codes already exist in the database
+    if (isInsecureMode) {
+      try {
+        const emailsNeedingNewCodes: string[] = [];
+
+        for (const email of emails) {
+          const existing = await sql`
+            SELECT invite_token FROM invites WHERE email = ${email} LIMIT 1
+          `;
+
+          if (existing.length > 0 && existing[0].invite_token) {
+            existingInvites.push({ email, inviteCode: existing[0].invite_token });
+          } else {
+            emailsNeedingNewCodes.push(email);
+          }
+        }
+
+        // If all emails have existing invite codes, return them
+        if (emailsNeedingNewCodes.length === 0) {
+          return new Response(JSON.stringify({ invites: existingInvites }), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+
+        // Otherwise, continue with creating new codes only for emails that don't have one
+        // We'll merge the results at the end
+        if (existingInvites.length > 0) {
+          // Some emails have existing codes, only create for the rest
+          // Update emails to only include those needing new codes
+          emails = emailsNeedingNewCodes;
+        }
+      } catch (dbErr) {
+        console.error("Failed to check existing invites:", dbErr);
+        // Continue with normal flow if DB check fails
+      }
     }
 
     const service = process.env.NEXT_PUBLIC_ATPROTO_SERVICE_URL || `https://${allowedPDSDomains[0]}`;
@@ -69,6 +120,14 @@ export async function POST(req: NextRequest) {
 
     // so N codes for N emails  with use count being 1
     const codeCount = emails.length;
+
+    // If all emails already had codes (codeCount is 0), we would have returned earlier
+    if (codeCount === 0) {
+      return new Response(JSON.stringify({ invites: existingInvites }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
     const response = await fetch(`${service}/xrpc/com.atproto.server.createInviteCodes`, {
       method: "POST",
@@ -123,7 +182,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return new Response(JSON.stringify({ invites: results }), {
+    // Merge with any existing invites (from insecure mode check)
+    const allInvites = [...existingInvites, ...results];
+
+    return new Response(JSON.stringify({ invites: allInvites }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });

@@ -22,11 +22,12 @@ import {
   User2,
   Check,
   ArrowRight,
+  Building,
 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useModal } from "@/components/ui/modal/context";
-import { GetAnInviteModal, GetAnInviteModalId } from "./get-an-invite";
 import SignInModal, { SignInModalId } from "./sign-in";
+import Link from "next/link";
 import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { useAtprotoStore } from "@/components/stores/atproto";
 
@@ -116,17 +117,12 @@ const SignUpModal = () => {
           </InputGroup>
           <span className="text-xs text-muted-foreground">
             Don&apos;t have an invite code yet?{" "}
-            <button
-              className="text-primary font-medium cursor-pointer"
-              onClick={() => {
-                pushModal({
-                  id: GetAnInviteModalId,
-                  content: <GetAnInviteModal />,
-                });
-              }}
+            <Link
+              href="/onboarding"
+              className="text-primary font-medium cursor-pointer hover:underline"
             >
               Get an invite code
-            </button>{" "}
+            </Link>{" "}
             now.
           </span>
         </div>
@@ -145,10 +141,10 @@ const SignUpModal = () => {
           </InputGroup>
         </div>
         <div className="flex flex-col gap-1">
-          <span className="text-sm">Type your desired handle</span>
+          <span className="text-sm">Type your desired username</span>
           <InputGroup>
             <InputGroupAddon>
-              <User2 />
+              <Building />
             </InputGroupAddon>
             <InputGroupInput
               placeholder="john-doe"
@@ -188,7 +184,7 @@ const SignUpModal = () => {
           </InputGroup>
         </div>
         <div className="flex flex-col gap-1">
-          <span className="text-sm">Secure Password</span>
+          <span className="text-sm">Repeat Password</span>
           <InputGroup>
             <InputGroupAddon>
               <LockIcon />

@@ -73,7 +73,7 @@ const AllOrganizationsClient = ({
       result = result.filter(
         (org) =>
           org.displayName.toLowerCase().includes(query) ||
-          org.shortDescription.toLowerCase().includes(query)
+          org.shortDescription.text.toLowerCase().includes(query)
       );
     }
 
