@@ -181,16 +181,22 @@ export type Database = {
           email: string
           invite_token: string
           pds_domain: string
+          used_at: string | null
+          used_by_did: string | null
         }
         Insert: {
           email: string
           invite_token: string
           pds_domain: string
+          used_at?: string | null
+          used_by_did?: string | null
         }
         Update: {
           email?: string
           invite_token?: string
           pds_domain?: string
+          used_at?: string | null
+          used_by_did?: string | null
         }
         Relationships: []
       }

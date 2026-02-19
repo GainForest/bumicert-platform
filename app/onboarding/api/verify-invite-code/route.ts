@@ -109,6 +109,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (inviteResult.data.used_at) {
+      await recordRateLimitAttempt(`ip:${clientIp}`, "verify-invite-code");
+      return Response.json(
+        { error: "InviteAlreadyUsed", message: "This invite code has already been used" },
+        { status: 400 }
+      );
+    }
+
     await recordRateLimitAttempt(`ip:${clientIp}`, "verify-invite-code");
     return Response.json(
       {
@@ -122,9 +130,7 @@ export async function POST(req: NextRequest) {
     return Response.json(
       {
         error: "InternalServerError",
-        message:
-          (err as Record<string, string>)?.message ||
-          "Unexpected error occurred",
+        message: "An unexpected error occurred. Please try again.",
       },
       { status: 500 }
     );
