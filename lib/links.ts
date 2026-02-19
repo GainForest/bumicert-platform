@@ -12,6 +12,7 @@ export const links = {
     projects: didCatcher((did) => `/upload/organization/${did}/projects`),
     sites: didCatcher((did) => `/upload/organization/${did}/sites`),
     layers: didCatcher((did) => `/upload/organization/${did}/layers`),
+    audio: didCatcher((did) => `/upload/organization/${did}/audio`),
     bumicerts: didCatcher((did) => `/upload/organization/${did}/bumicerts`),
   },
   user: didCatcher((did) => `/user/${did}`),

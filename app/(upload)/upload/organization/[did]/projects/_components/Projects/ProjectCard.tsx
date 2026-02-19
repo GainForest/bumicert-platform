@@ -44,7 +44,7 @@ const ProjectCard = ({ projectData, did }: ProjectCardProps) => {
         <div className="px-3 py-4">
           <h3 className="font-medium text-lg mb-2">{project.title}</h3>
           {project.description && (
-            <div className="text-sm text-muted-foreground mb-4 line-clamp-2">
+            <div className="text-sm text-muted-foreground mb-4 max-h-10 overflow-hidden">
               <DynamicLinearDocument document={project.description} />
             </div>
           )}

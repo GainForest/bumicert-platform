@@ -214,6 +214,7 @@ const Step5 = () => {
       onError: (error) => {
         console.error(error);
         setCreateBumicertError(error.message);
+        setHasClickedPublish(false);
       },
       onMutate: () => {
         setIsBumicertCreationMutationInFlight(true);
@@ -368,16 +369,16 @@ const Step5 = () => {
             <span className="mt-1">
               Your bumicert was published successfully!
             </span>
-            <Link
-              href={links.bumicert.view(
-                `${parseAtUri(createdBumicertResponse.uri).did}-${parseAtUri(createdBumicertResponse.uri).rkey
-                }`
-              )}
-            >
-              <Button className="mt-2">
+            <Button className="mt-2" asChild>
+              <Link
+                href={links.bumicert.view(
+                  `${parseAtUri(createdBumicertResponse.uri).did}-${parseAtUri(createdBumicertResponse.uri).rkey
+                  }`
+                )}
+              >
                 View bumicert <ArrowRightIcon />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </motion.div>
         )}
     </div>

@@ -54,7 +54,7 @@ export const UploadLogoModal = () => {
     if (!organizationInfo)
       throw new Error("Organization information is required");
     
-    const shortDescription = organizationInfo?.shortDescription || { text: "", facets: [] };
+    const shortDescription = organizationInfo.shortDescription ?? { text: "", facets: [] };
     
     await uploadLogo({
       did: auth.user?.did ?? "",
