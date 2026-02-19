@@ -11,7 +11,7 @@
  *   1. Rate limiting: Max 1 email per address per 5 minutes
  *   2. Invite code: Checks DB for existing code matching email+pdsDomain, reuses if found, otherwise mints new one via PDS admin API
  *   3. Email: Sends invite code via Resend
- *   4. Tracking: Updates rate_limits table only after successful send
+ *   4. Tracking: Records rate limit attempts immediately after checks pass (before email send) to prevent TOCTOU races
  *
  * Responses:
  *   200: { success: true }
@@ -100,6 +100,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Record rate limit attempts immediately after checks pass, before any email
+    // sending or invite code logic, to prevent TOCTOU race conditions where two
+    // concurrent requests both pass the check before either records an attempt.
+    await recordRateLimitAttempt(`ip:${clientIp}`, 'send-invite-email');
+    await recordRateLimitAttempt(`email:${email}`, 'send-invite-email');
+
     const inviteCode = await getOrCreateInviteCode(
       supabase,
       email,
@@ -122,10 +128,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Record rate limit attempts after successful email send
-    await recordRateLimitAttempt(`ip:${clientIp}`, 'send-invite-email');
-    await recordRateLimitAttempt(`email:${email}`, 'send-invite-email');
-
     return Response.json({ success: true });
   } catch (err: unknown) {
     if (isInviteCodeError(err)) {
@@ -136,9 +138,7 @@ export async function POST(req: NextRequest) {
     return Response.json(
       {
         error: "InternalServerError",
-        message:
-          (err as Record<string, string>)?.message ||
-          "Unexpected error occurred",
+        message: "An unexpected error occurred. Please try again.",
       },
       { status: 500 }
     );
