@@ -1,11 +1,9 @@
 "use client";
 
 import { useNavbarContext } from "@/components/global/Navbar/context";
-import MarkdownEditor from "@/components/ui/markdown-editor";
 import { cn } from "@/lib/utils";
 import React, { useState, useRef, useEffect } from "react";
 import SiteBoundaries from "./SiteBoundaries";
-import { FullHypercert } from "@/graphql/hypercerts/queries/fullHypercertById";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ChevronDownIcon } from "lucide-react";
@@ -14,6 +12,14 @@ import {
   deserialize,
   SerializedSuperjson,
 } from "gainforest-sdk/utilities/transform";
+import dynamic from "next/dynamic";
+import type { RichTextRecord } from "bsky-richtext-react";
+import { richTextDisplayClassNames, toRichTextFacets } from "@/lib/richtext";
+
+const DynamicRichTextDisplay = dynamic(
+  () => import("bsky-richtext-react").then((mod) => mod.RichTextDisplay),
+  { ssr: false }
+);
 
 // Custom hook to handle collapsible content
 const useCollapsible = (maxHeight: number = 320) => {
@@ -46,9 +52,11 @@ const useCollapsible = (maxHeight: number = 320) => {
 // Collapsible Description Component
 const CollapsibleDescription = ({
   description,
+  descriptionFacets,
   maxHeight = 360,
 }: {
   description: string;
+  descriptionFacets?: RichTextRecord["facets"];
   maxHeight?: number;
 }) => {
   const { isExpanded, setIsExpanded, shouldShowButton, contentRef } =
@@ -65,8 +73,12 @@ const CollapsibleDescription = ({
         <h2 className="text-2xl font-bold font-serif px-3 text-primary">
           Description
         </h2>
-        <div className="p-3">{description}</div>
-        {/* <MarkdownEditor markdown={description} showToolbar={false} readOnly /> */}
+        <div className="p-3">
+          <DynamicRichTextDisplay
+            value={{ text: description, facets: descriptionFacets }}
+            classNames={richTextDisplayClassNames}
+          />
+        </div>
       </div>
       {shouldShowButton && (
         <div
@@ -111,6 +123,10 @@ const Body = ({
     displayMode = "side-by-side";
   }
 
+  const descriptionFacets = bumicert.descriptionFacets
+    ? toRichTextFacets(bumicert.descriptionFacets)
+    : undefined;
+
   return (
     <div
       className={cn(
@@ -120,7 +136,10 @@ const Body = ({
           : "grid-cols-1 min-[1000px]:grid-cols-[1fr_300px]"
       )}
     >
-      <CollapsibleDescription description={bumicert.description ?? ""} />
+      <CollapsibleDescription
+        description={bumicert.description ?? ""}
+        descriptionFacets={descriptionFacets}
+      />
       <div className="flex flex-col px-3 min-[1000px]:px-0">
         {bumicert.locations && bumicert.locations.length > 0 && (
           <SiteBoundaries locationAtUri={bumicert.locations[0].uri} />

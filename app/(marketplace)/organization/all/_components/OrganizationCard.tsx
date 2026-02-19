@@ -1,10 +1,17 @@
 "use client";
 
-import { Building2, BuildingIcon, Globe, Leaf } from "lucide-react";
+import { BuildingIcon, Globe, Leaf } from "lucide-react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { countries } from "@/lib/countries";
+import { richTextDisplayClassNames, toRichTextRecord } from "@/lib/richtext";
 import type { OrganizationWithBumicertCount } from "../page";
+
+const DynamicRichTextDisplay = dynamic(
+  () => import("bsky-richtext-react").then((mod) => mod.RichTextDisplay),
+  { ssr: false }
+);
 
 interface OrganizationCardProps {
   organization: OrganizationWithBumicertCount;
@@ -50,9 +57,13 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="text-sm text-muted-foreground line-clamp-4 p-1">
-          {organization.shortDescription}
-        </p>
+        <div className="text-sm text-muted-foreground max-h-20 overflow-hidden p-1">
+          {organization.shortDescription.text ? (
+            <DynamicRichTextDisplay value={toRichTextRecord(organization.shortDescription)} classNames={richTextDisplayClassNames} />
+          ) : (
+            "No description provided."
+          )}
+        </div>
       </div>
 
       <div className="mt-4 flex items-center justify-between">

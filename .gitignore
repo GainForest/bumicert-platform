@@ -49,3 +49,6 @@ yarn.lock
 AGENTS.local.md
 agent-docs/
 app/agents-test-pages/
+
+# Any local files
+/.local

@@ -58,11 +58,11 @@ export const ProfileModal = () => {
 
   // Prefer displayName from profile, fallback to handle prefix, fallback to truncated DID
   const displayName = auth.user.displayName
-    ?? (auth.user.handle
+    ?? (auth.user.handle && auth.user.handle !== 'handle.invalid'
       ? auth.user.handle.split(".")[0]
       : auth.user.did.slice(0, 16) + "...");
 
-  const domain = auth.user.handle
+  const domain = auth.user.handle && auth.user.handle !== 'handle.invalid'
     ? auth.user.handle.split(".").slice(1).join(".")
     : "DID";
 

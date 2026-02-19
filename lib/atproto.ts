@@ -34,14 +34,14 @@ const isDev = process.env.NODE_ENV === "development";
  * Disclaimer when testing previews only works with the branch name preview and not with the commit name preview
  */
 export const resolvePublicUrl = (): string => {
-  if (process.env.NEXT_PUBLIC_BASE_URL) {
-    return process.env.NEXT_PUBLIC_BASE_URL;
-  }
   if (process.env.VERCEL_BRANCH_URL) {
     return `https://${process.env.VERCEL_BRANCH_URL}`;
   }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
   if (isDev) {
-    return "http://127.0.0.1:3000";
+    return `http://127.0.0.1:${process.env.PORT ?? 3000}`;
   }
   throw new Error(
     "Set NEXT_PUBLIC_BASE_URL, or deploy to Vercel (provides VERCEL_PROJECT_PRODUCTION_URL / VERCEL_BRANCH_URL automatically)"

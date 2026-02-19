@@ -90,13 +90,21 @@ export async function checkSession(): Promise<
     return { authenticated: false };
   }
 
-  // Optionally verify the OAuth session is still valid
-  // This is commented out to avoid unnecessary Supabase calls on every check
-  // Uncomment if you need strict session validation
-  // const oauthSession = await atprotoSDK.restoreSession(session.did);
-  // if (!oauthSession) {
-  //   return { authenticated: false };
-  // }
+  // Verify the OAuth session is still valid in Supabase.
+  // This catches cases where the session was deleted by another process
+  // (e.g. logging in from a different device/tab), preventing the UI from
+  // showing the user as logged in when their tokens are actually gone.
+  try {
+    const oauthSession = await atprotoSDK.restoreSession(session.did);
+    if (!oauthSession) {
+      await clearAppSession();
+      return { authenticated: false };
+    }
+  } catch {
+    // Session is dead — clear the stale cookie so the UI stays in sync
+    await clearAppSession();
+    return { authenticated: false };
+  }
 
   return {
     authenticated: true,
@@ -135,7 +143,9 @@ export type ProfileData = {
  */
 export async function getProfile(did: string): Promise<ProfileData | null> {
   try {
-    // Restore OAuth session from Supabase
+    // Re-use the already-validated session from checkSession.
+    // restoreSession here is a lightweight cache hit since checkSession
+    // already verified the session is alive moments ago.
     const session = await atprotoSDK.restoreSession(did);
     if (!session) {
       console.error("Could not restore session for profile fetch");
@@ -166,6 +176,8 @@ export async function getProfile(did: string): Promise<ProfileData | null> {
     };
   } catch (error) {
     console.error("Error fetching profile:", error);
+    // Clear the stale session so the UI reflects the true logged-out state
+    await clearAppSession();
     return null;
   }
 }
