@@ -50,5 +50,5 @@ AGENTS.local.md
 agent-docs/
 app/agents-test-pages/
 
-# Audio files
-public/audio/
+# Any local files
+/.local
