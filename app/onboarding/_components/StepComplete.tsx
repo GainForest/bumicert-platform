@@ -9,7 +9,7 @@ import {
   LogIn,
   XCircle,
 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { allowedPDSDomains } from "@/config/gainforest-sdk";
 import { motion } from "framer-motion";
 import { links } from "@/lib/links";
@@ -25,8 +25,12 @@ export function StepComplete() {
     data.accountCreated ? "success" : "idle"
   );
   const { show, pushModal } = useModal();
+  const isSubmittingRef = useRef(false);
+  const isCreating = completionState === "creating";
 
   const createAccount = async () => {
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
     setCompletionState("creating");
     setError(null);
 
@@ -94,6 +98,7 @@ export function StepComplete() {
         err instanceof Error ? err.message : "An unexpected error occurred"
       );
       setCompletionState("error");
+      isSubmittingRef.current = false;
     }
   };
 
@@ -158,7 +163,7 @@ export function StepComplete() {
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back
             </Button>
-            <Button onClick={createAccount}>
+            <Button onClick={createAccount} disabled={isCreating}>
               Agree and Create Account
             </Button>
           </div>

@@ -108,6 +108,8 @@ export const getOrCreateInviteCode = async (
   email: string,
   pdsDomain: AllowedPDSDomain
 ): Promise<string> => {
+  // NOTE: Requires UNIQUE constraint on invites(email, pds_domain) in the database.
+  // Without it, concurrent requests can create duplicate invite rows.
   const normalizedEmail = email.trim().toLowerCase();
 
   const existing = await supabase
@@ -126,15 +128,34 @@ export const getOrCreateInviteCode = async (
   }
 
   const [inviteCode] = await mintInviteCodes(pdsDomain, 1);
-  const insertResult = await supabase
-    .from("invites")
-    .insert({ email: normalizedEmail, invite_token: inviteCode, pds_domain: pdsDomain });
 
-  if (insertResult.error) {
+  // Use upsert to handle race condition: if a concurrent request inserted
+  // between our check and now, ignoreDuplicates prevents failure.
+  // Requires UNIQUE constraint on (email, pds_domain) in the database.
+  const upsertResult = await supabase
+    .from("invites")
+    .upsert(
+      { email: normalizedEmail, invite_token: inviteCode, pds_domain: pdsDomain },
+      { onConflict: "email,pds_domain", ignoreDuplicates: true }
+    );
+
+  if (upsertResult.error) {
     throwInviteError(500, "DatabaseError", "Failed to persist invite");
   }
 
-  return inviteCode;
+  // Re-read to get whichever code won the race
+  const finalResult = await supabase
+    .from("invites")
+    .select("invite_token")
+    .eq("email", normalizedEmail)
+    .eq("pds_domain", pdsDomain)
+    .single();
+
+  if (finalResult.error || !finalResult.data?.invite_token) {
+    throwInviteError(500, "DatabaseError", "Failed to read back invite");
+  }
+
+  return finalResult.data.invite_token;
 };
 
 export const fetchExistingInvites = async (

@@ -242,6 +242,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Idempotency check: if invite was already used, return the existing DID
+    if (inviteResult.data.used_at && inviteResult.data.used_by_did) {
+      return Response.json({
+        success: true,
+        did: inviteResult.data.used_by_did,
+        handle: `${handle}.${pdsDomain}`,
+        organizationInitialized: true, // assume it was initialized on first attempt
+        alreadyCreated: true,
+      });
+    }
+
     // Step 3: Create account on PDS
     const fullHandle = `${handle}.${pdsDomain}`;
     const accountResponse = await fetch(
