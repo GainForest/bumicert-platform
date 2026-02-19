@@ -85,6 +85,23 @@ async function fileToBase64(file: File): Promise<{ name: string; type: string; d
   };
 }
 
+
+/**
+ * Convert a plain text string to a LinearDocument format expected by the SDK.
+ * Splits by double newlines into separate text blocks for paragraph separation.
+ */
+function plainTextToLinearDocument(text: string) {
+  const paragraphs = text.split(/\n\n+/).filter(p => p.trim().length > 0);
+  return {
+    blocks: paragraphs.map(paragraph => ({
+      block: {
+        $type: "pub.leaflet.blocks.text" as const,
+        plaintext: paragraph.trim(),
+      },
+    })),
+  };
+}
+
 export async function POST(req: NextRequest) {
   try {
     const clientIp = getClientIp(req.headers);
@@ -279,7 +296,7 @@ export async function POST(req: NextRequest) {
         info: {
           displayName: orgInfo.displayName,
           shortDescription: orgInfo.shortDescription,
-          longDescription: orgInfo.longDescription,
+          longDescription: plainTextToLinearDocument(orgInfo.longDescription),
           objectives: parsed.data.objectives,
           country: orgInfo.country,
           visibility: "Public",
