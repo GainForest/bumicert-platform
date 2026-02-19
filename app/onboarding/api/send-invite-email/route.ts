@@ -21,7 +21,7 @@
  */
 import { NextRequest } from "next/server";
 import { z } from "zod";
-import { allowedPDSDomains, type AllowedPDSDomain } from "@/config/gainforest-sdk";
+import { allowedPDSDomains, defaultPdsDomain, type AllowedPDSDomain } from "@/config/gainforest-sdk";
 import { InviteCodeEmail } from "@/email-templates/InviteCodeEmail";
 import {
   getOrCreateInviteCode,
@@ -37,6 +37,8 @@ const requestSchema = z.object({
     .string()
     .trim()
     .toLowerCase()
+    .optional()
+    .default(defaultPdsDomain)
     .refine(
       (value) => allowedPDSDomains.includes(value as AllowedPDSDomain),
       { message: "Unsupported pdsDomain" }
@@ -52,7 +54,7 @@ export async function POST(req: NextRequest) {
         {
           error: "BadRequest",
           message: "Invalid request body",
-          issues: parsed.error,
+          issues: parsed.error.issues,
         },
         { status: 400 }
       );

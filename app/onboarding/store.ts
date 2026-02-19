@@ -142,7 +142,13 @@ export function generateHandle(
 
   // Add country code if available
   if (countryCode) {
-    handle = `${handle}-${countryCode.toLowerCase()}`;
+    handle = handle
+      ? `${handle}-${countryCode.toLowerCase()}`
+      : countryCode.toLowerCase();
+  }
+
+  if (!handle) {
+    handle = "org";
   }
 
   return handle;

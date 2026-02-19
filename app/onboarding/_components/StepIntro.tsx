@@ -61,7 +61,13 @@ export function StepIntro() {
         </p>
 
         {/* Form */}
-        <div className="w-full space-y-4 mt-2">
+        <form
+          className="w-full space-y-4 mt-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (canContinueWithWebsite) handleContinue();
+          }}
+        >
           <div>
             <label
               htmlFor="website"
@@ -84,26 +90,27 @@ export function StepIntro() {
               </p>
             )}
           </div>
-        </div>
 
-        {/* Buttons */}
-        <div className="w-full flex flex-col gap-2 mt-2">
-          <Button
-            onClick={handleContinue}
-            disabled={!canContinueWithWebsite}
-            className="w-full"
-          >
-            Continue
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
-          <Button
-            onClick={handleSkip}
-            variant="ghost"
-            className="w-full text-muted-foreground"
-          >
-            Skip
-          </Button>
-        </div>
+          {/* Buttons */}
+          <div className="w-full flex flex-col gap-2 mt-2">
+            <Button
+              type="submit"
+              disabled={!canContinueWithWebsite}
+              className="w-full"
+            >
+              Continue
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+            <Button
+              type="button"
+              onClick={handleSkip}
+              variant="ghost"
+              className="w-full text-muted-foreground"
+            >
+              Skip
+            </Button>
+          </div>
+        </form>
       </div>
     </motion.div>
   );
