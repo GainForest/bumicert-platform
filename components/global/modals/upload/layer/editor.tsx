@@ -52,10 +52,6 @@ const layerTypes: {
 export const LayerEditorModal = ({ initialData }: LayerEditorModalProps) => {
   const initialLayer = initialData?.value;
   const mode = initialData ? "edit" : "add";
-  const rkey = useMemo(
-    () => (initialData?.uri ? parseAtUri(initialData.uri).rkey : undefined),
-    [initialData]
-  );
 
   const [name, setName] = useState(initialLayer?.name ?? "");
   const [type, setType] = useState<
@@ -66,43 +62,38 @@ export const LayerEditorModal = ({ initialData }: LayerEditorModalProps) => {
     initialLayer?.description ?? ""
   );
 
-  const auth = useAtprotoStore((state) => state.auth);
-  const did = auth.user?.did ?? "";
-
   const { stack, popModal, hide } = useModal();
-  const utils = trpcApi.useUtils();
-  const layerRouter = trpcApi.gainforest.organization.layer;
 
-  const [isCompleted, setIsCompleted] = useState(false);
+  // TODO: Restore layer.createOrUpdate when SDK supports it
+  // See: https://github.com/GainForest/bumicerts-platform/issues/TBD
 
-  const {
-    mutate: handleCreateOrUpdate,
-    isPending,
-    error,
-  } = layerRouter.createOrUpdate.useMutation({
-    onSuccess: () => {
-      utils.gainforest.organization.layer.getAll.invalidate({
-        did,
-        pdsDomain: allowedPDSDomains[0],
-      });
-      setIsCompleted(true);
-    },
-  });
+  const isCompleted = false; // Will be state when feature is enabled
+  const isPending = false;
+  const error = null;
+  const isFeatureDisabled = true; // Remove this when SDK supports layer.createOrUpdate
 
-  const disableSubmit = !name.trim() || !type || !uri.trim();
+  const disableSubmit = !name.trim() || !type || !uri.trim() || isFeatureDisabled;
 
   const onSubmit = () => {
-    handleCreateOrUpdate({
-      did,
-      rkey,
-      layer: {
-        name: name.trim(),
-        type: type as AppGainforestOrganizationLayer.Record["type"],
-        uri: uri.trim(),
-        description: description.trim() || undefined,
-      },
-      pdsDomain: allowedPDSDomains[0],
-    });
+    // TODO: Restore when SDK supports layer.createOrUpdate
+    // handleCreateOrUpdate({
+    //   did,
+    //   rkey,
+    //   layer: {
+    //     name: name.trim(),
+    //     type: type as AppGainforestOrganizationLayer.Record["type"],
+    //     uri: uri.trim(),
+    //     description: description.trim() || undefined,
+    //   },
+    //   pdsDomain: allowedPDSDomains[0],
+    // });
+    console.warn("Layer create/update is not yet supported by the SDK");
+  };
+
+  const getButtonText = () => {
+    if (isFeatureDisabled) return 'Coming soon';
+    if (mode === 'edit') return isPending ? 'Saving...' : 'Save';
+    return isPending ? 'Adding...' : 'Add layer';
   };
 
   return (
@@ -209,20 +200,20 @@ export const LayerEditorModal = ({ initialData }: LayerEditorModalProps) => {
 
             {error && (
               <div className="text-sm text-destructive">
-                {error.message.startsWith("[") ? "Bad request" : error.message}
+                {(error as { message?: string })?.message ?? String(error)}
+              </div>
+            )}
+
+            {isFeatureDisabled && (
+              <div className="text-sm text-muted-foreground bg-muted p-3 rounded-md">
+                Layer creation/editing is coming soon. This feature is not yet available.
               </div>
             )}
 
             <ModalFooter>
               <Button onClick={onSubmit} disabled={disableSubmit || isPending}>
                 {isPending && <Loader2 className="animate-spin mr-2" />}
-                {mode === "edit"
-                  ? isPending
-                    ? "Saving..."
-                    : "Save"
-                  : isPending
-                  ? "Adding..."
-                  : "Add layer"}
+                {getButtonText()}
               </Button>
             </ModalFooter>
           </motion.section>
