@@ -85,6 +85,9 @@ export function StepComplete() {
       });
 
       setCompletionState("success");
+
+      // Clear sensitive data from store after successful account creation
+      updateData({ password: "", confirmPassword: "" });
     } catch (err) {
       console.error("Account creation error:", err);
       setError(
