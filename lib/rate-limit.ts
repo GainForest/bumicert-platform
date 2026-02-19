@@ -3,6 +3,13 @@ import { getSupabaseAdmin } from "@/lib/supabase/server";
 
 const RATE_LIMIT_HMAC_KEY = process.env.RATE_LIMIT_HMAC_KEY ?? "";
 
+if (!RATE_LIMIT_HMAC_KEY && process.env.NODE_ENV === "production") {
+  console.warn(
+    "[rate-limit] RATE_LIMIT_HMAC_KEY is not set — PII hashing is weakened. " +
+    "Set this env var in production to protect email/IP privacy in the rate_limits table."
+  );
+}
+
 /**
  * Hash an identifier (email/IP) with HMAC-SHA256 to avoid storing PII in the rate_limits table.
  * Lookups remain deterministic because the same key + identifier always produce the same hash.
