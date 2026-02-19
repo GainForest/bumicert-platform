@@ -22,6 +22,8 @@ type XrpcInviteResponse = {
 
 export async function POST(req: NextRequest) {
   try {
+    const existingInvites: { email: string; inviteCode: string }[] = [];
+
     // --- Parse & normalize body ---
     const body = (await req.json()) as {
       email?: string;
@@ -34,7 +36,7 @@ export async function POST(req: NextRequest) {
       : body.email ? [body.email]
       : [];
 
-    const emails = emailsInput
+    let emails = emailsInput
       .map((e) => (e ?? "").trim().toLowerCase())
       .filter(Boolean);
 
@@ -76,7 +78,6 @@ export async function POST(req: NextRequest) {
     // When using "insecure" mode, check if invite codes already exist in the database
     if (isInsecureMode) {
       try {
-        const existingInvites: { email: string; inviteCode: string }[] = [];
         const emailsNeedingNewCodes: string[] = [];
 
         for (const email of emails) {
@@ -103,11 +104,8 @@ export async function POST(req: NextRequest) {
         // We'll merge the results at the end
         if (existingInvites.length > 0) {
           // Some emails have existing codes, only create for the rest
-          // Update emails array to only include those needing new codes
-          emails.length = 0;
-          emails.push(...emailsNeedingNewCodes);
-          // Store existing invites to merge later
-          (req as unknown as { existingInvites: typeof existingInvites }).existingInvites = existingInvites;
+          // Update emails to only include those needing new codes
+          emails = emailsNeedingNewCodes;
         }
       } catch (dbErr) {
         console.error("Failed to check existing invites:", dbErr);
@@ -125,7 +123,6 @@ export async function POST(req: NextRequest) {
 
     // If all emails already had codes (codeCount is 0), we would have returned earlier
     if (codeCount === 0) {
-      const existingInvites = (req as unknown as { existingInvites: { email: string; inviteCode: string }[] }).existingInvites || [];
       return new Response(JSON.stringify({ invites: existingInvites }), {
         status: 200,
         headers: { "Content-Type": "application/json" },
@@ -186,7 +183,6 @@ export async function POST(req: NextRequest) {
     }
 
     // Merge with any existing invites (from insecure mode check)
-    const existingInvites = (req as unknown as { existingInvites?: { email: string; inviteCode: string }[] }).existingInvites || [];
     const allInvites = [...existingInvites, ...results];
 
     return new Response(JSON.stringify({ invites: allInvites }), {
