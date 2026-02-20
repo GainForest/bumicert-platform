@@ -18,6 +18,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
 
 export type DesktopNavbarProps = {
   navLinks: NavLinkConfig[];
@@ -136,23 +137,41 @@ const DesktopNavbar = ({
       {/* Top Section */}
       <div className="flex flex-col gap-2">
         {/* Header: logo + title in same line */}
-        <div className={cn("flex items-center", isCollapsed ? "justify-center" : "justify-between")}>
-          <Link href="/" className={cn("flex items-center", isCollapsed ? "justify-center" : "gap-2 min-w-0")}>
-            <Image
-              src="/assets/media/images/logo.svg"
-              alt={title}
-              width={20}
-              height={20}
-              className="shrink-0 opacity-80"
-            />
-            {!isCollapsed && (
+        {isCollapsed ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                onClick={() => setOpenState(true, "desktop")}
+                className="flex flex-col items-center justify-center gap-1 mx-auto h-auto py-2 px-2"
+              >
+                <Image
+                  src="/assets/media/images/logo.svg"
+                  alt={title}
+                  width={20}
+                  height={20}
+                  className="shrink-0 opacity-80"
+                />
+                <ChevronRight size={12} strokeWidth={1.5} className="text-muted-foreground" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">Expand sidebar</TooltipContent>
+          </Tooltip>
+        ) : (
+          <div className="flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-2 min-w-0">
+              <Image
+                src="/assets/media/images/logo.svg"
+                alt={title}
+                width={20}
+                height={20}
+                className="shrink-0 opacity-80"
+              />
               <h1 className="font-serif text-xl font-semibold text-foreground whitespace-nowrap">
                 {title}
               </h1>
-            )}
-          </Link>
-          {/* Collapse button — only when expanded */}
-          {!isCollapsed && (
+            </Link>
+            {/* Collapse button — only when expanded */}
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
@@ -164,22 +183,7 @@ const DesktopNavbar = ({
               </TooltipTrigger>
               <TooltipContent side="right">Collapse sidebar</TooltipContent>
             </Tooltip>
-          )}
-        </div>
-
-        {/* Expand chevron — only when collapsed, below logo */}
-        {isCollapsed && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                onClick={() => setOpenState(true, "desktop")}
-                className="w-8 h-8 rounded-md flex items-center justify-center mx-auto hover:bg-foreground/5 transition-colors text-muted-foreground/40 hover:text-muted-foreground"
-              >
-                <ChevronRight size={14} strokeWidth={1.5} />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="right">Expand sidebar</TooltipContent>
-          </Tooltip>
+          </div>
         )}
 
         {/* Nav Links */}
