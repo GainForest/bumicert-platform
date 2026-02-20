@@ -68,7 +68,9 @@ const DesktopNavbar = ({
   const { openState, setOpenState } = useNavbarContext();
   const isCollapsed = !openState.desktop;
 
-  const [expandedGroups, setExpandedGroups] = useState<string[]>([]);
+  const [expandedGroups, setExpandedGroups] = useState<string[]>(() =>
+    navLinks.filter((link) => link.children).map((link) => link.id)
+  );
   const expandedOrderRef = useRef<string[]>([]);
 
   const isChildActive = useCallback(
