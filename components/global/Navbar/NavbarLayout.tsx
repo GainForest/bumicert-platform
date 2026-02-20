@@ -27,20 +27,9 @@ const NavbarLayout = ({
           viewport === "mobile" && "flex-col",
           "bg-[rgb(242_237_227.7)] dark:bg-[rgb(30_30_30.7)]"
         )}
-        // style={{
-        //   background: `repeating-linear-gradient(
-        //     -55deg,
-        //     var(--background),
-        //     var(--background) 2px,
-        //     color-mix(in oklab, var(--primary) 10%, transparent) 2px,
-        //     color-mix(in oklab, var(--primary) 10%, transparent) 4px
-        //   )`,
-        // }}
         ref={parent}
       >
-        {viewport === "desktop" && openState.desktop && (
-          <DesktopNavbar {...desktopNavbarProps} />
-        )}
+        {viewport === "desktop" && <DesktopNavbar {...desktopNavbarProps} />}
         {viewport === "mobile" && <MobileNavbar {...mobileNavbarProps} />}
         <main
           onClick={(e) => {
@@ -53,9 +42,7 @@ const NavbarLayout = ({
           className={cn(
             "flex-1 flex flex-col bg-background border border-border shadow-inner rounded-xl relative overflow-y-auto",
             viewport === "desktop"
-              ? openState.desktop
-                ? "m-2 md:ml-0"
-                : "m-0 rounded-none"
+              ? "m-2 md:ml-0"
               : openState.mobile
               ? "brightness-90 blur-[1px] overflow-hidden cursor-default"
               : ""
