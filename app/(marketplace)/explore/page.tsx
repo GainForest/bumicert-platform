@@ -10,13 +10,13 @@ const ExplorePage = () => {
   return (
     <Container>
       <HeaderContent />
-      <ExploreHydrator>
-        <ExploreHero />
-        <ExploreFilters />
-        <Suspense>
+      <Suspense>
+        <ExploreHydrator>
+          <ExploreHero />
+          <ExploreFilters />
           <Bumicerts />
-        </Suspense>
-      </ExploreHydrator>
+        </ExploreHydrator>
+      </Suspense>
     </Container>
   );
 };
