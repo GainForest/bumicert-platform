@@ -90,14 +90,14 @@ const Hero2 = () => {
         {FLOATING_CARDS.map((card) => (
           <motion.div
             key={card.id}
-            className={`absolute ${card.position} ${card.size} z-10`}
+            className={`absolute ${card.position} ${card.size} z-[5]`}
             initial={{ opacity: 0, y: 40, rotate: card.rotation }}
             animate={{ opacity: 1, y: 0, rotate: card.rotation }}
             transition={{ delay: card.delay, duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
             whileHover={{ 
               scale: 1.05, 
               rotate: 0,
-              zIndex: 30,
+              zIndex: 15,
               transition: { duration: 0.3, ease: "easeOut" }
             }}
           >
@@ -124,7 +124,7 @@ const Hero2 = () => {
         ))}
 
         {/* Central content */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center z-20">
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
           <AnimatePresence mode="wait">
             {!showLearnMore ? (
               <motion.div
@@ -245,7 +245,7 @@ const Hero2 = () => {
               transition={{ duration: 0.3 }}
             >
               {/* Title */}
-              <div className="relative z-20 text-center mb-4">
+              <div className="relative z-10 text-center mb-4">
                 <h1 className="font-serif text-3xl font-semibold text-foreground">
                   Bumicerts
                 </h1>
@@ -305,7 +305,7 @@ const Hero2 = () => {
               </div>
 
               {/* CTA Button - mobile */}
-              <div className="relative z-20 mt-4 text-center">
+              <div className="relative z-10 mt-4 text-center">
                 <Link
                   href={links.explore}
                   className="inline-flex items-center gap-2 px-5 py-2 bg-primary text-primary-foreground rounded-full font-medium text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
@@ -322,7 +322,7 @@ const Hero2 = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="relative z-20 flex flex-col items-center justify-center min-h-[280px] px-2"
+              className="relative z-10 flex flex-col items-center justify-center min-h-[280px] px-2"
             >
               <p className="font-serif text-lg text-foreground text-center leading-relaxed">
                 {LEARN_MORE_TEXT}
@@ -332,7 +332,7 @@ const Hero2 = () => {
         </AnimatePresence>
 
         {/* Learn More Toggle Button - mobile */}
-        <div className="relative z-20 mt-4 flex justify-center">
+        <div className="relative z-10 mt-4 flex justify-center">
           <button
             onClick={() => setShowLearnMore(!showLearnMore)}
             className="flex items-center gap-1.5 px-4 py-1.5 bg-background/60 backdrop-blur-sm border border-border/50 rounded-full text-sm text-muted-foreground hover:bg-background/80 hover:text-foreground transition-colors"

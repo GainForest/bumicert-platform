@@ -1,7 +1,7 @@
 "use client";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { ArrowUpRight, ChevronDown, ChevronLeft, ChevronUp, Moon, Sun } from "lucide-react";
+import { ArrowUpRight, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Moon, Sun } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -127,15 +127,15 @@ const DesktopNavbar = ({
   return (
     <nav
       className={cn(
-        "flex flex-col justify-between p-3 transition-all duration-200 ease-in-out overflow-hidden shrink-0 bg-background/50",
+        "flex flex-col justify-between p-3 transition-all duration-200 ease-in-out overflow-hidden shrink-0 bg-transparent",
         isCollapsed ? "w-16" : "w-[240px]"
       )}
     >
       {/* Top Section */}
       <div className="flex flex-col gap-2">
         {/* Header: logo + title in same line */}
-        <div className="flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 min-w-0">
+        <div className={cn("flex items-center", isCollapsed ? "justify-center" : "justify-between")}>
+          <Link href="/" className={cn("flex items-center", isCollapsed ? "justify-center" : "gap-2 min-w-0")}>
             <Image
               src="/assets/media/images/logo.svg"
               alt={title}
@@ -164,6 +164,21 @@ const DesktopNavbar = ({
             </Tooltip>
           )}
         </div>
+
+        {/* Expand chevron — only when collapsed, below logo */}
+        {isCollapsed && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={() => setOpenState(true, "desktop")}
+                className="w-8 h-8 rounded-md flex items-center justify-center mx-auto hover:bg-foreground/5 transition-colors text-muted-foreground/40 hover:text-muted-foreground"
+              >
+                <ChevronRight size={14} strokeWidth={1.5} />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="right">Expand sidebar</TooltipContent>
+          </Tooltip>
+        )}
 
         {/* Nav Links */}
         <ul className="mt-2 flex flex-col gap-1">
@@ -448,24 +463,7 @@ const DesktopNavbar = ({
             v{packageJson.version}
           </span>
         )}
-        {/* Expand button when collapsed */}
-        {isCollapsed && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                onClick={() => setOpenState(true, "desktop")}
-                className="w-8 h-8 rounded-md flex items-center justify-center mx-auto hover:bg-foreground/5 transition-colors text-muted-foreground/60 hover:text-muted-foreground"
-              >
-                <ChevronLeft
-                  size={14}
-                  strokeWidth={1.5}
-                  className="rotate-180"
-                />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="right">Expand sidebar</TooltipContent>
-          </Tooltip>
-        )}
+
       </div>
     </nav>
   );
