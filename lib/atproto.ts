@@ -43,6 +43,9 @@ export const resolvePublicUrl = (): string => {
   if (isDev) {
     return `http://127.0.0.1:${process.env.PORT ?? 3000}`;
   }
+  if (process.env.NEXT_PUBLIC_BASE_URL) {
+    return process.env.NEXT_PUBLIC_BASE_URL;
+  }
   throw new Error(
     "Set NEXT_PUBLIC_BASE_URL, or deploy to Vercel (provides VERCEL_PROJECT_PRODUCTION_URL / VERCEL_BRANCH_URL automatically)"
   );
