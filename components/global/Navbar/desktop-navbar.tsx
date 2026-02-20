@@ -143,16 +143,16 @@ const DesktopNavbar = ({
               <Button
                 variant="outline"
                 onClick={() => setOpenState(true, "desktop")}
-                className="flex flex-col items-center justify-center gap-1 mx-auto h-auto py-2 px-2"
+                className="flex flex-col items-center justify-center gap-3 mx-auto h-auto py-2 px-2"
               >
                 <Image
                   src="/assets/media/images/logo.svg"
                   alt={title}
                   width={20}
                   height={20}
-                  className="shrink-0 opacity-80"
+                  className="shrink-0 mt-1 scale-150"
                 />
-                <ChevronRight size={12} strokeWidth={1.5} className="text-muted-foreground" />
+                <ChevronRight />
               </Button>
             </TooltipTrigger>
             <TooltipContent side="right">Expand sidebar</TooltipContent>
@@ -236,8 +236,8 @@ const DesktopNavbar = ({
                       parentHighlighted
                         ? "bg-primary text-primary-foreground"
                         : hasActiveChild
-                        ? "bg-foreground/10 hover:bg-foreground/5"
-                        : "hover:bg-foreground/5 text-foreground"
+                          ? "bg-foreground/10 hover:bg-foreground/5"
+                          : "hover:bg-foreground/5 text-foreground"
                     )}
                   >
                     {parentHighlighted && (
