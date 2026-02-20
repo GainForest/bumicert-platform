@@ -28,6 +28,7 @@ export type DesktopNavbarProps = {
     text: string;
   }[];
   title?: string;
+  banner?: React.ReactNode;
 };
 
 function isLeafActive(
@@ -61,6 +62,7 @@ const DesktopNavbar = ({
   navLinks,
   footerLinks,
   title = "Bumicerts",
+  banner = null,
 }: DesktopNavbarProps) => {
   const { theme, setTheme } = useTheme();
   const isMounted = useIsMounted();
@@ -389,10 +391,18 @@ const DesktopNavbar = ({
       {/* Bottom Section */}
       <div className="flex flex-col gap-2">
         {/* Footer links — hidden when collapsed */}
-        <AnimatePresence mode="popLayout">
-
+        <AnimatePresence mode="popLayout" key={"footer-animate-presence"}>
+          {!isCollapsed && banner && (
+            <motion.div key={"banner"} className="flex flex-col"
+              initial={{ opacity: 0, filter: "blur(10px)" }}
+              animate={{ opacity: 1, filter: "blur(0px)" }}
+              exit={{ opacity: 0, filter: "blur(10px)" }}
+            >
+              {banner}
+            </motion.div>
+          )}
           {!isCollapsed && (
-            <motion.div className="flex flex-col"
+            <motion.div key={"footer-links"} className="flex flex-col"
               initial={{ opacity: 0, filter: "blur(10px)" }}
               animate={{ opacity: 1, filter: "blur(0px)" }}
               exit={{ opacity: 0, filter: "blur(10px)" }}
