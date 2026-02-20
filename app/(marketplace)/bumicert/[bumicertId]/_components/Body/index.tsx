@@ -1,12 +1,11 @@
 "use client";
 
-import { useNavbarContext } from "@/components/global/Navbar/context";
 import { cn } from "@/lib/utils";
 import React, { useState, useRef, useEffect } from "react";
 import SiteBoundaries from "./SiteBoundaries";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ChevronDownIcon } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { OrgHypercertsClaimActivity } from "gainforest-sdk/lex-api";
 import {
   deserialize,
@@ -53,7 +52,7 @@ const useCollapsible = (maxHeight: number = 320) => {
 const CollapsibleDescription = ({
   description,
   descriptionFacets,
-  maxHeight = 360,
+  maxHeight = 400,
 }: {
   description: string;
   descriptionFacets?: RichTextRecord["facets"];
@@ -63,50 +62,46 @@ const CollapsibleDescription = ({
     useCollapsible(maxHeight);
 
   return (
-    <motion.div
-      className="flex flex-col overflow-hidden relative"
-      animate={{
-        height: isExpanded ? "auto" : `${maxHeight}px`,
-      }}
-    >
-      <div className="flex flex-col" ref={contentRef}>
-        <h2 className="text-2xl font-bold font-serif px-3 text-primary">
-          Description
-        </h2>
-        <div className="p-3">
+    <div className="relative">
+      <motion.div
+        className="overflow-hidden"
+        animate={{
+          height: isExpanded ? "auto" : `${maxHeight}px`,
+        }}
+      >
+        <div ref={contentRef}>
           <DynamicRichTextDisplay
             value={{ text: description, facets: descriptionFacets }}
             classNames={richTextDisplayClassNames}
           />
         </div>
-      </div>
+      </motion.div>
       {shouldShowButton && (
         <div
           className={cn(
-            "absolute bottom-0 w-full flex items-end justify-center bg-gradient-to-t from-background to-transparent h-20 py-1",
-            isExpanded && "bg-transparent static h-10"
+            "absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background via-background to-transparent h-24 flex items-end justify-center",
+            isExpanded && "flex justify-center pt-4 static bg-transparent h-auto"
           )}
         >
           <Button
             variant="outline"
-            className="rounded-full"
-            style={{
-              backgroundColor: "var(--background)",
-            }}
+            className="rounded-full bg-background"
             size="sm"
             onClick={() => setIsExpanded(!isExpanded)}
           >
-            <ChevronDownIcon
+            <ChevronDown
+              size={16}
+              strokeWidth={1.5}
               className={cn(
-                "transition-transform duration-300",
+                "mr-1 transition-transform duration-300",
                 isExpanded && "rotate-180"
               )}
             />
-            {isExpanded ? "Read Less" : "Read More"}
+            {isExpanded ? "Show less" : "Read more"}
           </Button>
         </div>
       )}
-    </motion.div>
+    </div>
   );
 };
 
@@ -116,33 +111,34 @@ const Body = ({
   serializedBumicert: SerializedSuperjson<OrgHypercertsClaimActivity.Record>;
 }) => {
   const bumicert = deserialize(serializedBumicert);
-  const { openState, viewport } = useNavbarContext();
 
-  let displayMode: "stacked" | "side-by-side" = "stacked";
-  if (viewport === "desktop" && openState.desktop === true) {
-    displayMode = "side-by-side";
-  }
+  const hasLocations = bumicert.locations && bumicert.locations.length > 0;
 
   const descriptionFacets = bumicert.descriptionFacets
     ? toRichTextFacets(bumicert.descriptionFacets)
     : undefined;
 
   return (
-    <div
-      className={cn(
-        "mt-8 gap-2 grid",
-        displayMode === "stacked"
-          ? "grid-cols-1 min-[880px]:grid-cols-[1fr_300px]"
-          : "grid-cols-1 min-[1000px]:grid-cols-[1fr_300px]"
-      )}
-    >
-      <CollapsibleDescription
-        description={bumicert.description ?? ""}
-        descriptionFacets={descriptionFacets}
-      />
-      <div className="flex flex-col px-3 min-[1000px]:px-0">
-        {bumicert.locations && bumicert.locations.length > 0 && (
-          <SiteBoundaries locationAtUri={bumicert.locations[0].uri} />
+    <div className="mt-12">
+      <div
+        className={cn(
+          "grid gap-8",
+          hasLocations ? "lg:grid-cols-[1fr_380px]" : "grid-cols-1 max-w-3xl"
+        )}
+      >
+        <div>
+          <h2 className="text-xl font-semibold text-foreground mb-4">
+            About this project
+          </h2>
+          <CollapsibleDescription
+            description={bumicert.description ?? ""}
+            descriptionFacets={descriptionFacets}
+          />
+        </div>
+        {hasLocations && (
+          <div className="lg:sticky lg:top-24 lg:self-start">
+            <SiteBoundaries locationAtUri={bumicert.locations![0].uri} />
+          </div>
         )}
       </div>
     </div>
