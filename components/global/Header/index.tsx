@@ -8,7 +8,7 @@ const Header = () => {
   const { viewport } = useNavbarContext();
   const { leftContent, rightContent, subHeaderContent } = useHeaderContext();
   return (
-    <div className="w-full flex flex-col sticky top-0 border-b border-border/60 backdrop-blur-sm bg-background/80 z-20">
+    <div className="w-full flex flex-col sticky top-0 border-b border-border/60 backdrop-blur-sm bg-background/90 drop-shadow-lg z-20">
       <div className="flex items-center justify-between gap-2 px-4 py-3 min-h-[52px]">
         <div className="flex items-center gap-2">
           {leftContent}

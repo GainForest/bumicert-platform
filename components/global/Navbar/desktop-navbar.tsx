@@ -1,4 +1,5 @@
 "use client";
+import { AnimatePresence, motion } from "framer-motion";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ArrowUpRight, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Moon, Sun } from "lucide-react";
@@ -165,21 +166,23 @@ const DesktopNavbar = ({
                 alt={title}
                 width={20}
                 height={20}
-                className="shrink-0 opacity-80"
+                className="shrink-0 brightness-80 dark:brightness-100 scale-120 ml-1"
               />
-              <h1 className="font-serif text-xl font-semibold text-foreground whitespace-nowrap">
+              <h1 className="font-serif text-xl font-semibold text-primary whitespace-nowrap">
                 {title}
               </h1>
             </Link>
             {/* Collapse button — only when expanded */}
             <Tooltip>
               <TooltipTrigger asChild>
-                <button
+                <Button
+                  variant="outline"
+                  size="icon-sm"
                   onClick={() => setOpenState(false, "desktop")}
-                  className="p-1 text-muted-foreground/60 hover:text-muted-foreground transition-colors shrink-0"
+                  className="rounded-full transition-colors shrink-0"
                 >
-                  <ChevronLeft size={14} strokeWidth={1.5} />
-                </button>
+                  <ChevronLeft />
+                </Button>
               </TooltipTrigger>
               <TooltipContent side="right">Collapse sidebar</TooltipContent>
             </Tooltip>
@@ -386,29 +389,36 @@ const DesktopNavbar = ({
       {/* Bottom Section */}
       <div className="flex flex-col gap-2">
         {/* Footer links — hidden when collapsed */}
-        {!isCollapsed && (
-          <div className="flex flex-col">
-            <ul className="flex flex-col">
-              {footerLinks.map((link) => {
-                const isInternal = link.href.startsWith("/");
-                return (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      target={isInternal ? undefined : "_blank"}
-                      className="cursor-pointer"
-                    >
-                      <div className="flex items-center justify-between px-2 py-1.5 rounded-md text-sm hover:bg-foreground/5 transition-colors cursor-pointer">
-                        <span>{link.text}</span>
-                        <ArrowUpRight size={16} className="text-primary" />
-                      </div>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        )}
+        <AnimatePresence mode="popLayout">
+
+          {!isCollapsed && (
+            <motion.div className="flex flex-col"
+              initial={{ opacity: 0, filter: "blur(10px)" }}
+              animate={{ opacity: 1, filter: "blur(0px)" }}
+              exit={{ opacity: 0, filter: "blur(10px)" }}
+            >
+              <ul className="flex flex-col">
+                {footerLinks.map((link) => {
+                  const isInternal = link.href.startsWith("/");
+                  return (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        target={isInternal ? undefined : "_blank"}
+                        className="cursor-pointer"
+                      >
+                        <div className="flex items-center justify-between px-2 py-1.5 rounded-md text-sm hover:bg-foreground/5 transition-colors cursor-pointer">
+                          <span>{link.text}</span>
+                          <ArrowUpRight size={16} className="text-primary" />
+                        </div>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </motion.div>
+          )}
+        </AnimatePresence>
         <hr />
         {/* Theme toggle */}
         {isCollapsed ? (
