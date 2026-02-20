@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { ArrowUpRight, ChevronDown, ChevronUp, Menu, UserX2, X } from "lucide-react";
+import { ArrowUpRight, ChevronDown, ChevronUp, Menu, X } from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useNavbarContext } from "./context";
@@ -9,10 +9,6 @@ import { NavLinkConfig, NavLinkLeaf } from "./types";
 import { usePathname } from "next/navigation";
 import { useAtprotoStore } from "@/components/stores/atproto";
 import Link from "next/link";
-import UserAvatar from "@/components/user-avatar";
-import { useModal } from "@/components/ui/modal/context";
-import { ProfileModal, ProfileModalId } from "../modals/profile";
-import AuthModal, { AuthModalId } from "../modals/auth";
 import { links } from "@/lib/links";
 
 export type MobileNavbarProps = {
@@ -56,8 +52,6 @@ const MobileNavbar = ({ navLinks, footerLinks }: MobileNavbarProps) => {
   const pathname = usePathname();
   const auth = useAtprotoStore((state) => state.auth);
   const did = auth.user?.did;
-
-  const { show, popModal, pushModal } = useModal();
 
   const [expandedGroups, setExpandedGroups] = useState<string[]>([]);
   const expandedOrderRef = useRef<string[]>([]);
@@ -122,49 +116,7 @@ const MobileNavbar = ({ navLinks, footerLinks }: MobileNavbarProps) => {
             Bumicerts
           </span>
         </div>
-
-        <Button
-          variant={"outline"}
-          size={"sm"}
-          className={cn(
-            "absolute right-2 top-2 h-8 w-8 rounded-full transition-all duration-300",
-            openState.mobile &&
-              "h-20 w-20 translate-y-8 right-[50%] translate-x-[calc(5rem-50%)]"
-          )}
-          onClick={() => {
-            setOpenState(false);
-            pushModal(
-              {
-                id: did ? ProfileModalId : AuthModalId,
-                content: did ? <ProfileModal /> : <AuthModal />,
-              },
-              true
-            );
-            show();
-          }}
-        >
-          {did ? (
-            <UserAvatar
-              className="transition-all duration-300"
-              did={did as `did:plc:${string}`}
-              size={openState.mobile ? "calc(5rem - 12px)" : "calc(2rem - 6px)"}
-            />
-          ) : (
-            <UserX2
-              className={cn(
-                "size-4 text-muted-foreground transition-all duration-300",
-                openState.mobile && "size-8"
-              )}
-            />
-          )}
-        </Button>
       </div>
-      <div
-        className={cn(
-          "flex items-center justify-center transition-all duration-300",
-          openState.mobile && "h-20"
-        )}
-      ></div>
       <div className="w-full flex flex-col" ref={parent}>
         {openState.mobile && (
           <div className="mt-2 flex flex-col gap-2 w-full mb-2">
