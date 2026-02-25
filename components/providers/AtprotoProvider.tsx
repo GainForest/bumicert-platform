@@ -35,19 +35,27 @@ export function AtprotoProvider({ children }: { children: React.ReactNode }) {
       try {
         const result = await checkSession();
         if (result.authenticated) {
-          // Fetch profile to get handle, displayName, avatar
+          // Fetch profile to get handle, displayName, avatar.
+          // getProfile returns null when the OAuth session is dead (e.g. deleted
+          // by another process). In that case we treat the user as logged out so
+          // the UI stays in sync with the actual session state.
           const profile = await getProfile(result.did);
+          if (!profile) {
+            setAuth(null);
+            return;
+          }
 
           // Use handle from session cookie if profile.get() returns invalid handle
-          const validHandle = profile?.handle && profile.handle !== 'handle.invalid' 
-            ? profile.handle 
-            : result.handle;
+          const validHandle =
+            profile.handle && profile.handle !== "handle.invalid"
+              ? profile.handle
+              : result.handle;
 
           setAuth({
             did: result.did,
             handle: validHandle,
-            displayName: profile?.displayName,
-            avatar: profile?.avatar,
+            displayName: profile.displayName,
+            avatar: profile.avatar,
           });
         } else {
           setAuth(null);

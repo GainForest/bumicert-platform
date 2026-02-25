@@ -1,8 +1,7 @@
 "use client";
 import React, { useEffect, useMemo } from "react";
-import type { AppGainforestOrganizationInfo, PubLeafletBlocksText } from "gainforest-sdk/lex-api";
+import type { AppGainforestOrganizationInfo } from "gainforest-sdk/lex-api";
 import { useOrganizationPageStore } from "../../store";
-import { Textarea } from "@/components/ui/textarea";
 import useHydratedData from "@/hooks/use-hydration";
 import {
   deserialize,
@@ -12,19 +11,32 @@ import { cn } from "@/lib/utils";
 import { CircleAlert } from "lucide-react";
 import QuickTooltip from "@/components/ui/quick-tooltip";
 import { Button } from "@/components/ui/button";
-import { $Typed } from "gainforest-sdk/lex-api/utils";
+import dynamic from "next/dynamic";
+import type { LinearDocumentType } from 'leaflet-parser';
+
+const DynamicLinearDocument = dynamic(
+  () => import('leaflet-parser').then(mod => mod.LinearDocument),
+  { ssr: false }
+);
+
+const DynamicEditableLinearDocument = dynamic(
+  () => import('leaflet-parser').then(mod => mod.EditableLinearDocument),
+  { ssr: false }
+);
+
+const EMPTY_LINEAR_DOCUMENT = { blocks: [] };
 
 const AboutOrganization = ({
   initialData,
-  dynamic = true,
+  enableReactiveData = true,
 }: {
   initialData: SerializedSuperjson<AppGainforestOrganizationInfo.Record>;
-  dynamic?: boolean;
+  enableReactiveData?: boolean;
 }) => {
   const reactiveData = useOrganizationPageStore((state) => state.data);
   const data = useHydratedData(
     deserialize(initialData),
-    dynamic ? reactiveData : null
+    enableReactiveData ? reactiveData : null
   );
   const isEditing = useOrganizationPageStore((state) => state.isEditing);
   const editingData = useOrganizationPageStore(
@@ -34,44 +46,43 @@ const AboutOrganization = ({
     (actions) => actions.setAboutEditingData
   );
 
+  const extractPlaintext = (doc: LinearDocumentType): string => {
+    if (!doc || !doc.blocks) return '';
+    return doc.blocks.map((b) => {
+      const block = b.block;
+      if ('plaintext' in block) return block.plaintext;
+      return '';
+    }).join('\n');
+  };
+
   const longDescriptionError = useMemo(() => {
     if (!isEditing) return null;
-    const longDescription = editingData.longDescription;
-    if (longDescription.length < 50) return "Long description is too short.";
-    if (longDescription.length > 5000) return "Long description is too long.";
+    const plaintext = extractPlaintext(editingData.longDescription);
+    if (plaintext.length < 50) return "Long description is too short.";
+    if (plaintext.length > 5000) return "Long description is too long.";
     return null;
   }, [editingData.longDescription, isEditing]);
 
   useEffect(() => {
-    const firstBlock = data.longDescription?.blocks?.[0]?.block;
-    const longDescription = firstBlock?.$type === "pub.leaflet.blocks.text" 
-      ? (firstBlock as $Typed<PubLeafletBlocksText.Main>).plaintext 
-      : "";
     setEditingData({
-      longDescription,
+      longDescription: data.longDescription ?? EMPTY_LINEAR_DOCUMENT,
     });
-  }, [isEditing, data]);
+  }, [isEditing, data, setEditingData]);
 
   return (
     <div className="p-2 mt-6">
       <h2 className="font-serif font-bold text-2xl">About Organization</h2>
       {isEditing ? (
         <div className="relative">
-          <Textarea
-            value={editingData.longDescription}
-            placeholder="Long description"
-            className={cn(
-              "bg-background min-h-44 w-full mt-2",
-              longDescriptionError &&
-                "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/40 pr-8"
-            )}
-            onChange={(e) =>
-              setEditingData({
-                ...editingData,
-                longDescription: e.target.value,
-              })
-            }
-          />
+          <div className={cn(
+            "bg-background min-h-44 w-full mt-2 rounded-md border border-border overflow-hidden",
+            longDescriptionError && "border-destructive"
+          )}>
+            <DynamicEditableLinearDocument
+              document={editingData.longDescription}
+              onChange={(doc) => setEditingData({ ...editingData, longDescription: doc })}
+            />
+          </div>
           {longDescriptionError && (
             <QuickTooltip
               asChild
@@ -90,19 +101,15 @@ const AboutOrganization = ({
           )}
         </div>
       ) : (
-        <p className="text-justify mt-2">
+        <div className="mt-2">
           {data.longDescription.blocks.length === 0 ? (
             <span className="text-muted-foreground">
               No long description provided.
             </span>
           ) : (
-            // temp solution for now until parser is ready
-            data.longDescription.blocks.map((block) => {
-              const typedBlock = block.block as $Typed<PubLeafletBlocksText.Main>;
-              return typedBlock?.plaintext || "";
-            }).join("\n\n")
+            <DynamicLinearDocument document={data.longDescription} />
           )}
-        </p>
+        </div>
       )}
     </div>
   );

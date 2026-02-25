@@ -7,7 +7,12 @@ import { useFormStore } from "../../form-store";
 import useNewBumicertStore from "../../store";
 import { Button } from "@/components/ui/button";
 import QuickTooltip from "@/components/ui/quick-tooltip";
-
+import dynamic from 'next/dynamic';
+import { richTextEditorClassNames } from "@/lib/richtext";
+const DynamicRichTextEditor = dynamic(
+  () => import('bsky-richtext-react').then((mod) => mod.RichTextEditor),
+  { ssr: false }  // <-- This is critical!
+);
 const Step2 = () => {
   const { maxStepIndexReached, currentStepIndex } = useNewBumicertStore();
   const shouldShowValidationErrors = currentStepIndex < maxStepIndexReached;
@@ -18,11 +23,12 @@ const Step2 = () => {
   const updateErrorsAndCompletion = useFormStore(
     (state) => state.updateErrorsAndCompletion
   );
-  const { description, shortDescription } = formValues;
+  const { description, descriptionFacets, shortDescription } = formValues;
 
   useEffect(() => {
     updateErrorsAndCompletion();
   }, [shouldShowValidationErrors]);
+
 
   return (
     <div>
@@ -36,17 +42,22 @@ const Step2 = () => {
         description="Tell us about your impact — what changed, who was involved, and how it's helping. Take your time. Your story helps inspire others and verify your work."
         error={errors.description}
         showError={shouldShowValidationErrors}
-        inlineEndMessage={`${description.length}/8000`}
+        inlineEndMessage={`${description.length}/30000`}
         required
         info="Tell us what you did and what happened as a result"
       >
-        <Textarea
-          id="your-impact-story"
-          placeholder="Start your story here..."
-          value={description}
-          onChange={(e) => setFormValue("description", e.target.value)}
-          className="min-h-44 bg-background"
-        />
+        <div className="w-full bg-background rounded-md border border-border overflow-hidden p-3">
+          <DynamicRichTextEditor
+            initialValue={{ text: description, facets: descriptionFacets }}
+            onChange={(record) => {
+              setFormValue("description", record.text);
+              setFormValue("descriptionFacets", record.facets);
+            }}
+            placeholder="Describe your impact story..."
+            classNames={richTextEditorClassNames}
+            className="min-h-[200px]"
+          />
+        </div>
       </FormField>
       <FormField
         Icon={MessageCircle}

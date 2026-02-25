@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { AppGainforestOrganizationInfo } from "gainforest-sdk/lex-api";
+import { AppGainforestOrganizationInfo, PubLeafletPagesLinearDocument as LinearDocument } from "gainforest-sdk/lex-api";
 import { allowedPDSDomains, trpcClient } from "@/config/gainforest-sdk";
 import {
   BlobRefGenerator,
@@ -8,10 +8,19 @@ import {
 } from "gainforest-sdk/zod";
 import { BlobRef } from "gainforest-sdk/zod";
 import { PutRecordResponse } from "gainforest-sdk/types";
+import type { RichTextRecord } from "bsky-richtext-react";
+
+const EMPTY_LINEAR_DOCUMENT: LinearDocument.Main = { blocks: [] };
 
 export type HeroEditingData = {
   displayName: string;
-  shortDescription: string;
+  // shortDescription uses RichTextRecord from bsky-richtext-react (text + facets).
+  // Note: RichTextRecord.facets uses bsky-richtext-react's Facet type, which is structurally
+  // compatible with AppBskyRichtextFacet.Main at runtime but differs in TypeScript types
+  // (the SDK type includes an extra `{ $type: string }` union member in features).
+  // We use RichTextRecord here because it is what the RichTextEditor onChange produces,
+  // and the shapes are wire-compatible with the API's Richtext type.
+  shortDescription: RichTextRecord;
   coverImage: File | BlobRef | undefined;
   logoImage: File | BlobRef | undefined;
 };
@@ -25,7 +34,7 @@ export type SubHeroEditingData = {
 };
 
 export type AboutEditingData = {
-  longDescription: string;
+  longDescription: LinearDocument.Main;
 };
 
 export type OrganizationPageStoreState = {
@@ -57,7 +66,7 @@ export const useOrganizationPageStore = create<
   did: "",
   heroEditingData: {
     displayName: "",
-    shortDescription: "",
+    shortDescription: { text: "" },
     coverImage: undefined,
     logoImage: undefined,
   },
@@ -69,7 +78,7 @@ export const useOrganizationPageStore = create<
     objectives: [],
   },
   aboutEditingData: {
-    longDescription: "",
+    longDescription: EMPTY_LINEAR_DOCUMENT,
   },
   setData: (data) => set({ data }),
   setDid: (did) => set({ did }),
@@ -105,8 +114,13 @@ export const useOrganizationPageStore = create<
         displayName: heroEditingData.displayName,
         logo: logoImageBlobRef,
         coverImage: coverImageBlobRef,
+        // The TRPC mutation input type incorrectly narrows shortDescription to string,
+        // but the API actually accepts the full Richtext object (text + facets).
+        // Same pattern as UploadLogoModal.tsx.
+        // @ts-expect-error SDK input type incorrectly narrows shortDescription to string
         shortDescription: heroEditingData.shortDescription,
-        longDescription: aboutEditingData.longDescription,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        longDescription: aboutEditingData.longDescription as any,
         objectives: subHeroEditingData.objectives.length > 0 ? subHeroEditingData.objectives : ["Other"],
         startDate: subHeroEditingData.startDate && subHeroEditingData.startDate.trim() !== "" ? subHeroEditingData.startDate : undefined,
         country: subHeroEditingData.country,

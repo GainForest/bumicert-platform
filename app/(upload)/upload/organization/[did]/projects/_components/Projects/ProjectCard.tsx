@@ -1,10 +1,14 @@
 "use client";
 import React from "react";
+import dynamic from "next/dynamic";
 import { getStripedBackground } from "@/lib/getStripedBackground";
 import { cn } from "@/lib/utils";
 import { AllProjectsData } from "./ProjectsClient";
-import { PubLeafletBlocksText } from "gainforest-sdk/lex-api";
-import { $Typed } from "gainforest-sdk/lex-api/utils";
+
+const DynamicLinearDocument = dynamic(
+  () => import("leaflet-parser").then((mod) => mod.LinearDocument),
+  { ssr: false }
+);
 
 export type ProjectData = AllProjectsData["projects"][number];
 type ProjectCardProps = {
@@ -40,16 +44,9 @@ const ProjectCard = ({ projectData, did }: ProjectCardProps) => {
         <div className="px-3 py-4">
           <h3 className="font-medium text-lg mb-2">{project.title}</h3>
           {project.description && (
-            <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-              {project.description.blocks.map((doc) => {
-                const block = doc.block;
-                if (block.$type === "pub.leaflet.blocks.text") {
-                  const typedBlock = block as $Typed<PubLeafletBlocksText.Main>;
-                  return typedBlock.plaintext;
-                }
-                return null;
-              })}
-            </p>
+            <div className="text-sm text-muted-foreground mb-4 max-h-10 overflow-hidden">
+              <DynamicLinearDocument document={project.description} />
+            </div>
           )}
 
           <hr className="mt-3 mb-3 opacity-50" />
