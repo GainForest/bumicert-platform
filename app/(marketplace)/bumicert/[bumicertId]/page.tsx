@@ -1,8 +1,6 @@
 import Container from "@/components/ui/container";
-import { fetchFullHypercertById } from "@/graphql/hypercerts/queries/fullHypercertById";
 import React from "react";
 import Hero from "./_components/Hero";
-import WidgetItem from "./_components/Widgets/WidgetItem";
 import Body from "./_components/Body";
 import HeaderContent from "./_components/HeaderContent";
 import { gainforestSdk } from "@/config/gainforest-sdk.server";
@@ -64,7 +62,7 @@ const BumicertPage = async ({
   }
 
   return (
-    <Container>
+    <Container className="pb-16">
       <HeaderContent bumicertId={decodedBumicertId} />
       <Hero
         creatorDid={did}
@@ -72,19 +70,6 @@ const BumicertPage = async ({
         serializedOrganizationInfo={serializedOrganizationInfo}
       />
       <Body serializedBumicert={serializedBumicert} />
-      <hr className="my-4" />
-      <div
-        className={"grid gap-4"}
-        style={{
-          gridTemplateColumns:
-            "repeat(auto-fit, minmax(min(460px, 100%), 1fr))",
-        }}
-      >
-        {/* <ProofsOfImpact bumicert={bumicert} /> */}
-        {/* <WidgetItem title="Reviews">Hello</WidgetItem>
-        <WidgetItem title="Support">Hello</WidgetItem>
-        <WidgetItem title="Contributors & Evaluators">Hello</WidgetItem> */}
-      </div>
     </Container>
   );
 };

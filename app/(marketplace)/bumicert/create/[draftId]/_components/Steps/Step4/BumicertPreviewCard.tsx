@@ -9,8 +9,13 @@ import { format } from "date-fns";
 import { getBlobUrl } from "gainforest-sdk/utilities/atproto";
 import { Loader2, UploadIcon } from "lucide-react";
 import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import { useFormStore } from "../../../form-store";
 import { UploadLogoModal, UploadLogoModalId } from "./UploadLogoModal";
+
+// Base dimensions: 256px inner + 8px padding on each side (p-2) = 272px wide, 360px inner + 16px padding = 376px tall
+const BASE_WIDTH = 272;
+const BASE_HEIGHT = 376;
 
 export const BumicertArt = ({
   logoUrl,
@@ -31,67 +36,96 @@ export const BumicertArt = ({
   className?: string;
   performant?: boolean;
 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const containerWidth = entry.contentRect.width;
+        const newScale = Math.min(containerWidth / BASE_WIDTH, 1); // never scale up
+        setScale(newScale);
+      }
+    });
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div
-      className={cn(
-        "group p-2 rounded-3xl shadow-2xl bg-white dark:bg-neutral-800 border border-black/10 dark:border-white/10",
-        className
-      )}
+      ref={containerRef}
+      className={cn("w-full", className)}
+      style={{ height: BASE_HEIGHT * scale }}
     >
-      <div className="w-[256px] h-[360px] relative overflow-hidden rounded-2xl">
-        <Image
-          src={
-            typeof coverImage === "string"
-              ? coverImage
-              : URL.createObjectURL(coverImage)
-          }
-          alt="Bumicert"
-          fill
-          className="object-cover rounded-2xl scale-105 group-hover:scale-100 transition-all duration-300"
-        />
-        {!performant && (
-          <ProgressiveBlur
-            position="bottom"
-            height="55%"
-            className="z-0"
-            borderRadiusClassName="rounded-2xl"
-          />
-        )}
-        {/* Gradient to improve contrast */}
-        <div
-          className={cn(
-            "rounded-b-2xl absolute inset-0 top-[50%] bg-black/50 z-0 mask-t-from-50%",
-            performant ? "backdrop-blur-xl" : ""
-          )}
-        ></div>
-        <div className="absolute top-3 left-3 h-9 w-9 rounded-full bg-white border-2 border-black/10 shadow-lg">
-          {logoUrl && (
-            <Image src={logoUrl} alt="Logo" fill className="rounded-full" />
-          )}
-        </div>
-        <div className="absolute bottom-3 left-3 right-3 flex flex-col">
-          <span className="font-serif font-semibold text-white text-shadow-lg text-3xl mt-2">
-            {title}
-          </span>
-          <span className="text-xs text-gray-200 text-shadow-lg mt-1">
-            {startDate && format(startDate, "LLL dd, y")}
-            {startDate && endDate && " → "}
-            {endDate && format(endDate, "LLL dd, y")}
-          </span>
-          <div className="flex items-center gap-1 flex-wrap mt-2">
-            {objectives.slice(0, 2).map((objective) => (
-              <span
-                key={objective}
-                className="text-xs bg-white/50 text-black backdrop-blur-lg rounded-md px-3 py-1.5 w-fit font-medium text-shadow-lg shadow-lg"
-              >
-                {objective}
-              </span>
-            ))}
-            {objectives.length > 2 && (
-              <span className="text-xs bg-white/10 text-white backdrop-blur-lg rounded-md px-2 py-1.5 w-fit font-medium text-shadow-lg shadow-lg">
-                +{objectives.length - 2}
-              </span>
+      <div
+        style={{
+          transform: `scale(${scale})`,
+          transformOrigin: "top left",
+          width: BASE_WIDTH,
+          height: BASE_HEIGHT,
+        }}
+      >
+        <div className="group p-2 rounded-3xl shadow-2xl bg-white dark:bg-neutral-800 border border-black/10 dark:border-white/10">
+          <div className="w-[256px] h-[360px] relative overflow-hidden rounded-2xl">
+            <Image
+              src={
+                typeof coverImage === "string"
+                  ? coverImage
+                  : URL.createObjectURL(coverImage)
+              }
+              alt="Bumicert"
+              fill
+              className="object-cover rounded-2xl scale-105 group-hover:scale-100 transition-all duration-300"
+            />
+            {!performant && (
+              <ProgressiveBlur
+                position="bottom"
+                height="55%"
+                className="z-0"
+                borderRadiusClassName="rounded-2xl"
+              />
             )}
+            {/* Gradient to improve contrast */}
+            <div
+              className={cn(
+                "rounded-b-2xl absolute inset-0 top-[50%] bg-black/50 z-0 mask-t-from-50%",
+                performant ? "backdrop-blur-xl" : ""
+              )}
+            ></div>
+            <div className="absolute top-3 left-3 h-9 w-9 rounded-full bg-white border-2 border-black/10 shadow-lg">
+              {logoUrl && (
+                <Image src={logoUrl} alt="Logo" fill className="rounded-full" />
+              )}
+            </div>
+            <div className="absolute bottom-3 left-3 right-3 flex flex-col">
+              <span className="font-serif font-semibold text-white text-shadow-lg text-3xl mt-2">
+                {title}
+              </span>
+              <span className="text-xs text-gray-200 text-shadow-lg mt-1">
+                {startDate && format(startDate, "LLL dd, y")}
+                {startDate && endDate && " → "}
+                {endDate && format(endDate, "LLL dd, y")}
+              </span>
+              <div className="flex items-center gap-1 flex-wrap mt-2">
+                {objectives.slice(0, 2).map((objective) => (
+                  <span
+                    key={objective}
+                    className="text-xs bg-white/50 text-black backdrop-blur-lg rounded-md px-3 py-1.5 w-fit font-medium text-shadow-lg shadow-lg"
+                  >
+                    {objective}
+                  </span>
+                ))}
+                {objectives.length > 2 && (
+                  <span className="text-xs bg-white/10 text-white backdrop-blur-lg rounded-md px-2 py-1.5 w-fit font-medium text-shadow-lg shadow-lg">
+                    +{objectives.length - 2}
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>

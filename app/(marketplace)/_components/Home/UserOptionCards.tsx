@@ -7,14 +7,16 @@ import React from "react";
 const UserOptionCards = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 mt-4 gap-4">
-      <div className="flex flex-col justify-end bg-foreground/3 backdrop-blur-md rounded-3xl p-4 pt-20 relative">
+      <div className="flex flex-col justify-end bg-gradient-to-br from-background via-background to-primary/5 border border-border/30 rounded-3xl p-4 pt-20 relative overflow-hidden hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-500">
+        <div className="absolute -right-12 -top-12 w-48 h-48 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute -left-12 -bottom-12 w-32 h-32 bg-primary/3 rounded-full blur-2xl" />
         <HandHeartIcon className="size-10 absolute top-3 left-4 text-primary opacity-50" />
         <span className="font-serif text-primary font-bold text-3xl">
-          I want to support a project.
+          Discover impact
         </span>
         <p className="mt-2 text-muted-foreground">
-          Purchase Bumicerts to directly fund regenerative projects that restore
-          nature and strengthen community resilience.
+          Explore verified conservation projects from communities worldwide. Find
+          work that resonates with you and support it directly.
         </p>
         <Link href={links.explore}>
           <Button
@@ -25,14 +27,16 @@ const UserOptionCards = () => {
           </Button>
         </Link>
       </div>
-      <div className="flex flex-col justify-end bg-foreground/3 backdrop-blur-md rounded-3xl p-4 pt-20 relative">
+      <div className="flex flex-col justify-end bg-gradient-to-br from-background via-background to-primary/5 border border-border/30 rounded-3xl p-4 pt-20 relative overflow-hidden hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-500">
+        <div className="absolute -right-12 -top-12 w-48 h-48 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute -left-12 -bottom-12 w-32 h-32 bg-primary/3 rounded-full blur-2xl" />
         <TreesIcon className="size-10 absolute top-3 left-4 text-primary opacity-50" />
         <span className="font-serif text-primary font-bold text-3xl">
-          I am an organization.
+          Certify your work
         </span>
         <p className="mt-2 text-muted-foreground">
-          Create a bumicert to showcase your regenerative impact and attract
-          donors.
+          Turn your conservation efforts into verifiable digital certificates.
+          Connect with funders who share your mission.
         </p>
         <Link href={links.bumicert.create}>
           <Button

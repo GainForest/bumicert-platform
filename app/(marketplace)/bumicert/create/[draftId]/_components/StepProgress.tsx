@@ -79,7 +79,7 @@ const StepHeader = () => {
                             className={cn(
                               "size-6 text-primary",
                               currentStepIndex === index &&
-                                "text-primary-foreground"
+                              "text-primary-foreground"
                             )}
                           />
                         }
@@ -117,34 +117,12 @@ const StepHeader = () => {
         })}
       </div>
       <div
-        className="w-full h-1.5 overflow-hidden mt-1"
-        style={{
-          background: getStripedBackground(
-            {
-              variable: "--foreground",
-              opacity: 8,
-            },
-            {
-              variable: "--foreground",
-              opacity: 3,
-            }
-          ),
-        }}
+        className="w-full h-1.5 overflow-hidden mt-1 bg-muted"
       >
         <div
           className="h-full bg-primary transition-all duration-300"
           style={{
             width: `${step4Progress}%`,
-            background: getStripedBackground(
-              {
-                variable: "--primary",
-                opacity: 100,
-              },
-              {
-                variable: "--primary",
-                opacity: 50,
-              }
-            ),
           }}
         ></div>
       </div>
